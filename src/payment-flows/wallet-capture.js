@@ -8,7 +8,7 @@ import type { MenuChoices, Wallet, WalletInstrument } from '../types';
 import { getSupplementalOrderInfo, oneClickApproveOrder, getSmartWallet, loadFraudnet, updateButtonClientConfig } from '../api';
 import { BUYER_INTENT, FPTI_TRANSITION, FPTI_MENU_OPTION } from '../constants';
 import { type ButtonProps } from '../button/props';
-import { getLogger } from '../lib';
+import {getBuyerAccessToken, getLogger} from '../lib';
 
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, IsEligibleOptions, IsPaymentEligibleOptions, InitOptions, MenuOptions, Payment } from './types';
 import { checkout, CHECKOUT_POPUP_DIMENSIONS } from './checkout';
@@ -116,9 +116,11 @@ function isWalletCapturePaymentEligible({ serviceData, payment } : IsPaymentElig
 }
 
 function initWalletCapture({ props, components, payment, serviceData, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
+
     const { createOrder, onApprove, clientMetadataID, vault, onAuth } = props;
     const { fundingSource, instrumentID } = payment;
-    const { wallet } = serviceData;
+    const { wallet, orderID, enableInContextWallet } = serviceData;
+    const createOrderWrapped = enableInContextWallet && orderID ? ZalgoPromise.resolve(orderID) : createOrder;
 
     if (!wallet || !smartWalletPromise) {
         throw new Error(`No smart wallet found`);
@@ -134,7 +136,10 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
         if (!smartWalletPromise) {
             throw new Error(`No smart wallet found`);
         }
-                    
+
+        if(getBuyerAccessToken()) {
+            return getBuyerAccessToken();
+        }
         return smartWalletPromise.then(smartWallet => {
             const { accessToken } = getInstrument(smartWallet, fundingSource, instrumentID);
 
@@ -147,6 +152,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
     };
 
     const getWebCheckoutFallback = () => {
+        console.log('TEST Wallet Capture fallbackToWebCheckout > getWebCheckoutFallback')
         return checkout.init({
             props, components, serviceData, payment: {
                 ...payment,
@@ -159,11 +165,17 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
     };
 
     const fallbackToWebCheckout = () => {
+        console.log('TEST Wallet Capture fallbackToWebCheckout')
         getLogger().info('web_checkout_fallback').flush();
         return getWebCheckoutFallback().start();
     };
 
     if (!instrument.oneClick || smartWalletErrored || vault) {
+        console.warn('TEST Wallet Capture initWalletCapture > needs to fallbackToWebCheckout', {
+            oneClick: instrument.oneClick,
+            smartWalletErrored,
+            vault
+        })
         return getWebCheckoutFallback();
     }
 
@@ -183,12 +195,15 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
         });
     };
 
+
     const start = () => {
+        console.log('TEST Wallet Capture Start')
         return ZalgoPromise.hash({
-            orderID:     createOrder(),
+            orderID:     createOrderWrapped(),
             smartWallet: smartWalletPromise
         }).then(({ orderID, smartWallet }) => {
-            const { accessToken: buyerAccessToken } = getInstrument(smartWallet, fundingSource, instrumentID);
+            console.log('TEST Wallet Capture Start Promise Resolved', { orderID, smartWallet })
+            const buyerAccessToken = getBuyerAccessToken() || getInstrument(smartWallet, fundingSource, instrumentID).accessToken;
 
             if (!buyerAccessToken) {
                 throw new Error(`No access token available for instrument`);
@@ -198,21 +213,23 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
             if (!instrumentType) {
                 throw new Error(`Instrument has no type`);
             }
-            
+
             return ZalgoPromise.hash({
                 requireShipping: shippingRequired(orderID),
                 orderApproval:   oneClickApproveOrder({ orderID, instrumentType, buyerAccessToken, instrumentID, clientMetadataID }),
                 onAuth:          onAuth({ accessToken: buyerAccessToken })
             }).then(({ requireShipping, orderApproval }) => {
+                console.log('TEST Wallet Capture Start > ZalgoPromise.hash', {requireShipping, orderApproval})
                 if (requireShipping) {
                     return fallbackToWebCheckout();
                 }
 
                 const { payerID } = orderApproval;
                 return onApprove({ payerID, buyerAccessToken }, { restart }).catch(noop);
-                
+
             });
         }).catch(err => {
+            console.log('TEST Wallet Capture Start Promise Catch')
             getLogger().warn('approve_order_error', { err: stringifyError(err) }).flush();
             return fallbackToWebCheckout();
         });
@@ -234,6 +251,9 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
     const { fundingSource, instrumentID } = payment;
     const { wallet, content } = serviceData;
 
+    const { orderID, enableInContextWallet } = serviceData;
+    const createOrderWrapped = enableInContextWallet && orderID ? ZalgoPromise.resolve(orderID) : createOrder;
+
     if (!wallet) {
         throw new Error(`Can not render wallet menu without wallet`);
     }
@@ -250,7 +270,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
 
     const updateMenuClientConfig = () => {
         return ZalgoPromise.try(() => {
-            return createOrder();
+            return createOrderWrapped();
         }).then(orderID => {
             return updateButtonClientConfig({ fundingSource, orderID, inline: false });
         });
@@ -328,7 +348,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
             CHOOSE_ACCOUNT
         ];
     }
-    
+
     throw new Error(`Can not render menu for ${ fundingSource }`);
 }
 
@@ -339,10 +359,10 @@ function updateWalletClientConfig({ orderID, payment }) : ZalgoPromise<void> {
 
 export const walletCapture : PaymentFlow = {
     name:                   'wallet_capture',
-    setup:                  setupWalletCapture,
-    isEligible:             isWalletCaptureEligible,
-    isPaymentEligible:      isWalletCapturePaymentEligible,
-    init:                   initWalletCapture,
+    setup:                 (...args) => { let res = setupWalletCapture(...args); console.log('TEST setupWalletCapture', res, args); return res;  },
+    isEligible:             (...args) => { let res = isWalletCaptureEligible(...args); console.log('TEST isWalletCaptureEligible', res, args); return res;  },
+    isPaymentEligible:      (...args) => { let res = isWalletCapturePaymentEligible(...args); console.log('TEST isWalletCapturePaymentEligible', res, args); return res; },
+    init:                   (...args) => { let res = initWalletCapture(...args); console.log('TEST initWalletCapture', res, args); return res; },
     setupMenu:              setupWalletMenu,
     updateFlowClientConfig: updateWalletClientConfig,
     spinner:                true,

@@ -5,7 +5,8 @@ import { COUNTRY, FPTI_KEY, type FundingEligibilityType } from '@paypal/sdk-cons
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import type { ContentType, Wallet, PersonalizationType, FeatureFlags, InlinePaymentFieldsEligibility } from '../types';
-import { getLogger, getSmartFieldsByFundingSource } from '../lib';
+import { getLogger, getSmartFieldsByFundingSource, setBuyerAccessToken } from '../lib';
+
 import { type FirebaseConfig } from '../api';
 import { DATA_ATTRIBUTES, BUYER_INTENT } from '../constants';
 import { type Payment } from '../payment-flows';
@@ -38,7 +39,9 @@ export type SetupButtonOptions = {|
     cookies : string,
     personalization : PersonalizationType,
     brandedDefault? : boolean | null,
-    featureFlags: FeatureFlags
+    featureFlags: FeatureFlags,
+    orderID? : string,
+    enableInContextWallet? : boolean
 |};
 
 try {
@@ -76,6 +79,7 @@ export function setupButton({
     }
 
     const clientID = window.xprops.clientID;
+    setBuyerAccessToken(buyerAccessToken);
 
     const serviceData = getServiceData({
         eligibility,
@@ -99,10 +103,19 @@ export function setupButton({
         buttonSessionID, merchantDomain, onInit,
         getPrerenderDetails, rememberFunding, getQueriedEligibleFunding, experience,
         style, fundingSource, intent, createBillingAgreement, createSubscription, stickinessID } = props;
-        
+
+    console.log('TEST ....... setupButton ', {enableInContextWallet, orderID, buyerAccessToken});
+
+    if(enableInContextWallet && orderID && buyerAccessToken) {
+        getLogger()
+            .info('smart_buttons_incontext_wallet_enable', {orderID});
+        // Create Order should always return the existing orderID incase of In-context wallet flow
+        props.createOrder = ZalgoPromise.resolve(orderID);
+    }
+
     const config = getConfig({ serverCSPNonce, firebaseConfig });
     const { sdkVersion } = config;
-    
+
     const components = getComponents();
 
     const { initPromise, isEnabled } = onInit({ correlationID: buttonCorrelationID });
@@ -110,6 +123,7 @@ export function setupButton({
     let paymentProcessing = false;
 
     function initiatePayment({ payment, props: paymentProps } : {| props : ButtonProps, payment : Payment |}) : ZalgoPromise<void> {
+        console.log('TEST Button.js initiatePayment', { payment, props });
         return ZalgoPromise.try(() => {
             if (paymentProcessing) {
                 return;
@@ -119,7 +133,7 @@ export function setupButton({
             const { onClick } = paymentProps;
 
             const smartFields = getSmartFieldsByFundingSource(paymentFundingSource);
-            
+
             if (smartFields) {
                 if (!smartFields.isValid()) {
                     if (win) {
@@ -145,7 +159,7 @@ export function setupButton({
                 }
             }
         }).catch(err => {
-            
+
             getLogger()
                 .info('smart_buttons_payment_error', { err: stringifyError(err) })
                 .track({
@@ -179,7 +193,7 @@ export function setupButton({
     }
 
     clearButtonSmartMenu();
-    
+
     getButtons().forEach(button => {
         const menuToggle = getMenuButton(button);
         const { fundingSource: paymentFundingSource, card, paymentMethodID, instrumentID, instrumentType } = getSelectedFunding(button);
@@ -188,6 +202,7 @@ export function setupButton({
 
         preventClickFocus(button);
         onElementClick(button, event => {
+            console.log('TEST Button.js onElementClick', { button });
             event.preventDefault();
             event.stopPropagation();
 
