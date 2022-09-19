@@ -1,7 +1,7 @@
 /* @flow */
 
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { memoize, noop, supportsPopups, stringifyError, extendUrl, PopupOpenError, parseQuery } from '@krakenjs/belter/src';
+import { memoize, noop, supportsPopups, stringifyError, extendUrl, PopupOpenError, parseQuery,  submitForm } from '@krakenjs/belter/src';
 import { FUNDING, FPTI_KEY, APM_LIST } from '@paypal/sdk-constants/src';
 import { getParent, getTop, type CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 
@@ -51,6 +51,7 @@ function getRenderWindow() : Object {
 }
 
 function setupCheckout({ components } : SetupOptions) : ZalgoPromise<void> {
+    console.log('TEST Checkout.js setupCheckout', { components });
     const { Checkout } = components;
 
     const [ parent, top ] = [ getParent(window), getTop(window) ];
@@ -128,16 +129,13 @@ function getContext({ win, isClick, merchantRequestedPopupsDisabled } : {| win :
 }
 
 export const getDimensions = (fundingSource : string) : {| width : number, height : number |} => {
-    if (APM_LIST.indexOf(fundingSource) !== -1) {
-        getLogger().info(`popup_dimensions_value_${ fundingSource }`).flush();
-        return { width: CHECKOUT_APM_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_APM_POPUP_DIMENSIONS.HEIGHT };
-    } else {
-        getLogger().info(`popup_dimensions_${ fundingSource }`).flush();
-        return { width: CHECKOUT_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_POPUP_DIMENSIONS.HEIGHT };
-    }
+    getLogger().info(`popup_dimensions_${ fundingSource }`).flush();
+    return { width: CHECKOUT_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_POPUP_DIMENSIONS.HEIGHT };
+
 }
 
 function initCheckout({ props, components, serviceData, payment, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
+    console.log('TEST Checkout.js initCheckout', { props, components, serviceData, payment, config, fullRestart });
     const { Checkout } = components;
     const { sessionID, buttonSessionID, createOrder, onApprove, onComplete, onCancel,
         onShippingChange, onShippingAddressChange, onShippingOptionsChange, locale, commit, onError, vault, clientAccessToken,
@@ -160,6 +158,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     let forceClosed = false;
 
     const init = () => {
+        console.log('TEST Checkout.js Init')
         return Checkout({
             window:   win,
             sessionID,
@@ -171,6 +170,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
             smokeHash,
 
             createAuthCode: () => {
+                console.log('TEST checkout.js >> createAuthCode');
                 return ZalgoPromise.try(() => {
                     const fundingSkipLogin = FUNDING_SKIP_LOGIN[fundingSource];
 
@@ -278,6 +278,20 @@ function initCheckout({ props, components, serviceData, payment, config, restart
 
             onAuth: ({ accessToken }) => {
                 const access_token = accessToken ? accessToken : buyerAccessToken;
+                createOrder().then(orderID => { // use memoized version
+                    close().then(() => {
+                        submitForm({
+                            url: document.location.href,
+                            target: '_self',
+                            body: {
+                                buyerAccessToken: accessToken,
+                                orderID,
+                                enableInContextWallet: true
+                            }
+                        });
+                    });
+                })
+
 
                 return onAuth({ accessToken: access_token }).then(token => {
                     buyerAccessToken = token;
@@ -301,7 +315,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     if (!data.shipping_address) {
                         throw new Error('Must pass shipping_address in data to handle changes in shipping address.');
                     }
-                    
+
                     return onShippingAddressChange({ ...data }, actions);
                 } : null,
 
@@ -310,7 +324,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     if (!data.selected_shipping_option) {
                         throw new Error('Must pass selected_shipping_option in data to handle changes in shipping options.');
                     }
-                    
+
                     return onShippingOptionsChange({ ...data }, actions);
                 } : null,
 
@@ -365,6 +379,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     };
 
     const start = memoize(() => {
+        console.log('TEST Checkout.js Start')
         instance = init();
         return instance.renderTo(getRenderWindow(), TARGET_ELEMENT.BODY, context);
     });
@@ -378,6 +393,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     });
 
     const click = () => {
+        console.log('TEST Checkout.js Click')
         return ZalgoPromise.try(() => {
             if (acceleratedXO) {
                 context = CONTEXT.IFRAME;
