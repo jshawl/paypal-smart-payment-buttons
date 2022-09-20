@@ -4114,7 +4114,7 @@ window.smartCard = function(modules) {
         })), S.d(N, "DEFAULT_COMPONENTS", (function() {
             return U;
         })), S.d(N, "DEFAULT_DEBUG", (function() {
-            return B;
+            return s;
         })), S.d(N, "ENV", (function() {
             return s;
         })), S.d(N, "MOBILE_ENV", (function() {
@@ -4146,9 +4146,9 @@ window.smartCard = function(modules) {
         })), S.d(N, "LANG", (function() {
             return t;
         })), S.d(N, "COUNTRY_LANGS", (function() {
-            return T;
-        })), S.d(N, "INTENT", (function() {
             return e;
+        })), S.d(N, "INTENT", (function() {
+            return T;
         })), S.d(N, "COMMIT", (function() {
             return n;
         })), S.d(N, "VAULT", (function() {
@@ -4160,15 +4160,15 @@ window.smartCard = function(modules) {
         })), S.d(N, "SDK_SETTINGS", (function() {
             return F;
         })), S.d(N, "SDK_QUERY_KEYS", (function() {
-            return I;
-        })), S.d(N, "COMPONENTS", (function() {
             return D;
-        })), S.d(N, "DEBUG", (function() {
+        })), S.d(N, "COMPONENTS", (function() {
             return H;
+        })), S.d(N, "DEBUG", (function() {
+            return I;
         })), S.d(N, "QUERY_BOOL", (function() {
-            return O;
-        })), S.d(N, "UNKNOWN", (function() {
             return o;
+        })), S.d(N, "UNKNOWN", (function() {
+            return O;
         })), S.d(N, "PROTOCOL", (function() {
             return i;
         })), S.d(N, "PAGE_TYPES", (function() {
@@ -4179,8 +4179,6 @@ window.smartCard = function(modules) {
             return h;
         })), S.d(N, "TYPES", (function() {
             return k;
-        })), S.d(N, "APM_LIST", (function() {
-            return g;
         }));
         var R = {
             AD: "AD",
@@ -4424,7 +4422,7 @@ window.smartCard = function(modules) {
             VI: "vi",
             ZH: "zh",
             ZH_HANT: "zh_Hant"
-        }, T = {
+        }, e = {
             AD: [ t.EN, t.FR, t.ES, t.ZH ],
             AE: [ t.EN, t.FR, t.ES, t.ZH, t.AR ],
             AG: [ t.EN, t.FR, t.ES, t.ZH ],
@@ -4628,7 +4626,7 @@ window.smartCard = function(modules) {
             ZA: [ t.EN, t.FR, t.ES, t.ZH ],
             ZM: [ t.EN, t.FR, t.ES, t.ZH ],
             ZW: [ t.EN ]
-        }, e = {
+        }, T = {
             CAPTURE: "capture",
             AUTHORIZE: "authorize",
             ORDER: "order",
@@ -4759,7 +4757,7 @@ window.smartCard = function(modules) {
             PAGE_TYPE: "data-page-type",
             USER_EXPERIENCE_FLOW: "data-user-experience-flow",
             POPUPS_DISABLED: "data-popups-disabled"
-        }, I = {
+        }, D = {
             COMPONENTS: "components",
             ENV: "env",
             DEBUG: "debug",
@@ -4780,16 +4778,16 @@ window.smartCard = function(modules) {
             STAGE_ALIAS: "stage-alias",
             CDN_REGISTRY: "cdn-registry",
             VERSION: "version"
-        }, D = {
+        }, H = {
             BUTTONS: "buttons",
             HOSTED_FIELDS: "hosted-fields"
-        }, H = {
+        }, I = {
             TRUE: !0,
             FALSE: !1
-        }, O = {
+        }, o = {
             TRUE: "true",
             FALSE: "false"
-        }, o = "unknown", i = {
+        }, O = "unknown", i = {
             HTTP: "http",
             HTTPS: "https"
         }, M = {
@@ -4815,7 +4813,6 @@ window.smartCard = function(modules) {
         }, p = {
             FEED: "feed_name",
             STATE: "state_name",
-            EVENT_NAME: "event_name",
             TRANSITION: "transition_name",
             PAGE: "page_name",
             BUTTON_TYPE: "button_type",
@@ -5059,7 +5056,7 @@ window.smartCard = function(modules) {
         var h, y, d, k, b, g, w, x = i && i.__k || preact_module_e, C = x.length;
         for (u.__k = [], h = 0; h < l.length; h++) if (null != (k = u.__k[h] = null == (k = l[h]) || "boolean" == typeof k ? null : "string" == typeof k || "number" == typeof k || "bigint" == typeof k ? v(null, k, null, null, k) : Array.isArray(k) ? v(p, {
             children: k
-        }, null, null, null) : k.__b > 0 ? v(k.type, k.props, k.key, k.ref ? k.ref : null, k.__v) : k)) {
+        }, null, null, null) : k.__b > 0 ? v(k.type, k.props, k.key, null, k.__v) : k)) {
             if (k.__ = u, k.__b = u.__b + 1, null === (d = x[h]) || d && k.key == d.key && k.type === d.type) x[h] = void 0; else for (y = 0; y < C; y++) {
                 if ((d = x[y]) && k.key == d.key && k.type === d.type) {
                     x[y] = void 0;
@@ -5212,10 +5209,10 @@ window.smartCard = function(modules) {
             } catch (n) {
                 l.__e(n, u);
             }
-            t.base = t.__P = null, n.__c = void 0;
+            t.base = t.__P = null;
         }
-        if (t = n.__k) for (o = 0; o < t.length; o++) t[o] && N(t[o], u, i || "function" != typeof n.type);
-        i || null == n.__e || preact_module_a(n.__e), n.__ = n.__e = n.__d = void 0;
+        if (t = n.__k) for (o = 0; o < t.length; o++) t[o] && N(t[o], u, "function" != typeof n.type);
+        i || null == n.__e || preact_module_a(n.__e), n.__e = n.__d = void 0;
     }
     function O(n, l, u) {
         return this.constructor(n, u);
@@ -5239,7 +5236,7 @@ window.smartCard = function(modules) {
     }, preact_module_d.prototype.forceUpdate = function(n) {
         this.__v && (this.__e = !0, n && this.__h.push(n), b(this));
     }, preact_module_d.prototype.render = p, preact_module_t = [], g.__r = 0;
-    var hooks_module_t, hooks_module_r, hooks_module_u, hooks_module_i, hooks_module_o = 0, hooks_module_f = [], hooks_module_c = [], hooks_module_e = l.__b, hooks_module_a = l.__r, hooks_module_v = l.diffed, hooks_module_l = l.__c, hooks_module_m = l.unmount;
+    var hooks_module_t, hooks_module_r, hooks_module_u, hooks_module_i, hooks_module_o = 0, hooks_module_c = [], hooks_module_f = [], hooks_module_e = l.__b, hooks_module_a = l.__r, hooks_module_v = l.diffed, hooks_module_l = l.__c, hooks_module_m = l.unmount;
     function hooks_module_d(t, u) {
         l.__h && l.__h(hooks_module_r, t, hooks_module_o || u), hooks_module_o = 0;
         var i = hooks_module_r.__H || (hooks_module_r.__H = {
@@ -5247,18 +5244,18 @@ window.smartCard = function(modules) {
             __h: []
         });
         return t >= i.__.length && i.__.push({
-            __V: hooks_module_c
+            __V: hooks_module_f
         }), i.__[t];
     }
     function hooks_module_p(n) {
         return hooks_module_o = 1, function(n, u, i) {
             var o = hooks_module_d(hooks_module_t++, 2);
-            if (o.t = n, !o.__c && (o.__ = [ hooks_module_B(void 0, u), function(n) {
+            if (o.t = n, !o.__c && (o.__ = [ hooks_module_z(void 0, u), function(n) {
                 var t = o.__N ? o.__N[0] : o.__[0], r = o.t(t, n);
                 t !== r && (o.__N = [ r, o.__[1] ], o.__c.setState({}));
             } ], o.__c = hooks_module_r, !hooks_module_r.u)) {
                 hooks_module_r.u = !0;
-                var f = hooks_module_r.shouldComponentUpdate;
+                var c = hooks_module_r.shouldComponentUpdate;
                 hooks_module_r.shouldComponentUpdate = function(n, t, r) {
                     if (!o.__c.__H) return !0;
                     var u = o.__c.__H.__.filter((function(n) {
@@ -5266,27 +5263,27 @@ window.smartCard = function(modules) {
                     }));
                     if (u.every((function(n) {
                         return !n.__N;
-                    }))) return !f || f.call(this, n, t, r);
+                    }))) return !c || c.call(this, n, t, r);
                     var i = !1;
                     return u.forEach((function(n) {
                         if (n.__N) {
                             var t = n.__[0];
                             n.__ = n.__N, n.__N = void 0, t !== n.__[0] && (i = !0);
                         }
-                    })), !(!i && o.__c.props === n) && (!f || f.call(this, n, t, r));
+                    })), !!i && (!c || c.call(this, n, t, r));
                 };
             }
             return o.__N || o.__;
-        }(hooks_module_B, n);
+        }(hooks_module_z, n);
     }
     function hooks_module_h(u, i) {
         var o = hooks_module_d(hooks_module_t++, 3);
-        !l.__s && hooks_module_z(o.__H, i) && (o.__ = u, o.i = i, hooks_module_r.__H.__h.push(o));
+        !l.__s && hooks_module_w(o.__H, i) && (o.__ = u, o.i = i, hooks_module_r.__H.__h.push(o));
     }
     function hooks_module_(n) {
         return hooks_module_o = 5, function(n, r) {
             var u = hooks_module_d(hooks_module_t++, 7);
-            return hooks_module_z(u.__H, r) ? (u.__V = n(), u.i = r, u.__h = n, u.__V) : u.__;
+            return hooks_module_w(u.__H, r) ? (u.__V = n(), u.i = r, u.__h = n, u.__V) : u.__;
         }((function() {
             return {
                 current: n
@@ -5294,8 +5291,8 @@ window.smartCard = function(modules) {
         }), []);
     }
     function hooks_module_b() {
-        for (var t; t = hooks_module_f.shift(); ) if (t.__P && t.__H) try {
-            t.__H.__h.forEach(hooks_module_k), t.__H.__h.forEach(hooks_module_w), t.__H.__h = [];
+        for (var t; t = hooks_module_c.shift(); ) if (t.__P && t.__H) try {
+            t.__H.__h.forEach(hooks_module_j), t.__H.__h.forEach(hooks_module_k), t.__H.__h = [];
         } catch (r) {
             t.__H.__h = [], l.__e(r, t.__v);
         }
@@ -5307,22 +5304,26 @@ window.smartCard = function(modules) {
         var i = (hooks_module_r = n.__c).__H;
         i && (hooks_module_u === hooks_module_r ? (i.__h = [], hooks_module_r.__h = [], 
         i.__.forEach((function(n) {
-            n.__N && (n.__ = n.__N), n.__V = hooks_module_c, n.__N = n.i = void 0;
-        }))) : (i.__h.forEach(hooks_module_k), i.__h.forEach(hooks_module_w), i.__h = [])), 
+            n.__N && (n.__ = n.__N), n.__V = hooks_module_f, n.__N = n.i = void 0;
+        }))) : (i.__h.forEach(hooks_module_j), i.__h.forEach(hooks_module_k), i.__h = [])), 
         hooks_module_u = hooks_module_r;
     }, l.diffed = function(t) {
         hooks_module_v && hooks_module_v(t);
         var o = t.__c;
-        o && o.__H && (o.__H.__h.length && (1 !== hooks_module_f.push(o) && hooks_module_i === l.requestAnimationFrame || ((hooks_module_i = l.requestAnimationFrame) || hooks_module_j)(hooks_module_b)), 
-        o.__H.__.forEach((function(n) {
-            n.i && (n.__H = n.i), n.__V !== hooks_module_c && (n.__ = n.__V), n.i = void 0, 
-            n.__V = hooks_module_c;
+        o && o.__H && (o.__H.__h.length && (1 !== hooks_module_c.push(o) && hooks_module_i === l.requestAnimationFrame || ((hooks_module_i = l.requestAnimationFrame) || function(n) {
+            var t, r = function() {
+                clearTimeout(u), hooks_module_g && cancelAnimationFrame(t), setTimeout(n);
+            }, u = setTimeout(r, 100);
+            hooks_module_g && (t = requestAnimationFrame(r));
+        })(hooks_module_b)), o.__H.__.forEach((function(n) {
+            n.i && (n.__H = n.i), n.__V !== hooks_module_f && (n.__ = n.__V), n.i = void 0, 
+            n.__V = hooks_module_f;
         }))), hooks_module_u = hooks_module_r = null;
     }, l.__c = function(t, r) {
         r.some((function(t) {
             try {
-                t.__h.forEach(hooks_module_k), t.__h = t.__h.filter((function(n) {
-                    return !n.__ || hooks_module_w(n);
+                t.__h.forEach(hooks_module_j), t.__h = t.__h.filter((function(n) {
+                    return !n.__ || hooks_module_k(n);
                 }));
             } catch (u) {
                 r.some((function(n) {
@@ -5335,33 +5336,27 @@ window.smartCard = function(modules) {
         var r, u = t.__c;
         u && u.__H && (u.__H.__.forEach((function(n) {
             try {
-                hooks_module_k(n);
+                hooks_module_j(n);
             } catch (n) {
                 r = n;
             }
-        })), u.__H = void 0, r && l.__e(r, u.__v));
+        })), r && l.__e(r, u.__v));
     };
     var hooks_module_g = "function" == typeof requestAnimationFrame;
     function hooks_module_j(n) {
-        var t, r = function() {
-            clearTimeout(u), hooks_module_g && cancelAnimationFrame(t), setTimeout(n);
-        }, u = setTimeout(r, 100);
-        hooks_module_g && (t = requestAnimationFrame(r));
-    }
-    function hooks_module_k(n) {
         var t = hooks_module_r, u = n.__c;
         "function" == typeof u && (n.__c = void 0, u()), hooks_module_r = t;
     }
-    function hooks_module_w(n) {
+    function hooks_module_k(n) {
         var t = hooks_module_r;
         n.__c = n.__(), hooks_module_r = t;
     }
-    function hooks_module_z(n, t) {
+    function hooks_module_w(n, t) {
         return !n || n.length !== t.length || t.some((function(t, r) {
             return t !== n[r];
         }));
     }
-    function hooks_module_B(n, t) {
+    function hooks_module_z(n, t) {
         return "function" == typeof t ? t(n) : t;
     }
     function utils_isPromise(item) {
@@ -7022,8 +7017,9 @@ window.smartCard = function(modules) {
                 };
                 if (429 === status) {
                     var _getLogger$track;
-                    getLogger().track(((_getLogger$track = {}).transition_name = "call_rest_api", _getLogger$track.int_error_desc = "Error: " + status + " - " + body, 
-                    _getLogger$track.info_msg = "URL: " + url, _getLogger$track));
+                    getLogger().track(((_getLogger$track = {})[FPTI_KEY.TRANSITION] = "call_rest_api", 
+                    _getLogger$track.int_error_desc = "Error: " + status + " - " + body, _getLogger$track.info_msg = "URL: " + url, 
+                    _getLogger$track));
                 }
                 getLogger().warn("rest_api_" + eventName + "_error");
                 throw error;
@@ -7057,8 +7053,9 @@ window.smartCard = function(modules) {
             }
             if (429 === status) {
                 var _getLogger$track2;
-                getLogger().track(((_getLogger$track2 = {}).transition_name = "call_rest_api", _getLogger$track2.int_error_desc = "Error: " + status + " - " + body, 
-                _getLogger$track2.info_msg = "URL: " + url, _getLogger$track2));
+                getLogger().track(((_getLogger$track2 = {})[FPTI_KEY.TRANSITION] = "call_rest_api", 
+                _getLogger$track2.int_error_desc = "Error: " + status + " - " + body, _getLogger$track2.info_msg = "URL: " + url, 
+                _getLogger$track2));
             }
             if (status > 400) {
                 getLogger().warn("smart_api_" + eventName + "_status_" + status + "_error");
@@ -7430,7 +7427,7 @@ window.smartCard = function(modules) {
     }));
     memoize((function(_ref) {
         var _headers;
-        var _ref$amount = _ref.amount, _ref$vetted = _ref.vetted, _ref$allowBillingPaym = _ref.allowBillingPayments;
+        var _ref$amount = _ref.amount, _ref$vetted = _ref.vetted, _ref$allowBillingPaym = _ref.allowBillingPayments, buyerAccessToken = _ref.buyerAccessToken;
         return callGraphQL({
             name: "GetSmartWallet",
             query: "\n            query GetSmartWallet(\n                $clientID: String!\n                $merchantID: [String!]\n                $currency: String\n                $amount: String\n                $userIDToken: String\n                $vetted: Boolean\n                $paymentMethodToken: String\n                $branded: Boolean,\n                $allowBillingPayments: Boolean\n            ) {\n                smartWallet(\n                    clientId: $clientID\n                    merchantId: $merchantID\n                    currency: $currency\n                    amount: $amount\n                    userIdToken: $userIDToken\n                    vetted: $vetted\n                    paymentMethodNonce: $paymentMethodToken\n                    branded: $branded,\n                    allowBillingPayments: $allowBillingPayments\n                ) {\n                    paypal {\n                        instruments {\n                            type\n                            label\n                            logoUrl\n                            instrumentID\n                            tokenID\n                            vendor\n                            oneClick\n                            accessToken\n                        }\n                    }\n                    credit {\n                        instruments {\n                            type\n                            label\n                            logoUrl\n                            instrumentID\n                            tokenID\n                            vendor\n                            oneClick\n                            accessToken\n                        }\n                    }\n                    card {\n                        instruments {\n                            type\n                            label\n                            logoUrl\n                            instrumentID\n                            tokenID\n                            vendor\n                            oneClick\n                        }\n                    }\n                    venmo {\n                        instruments {\n                            type\n                            label\n                            logoUrl\n                            instrumentID\n                            tokenID\n                            oneClick\n                        }\n                    }\n                }\n            }\n        ",
@@ -7443,10 +7440,11 @@ window.smartCard = function(modules) {
                 vetted: void 0 === _ref$vetted || _ref$vetted,
                 paymentMethodToken: _ref.paymentMethodToken,
                 branded: _ref.branded,
-                allowBillingPayments: void 0 === _ref$allowBillingPaym || _ref$allowBillingPaym
+                allowBillingPayments: void 0 === _ref$allowBillingPaym || _ref$allowBillingPaym,
+                orderID: _ref.orderID
             },
             headers: (_headers = {}, _headers["paypal-client-metadata-id"] = _ref.clientMetadataID, 
-            _headers)
+            _headers["x-paypal-internal-euat"] = buyerAccessToken, _headers)
         }).then((function(_ref2) {
             return _ref2.smartWallet;
         }));
@@ -7502,9 +7500,9 @@ window.smartCard = function(modules) {
                                 var _getLogger$track;
                                 var orderID = body && body.id;
                                 if (!orderID) throw new Error("Order Api response error:\n\n" + JSON.stringify(body, null, 4));
-                                getLogger().track(((_getLogger$track = {}).transition_name = "process_create_order", 
-                                _getLogger$track.context_type = "EC-Token", _getLogger$track.token = orderID, _getLogger$track.context_id = orderID, 
-                                _getLogger$track));
+                                getLogger().track(((_getLogger$track = {})[FPTI_KEY.TRANSITION] = "process_create_order", 
+                                _getLogger$track[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", _getLogger$track[FPTI_KEY.TOKEN] = orderID, 
+                                _getLogger$track[FPTI_KEY.CONTEXT_ID] = orderID, _getLogger$track));
                                 return orderID;
                             }));
                         }(order, {
@@ -7570,12 +7568,12 @@ window.smartCard = function(modules) {
                     };
                 })).addTrackingBuilder((function() {
                     var _ref7;
-                    return (_ref7 = {}).context_type = "EC-Token", _ref7.context_id = orderID, _ref7.token = orderID, 
-                    _ref7;
-                })).track((_getLogger$addPayload = {}, _getLogger$addPayload.state_name = "smart_button", 
-                _getLogger$addPayload.transition_name = "process_receive_order", _getLogger$addPayload.event_name = "process_receive_order", 
-                _getLogger$addPayload.context_type = "EC-Token", _getLogger$addPayload.context_id = orderID, 
-                _getLogger$addPayload.token = orderID, _getLogger$addPayload.response_duration = duration.toString(), 
+                    return (_ref7 = {})[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", _ref7[FPTI_KEY.CONTEXT_ID] = orderID, 
+                    _ref7[FPTI_KEY.TOKEN] = orderID, _ref7;
+                })).track((_getLogger$addPayload = {}, _getLogger$addPayload[FPTI_KEY.STATE] = "smart_button", 
+                _getLogger$addPayload[FPTI_KEY.TRANSITION] = "process_receive_order", _getLogger$addPayload[FPTI_KEY.EVENT_NAME] = "process_receive_order", 
+                _getLogger$addPayload[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", _getLogger$addPayload[FPTI_KEY.CONTEXT_ID] = orderID, 
+                _getLogger$addPayload[FPTI_KEY.TOKEN] = orderID, _getLogger$addPayload[FPTI_KEY.RESPONSE_DURATION] = duration.toString(), 
                 _getLogger$addPayload)).flush();
                 return orderID;
             }));
@@ -7897,9 +7895,9 @@ window.smartCard = function(modules) {
                     var restart = _ref12.restart;
                     return createOrder().then((function(orderID) {
                         var _getLogger$info$track2;
-                        getLogger().info("button_approve").track((_getLogger$info$track2 = {}, _getLogger$info$track2.transition_name = "process_checkout_approve", 
-                        _getLogger$info$track2.context_type = "EC-Token", _getLogger$info$track2.token = orderID, 
-                        _getLogger$info$track2.context_id = orderID, _getLogger$info$track2)).flush();
+                        getLogger().info("button_approve").track((_getLogger$info$track2 = {}, _getLogger$info$track2[FPTI_KEY.TRANSITION] = "process_checkout_approve", 
+                        _getLogger$info$track2[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", _getLogger$info$track2[FPTI_KEY.TOKEN] = orderID, 
+                        _getLogger$info$track2[FPTI_KEY.CONTEXT_ID] = orderID, _getLogger$info$track2)).flush();
                         return getSupplementalOrderInfo(orderID).then((function(supplementalData) {
                             return onApprove({
                                 orderID: orderID,
@@ -7939,9 +7937,9 @@ window.smartCard = function(modules) {
                     if (!subscriptionID) throw new Error("Expected subscriptionID");
                     return createOrder().then((function(orderID) {
                         var _getLogger$info$track4;
-                        getLogger().info("button_approve").track((_getLogger$info$track4 = {}, _getLogger$info$track4.transition_name = "process_checkout_approve", 
-                        _getLogger$info$track4.event_name = "process_checkout_approve", _getLogger$info$track4.context_type = "EC-Token", 
-                        _getLogger$info$track4.token = orderID, _getLogger$info$track4.context_id = orderID, 
+                        getLogger().info("button_approve").track((_getLogger$info$track4 = {}, _getLogger$info$track4[FPTI_KEY.TRANSITION] = "process_checkout_approve", 
+                        _getLogger$info$track4[FPTI_KEY.EVENT_NAME] = "process_checkout_approve", _getLogger$info$track4[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", 
+                        _getLogger$info$track4[FPTI_KEY.TOKEN] = orderID, _getLogger$info$track4[FPTI_KEY.CONTEXT_ID] = orderID, 
                         _getLogger$info$track4)).flush();
                         var data = {
                             orderID: orderID,
@@ -8023,9 +8021,9 @@ window.smartCard = function(modules) {
                     var restart = _ref9.restart;
                     return createOrder().then((function(orderID) {
                         var _getLogger$info$track;
-                        getLogger().info("button_approve").track((_getLogger$info$track = {}, _getLogger$info$track.transition_name = "process_checkout_approve", 
-                        _getLogger$info$track.context_type = "EC-Token", _getLogger$info$track.token = orderID, 
-                        _getLogger$info$track.context_id = orderID, _getLogger$info$track)).flush();
+                        getLogger().info("button_approve").track((_getLogger$info$track = {}, _getLogger$info$track[FPTI_KEY.TRANSITION] = "process_checkout_approve", 
+                        _getLogger$info$track[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", _getLogger$info$track[FPTI_KEY.TOKEN] = orderID, 
+                        _getLogger$info$track[FPTI_KEY.CONTEXT_ID] = orderID, _getLogger$info$track)).flush();
                         billingToken || clientAccessToken || vault || !payerID && branded && getLogger().warn("onapprove_payerid_not_present_for_branded_standalone_button", {
                             orderID: orderID
                         }).flush();
@@ -8331,7 +8329,7 @@ window.smartCard = function(modules) {
                     var paymentMethodToken = _ref14.paymentMethodToken;
                     var restart = _ref15.restart;
                     if (!paymentMethodToken) throw new Error("Payment method token required for tokenize onApprove");
-                    getLogger().info("button_approve").track((_getLogger$info$track3 = {}, _getLogger$info$track3.transition_name = "process_tokenize_approve", 
+                    getLogger().info("button_approve").track((_getLogger$info$track3 = {}, _getLogger$info$track3[FPTI_KEY.TRANSITION] = "process_tokenize_approve", 
                     _getLogger$info$track3)).flush();
                     return onApprove({
                         facilitatorAccessToken: facilitatorAccessToken,
@@ -8377,9 +8375,9 @@ window.smartCard = function(modules) {
                 var buyerAccessToken = _ref3.buyerAccessToken, _ref3$forceRestAPI = _ref3.forceRestAPI, forceRestAPI = void 0 === _ref3$forceRestAPI ? featureFlags.isLsatUpgradable : _ref3$forceRestAPI;
                 return createOrder().then((function(orderID) {
                     var _getLogger$info$track;
-                    getLogger().info("button_complete").track((_getLogger$info$track = {}, _getLogger$info$track.transition_name = "process_checkout_complete", 
-                    _getLogger$info$track.event_name = "process_checkout_complete", _getLogger$info$track.context_type = "EC-Token", 
-                    _getLogger$info$track.token = orderID, _getLogger$info$track.context_id = orderID, 
+                    getLogger().info("button_complete").track((_getLogger$info$track = {}, _getLogger$info$track[FPTI_KEY.TRANSITION] = "process_checkout_complete", 
+                    _getLogger$info$track[FPTI_KEY.EVENT_NAME] = "process_checkout_complete", _getLogger$info$track[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", 
+                    _getLogger$info$track[FPTI_KEY.TOKEN] = orderID, _getLogger$info$track[FPTI_KEY.CONTEXT_ID] = orderID, 
                     _getLogger$info$track)).flush();
                     var actions = function(_ref) {
                         var orderID = _ref.orderID, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI;
@@ -8433,9 +8431,9 @@ window.smartCard = function(modules) {
             return memoize((function() {
                 return createOrder().then((function(orderID) {
                     var _getLogger$info$track;
-                    getLogger().info("button_cancel").track((_getLogger$info$track = {}, _getLogger$info$track.transition_name = "process_checkout_cancel", 
-                    _getLogger$info$track.event_name = "process_checkout_cancel", _getLogger$info$track.context_type = "EC-Token", 
-                    _getLogger$info$track.token = orderID, _getLogger$info$track.context_id = orderID, 
+                    getLogger().info("button_cancel").track((_getLogger$info$track = {}, _getLogger$info$track[FPTI_KEY.TRANSITION] = "process_checkout_cancel", 
+                    _getLogger$info$track[FPTI_KEY.EVENT_NAME] = "process_checkout_cancel", _getLogger$info$track[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", 
+                    _getLogger$info$track[FPTI_KEY.TOKEN] = orderID, _getLogger$info$track[FPTI_KEY.CONTEXT_ID] = orderID, 
                     _getLogger$info$track)).flush();
                     return onCancel({
                         orderID: {
@@ -8473,10 +8471,11 @@ window.smartCard = function(modules) {
                 var buyerAccessToken = _ref4.buyerAccessToken, _ref4$forceRestAPI = _ref4.forceRestAPI, forceRestAPI = void 0 === _ref4$forceRestAPI ? featureFlags.isLsatUpgradable : _ref4$forceRestAPI, data = _objectWithoutPropertiesLoose(_ref4, _excluded);
                 return createOrder().then((function(orderID) {
                     var _getLogger$info$track;
-                    getLogger().info("button_shipping_change").track((_getLogger$info$track = {}, _getLogger$info$track.transition_name = "process_checkout_shipping_change", 
-                    _getLogger$info$track.event_name = "process_checkout_shipping_change", _getLogger$info$track.context_type = "EC-Token", 
-                    _getLogger$info$track.token = orderID, _getLogger$info$track.context_id = orderID, 
-                    _getLogger$info$track.shipping_callback_invoked = "1", _getLogger$info$track)).flush();
+                    getLogger().info("button_shipping_change").track((_getLogger$info$track = {}, _getLogger$info$track[FPTI_KEY.TRANSITION] = "process_checkout_shipping_change", 
+                    _getLogger$info$track[FPTI_KEY.EVENT_NAME] = "process_checkout_shipping_change", 
+                    _getLogger$info$track[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", _getLogger$info$track[FPTI_KEY.TOKEN] = orderID, 
+                    _getLogger$info$track[FPTI_KEY.CONTEXT_ID] = orderID, _getLogger$info$track.shipping_callback_invoked = "1", 
+                    _getLogger$info$track)).flush();
                     return onShippingChange(data, function(_ref) {
                         var orderID = _ref.orderID, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI;
                         return {
@@ -8526,10 +8525,11 @@ window.smartCard = function(modules) {
                 return createOrder().then((function(orderID) {
                     var _getLogger$info$track;
                     getLogger().info("button_shipping_address_change").track((_getLogger$info$track = {}, 
-                    _getLogger$info$track.transition_name = "process_checkout_shipping_address_change", 
-                    _getLogger$info$track.event_name = "process_checkout_shipping_address_change", _getLogger$info$track.context_type = "EC-Token", 
-                    _getLogger$info$track.token = orderID, _getLogger$info$track.context_id = orderID, 
-                    _getLogger$info$track.shipping_callback_invoked = "1", _getLogger$info$track)).flush();
+                    _getLogger$info$track[FPTI_KEY.TRANSITION] = "process_checkout_shipping_address_change", 
+                    _getLogger$info$track[FPTI_KEY.EVENT_NAME] = "process_checkout_shipping_address_change", 
+                    _getLogger$info$track[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", _getLogger$info$track[FPTI_KEY.TOKEN] = orderID, 
+                    _getLogger$info$track[FPTI_KEY.CONTEXT_ID] = orderID, _getLogger$info$track.shipping_callback_invoked = "1", 
+                    _getLogger$info$track)).flush();
                     return onShippingAddressChange(function(data) {
                         var shippingAddress = data.shipping_address, rest = _objectWithoutPropertiesLoose(data, onShippingAddressChange_excluded);
                         return _extends({
@@ -8690,10 +8690,11 @@ window.smartCard = function(modules) {
                 return createOrder().then((function(orderID) {
                     var _getLogger$info$track;
                     getLogger().info("button_shipping_options_change").track((_getLogger$info$track = {}, 
-                    _getLogger$info$track.transition_name = "process_checkout_shipping_options_change", 
-                    _getLogger$info$track.event_name = "process_checkout_shipping_options_change", _getLogger$info$track.context_type = "EC-Token", 
-                    _getLogger$info$track.token = orderID, _getLogger$info$track.context_id = orderID, 
-                    _getLogger$info$track.shipping_callback_invoked = "1", _getLogger$info$track)).flush();
+                    _getLogger$info$track[FPTI_KEY.TRANSITION] = "process_checkout_shipping_options_change", 
+                    _getLogger$info$track[FPTI_KEY.EVENT_NAME] = "process_checkout_shipping_options_change", 
+                    _getLogger$info$track[FPTI_KEY.CONTEXT_TYPE] = "EC-Token", _getLogger$info$track[FPTI_KEY.TOKEN] = orderID, 
+                    _getLogger$info$track[FPTI_KEY.CONTEXT_ID] = orderID, _getLogger$info$track.shipping_callback_invoked = "1", 
+                    _getLogger$info$track)).flush();
                     return onShippingOptionsChange(function(data) {
                         var selectedShippingOption = data.selected_shipping_option, rest = _objectWithoutPropertiesLoose(data, onShippingOptionsChange_excluded);
                         return _extends({
