@@ -115,12 +115,24 @@ function isWalletCapturePaymentEligible({ serviceData, payment } : IsPaymentElig
     return true;
 }
 
+function getCreateOrder(orderID, enableInContextWallet, createOrder) {
+    if(orderID && enableInContextWallet) {
+        return () => {
+            console.log('TEST WalletCapture.js createOrder resolved');
+            return ZalgoPromise.resolve(orderID)
+        }
+    } else {
+        return createOrder;
+    }
+}
+
 function initWalletCapture({ props, components, payment, serviceData, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
 
     const { createOrder, onApprove, clientMetadataID, vault, onAuth } = props;
     const { fundingSource, instrumentID } = payment;
     const { wallet, orderID, enableInContextWallet } = serviceData;
-    const createOrderWrapped = enableInContextWallet && orderID ? ZalgoPromise.resolve(orderID) : createOrder;
+
+    const createOrderWrapped = getCreateOrder(orderID, enableInContextWallet, createOrder);
 
     if (!wallet || !smartWalletPromise) {
         throw new Error(`No smart wallet found`);
@@ -203,7 +215,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
             smartWallet: smartWalletPromise
         }).then(({ orderID, smartWallet }) => {
             console.log('TEST Wallet Capture Start Promise Resolved', { orderID, smartWallet })
-            const buyerAccessToken = getBuyerAccessToken() || getInstrument(smartWallet, fundingSource, instrumentID).accessToken;
+            const buyerAccessToken = (enableInContextWallet && getBuyerAccessToken()) || getInstrument(smartWallet, fundingSource, instrumentID).accessToken;
 
             if (!buyerAccessToken) {
                 throw new Error(`No access token available for instrument`);
@@ -247,12 +259,12 @@ const POPUP_OPTIONS = {
 };
 
 function setupWalletMenu({ props, payment, serviceData, components, config, restart } : MenuOptions) : MenuChoices {
+    console.log('TEST setupWalletMenu', { props, payment, serviceData, components, config, restart })
     const { createOrder } = props;
     const { fundingSource, instrumentID } = payment;
     const { wallet, content } = serviceData;
 
     const { orderID, enableInContextWallet } = serviceData;
-    const createOrderWrapped = enableInContextWallet && orderID ? ZalgoPromise.resolve(orderID) : createOrder;
 
     if (!wallet) {
         throw new Error(`Can not render wallet menu without wallet`);
@@ -268,15 +280,30 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
         throw new Error(`Can not render wallet menu without instrument`);
     }
 
+    console.log('TEST setupWalletMenu validated')
+
     const updateMenuClientConfig = () => {
+
+        if(enableInContextWallet && orderID) {
+            console.log('TEST setupWalletMenu updateMenuClientConfig using existing orderID')
+            return updateButtonClientConfig({ fundingSource, orderID, inline: false });
+        }
+        console.log('TEST setupWalletMenu updateMenuClientConfig > create orderID')
         return ZalgoPromise.try(() => {
-            return createOrderWrapped();
+            return createOrder();
         }).then(orderID => {
+            console.log('TEST setupWalletMenu updateMenuClientConfig  > then ', {orderID})
             return updateButtonClientConfig({ fundingSource, orderID, inline: false });
         });
     };
 
     const loadCheckout = ({ payment: checkoutPayment } : {| payment : Payment |}) => {
+        const updatedProps = {...props};
+        console.log('TEST setupWalletMenu > loadCheckout Regular wallet', {payment});
+        if (enableInContextWallet && orderID) {
+            console.log('TEST setupWalletMenu > loadCheckout for enableInContextWallet', {payment})
+            updatedProps.createOrder = () => { console.log('TEST WalletCapture.js createOrder resolved'); return ZalgoPromise.resolve(orderID) };
+        }
         return checkout.init({
             props, components, serviceData, config, payment: checkoutPayment, restart
         }).start();
@@ -291,14 +318,18 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
         popup:    POPUP_OPTIONS,
         onSelect: ({ win }) => {
 
+            console.log('TEST setupWalletMenu > onSelect', {win})
+
             getLogger().info('click_choose_funding').track({
                 [FPTI_KEY.TRANSITION]:      FPTI_TRANSITION.CLICK_CHOOSE_FUNDING,
                 [FPTI_KEY.OPTION_SELECTED]: FPTI_MENU_OPTION.CHOOSE_FUNDING
             }).flush();
 
             return ZalgoPromise.try(() => {
+                console.log('TEST setupWalletMenu > onSelect > try')
                 return updateMenuClientConfig();
             }).then(() => {
+                console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout', {payment})
                 return loadCheckout({
                     payment: {
                         ...payment,
@@ -306,9 +337,15 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
                         buyerIntent:       BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING,
                         fundingSource:     newFundingSource,
                         createAccessToken: () => {
-                            return smartWalletPromise.then(smartWallet => {
-                                const smartInstrument = getInstrument(smartWallet, fundingSource, instrumentID);
+                            console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken', {payment});
 
+                            return smartWalletPromise.then(smartWallet => {
+                                if(enableInContextWallet && getBuyerAccessToken()) {
+                                    console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken > then getBuyerAccessToken', {accessToken: getBuyerAccessToken()})
+                                    return getBuyerAccessToken();
+                                }
+                                const smartInstrument = getInstrument(smartWallet, fundingSource, instrumentID);
+                                console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken > then', {smartInstrument})
                                 if (!smartInstrument) {
                                     throw new Error(`Instrument not found`);
                                 }
@@ -363,7 +400,7 @@ export const walletCapture : PaymentFlow = {
     isEligible:             (...args) => { let res = isWalletCaptureEligible(...args); console.log('TEST isWalletCaptureEligible', res, args); return res;  },
     isPaymentEligible:      (...args) => { let res = isWalletCapturePaymentEligible(...args); console.log('TEST isWalletCapturePaymentEligible', res, args); return res; },
     init:                   (...args) => { let res = initWalletCapture(...args); console.log('TEST initWalletCapture', res, args); return res; },
-    setupMenu:              setupWalletMenu,
+    setupMenu:              (...args) => { let res = setupWalletMenu(...args); console.log('TEST setupWalletMenu', res, args); return res; },
     updateFlowClientConfig: updateWalletClientConfig,
     spinner:                true,
     inline:                 true

@@ -14,6 +14,7 @@ import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
 
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, InitOptions } from './types';
+import {enableLoadingSpinner, getButtons} from "../button/dom";
 
 export const CHECKOUT_POPUP_DIMENSIONS = {
     WIDTH:  500,
@@ -276,23 +277,49 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     .catch(noop);
             },
 
-            onAuth: ({ accessToken }) => {
+            onSmartWalletEligible: ({accessToken}) => {
                 const access_token = accessToken ? accessToken : buyerAccessToken;
+                const { enableInContextWallet } = serviceData;
+                // If enableInContextWallet is true then it means this checkout flow was running in the context of fallback or buyer selecting different instrument.
+                if (window.innerWidth < 300 || enableInContextWallet) {
+                    getLogger().info(`checkout_smart_wallet_not_eligible `, {
+                        enableInContextWallet,
+                        width: window.innerWidth
+                    })
+                    return ZalgoPromise.resolve({
+                        smartWalletRendered: false
+                    });
+                }
+                let timer = null;
+                const returnPromise = new ZalgoPromise(resolve => {
+                    // If we are unable to load the wallet, let the UI client know that they need to continue.
+                    timer = setTimeout(() => {
+                        resolve({
+                            smartWalletRendered: false
+                        })
+                    }, 1000);
+                })
                 createOrder().then(orderID => { // use memoized version
                     close().then(() => {
+                        getButtons().forEach(button => enableLoadingSpinner(button));
+                        clearTimeout(timer);
                         submitForm({
                             url: document.location.href,
                             target: '_self',
                             body: {
-                                buyerAccessToken: accessToken,
+                                buyerAccessToken: access_token,
                                 orderID,
                                 enableInContextWallet: true
                             }
                         });
                     });
-                })
+                });
 
+                return returnPromise;
+            },
 
+            onAuth: ({ accessToken }) => {
+                const access_token = accessToken ? accessToken : buyerAccessToken;
                 return onAuth({ accessToken: access_token }).then(token => {
                     buyerAccessToken = token;
                 });
