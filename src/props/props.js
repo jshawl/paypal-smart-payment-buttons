@@ -33,6 +33,12 @@ import type { CreateOrder, XCreateOrder, CreateBillingAgreement, XCreateBillingA
 // export something to force webpack to see this as an ES module
 export const TYPES = true;
 
+export type XOnSmartWalletEligibleDataType = {|
+    accessToken : ?string
+|};
+
+export type onSmartWalletEligible = (params : XOnSmartWalletEligibleDataType) => ZalgoPromise<any>;
+
 export type PrerenderDetailsType = {|
     win ? : ? ProxyWindow,
     fundingSource : $Values<typeof FUNDING>,
@@ -174,6 +180,7 @@ export type Props = {|
     onShippingAddressChange : ?OnShippingAddressChange,
     onShippingOptionsChange : ?OnShippingOptionsChange,
     onAuth : OnAuth,
+    onSmartWalletEligible : onSmartWalletEligible,
 
     paymentMethodToken : ?string,
 

@@ -110,7 +110,7 @@ export function setupButton({
         getLogger()
             .info('smart_buttons_incontext_wallet_enable', {orderID});
         // Create Order should always return the existing orderID incase of In-context wallet flow
-        props.createOrder = ZalgoPromise.resolve(orderID);
+        props.createOrder = () => { console.log('TEST Button.js createOrder resolved'); return ZalgoPromise.resolve(orderID) };
     }
 
     const config = getConfig({ serverCSPNonce, firebaseConfig });
