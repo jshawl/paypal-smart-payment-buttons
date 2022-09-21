@@ -115,8 +115,8 @@ function isWalletCapturePaymentEligible({ serviceData, payment } : IsPaymentElig
     return true;
 }
 
-function getCreateOrder(orderID, enableInContextWallet, createOrder) {
-    if(orderID && enableInContextWallet) {
+function getCreateOrder(orderID, enableOrdersApprovalSmartWallet, createOrder) {
+    if(orderID && enableOrdersApprovalSmartWallet) {
         return () => {
             console.log('TEST WalletCapture.js createOrder resolved');
             return ZalgoPromise.resolve(orderID)
@@ -128,11 +128,11 @@ function getCreateOrder(orderID, enableInContextWallet, createOrder) {
 
 function initWalletCapture({ props, components, payment, serviceData, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
 
-    const { createOrder, onApprove, clientMetadataID, vault, onAuth } = props;
+    const { createOrder, onApprove, clientMetadataID, vault, onAuth, userIDToken } = props;
     const { fundingSource, instrumentID } = payment;
-    const { wallet, orderID, enableInContextWallet } = serviceData;
+    const { wallet, orderID, enableOrdersApprovalSmartWallet } = serviceData;
 
-    const createOrderWrapped = getCreateOrder(orderID, enableInContextWallet, createOrder);
+    const createOrderWrapped = getCreateOrder(orderID, enableOrdersApprovalSmartWallet, createOrder);
 
     if (!wallet || !smartWalletPromise) {
         throw new Error(`No smart wallet found`);
@@ -181,12 +181,15 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
         getLogger().info('web_checkout_fallback').flush();
         return getWebCheckoutFallback().start();
     };
+    // One click checkout is ineligible if the flow was using (userIDToken  + vault)
+    // One click checkout is Eligible for (vault + enableOrdersApprovalSmartWallet)
 
-    if (!instrument.oneClick || smartWalletErrored || vault) {
+    if ( !instrument.oneClick || smartWalletErrored || (vault && !enableOrdersApprovalSmartWallet)) {
         console.warn('TEST Wallet Capture initWalletCapture > needs to fallbackToWebCheckout', {
             oneClick: instrument.oneClick,
             smartWalletErrored,
-            vault
+            vault,
+            enableOrdersApprovalSmartWallet
         })
         return getWebCheckoutFallback();
     }
@@ -215,7 +218,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
             smartWallet: smartWalletPromise
         }).then(({ orderID, smartWallet }) => {
             console.log('TEST Wallet Capture Start Promise Resolved', { orderID, smartWallet })
-            const buyerAccessToken = (enableInContextWallet && getBuyerAccessToken()) || getInstrument(smartWallet, fundingSource, instrumentID).accessToken;
+            const buyerAccessToken = (enableOrdersApprovalSmartWallet && getBuyerAccessToken()) || getInstrument(smartWallet, fundingSource, instrumentID).accessToken;
 
             if (!buyerAccessToken) {
                 throw new Error(`No access token available for instrument`);
@@ -264,7 +267,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
     const { fundingSource, instrumentID } = payment;
     const { wallet, content } = serviceData;
 
-    const { orderID, enableInContextWallet } = serviceData;
+    const { orderID, enableOrdersApprovalSmartWallet } = serviceData;
 
     if (!wallet) {
         throw new Error(`Can not render wallet menu without wallet`);
@@ -284,7 +287,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
 
     const updateMenuClientConfig = () => {
 
-        if(enableInContextWallet && orderID) {
+        if(enableOrdersApprovalSmartWallet && orderID) {
             console.log('TEST setupWalletMenu updateMenuClientConfig using existing orderID')
             return updateButtonClientConfig({ fundingSource, orderID, inline: false });
         }
@@ -300,8 +303,8 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
     const loadCheckout = ({ payment: checkoutPayment } : {| payment : Payment |}) => {
         const updatedProps = {...props};
         console.log('TEST setupWalletMenu > loadCheckout Regular wallet', {payment});
-        if (enableInContextWallet && orderID) {
-            console.log('TEST setupWalletMenu > loadCheckout for enableInContextWallet', {payment})
+        if (enableOrdersApprovalSmartWallet && orderID) {
+            console.log('TEST setupWalletMenu > loadCheckout for enableOrdersApprovalSmartWallet', {payment})
             updatedProps.createOrder = () => { console.log('TEST WalletCapture.js createOrder resolved'); return ZalgoPromise.resolve(orderID) };
         }
         return checkout.init({
@@ -340,7 +343,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
                             console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken', {payment});
 
                             return smartWalletPromise.then(smartWallet => {
-                                if(enableInContextWallet && getBuyerAccessToken()) {
+                                if(enableOrdersApprovalSmartWallet && getBuyerAccessToken()) {
                                     console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken > then getBuyerAccessToken', {accessToken: getBuyerAccessToken()})
                                     return getBuyerAccessToken();
                                 }

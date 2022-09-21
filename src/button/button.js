@@ -41,7 +41,7 @@ export type SetupButtonOptions = {|
     brandedDefault? : boolean | null,
     featureFlags: FeatureFlags,
     orderID? : string,
-    enableInContextWallet? : boolean
+    enableOrdersApprovalSmartWallet? : boolean
 |};
 
 try {
@@ -104,11 +104,11 @@ export function setupButton({
         getPrerenderDetails, rememberFunding, getQueriedEligibleFunding, experience,
         style, fundingSource, intent, createBillingAgreement, createSubscription, stickinessID } = props;
 
-    console.log('TEST ....... setupButton ', {enableInContextWallet, orderID, buyerAccessToken});
+    console.log('TEST ....... setupButton ', {enableOrdersApprovalSmartWallet, orderID, buyerAccessToken});
 
-    if(enableInContextWallet && orderID && buyerAccessToken) {
+    if(enableOrdersApprovalSmartWallet && orderID && buyerAccessToken) {
         getLogger()
-            .info('smart_buttons_incontext_wallet_enable', {orderID});
+            .info('smart_buttons_orders_approve_wallet_enable', {orderID});
         // Create Order should always return the existing orderID incase of In-context wallet flow
         props.createOrder = () => { console.log('TEST Button.js createOrder resolved'); return ZalgoPromise.resolve(orderID) };
     }
