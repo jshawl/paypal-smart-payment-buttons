@@ -40,7 +40,7 @@ export type SetupButtonOptions = {|
     personalization : PersonalizationType,
     brandedDefault? : boolean | null,
     featureFlags: FeatureFlags,
-    orderID? : string,
+    smartWalletOrderID? : string,
     enableOrdersApprovalSmartWallet? : boolean
 |};
 
@@ -98,20 +98,13 @@ export function setupButton({
 
     const { merchantID, buyerCountry } = serviceData;
 
-    const props = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: null, featureFlags });
+    const props = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: null, featureFlags, enableOrdersApprovalSmartWallet, smartWalletOrderID });
     const { env, sessionID, partnerAttributionID, commit, sdkCorrelationID, locale, onShippingChange,
         buttonSessionID, merchantDomain, onInit,
         getPrerenderDetails, rememberFunding, getQueriedEligibleFunding, experience,
         style, fundingSource, intent, createBillingAgreement, createSubscription, stickinessID } = props;
 
-    console.log('TEST ....... setupButton ', {enableOrdersApprovalSmartWallet, orderID, buyerAccessToken});
-
-    if(enableOrdersApprovalSmartWallet && orderID && buyerAccessToken) {
-        getLogger()
-            .info('smart_buttons_orders_approve_wallet_enable', {orderID});
-        // Create Order should always return the existing orderID incase of In-context wallet flow
-        props.createOrder = () => { console.log('TEST Button.js createOrder resolved'); return ZalgoPromise.resolve(orderID) };
-    }
+    console.log('TEST ....... setupButton ', {enableOrdersApprovalSmartWallet, smartWalletOrderID, buyerAccessToken});
 
     const config = getConfig({ serverCSPNonce, firebaseConfig });
     const { sdkVersion } = config;
@@ -206,7 +199,7 @@ export function setupButton({
             event.preventDefault();
             event.stopPropagation();
 
-            const paymentProps = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: paymentFundingSource, featureFlags });
+            const paymentProps = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: paymentFundingSource, featureFlags, enableOrdersApprovalSmartWallet, smartWalletOrderID });
 
             const payPromise = initiatePayment({ payment, props: paymentProps });
             const { onError } = paymentProps;
@@ -248,7 +241,7 @@ export function setupButton({
                 throw new Error(`Can not find button element`);
             }
 
-            const paymentProps = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: paymentFundingSource, featureFlags });
+            const paymentProps = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: paymentFundingSource, featureFlags, enableOrdersApprovalSmartWallet, smartWalletOrderID });
             const payment = { win, button, fundingSource: paymentFundingSource, card, buyerIntent: BUYER_INTENT.PAY };
             const payPromise = initiatePayment({ payment, props: paymentProps });
             const { onError } = paymentProps;

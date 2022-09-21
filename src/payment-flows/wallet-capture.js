@@ -115,24 +115,11 @@ function isWalletCapturePaymentEligible({ serviceData, payment } : IsPaymentElig
     return true;
 }
 
-function getCreateOrder(orderID, enableOrdersApprovalSmartWallet, createOrder) {
-    if(orderID && enableOrdersApprovalSmartWallet) {
-        return () => {
-            console.log('TEST WalletCapture.js createOrder resolved');
-            return ZalgoPromise.resolve(orderID)
-        }
-    } else {
-        return createOrder;
-    }
-}
-
 function initWalletCapture({ props, components, payment, serviceData, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
 
-    const { createOrder, onApprove, clientMetadataID, vault, onAuth, userIDToken } = props;
+    const { createOrder, onApprove, clientMetadataID, vault, onAuth, enableOrdersApprovalSmartWallet } = props;
     const { fundingSource, instrumentID } = payment;
-    const { wallet, orderID, enableOrdersApprovalSmartWallet } = serviceData;
-
-    const createOrderWrapped = getCreateOrder(orderID, enableOrdersApprovalSmartWallet, createOrder);
+    const { wallet } = serviceData;
 
     if (!wallet || !smartWalletPromise) {
         throw new Error(`No smart wallet found`);
@@ -214,7 +201,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
     const start = () => {
         console.log('TEST Wallet Capture Start')
         return ZalgoPromise.hash({
-            orderID:     createOrderWrapped(),
+            orderID:     createOrder(),
             smartWallet: smartWalletPromise
         }).then(({ orderID, smartWallet }) => {
             console.log('TEST Wallet Capture Start Promise Resolved', { orderID, smartWallet })
@@ -263,11 +250,9 @@ const POPUP_OPTIONS = {
 
 function setupWalletMenu({ props, payment, serviceData, components, config, restart } : MenuOptions) : MenuChoices {
     console.log('TEST setupWalletMenu', { props, payment, serviceData, components, config, restart })
-    const { createOrder } = props;
+    const { createOrder, enableOrdersApprovalSmartWallet } = props;
     const { fundingSource, instrumentID } = payment;
     const { wallet, content } = serviceData;
-
-    const { orderID, enableOrdersApprovalSmartWallet } = serviceData;
 
     if (!wallet) {
         throw new Error(`Can not render wallet menu without wallet`);
@@ -287,11 +272,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
 
     const updateMenuClientConfig = () => {
 
-        if(enableOrdersApprovalSmartWallet && orderID) {
-            console.log('TEST setupWalletMenu updateMenuClientConfig using existing orderID')
-            return updateButtonClientConfig({ fundingSource, orderID, inline: false });
-        }
-        console.log('TEST setupWalletMenu updateMenuClientConfig > create orderID')
+        console.log('TEST setupWalletMenu updateMenuClientConfig')
         return ZalgoPromise.try(() => {
             return createOrder();
         }).then(orderID => {
@@ -301,12 +282,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
     };
 
     const loadCheckout = ({ payment: checkoutPayment } : {| payment : Payment |}) => {
-        const updatedProps = {...props};
         console.log('TEST setupWalletMenu > loadCheckout Regular wallet', {payment});
-        if (enableOrdersApprovalSmartWallet && orderID) {
-            console.log('TEST setupWalletMenu > loadCheckout for enableOrdersApprovalSmartWallet', {payment})
-            updatedProps.createOrder = () => { console.log('TEST WalletCapture.js createOrder resolved'); return ZalgoPromise.resolve(orderID) };
-        }
         return checkout.init({
             props, components, serviceData, config, payment: checkoutPayment, restart
         }).start();

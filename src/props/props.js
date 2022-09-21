@@ -191,19 +191,25 @@ export type Props = {|
     allowBillingPayments : boolean,
 
     paymentRequest: ?PaymentRequest,
-    merchantID : $ReadOnlyArray<string>
+    merchantID : $ReadOnlyArray<string>,
+    enableOrdersApprovalSmartWallet : boolean | null,
+    smartWalletOrderID : string | null
 |};
 
 export function getProps({
     facilitatorAccessToken,
     branded,
     paymentSource,
-    featureFlags
+    featureFlags,
+    enableOrdersApprovalSmartWallet,
+    smartWalletOrderID
 } : {|
     facilitatorAccessToken : string,
     branded : boolean | null,
     paymentSource : $Values<typeof FUNDING> | null,
-    featureFlags: FeatureFlags
+    featureFlags: FeatureFlags,
+    enableOrdersApprovalSmartWallet : boolean | false,
+    smartWalletOrderID : string | null
 |}) : Props {
     const xprops : XProps = window.xprops;
 
@@ -270,7 +276,7 @@ export function getProps({
     const createBillingAgreement = getCreateBillingAgreement({ createBillingAgreement: xprops.createBillingAgreement, paymentSource });
     const createSubscription = getCreateSubscription({ createSubscription: xprops.createSubscription, partnerAttributionID, merchantID, clientID, paymentSource }, { facilitatorAccessToken });
 
-    const createOrder = getCreateOrder({ createOrder: xprops.createOrder, currency, intent, merchantID, partnerAttributionID, paymentSource }, { facilitatorAccessToken, createBillingAgreement, createSubscription });
+    const createOrder = getCreateOrder({ createOrder: xprops.createOrder, currency, intent, merchantID, partnerAttributionID, paymentSource }, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID });
 
     const onError = getOnError({ onError: xprops.onError });
     const onApprove = getOnApprove({ onApprove: xprops.onApprove, createBillingAgreement, createSubscription, intent, onError, partnerAttributionID, clientAccessToken, vault, clientID, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags });
@@ -350,6 +356,9 @@ export function getProps({
         allowBillingPayments,
 
         paymentRequest,
-        merchantID
+        merchantID,
+
+        enableOrdersApprovalSmartWallet,
+        smartWalletOrderID
     };
 }

@@ -49,12 +49,16 @@ export function getButtonProps({
     facilitatorAccessToken,
     brandedDefault,
     paymentSource,
-    featureFlags
+    featureFlags,
+    enableOrdersApprovalSmartWallet,
+    smartWalletOrderID
 } : {|
     facilitatorAccessToken : string,
     brandedDefault : boolean | null,
     paymentSource : $Values<typeof FUNDING> | null,
-    featureFlags: FeatureFlags
+    featureFlags: FeatureFlags,
+    enableOrdersApprovalSmartWallet? : boolean,
+    smartWalletOrderID? : string
 |}) : ButtonProps {
     const xprops : ButtonXProps = window.xprops;
 
@@ -113,7 +117,7 @@ export function getButtonProps({
     }
 
     return {
-        ...getProps({ facilitatorAccessToken, branded, paymentSource, featureFlags }),
+        ...getProps({ facilitatorAccessToken, branded, paymentSource, featureFlags, enableOrdersApprovalSmartWallet, smartWalletOrderID }),
         style,
         buttonSessionID,
         branded,
