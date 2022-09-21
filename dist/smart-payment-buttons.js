@@ -7705,7 +7705,7 @@ window.spb = function(modules) {
             })), S.d(N, "DEFAULT_COMPONENTS", (function() {
                 return U;
             })), S.d(N, "DEFAULT_DEBUG", (function() {
-                return B;
+                return s;
             })), S.d(N, "ENV", (function() {
                 return s;
             })), S.d(N, "MOBILE_ENV", (function() {
@@ -7737,9 +7737,9 @@ window.spb = function(modules) {
             })), S.d(N, "LANG", (function() {
                 return t;
             })), S.d(N, "COUNTRY_LANGS", (function() {
-                return T;
-            })), S.d(N, "INTENT", (function() {
                 return e;
+            })), S.d(N, "INTENT", (function() {
+                return T;
             })), S.d(N, "COMMIT", (function() {
                 return n;
             })), S.d(N, "VAULT", (function() {
@@ -7751,15 +7751,15 @@ window.spb = function(modules) {
             })), S.d(N, "SDK_SETTINGS", (function() {
                 return F;
             })), S.d(N, "SDK_QUERY_KEYS", (function() {
-                return I;
-            })), S.d(N, "COMPONENTS", (function() {
                 return D;
-            })), S.d(N, "DEBUG", (function() {
+            })), S.d(N, "COMPONENTS", (function() {
                 return H;
+            })), S.d(N, "DEBUG", (function() {
+                return I;
             })), S.d(N, "QUERY_BOOL", (function() {
-                return O;
-            })), S.d(N, "UNKNOWN", (function() {
                 return o;
+            })), S.d(N, "UNKNOWN", (function() {
+                return O;
             })), S.d(N, "PROTOCOL", (function() {
                 return i;
             })), S.d(N, "PAGE_TYPES", (function() {
@@ -7770,8 +7770,6 @@ window.spb = function(modules) {
                 return h;
             })), S.d(N, "TYPES", (function() {
                 return k;
-            })), S.d(N, "APM_LIST", (function() {
-                return g;
             }));
             var R = {
                 AD: "AD",
@@ -8015,7 +8013,7 @@ window.spb = function(modules) {
                 VI: "vi",
                 ZH: "zh",
                 ZH_HANT: "zh_Hant"
-            }, T = {
+            }, e = {
                 AD: [ t.EN, t.FR, t.ES, t.ZH ],
                 AE: [ t.EN, t.FR, t.ES, t.ZH, t.AR ],
                 AG: [ t.EN, t.FR, t.ES, t.ZH ],
@@ -8219,7 +8217,7 @@ window.spb = function(modules) {
                 ZA: [ t.EN, t.FR, t.ES, t.ZH ],
                 ZM: [ t.EN, t.FR, t.ES, t.ZH ],
                 ZW: [ t.EN ]
-            }, e = {
+            }, T = {
                 CAPTURE: "capture",
                 AUTHORIZE: "authorize",
                 ORDER: "order",
@@ -8350,7 +8348,7 @@ window.spb = function(modules) {
                 PAGE_TYPE: "data-page-type",
                 USER_EXPERIENCE_FLOW: "data-user-experience-flow",
                 POPUPS_DISABLED: "data-popups-disabled"
-            }, I = {
+            }, D = {
                 COMPONENTS: "components",
                 ENV: "env",
                 DEBUG: "debug",
@@ -8371,16 +8369,16 @@ window.spb = function(modules) {
                 STAGE_ALIAS: "stage-alias",
                 CDN_REGISTRY: "cdn-registry",
                 VERSION: "version"
-            }, D = {
+            }, H = {
                 BUTTONS: "buttons",
                 HOSTED_FIELDS: "hosted-fields"
-            }, H = {
+            }, I = {
                 TRUE: !0,
                 FALSE: !1
-            }, O = {
+            }, o = {
                 TRUE: "true",
                 FALSE: "false"
-            }, o = "unknown", i = {
+            }, O = "unknown", i = {
                 HTTP: "http",
                 HTTPS: "https"
             }, M = {
@@ -8406,7 +8404,6 @@ window.spb = function(modules) {
             }, p = {
                 FEED: "feed_name",
                 STATE: "state_name",
-                EVENT_NAME: "event_name",
                 TRANSITION: "transition_name",
                 PAGE: "page_name",
                 BUTTON_TYPE: "button_type",
@@ -8662,9 +8659,6 @@ window.spb = function(modules) {
         }));
         __webpack_require__.d(__webpack_exports__, "TYPES", (function() {
             return TYPES;
-        }));
-        __webpack_require__.d(__webpack_exports__, "APM_LIST", (function() {
-            return APM_LIST;
         }));
         var COUNTRY = {
             AD: "AD",
@@ -9328,7 +9322,6 @@ window.spb = function(modules) {
         var FPTI_KEY = {
             FEED: "feed_name",
             STATE: "state_name",
-            EVENT_NAME: "event_name",
             TRANSITION: "transition_name",
             PAGE: "page_name",
             BUTTON_TYPE: "button_type",
@@ -11640,7 +11633,7 @@ window.spb = function(modules) {
         }));
         var getSmartWallet = Object(belter_src.memoize)((function(_ref) {
             var _headers;
-            var _ref$amount = _ref.amount, _ref$vetted = _ref.vetted, _ref$allowBillingPaym = _ref.allowBillingPayments;
+            var _ref$amount = _ref.amount, _ref$vetted = _ref.vetted, _ref$allowBillingPaym = _ref.allowBillingPayments, buyerAccessToken = _ref.buyerAccessToken;
             return callGraphQL({
                 name: "GetSmartWallet",
                 query: "\n            query GetSmartWallet(\n                $clientID: String!\n                $merchantID: [String!]\n                $currency: String\n                $amount: String\n                $userIDToken: String\n                $vetted: Boolean\n                $paymentMethodToken: String\n                $branded: Boolean,\n                $allowBillingPayments: Boolean\n            ) {\n                smartWallet(\n                    clientId: $clientID\n                    merchantId: $merchantID\n                    currency: $currency\n                    amount: $amount\n                    userIdToken: $userIDToken\n                    vetted: $vetted\n                    paymentMethodNonce: $paymentMethodToken\n                    branded: $branded,\n                    allowBillingPayments: $allowBillingPayments\n                ) {\n                    paypal {\n                        instruments {\n                            type\n                            label\n                            logoUrl\n                            instrumentID\n                            tokenID\n                            vendor\n                            oneClick\n                            accessToken\n                        }\n                    }\n                    credit {\n                        instruments {\n                            type\n                            label\n                            logoUrl\n                            instrumentID\n                            tokenID\n                            vendor\n                            oneClick\n                            accessToken\n                        }\n                    }\n                    card {\n                        instruments {\n                            type\n                            label\n                            logoUrl\n                            instrumentID\n                            tokenID\n                            vendor\n                            oneClick\n                        }\n                    }\n                    venmo {\n                        instruments {\n                            type\n                            label\n                            logoUrl\n                            instrumentID\n                            tokenID\n                            oneClick\n                        }\n                    }\n                }\n            }\n        ",
@@ -11653,10 +11646,11 @@ window.spb = function(modules) {
                     vetted: void 0 === _ref$vetted || _ref$vetted,
                     paymentMethodToken: _ref.paymentMethodToken,
                     branded: _ref.branded,
-                    allowBillingPayments: void 0 === _ref$allowBillingPaym || _ref$allowBillingPaym
+                    allowBillingPayments: void 0 === _ref$allowBillingPaym || _ref$allowBillingPaym,
+                    orderID: _ref.orderID
                 },
                 headers: (_headers = {}, _headers[constants.HEADERS.CLIENT_METADATA_ID] = _ref.clientMetadataID, 
-                _headers)
+                _headers[constants.HEADERS.ACCESS_TOKEN] = buyerAccessToken, _headers)
             }).then((function(_ref2) {
                 return _ref2.smartWallet;
             }));
@@ -11863,6 +11857,9 @@ window.spb = function(modules) {
                 personalization: _ref3.personalization,
                 featureFlags: _ref3.featureFlags
             };
+        }
+        function getButtons() {
+            return Object(src.querySelectorAll)("[ " + constants.DATA_ATTRIBUTES.FUNDING_SOURCE + " ]");
         }
         function enableLoadingSpinner(button) {
             button.classList.add(constants.CLASS.LOADING);
@@ -12572,13 +12569,6 @@ window.spb = function(modules) {
         var acceleratedXO = !1;
         var smokeHash = "";
         var checkout_getDimensions = function(fundingSource) {
-            if (-1 !== sdk_constants_src.APM_LIST.indexOf(fundingSource)) {
-                Object(lib.getLogger)().info("popup_dimensions_value_" + fundingSource).flush();
-                return {
-                    width: 1282,
-                    height: 720
-                };
-            }
             Object(lib.getLogger)().info("popup_dimensions_" + fundingSource).flush();
             return {
                 width: 500,
@@ -12588,7 +12578,11 @@ window.spb = function(modules) {
         var checkout = {
             name: "checkout",
             setup: function(_ref) {
-                var Checkout = _ref.components.Checkout;
+                var components = _ref.components;
+                console.log("TEST Checkout.js setupCheckout", {
+                    components: components
+                });
+                var Checkout = components.Checkout;
                 var _ref2 = [ Object(cross_domain_utils_src.getParent)(window), Object(cross_domain_utils_src.getTop)(window) ], parent = _ref2[0], top = _ref2[1];
                 var tasks = {};
                 top && parent && parent !== top && (tasks.canRenderTo = Checkout.canRenderTo(top).then((function(result) {
@@ -12609,6 +12603,14 @@ window.spb = function(modules) {
             },
             init: function initCheckout(_ref5) {
                 var props = _ref5.props, components = _ref5.components, serviceData = _ref5.serviceData, payment = _ref5.payment, config = _ref5.config, fullRestart = _ref5.restart;
+                console.log("TEST Checkout.js initCheckout", {
+                    props: props,
+                    components: components,
+                    serviceData: serviceData,
+                    payment: payment,
+                    config: config,
+                    fullRestart: fullRestart
+                });
                 var Checkout = components.Checkout;
                 var sessionID = props.sessionID, buttonSessionID = props.buttonSessionID, _createOrder = props.createOrder, _onApprove = props.onApprove, _onComplete = props.onComplete, _onCancel = props.onCancel, onShippingChange = props.onShippingChange, onShippingAddressChange = props.onShippingAddressChange, onShippingOptionsChange = props.onShippingOptionsChange, locale = props.locale, commit = props.commit, _onError = props.onError, vault = props.vault, clientAccessToken = props.clientAccessToken, createBillingAgreement = props.createBillingAgreement, createSubscription = props.createSubscription, onClick = props.onClick, amount = props.amount, clientID = props.clientID, connect = props.connect, cmid = props.clientMetadataID, _onAuth = props.onAuth, userIDToken = props.userIDToken, env = props.env, currency = props.currency, enableFunding = props.enableFunding, stickinessID = props.stickinessID, standaloneFundingSource = props.standaloneFundingSource, branded = props.branded, paymentMethodToken = props.paymentMethodToken, allowBillingPayments = props.allowBillingPayments, merchantRequestedPopupsDisabled = props.merchantRequestedPopupsDisabled;
                 var button = payment.button, win = payment.win, fundingSource = payment.fundingSource, card = payment.card, _payment$buyerAccessT = payment.buyerAccessToken, buyerAccessToken = void 0 === _payment$buyerAccessT ? serviceData.buyerAccessToken : _payment$buyerAccessT, venmoPayloadID = payment.venmoPayloadID, buyerIntent = payment.buyerIntent;
@@ -12679,158 +12681,206 @@ window.spb = function(modules) {
                                             currency: currency,
                                             amount: amount,
                                             clientMetadataID: clientMetadataID,
-                                            userIDToken: userIDToken,
-                                            paymentMethodToken: paymentMethodToken,
-                                            allowBillingPayments: allowBillingPayments,
-                                            branded: branded
-                                        });
-                                    })).then((function(wallet) {
-                                        var walletInstruments = wallet[fundingSkipLogin] && wallet[fundingSkipLogin].instruments;
-                                        if (walletInstruments) for (var _i2 = 0; _i2 < walletInstruments.length; _i2++) {
-                                            var instrument = walletInstruments[_i2];
-                                            if (instrument.accessToken) return instrument.accessToken;
-                                        }
-                                    }));
-                                }
-                            })).then((function(accessToken) {
-                                if (accessToken && (buyerIntent === constants.BUYER_INTENT.PAY || buyerIntent === constants.BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING)) return Object(api.exchangeAccessTokenForAuthCode)(accessToken);
-                            })).catch((function(err) {
-                                Object(lib.getLogger)().warn("exchange_access_token_auth_code_error", {
-                                    err: Object(src.stringifyError)(err)
-                                });
-                            }));
-                        },
-                        getConnectURL: connect && connectEligible ? function(_ref6) {
-                            var payerID = _ref6.payerID;
-                            if (!clientID) throw new Error("Expected clientID");
-                            return _createOrder().then((function(orderID) {
-                                return Object(api.getConnectURL)({
-                                    orderID: orderID,
-                                    payerID: payerID,
-                                    clientID: clientID,
-                                    fundingSource: fundingSource,
-                                    connect: connect
-                                }).then((function(connectURL) {
-                                    var _getLogger$info$track;
-                                    Object(lib.getLogger)().info("connect_redirect", {
-                                        connectURL: connectURL
-                                    }).track((_getLogger$info$track = {}, _getLogger$info$track[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CONNECT_REDIRECT, 
-                                    _getLogger$info$track[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.ORDER_ID, 
-                                    _getLogger$info$track[sdk_constants_src.FPTI_KEY.TOKEN] = orderID, _getLogger$info$track[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = orderID, 
-                                    _getLogger$info$track)).flush();
-                                    return Object(src.extendUrl)(connectURL, {
-                                        query: {
-                                            sdkMeta: sdkMeta
-                                        }
-                                    });
+                                            cspNonce: cspNonce
+                                        }).catch(src.noop).then((function() {
+                                            return Object(api.getSmartWallet)({
+                                                clientID: clientID,
+                                                merchantID: merchantID,
+                                                currency: currency,
+                                                amount: amount,
+                                                clientMetadataID: clientMetadataID,
+                                                userIDToken: userIDToken,
+                                                paymentMethodToken: paymentMethodToken,
+                                                allowBillingPayments: allowBillingPayments,
+                                                branded: branded
+                                            });
+                                        })).then((function(wallet) {
+                                            var walletInstruments = wallet[fundingSkipLogin] && wallet[fundingSkipLogin].instruments;
+                                            if (walletInstruments) for (var _i2 = 0; _i2 < walletInstruments.length; _i2++) {
+                                                var instrument = walletInstruments[_i2];
+                                                if (instrument.accessToken) return instrument.accessToken;
+                                            }
+                                        }));
+                                    }
+                                })).then((function(accessToken) {
+                                    if (accessToken && (buyerIntent === constants.BUYER_INTENT.PAY || buyerIntent === constants.BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING)) return Object(api.exchangeAccessTokenForAuthCode)(accessToken);
                                 })).catch((function(err) {
-                                    Object(lib.getLogger)().error("connect_redirect_error", {
+                                    Object(lib.getLogger)().warn("exchange_access_token_auth_code_error", {
                                         err: Object(src.stringifyError)(err)
                                     });
-                                    throw err;
                                 }));
-                            }));
-                        } : null,
-                        createOrder: function() {
-                            return _createOrder().then((function(orderID) {
-                                return orderID;
-                            }));
-                        },
-                        onApprove: function(_temp) {
-                            var _ref7 = void 0 === _temp ? {} : _temp, accelerated = _ref7.accelerated, _ref7$approveOnClose = _ref7.approveOnClose, payerID = _ref7.payerID, paymentID = _ref7.paymentID, billingToken = _ref7.billingToken, subscriptionID = _ref7.subscriptionID, authCode = _ref7.authCode;
-                            if (void 0 === _ref7$approveOnClose || !_ref7$approveOnClose) {
-                                approved = !0;
-                                Object(lib.getLogger)().info("spb_onapprove_access_token_" + (buyerAccessToken ? "present" : "not_present")).flush();
+                            },
+                            getConnectURL: connect && connectEligible ? function(_ref6) {
+                                var payerID = _ref6.payerID;
+                                if (!clientID) throw new Error("Expected clientID");
+                                return _createOrder().then((function(orderID) {
+                                    return Object(api.getConnectURL)({
+                                        orderID: orderID,
+                                        payerID: payerID,
+                                        clientID: clientID,
+                                        fundingSource: fundingSource,
+                                        connect: connect
+                                    }).then((function(connectURL) {
+                                        var _getLogger$info$track;
+                                        Object(lib.getLogger)().info("connect_redirect", {
+                                            connectURL: connectURL
+                                        }).track((_getLogger$info$track = {}, _getLogger$info$track[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CONNECT_REDIRECT, 
+                                        _getLogger$info$track[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.ORDER_ID, 
+                                        _getLogger$info$track[sdk_constants_src.FPTI_KEY.TOKEN] = orderID, _getLogger$info$track[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = orderID, 
+                                        _getLogger$info$track)).flush();
+                                        return Object(src.extendUrl)(connectURL, {
+                                            query: {
+                                                sdkMeta: sdkMeta
+                                            }
+                                        });
+                                    })).catch((function(err) {
+                                        Object(lib.getLogger)().error("connect_redirect_error", {
+                                            err: Object(src.stringifyError)(err)
+                                        });
+                                        throw err;
+                                    }));
+                                }));
+                            } : null,
+                            createOrder: function() {
+                                return _createOrder().then((function(orderID) {
+                                    return orderID;
+                                }));
+                            },
+                            onApprove: function(_temp) {
+                                var _ref7 = void 0 === _temp ? {} : _temp, accelerated = _ref7.accelerated, _ref7$approveOnClose = _ref7.approveOnClose, payerID = _ref7.payerID, paymentID = _ref7.paymentID, billingToken = _ref7.billingToken, subscriptionID = _ref7.subscriptionID, authCode = _ref7.authCode;
+                                if (void 0 === _ref7$approveOnClose || !_ref7$approveOnClose) {
+                                    approved = !0;
+                                    Object(lib.getLogger)().info("spb_onapprove_access_token_" + (buyerAccessToken ? "present" : "not_present")).flush();
+                                    Object(lib.setBuyerAccessToken)(buyerAccessToken);
+                                    var valid = !0;
+                                    return _onApprove({
+                                        accelerated: accelerated,
+                                        payerID: payerID,
+                                        paymentID: paymentID,
+                                        billingToken: billingToken,
+                                        subscriptionID: subscriptionID,
+                                        buyerAccessToken: buyerAccessToken,
+                                        authCode: authCode
+                                    }, {
+                                        restart: restart
+                                    }).finally((function() {
+                                        return accelerated ? valid : close().then(src.noop);
+                                    })).catch((function() {
+                                        valid = !1;
+                                    }));
+                                }
+                                doApproveOnClose = !0;
+                            },
+                            onComplete: function() {
+                                Object(lib.getLogger)().info("spb_oncomplete_access_token_" + (buyerAccessToken ? "present" : "not_present")).flush();
                                 Object(lib.setBuyerAccessToken)(buyerAccessToken);
-                                var valid = !0;
-                                return _onApprove({
-                                    accelerated: accelerated,
-                                    payerID: payerID,
-                                    paymentID: paymentID,
-                                    billingToken: billingToken,
-                                    subscriptionID: subscriptionID,
-                                    buyerAccessToken: buyerAccessToken,
-                                    authCode: authCode
+                                return _onComplete({
+                                    buyerAccessToken: buyerAccessToken
+                                }).finally((function() {
+                                    return close().then(src.noop);
+                                })).catch(src.noop);
+                            },
+                            onSmartWalletEligible: function(_ref8) {
+                                var access_token = _ref8.accessToken || buyerAccessToken;
+                                var enableInContextWallet = serviceData.enableInContextWallet;
+                                if (window.innerWidth < 300 || enableInContextWallet) {
+                                    Object(lib.getLogger)().info("checkout_smart_wallet_not_eligible ", {
+                                        enableInContextWallet: enableInContextWallet,
+                                        width: window.innerWidth
+                                    });
+                                    return zalgo_promise_src.ZalgoPromise.resolve({
+                                        smartWalletRendered: !1
+                                    });
+                                }
+                                var timer = null;
+                                var returnPromise = new zalgo_promise_src.ZalgoPromise((function(resolve) {
+                                    timer = setTimeout((function() {
+                                        resolve({
+                                            smartWalletRendered: !1
+                                        });
+                                    }), 1e3);
+                                }));
+                                _createOrder().then((function(orderID) {
+                                    close().then((function() {
+                                        getButtons().forEach((function(button) {
+                                            return enableLoadingSpinner(button);
+                                        }));
+                                        clearTimeout(timer);
+                                        Object(src.submitForm)({
+                                            url: document.location.href,
+                                            target: "_self",
+                                            body: {
+                                                buyerAccessToken: access_token,
+                                                orderID: orderID,
+                                                enableInContextWallet: !0
+                                            }
+                                        });
+                                    }));
+                                }));
+                                return returnPromise;
+                            },
+                            onAuth: function(_ref9) {
+                                return _onAuth({
+                                    accessToken: _ref9.accessToken || buyerAccessToken
+                                }).then((function(token) {
+                                    buyerAccessToken = token;
+                                }));
+                            },
+                            onCancel: function() {
+                                return close().then((function() {
+                                    return _onCancel();
+                                }));
+                            },
+                            onShippingChange: onShippingChange ? function(data, actions) {
+                                return onShippingChange(Object(esm_extends.default)({
+                                    buyerAccessToken: buyerAccessToken
+                                }, data), actions);
+                            } : null,
+                            onShippingAddressChange: onShippingAddressChange ? function(data, actions) {
+                                if (!data.shipping_address) throw new Error("Must pass shipping_address in data to handle changes in shipping address.");
+                                return onShippingAddressChange(Object(esm_extends.default)({}, data), actions);
+                            } : null,
+                            onShippingOptionsChange: onShippingOptionsChange ? function(data, actions) {
+                                if (!data.selected_shipping_option) throw new Error("Must pass selected_shipping_option in data to handle changes in shipping options.");
+                                return onShippingOptionsChange(Object(esm_extends.default)({}, data), actions);
+                            } : null,
+                            onClose: function() {
+                                return doApproveOnClose && !approved ? _onApprove({
+                                    forceRestAPI: !0
                                 }, {
                                     restart: restart
-                                }).finally((function() {
-                                    return accelerated ? valid : close().then(src.noop);
-                                })).catch((function() {
-                                    valid = !1;
-                                }));
+                                }).catch(src.noop) : forceClosed || approved ? void 0 : _onCancel();
+                            },
+                            onError: function(err) {
+                                var _getLogger$info$track2;
+                                Object(lib.getLogger)().info("checkout_flow_error ", {
+                                    err: Object(src.stringifyError)(err)
+                                }).track((_getLogger$info$track2 = {}, _getLogger$info$track2[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CHECKOUT_ERROR, 
+                                _getLogger$info$track2[sdk_constants_src.FPTI_KEY.EVENT_NAME] = constants.FPTI_TRANSITION.CHECKOUT_ERROR, 
+                                _getLogger$info$track2[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyError)(err), 
+                                _getLogger$info$track2)).flush();
+                                return _onError(err);
+                            },
+                            dimensions: checkout_getDimensions(fundingSource),
+                            fundingSource: fundingSource,
+                            card: card,
+                            buyerCountry: buyerCountry,
+                            locale: locale,
+                            commit: commit,
+                            cspNonce: cspNonce,
+                            clientMetadataID: cmid,
+                            enableFunding: enableFunding,
+                            standaloneFundingSource: standaloneFundingSource,
+                            branded: branded,
+                            restart: function() {
+                                return fullRestart({
+                                    payment: Object(esm_extends.default)({}, payment, {
+                                        win: win
+                                    })
+                                });
                             }
-                            doApproveOnClose = !0;
-                        },
-                        onComplete: function() {
-                            Object(lib.getLogger)().info("spb_oncomplete_access_token_" + (buyerAccessToken ? "present" : "not_present")).flush();
-                            Object(lib.setBuyerAccessToken)(buyerAccessToken);
-                            return _onComplete({
-                                buyerAccessToken: buyerAccessToken
-                            }).finally((function() {
-                                return close().then(src.noop);
-                            })).catch(src.noop);
-                        },
-                        onAuth: function(_ref8) {
-                            return _onAuth({
-                                accessToken: _ref8.accessToken || buyerAccessToken
-                            }).then((function(token) {
-                                buyerAccessToken = token;
-                            }));
-                        },
-                        onCancel: function() {
-                            return close().then((function() {
-                                return _onCancel();
-                            }));
-                        },
-                        onShippingChange: onShippingChange ? function(data, actions) {
-                            return onShippingChange(Object(esm_extends.default)({
-                                buyerAccessToken: buyerAccessToken
-                            }, data), actions);
-                        } : null,
-                        onShippingAddressChange: onShippingAddressChange ? function(data, actions) {
-                            if (!data.shipping_address) throw new Error("Must pass shipping_address in data to handle changes in shipping address.");
-                            return onShippingAddressChange(Object(esm_extends.default)({}, data), actions);
-                        } : null,
-                        onShippingOptionsChange: onShippingOptionsChange ? function(data, actions) {
-                            if (!data.selected_shipping_option) throw new Error("Must pass selected_shipping_option in data to handle changes in shipping options.");
-                            return onShippingOptionsChange(Object(esm_extends.default)({}, data), actions);
-                        } : null,
-                        onClose: function() {
-                            return doApproveOnClose && !approved ? _onApprove({
-                                forceRestAPI: !0
-                            }, {
-                                restart: restart
-                            }).catch(src.noop) : forceClosed || approved ? void 0 : _onCancel();
-                        },
-                        onError: function(err) {
-                            var _getLogger$info$track2;
-                            Object(lib.getLogger)().info("checkout_flow_error ", {
-                                err: Object(src.stringifyError)(err)
-                            }).track((_getLogger$info$track2 = {}, _getLogger$info$track2[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CHECKOUT_ERROR, 
-                            _getLogger$info$track2[sdk_constants_src.FPTI_KEY.EVENT_NAME] = constants.FPTI_TRANSITION.CHECKOUT_ERROR, 
-                            _getLogger$info$track2[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyError)(err), 
-                            _getLogger$info$track2)).flush();
-                            return _onError(err);
-                        },
-                        dimensions: checkout_getDimensions(fundingSource),
-                        fundingSource: fundingSource,
-                        card: card,
-                        buyerCountry: buyerCountry,
-                        locale: locale,
-                        commit: commit,
-                        cspNonce: cspNonce,
-                        clientMetadataID: cmid,
-                        enableFunding: enableFunding,
-                        standaloneFundingSource: standaloneFundingSource,
-                        branded: branded,
-                        restart: function() {
-                            return fullRestart({
-                                payment: Object(esm_extends.default)({}, payment, {
-                                    win: win
-                                })
-                            });
-                        }
-                    })).renderTo(function() {
+                        });
+                    }()).renderTo(function() {
                         var top = Object(cross_domain_utils_src.getTop)(window);
                         return canRenderTop && top ? top : Object(cross_domain_utils_src.getParent)() ? Object(cross_domain_utils_src.getParent)() : window;
                     }(), constants.TARGET_ELEMENT.BODY, context);
@@ -12855,6 +12905,7 @@ window.spb = function(modules) {
                 }));
                 return {
                     click: function() {
+                        console.log("TEST Checkout.js Click");
                         return zalgo_promise_src.ZalgoPromise.try((function() {
                             if (acceleratedXO) context = constants.CONTEXT.IFRAME; else if (!merchantRequestedPopupsDisabled && !win && Object(src.supportsPopups)()) try {
                                 var _getDimensions = checkout_getDimensions(fundingSource);
@@ -14011,8 +14062,47 @@ window.spb = function(modules) {
             spinner: !0,
             inline: !0
         };
+        function isWalletCaptureEligible(_ref) {
+            var props = _ref.props;
+            return !!_ref.serviceData.wallet && !(props.onShippingChange || props.onShippingAddressChange || props.onShippingOptionsChange);
+        }
         var smartWalletPromise;
         var smartWalletErrored = !1;
+        function setupWalletCapture(_ref3) {
+            var props = _ref3.props, serviceData = _ref3.serviceData;
+            var env = props.env, clientID = props.clientID, currency = props.currency, amount = props.amount, userIDToken = props.userIDToken, paymentMethodToken = props.paymentMethodToken, allowBillingPayments = props.allowBillingPayments, branded = props.branded;
+            var cspNonce = _ref3.config.cspNonce;
+            var merchantID = serviceData.merchantID, wallet = serviceData.wallet;
+            var clientMetadataID = function(_ref2) {
+                var props = _ref2.props;
+                return props.clientMetadataID || props.sessionID;
+            }({
+                props: props
+            });
+            if (!wallet) throw new Error("No wallet found");
+            (smartWalletPromise = Object(api.loadFraudnet)({
+                env: env,
+                clientMetadataID: clientMetadataID,
+                cspNonce: cspNonce
+            }).catch(src.noop).then((function() {
+                return userIDToken ? Object(api.getSmartWallet)({
+                    clientID: clientID,
+                    merchantID: merchantID,
+                    currency: currency,
+                    amount: amount,
+                    clientMetadataID: clientMetadataID,
+                    userIDToken: userIDToken,
+                    paymentMethodToken: paymentMethodToken,
+                    allowBillingPayments: allowBillingPayments,
+                    branded: branded
+                }) : wallet;
+            }))).catch((function(err) {
+                Object(lib.getLogger)().warn("load_smart_wallet_error", {
+                    err: Object(src.stringifyError)(err)
+                });
+                smartWalletErrored = !0;
+            }));
+        }
         function getInstrument(wallet, fundingSource, instrumentID) {
             var walletFunding = wallet[fundingSource];
             if (!walletFunding) throw new Error("Wallet has no " + fundingSource);
@@ -14024,233 +14114,306 @@ window.spb = function(modules) {
             if (!instrument) throw new Error("Can not find instrument with id " + instrumentID);
             return instrument;
         }
+        function isWalletCapturePaymentEligible(_ref4) {
+            var payment = _ref4.payment;
+            var wallet = _ref4.serviceData.wallet;
+            var fundingSource = payment.fundingSource, instrumentID = payment.instrumentID;
+            if (payment.win) return !1;
+            if (!wallet) return !1;
+            if (!instrumentID) return !1;
+            if (!smartWalletPromise) return !1;
+            if (smartWalletErrored) return !1;
+            try {
+                getInstrument(wallet, fundingSource, instrumentID);
+            } catch (err) {
+                return !1;
+            }
+            return !0;
+        }
+        function initWalletCapture(_ref5) {
+            var props = _ref5.props, components = _ref5.components, payment = _ref5.payment, serviceData = _ref5.serviceData, config = _ref5.config, fullRestart = _ref5.restart;
+            var onApprove = props.onApprove, clientMetadataID = props.clientMetadataID, vault = props.vault, onAuth = props.onAuth;
+            var fundingSource = payment.fundingSource, instrumentID = payment.instrumentID;
+            var wallet = serviceData.wallet, enableInContextWallet = serviceData.enableInContextWallet;
+            var createOrderWrapped = function(orderID, enableInContextWallet, createOrder) {
+                return orderID && enableInContextWallet ? function() {
+                    console.log("TEST WalletCapture.js createOrder resolved");
+                    return zalgo_promise_src.ZalgoPromise.resolve(orderID);
+                } : createOrder;
+            }(serviceData.orderID, enableInContextWallet, props.createOrder);
+            if (!wallet || !smartWalletPromise) throw new Error("No smart wallet found");
+            if (!instrumentID) throw new Error("Instrument id required for wallet capture");
+            var instrument = getInstrument(wallet, fundingSource, instrumentID);
+            var createAccessToken = function() {
+                if (!smartWalletPromise) throw new Error("No smart wallet found");
+                return Object(lib.getBuyerAccessToken)() ? Object(lib.getBuyerAccessToken)() : smartWalletPromise.then((function(smartWallet) {
+                    var accessToken = getInstrument(smartWallet, fundingSource, instrumentID).accessToken;
+                    if (!accessToken) throw new Error("Instrument access token not found");
+                    return accessToken;
+                }));
+            };
+            var getWebCheckoutFallback = function() {
+                console.log("TEST Wallet Capture fallbackToWebCheckout > getWebCheckoutFallback");
+                return checkout.init({
+                    props: props,
+                    components: components,
+                    serviceData: serviceData,
+                    payment: Object(esm_extends.default)({}, payment, {
+                        createAccessToken: createAccessToken,
+                        isClick: !1,
+                        buyerIntent: constants.BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING,
+                        fundingSource: instrument && instrument.type === sdk_constants_src.WALLET_INSTRUMENT.CREDIT ? sdk_constants_src.FUNDING.CREDIT : fundingSource
+                    }),
+                    config: config,
+                    restart: fullRestart
+                });
+            };
+            var fallbackToWebCheckout = function() {
+                console.log("TEST Wallet Capture fallbackToWebCheckout");
+                Object(lib.getLogger)().info("web_checkout_fallback").flush();
+                return getWebCheckoutFallback().start();
+            };
+            if (!instrument.oneClick || smartWalletErrored || vault) {
+                console.warn("TEST Wallet Capture initWalletCapture > needs to fallbackToWebCheckout", {
+                    oneClick: instrument.oneClick,
+                    smartWalletErrored: smartWalletErrored,
+                    vault: vault
+                });
+                return getWebCheckoutFallback();
+            }
+            var restart = function() {
+                return fallbackToWebCheckout();
+            };
+            var shippingRequired = function(orderID) {
+                return Object(api.getSupplementalOrderInfo)(orderID).then((function(order) {
+                    return !!order.checkoutSession.flags.isChangeShippingAddressAllowed;
+                }));
+            };
+            return {
+                start: function() {
+                    console.log("TEST Wallet Capture Start");
+                    return zalgo_promise_src.ZalgoPromise.hash({
+                        orderID: createOrderWrapped(),
+                        smartWallet: smartWalletPromise
+                    }).then((function(_ref6) {
+                        var orderID = _ref6.orderID, smartWallet = _ref6.smartWallet;
+                        console.log("TEST Wallet Capture Start Promise Resolved", {
+                            orderID: orderID,
+                            smartWallet: smartWallet
+                        });
+                        var buyerAccessToken = enableInContextWallet && Object(lib.getBuyerAccessToken)() || getInstrument(smartWallet, fundingSource, instrumentID).accessToken;
+                        if (!buyerAccessToken) throw new Error("No access token available for instrument");
+                        var instrumentType = instrument.type;
+                        if (!instrumentType) throw new Error("Instrument has no type");
+                        return zalgo_promise_src.ZalgoPromise.hash({
+                            requireShipping: shippingRequired(orderID),
+                            orderApproval: Object(api.oneClickApproveOrder)({
+                                orderID: orderID,
+                                instrumentType: instrumentType,
+                                buyerAccessToken: buyerAccessToken,
+                                instrumentID: instrumentID,
+                                clientMetadataID: clientMetadataID
+                            }),
+                            onAuth: onAuth({
+                                accessToken: buyerAccessToken
+                            })
+                        }).then((function(_ref7) {
+                            var requireShipping = _ref7.requireShipping, orderApproval = _ref7.orderApproval;
+                            console.log("TEST Wallet Capture Start > ZalgoPromise.hash", {
+                                requireShipping: requireShipping,
+                                orderApproval: orderApproval
+                            });
+                            return requireShipping ? fallbackToWebCheckout() : onApprove({
+                                payerID: orderApproval.payerID,
+                                buyerAccessToken: buyerAccessToken
+                            }, {
+                                restart: restart
+                            }).catch(src.noop);
+                        }));
+                    })).catch((function(err) {
+                        console.log("TEST Wallet Capture Start Promise Catch");
+                        Object(lib.getLogger)().warn("approve_order_error", {
+                            err: Object(src.stringifyError)(err)
+                        }).flush();
+                        return fallbackToWebCheckout();
+                    }));
+                },
+                close: function() {
+                    return zalgo_promise_src.ZalgoPromise.resolve();
+                }
+            };
+        }
         var wallet_capture_POPUP_OPTIONS = {
             width: 500,
             height: 590
         };
-        var walletCapture = {
-            name: "wallet_capture",
-            setup: function(_ref3) {
-                var props = _ref3.props, serviceData = _ref3.serviceData;
-                var env = props.env, clientID = props.clientID, currency = props.currency, amount = props.amount, userIDToken = props.userIDToken, paymentMethodToken = props.paymentMethodToken, allowBillingPayments = props.allowBillingPayments, branded = props.branded;
-                var cspNonce = _ref3.config.cspNonce;
-                var merchantID = serviceData.merchantID, wallet = serviceData.wallet;
-                var clientMetadataID = function(_ref2) {
-                    var props = _ref2.props;
-                    return props.clientMetadataID || props.sessionID;
-                }({
-                    props: props
+        function setupWalletMenu(_ref8) {
+            var props = _ref8.props, payment = _ref8.payment, serviceData = _ref8.serviceData, components = _ref8.components, config = _ref8.config, restart = _ref8.restart;
+            console.log("TEST setupWalletMenu", {
+                props: props,
+                payment: payment,
+                serviceData: serviceData,
+                components: components,
+                config: config,
+                restart: restart
+            });
+            var createOrder = props.createOrder;
+            var fundingSource = payment.fundingSource, instrumentID = payment.instrumentID;
+            var wallet = serviceData.wallet, content = serviceData.content;
+            var orderID = serviceData.orderID, enableInContextWallet = serviceData.enableInContextWallet;
+            if (!wallet) throw new Error("Can not render wallet menu without wallet");
+            if (!instrumentID) throw new Error("Can not render wallet menu without instrumentID");
+            var instrument = getInstrument(wallet, fundingSource, instrumentID);
+            if (!instrument) throw new Error("Can not render wallet menu without instrument");
+            console.log("TEST setupWalletMenu validated");
+            var loadCheckout = function(_ref9) {
+                var checkoutPayment = _ref9.payment;
+                var updatedProps = Object(esm_extends.default)({}, props);
+                console.log("TEST setupWalletMenu > loadCheckout Regular wallet", {
+                    payment: payment
                 });
-                if (!wallet) throw new Error("No wallet found");
-                (smartWalletPromise = Object(api.loadFraudnet)({
-                    env: env,
-                    clientMetadataID: clientMetadataID,
-                    cspNonce: cspNonce
-                }).catch(src.noop).then((function() {
-                    return userIDToken ? Object(api.getSmartWallet)({
-                        clientID: clientID,
-                        merchantID: merchantID,
-                        currency: currency,
-                        amount: amount,
-                        clientMetadataID: clientMetadataID,
-                        userIDToken: userIDToken,
-                        paymentMethodToken: paymentMethodToken,
-                        allowBillingPayments: allowBillingPayments,
-                        branded: branded
-                    }) : wallet;
-                }))).catch((function(err) {
-                    Object(lib.getLogger)().warn("load_smart_wallet_error", {
-                        err: Object(src.stringifyError)(err)
+                if (enableInContextWallet && orderID) {
+                    console.log("TEST setupWalletMenu > loadCheckout for enableInContextWallet", {
+                        payment: payment
                     });
-                    smartWalletErrored = !0;
-                }));
-            },
-            isEligible: function(_ref) {
-                var props = _ref.props;
-                return !!_ref.serviceData.wallet && !(props.onShippingChange || props.onShippingAddressChange || props.onShippingOptionsChange);
-            },
-            isPaymentEligible: function(_ref4) {
-                var payment = _ref4.payment;
-                var wallet = _ref4.serviceData.wallet;
-                var fundingSource = payment.fundingSource, instrumentID = payment.instrumentID;
-                if (payment.win) return !1;
-                if (!wallet) return !1;
-                if (!instrumentID) return !1;
-                if (!smartWalletPromise) return !1;
-                if (smartWalletErrored) return !1;
-                try {
-                    getInstrument(wallet, fundingSource, instrumentID);
-                } catch (err) {
-                    return !1;
+                    updatedProps.createOrder = function() {
+                        console.log("TEST WalletCapture.js createOrder resolved");
+                        return zalgo_promise_src.ZalgoPromise.resolve(orderID);
+                    };
                 }
-                return !0;
-            },
-            init: function(_ref5) {
-                var props = _ref5.props, components = _ref5.components, payment = _ref5.payment, serviceData = _ref5.serviceData, config = _ref5.config, fullRestart = _ref5.restart;
-                var createOrder = props.createOrder, onApprove = props.onApprove, clientMetadataID = props.clientMetadataID, vault = props.vault, onAuth = props.onAuth;
-                var fundingSource = payment.fundingSource, instrumentID = payment.instrumentID;
-                var wallet = serviceData.wallet;
-                if (!wallet || !smartWalletPromise) throw new Error("No smart wallet found");
-                if (!instrumentID) throw new Error("Instrument id required for wallet capture");
-                var instrument = getInstrument(wallet, fundingSource, instrumentID);
-                var createAccessToken = function() {
-                    if (!smartWalletPromise) throw new Error("No smart wallet found");
-                    return smartWalletPromise.then((function(smartWallet) {
-                        var accessToken = getInstrument(smartWallet, fundingSource, instrumentID).accessToken;
-                        if (!accessToken) throw new Error("Instrument access token not found");
-                        return accessToken;
-                    }));
-                };
-                var getWebCheckoutFallback = function() {
-                    return checkout.init({
-                        props: props,
-                        components: components,
-                        serviceData: serviceData,
-                        payment: Object(esm_extends.default)({}, payment, {
-                            createAccessToken: createAccessToken,
-                            isClick: !1,
-                            buyerIntent: constants.BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING,
-                            fundingSource: instrument && instrument.type === sdk_constants_src.WALLET_INSTRUMENT.CREDIT ? sdk_constants_src.FUNDING.CREDIT : fundingSource
-                        }),
-                        config: config,
-                        restart: fullRestart
+                return checkout.init({
+                    props: props,
+                    components: components,
+                    serviceData: serviceData,
+                    config: config,
+                    payment: checkoutPayment,
+                    restart: restart
+                }).start();
+            };
+            var newFundingSource = instrument.type === sdk_constants_src.WALLET_INSTRUMENT.CREDIT ? sdk_constants_src.FUNDING.CREDIT : fundingSource;
+            if (fundingSource === sdk_constants_src.FUNDING.PAYPAL || fundingSource === sdk_constants_src.FUNDING.CREDIT) return [ {
+                label: content.payWithDifferentMethod,
+                popup: wallet_capture_POPUP_OPTIONS,
+                onSelect: function(_ref10) {
+                    var _getLogger$info$track;
+                    var win = _ref10.win;
+                    console.log("TEST setupWalletMenu > onSelect", {
+                        win: win
                     });
-                };
-                var fallbackToWebCheckout = function() {
-                    Object(lib.getLogger)().info("web_checkout_fallback").flush();
-                    return getWebCheckoutFallback().start();
-                };
-                if (!instrument.oneClick || smartWalletErrored || vault) return getWebCheckoutFallback();
-                var restart = function() {
-                    return fallbackToWebCheckout();
-                };
-                var shippingRequired = function(orderID) {
-                    return Object(api.getSupplementalOrderInfo)(orderID).then((function(order) {
-                        return !!order.checkoutSession.flags.isChangeShippingAddressAllowed;
-                    }));
-                };
-                return {
-                    start: function() {
-                        return zalgo_promise_src.ZalgoPromise.hash({
-                            orderID: createOrder(),
-                            smartWallet: smartWalletPromise
-                        }).then((function(_ref6) {
-                            var orderID = _ref6.orderID;
-                            var buyerAccessToken = getInstrument(_ref6.smartWallet, fundingSource, instrumentID).accessToken;
-                            if (!buyerAccessToken) throw new Error("No access token available for instrument");
-                            var instrumentType = instrument.type;
-                            if (!instrumentType) throw new Error("Instrument has no type");
-                            return zalgo_promise_src.ZalgoPromise.hash({
-                                requireShipping: shippingRequired(orderID),
-                                orderApproval: Object(api.oneClickApproveOrder)({
+                    Object(lib.getLogger)().info("click_choose_funding").track((_getLogger$info$track = {}, 
+                    _getLogger$info$track[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CLICK_CHOOSE_FUNDING, 
+                    _getLogger$info$track[sdk_constants_src.FPTI_KEY.OPTION_SELECTED] = constants.FPTI_MENU_OPTION.CHOOSE_FUNDING, 
+                    _getLogger$info$track)).flush();
+                    return zalgo_promise_src.ZalgoPromise.try((function() {
+                        console.log("TEST setupWalletMenu > onSelect > try");
+                        return function() {
+                            if (enableInContextWallet && orderID) {
+                                console.log("TEST setupWalletMenu updateMenuClientConfig using existing orderID");
+                                return Object(api.updateButtonClientConfig)({
+                                    fundingSource: fundingSource,
                                     orderID: orderID,
-                                    instrumentType: instrumentType,
-                                    buyerAccessToken: buyerAccessToken,
-                                    instrumentID: instrumentID,
-                                    clientMetadataID: clientMetadataID
-                                }),
-                                onAuth: onAuth({
-                                    accessToken: buyerAccessToken
-                                })
-                            }).then((function(_ref7) {
-                                var orderApproval = _ref7.orderApproval;
-                                return _ref7.requireShipping ? fallbackToWebCheckout() : onApprove({
-                                    payerID: orderApproval.payerID,
-                                    buyerAccessToken: buyerAccessToken
-                                }, {
-                                    restart: restart
-                                }).catch(src.noop);
-                            }));
-                        })).catch((function(err) {
-                            Object(lib.getLogger)().warn("approve_order_error", {
-                                err: Object(src.stringifyError)(err)
-                            }).flush();
-                            return fallbackToWebCheckout();
-                        }));
-                    },
-                    close: function() {
-                        return zalgo_promise_src.ZalgoPromise.resolve();
-                    }
-                };
-            },
-            setupMenu: function(_ref8) {
-                var props = _ref8.props, payment = _ref8.payment, serviceData = _ref8.serviceData, components = _ref8.components, config = _ref8.config, restart = _ref8.restart;
-                var createOrder = props.createOrder;
-                var fundingSource = payment.fundingSource, instrumentID = payment.instrumentID;
-                var wallet = serviceData.wallet, content = serviceData.content;
-                if (!wallet) throw new Error("Can not render wallet menu without wallet");
-                if (!instrumentID) throw new Error("Can not render wallet menu without instrumentID");
-                var instrument = getInstrument(wallet, fundingSource, instrumentID);
-                if (!instrument) throw new Error("Can not render wallet menu without instrument");
-                var loadCheckout = function(_ref9) {
-                    return checkout.init({
-                        props: props,
-                        components: components,
-                        serviceData: serviceData,
-                        config: config,
-                        payment: _ref9.payment,
-                        restart: restart
-                    }).start();
-                };
-                var newFundingSource = instrument.type === sdk_constants_src.WALLET_INSTRUMENT.CREDIT ? sdk_constants_src.FUNDING.CREDIT : fundingSource;
-                if (fundingSource === sdk_constants_src.FUNDING.PAYPAL || fundingSource === sdk_constants_src.FUNDING.CREDIT) return [ {
-                    label: content.payWithDifferentMethod,
-                    popup: wallet_capture_POPUP_OPTIONS,
-                    onSelect: function(_ref10) {
-                        var _getLogger$info$track;
-                        var win = _ref10.win;
-                        Object(lib.getLogger)().info("click_choose_funding").track((_getLogger$info$track = {}, 
-                        _getLogger$info$track[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CLICK_CHOOSE_FUNDING, 
-                        _getLogger$info$track[sdk_constants_src.FPTI_KEY.OPTION_SELECTED] = constants.FPTI_MENU_OPTION.CHOOSE_FUNDING, 
-                        _getLogger$info$track)).flush();
-                        return zalgo_promise_src.ZalgoPromise.try((function() {
+                                    inline: !1
+                                });
+                            }
+                            console.log("TEST setupWalletMenu updateMenuClientConfig > create orderID");
                             return zalgo_promise_src.ZalgoPromise.try((function() {
                                 return createOrder();
                             })).then((function(orderID) {
+                                console.log("TEST setupWalletMenu updateMenuClientConfig  > then ", {
+                                    orderID: orderID
+                                });
                                 return Object(api.updateButtonClientConfig)({
                                     fundingSource: fundingSource,
                                     orderID: orderID,
                                     inline: !1
                                 });
                             }));
-                        })).then((function() {
-                            return loadCheckout({
-                                payment: Object(esm_extends.default)({}, payment, {
-                                    win: win,
-                                    buyerIntent: constants.BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING,
-                                    fundingSource: newFundingSource,
-                                    createAccessToken: function() {
-                                        return smartWalletPromise.then((function(smartWallet) {
-                                            var smartInstrument = getInstrument(smartWallet, fundingSource, instrumentID);
-                                            if (!smartInstrument) throw new Error("Instrument not found");
-                                            if (!smartInstrument.accessToken) throw new Error("Instrument access token not found");
-                                            return smartInstrument.accessToken;
-                                        }));
-                                    }
-                                })
-                            });
-                        }));
-                    }
-                }, {
-                    label: content.payWithDifferentAccount,
-                    popup: wallet_capture_POPUP_OPTIONS,
-                    onSelect: function(_ref11) {
-                        var _getLogger$info$track2;
-                        var win = _ref11.win;
-                        Object(lib.getLogger)().info("click_choose_account").track((_getLogger$info$track2 = {}, 
-                        _getLogger$info$track2[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CLICK_CHOOSE_ACCOUNT, 
-                        _getLogger$info$track2[sdk_constants_src.FPTI_KEY.OPTION_SELECTED] = constants.FPTI_MENU_OPTION.CHOOSE_ACCOUNT, 
-                        _getLogger$info$track2)).flush();
+                        }();
+                    })).then((function() {
+                        console.log("TEST setupWalletMenu > onSelect > try > then > call loadCheckout", {
+                            payment: payment
+                        });
                         return loadCheckout({
                             payment: Object(esm_extends.default)({}, payment, {
                                 win: win,
-                                buyerIntent: constants.BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT,
-                                fundingSource: newFundingSource
+                                buyerIntent: constants.BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING,
+                                fundingSource: newFundingSource,
+                                createAccessToken: function() {
+                                    console.log("TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken", {
+                                        payment: payment
+                                    });
+                                    return smartWalletPromise.then((function(smartWallet) {
+                                        if (enableInContextWallet && Object(lib.getBuyerAccessToken)()) {
+                                            console.log("TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken > then getBuyerAccessToken", {
+                                                accessToken: Object(lib.getBuyerAccessToken)()
+                                            });
+                                            return Object(lib.getBuyerAccessToken)();
+                                        }
+                                        var smartInstrument = getInstrument(smartWallet, fundingSource, instrumentID);
+                                        console.log("TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken > then", {
+                                            smartInstrument: smartInstrument
+                                        });
+                                        if (!smartInstrument) throw new Error("Instrument not found");
+                                        if (!smartInstrument.accessToken) throw new Error("Instrument access token not found");
+                                        return smartInstrument.accessToken;
+                                    }));
+                                }
                             })
                         });
-                    }
-                } ];
-                throw new Error("Can not render menu for " + fundingSource);
+                    }));
+                }
+            }, {
+                label: content.payWithDifferentAccount,
+                popup: wallet_capture_POPUP_OPTIONS,
+                onSelect: function(_ref11) {
+                    var _getLogger$info$track2;
+                    var win = _ref11.win;
+                    Object(lib.getLogger)().info("click_choose_account").track((_getLogger$info$track2 = {}, 
+                    _getLogger$info$track2[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CLICK_CHOOSE_ACCOUNT, 
+                    _getLogger$info$track2[sdk_constants_src.FPTI_KEY.OPTION_SELECTED] = constants.FPTI_MENU_OPTION.CHOOSE_ACCOUNT, 
+                    _getLogger$info$track2)).flush();
+                    return loadCheckout({
+                        payment: Object(esm_extends.default)({}, payment, {
+                            win: win,
+                            buyerIntent: constants.BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT,
+                            fundingSource: newFundingSource
+                        })
+                    });
+                }
+            } ];
+            throw new Error("Can not render menu for " + fundingSource);
+        }
+        var walletCapture = {
+            name: "wallet_capture",
+            setup: function() {
+                for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) args[_key] = arguments[_key];
+                var res = setupWalletCapture.apply(void 0, args);
+                console.log("TEST setupWalletCapture", res, args);
+                return res;
+            },
+            isEligible: function() {
+                for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) args[_key2] = arguments[_key2];
+                var res = isWalletCaptureEligible.apply(void 0, args);
+                console.log("TEST isWalletCaptureEligible", res, args);
+                return res;
+            },
+            isPaymentEligible: function() {
+                for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) args[_key3] = arguments[_key3];
+                var res = isWalletCapturePaymentEligible.apply(void 0, args);
+                console.log("TEST isWalletCapturePaymentEligible", res, args);
+                return res;
+            },
+            init: function() {
+                for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) args[_key4] = arguments[_key4];
+                var res = initWalletCapture.apply(void 0, args);
+                console.log("TEST initWalletCapture", res, args);
+                return res;
+            },
+            setupMenu: function() {
+                for (var _len5 = arguments.length, args = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) args[_key5] = arguments[_key5];
+                var res = setupWalletMenu.apply(void 0, args);
+                console.log("TEST setupWalletMenu", res, args);
+                return res;
             },
             updateFlowClientConfig: function(_ref12) {
                 var orderID = _ref12.orderID;
@@ -15668,6 +15831,13 @@ window.spb = function(modules) {
         function initiatePaymentFlow(_ref3) {
             var _props$style;
             var payment = _ref3.payment, serviceData = _ref3.serviceData, config = _ref3.config, components = _ref3.components, props = _ref3.props;
+            console.log("TEST Pay.js initiatePaymentFlow", {
+                payment: payment,
+                serviceData: serviceData,
+                config: config,
+                components: components,
+                props: props
+            });
             var button = payment.button, fundingSource = payment.fundingSource, instrumentType = payment.instrumentType, buyerIntent = payment.buyerIntent;
             var buttonLabel = null == (_props$style = props.style) ? void 0 : _props$style.label;
             return zalgo_promise_src.ZalgoPromise.try((function() {
@@ -15734,15 +15904,18 @@ window.spb = function(modules) {
                 var clickPromise = click ? zalgo_promise_src.ZalgoPromise.try(click) : zalgo_promise_src.ZalgoPromise.resolve();
                 clickPromise.catch(src.noop);
                 return zalgo_promise_src.ZalgoPromise.try((function() {
+                    console.log("TEST Pay.js initiatePaymentFlow Callback for Try > Callback 2 for ZalgoPromise.try");
                     return !onClick || onClick({
                         fundingSource: fundingSource
                     });
                 })).then((function(valid) {
+                    console.log("TEST Pay.js initiatePaymentFlow Callback for Try > Callback 2 for ZalgoPromise.try > then valid=" + valid);
                     return !!valid && clickPromise;
                 })).then((function(valid) {
+                    console.log("TEST Pay.js initiatePaymentFlow Callback for Try > Callback 2 for ZalgoPromise.try > then2 valid=" + valid);
                     if (!1 !== valid) {
                         spinner && enableLoadingSpinner(button);
-                        var updateClientConfigPromise = createOrder().then((function(orderID) {
+                        var updateClientConfigPromise = createOrderWrapped().then((function(orderID) {
                             if (updateFlowClientConfig) return updateFlowClientConfig({
                                 orderID: orderID,
                                 payment: payment,
@@ -15761,7 +15934,7 @@ window.spb = function(modules) {
                                 });
                             }));
                         })).catch(src.noop);
-                        var vaultPromise = createOrder().then((function(orderID) {
+                        var vaultPromise = createOrderWrapped().then((function(orderID) {
                             return zalgo_promise_src.ZalgoPromise.try((function() {
                                 if (clientID && buyerIntent === constants.BUYER_INTENT.PAY) return function(_ref3) {
                                     var orderID = _ref3.orderID, vault = _ref3.vault, clientAccessToken = _ref3.clientAccessToken, createBillingAgreement = _ref3.createBillingAgreement, createSubscription = _ref3.createSubscription, fundingSource = _ref3.fundingSource, clientID = _ref3.clientID, merchantID = _ref3.merchantID, buyerCountry = _ref3.buyerCountry, currency = _ref3.currency, commit = _ref3.commit, intent = _ref3.intent, disableFunding = _ref3.disableFunding, disableCard = _ref3.disableCard, userIDToken = _ref3.userIDToken, _ref3$inline = _ref3.inline, inline = void 0 !== _ref3$inline && _ref3$inline, userExperienceFlow = _ref3.userExperienceFlow, buttonSessionID = _ref3.buttonSessionID;
@@ -15872,7 +16045,7 @@ window.spb = function(modules) {
                         var startPromise = updateClientConfigPromise.then((function() {
                             return start();
                         }));
-                        var validateOrderPromise = createOrder().then((function(orderID) {
+                        var validateOrderPromise = createOrderWrapped().then((function(orderID) {
                             return function(orderID, _ref3) {
                                 var env = _ref3.env, merchantID = _ref3.merchantID, currency = _ref3.currency, intent = _ref3.intent, vault = _ref3.vault, buttonLabel = _ref3.buttonLabel, featureFlags = _ref3.featureFlags;
                                 var logger = Object(lib.getLogger)();
@@ -16054,7 +16227,7 @@ window.spb = function(modules) {
                                 featureFlags: serviceData.featureFlags
                             });
                         }));
-                        var confirmOrderPromise = createOrder().then((function(orderID) {
+                        var confirmOrderPromise = createOrderWrapped().then((function(orderID) {
                             return window.xprops.sessionState.get("__confirm_" + fundingSource + "_payload__").then((function(confirmOrderPayload) {
                                 if (confirmOrderPayload) return Object(confirmOrder.getConfirmOrder)({
                                     orderID: orderID,
@@ -16066,6 +16239,7 @@ window.spb = function(modules) {
                             }));
                         }));
                         return zalgo_promise_src.ZalgoPromise.all([ loggingPromise, updateClientConfigPromise, clickPromise, vaultPromise, validateOrderPromise, startPromise, confirmOrderPromise ]).catch((function(err) {
+                            console.warn("TEST Pay.js initiatePaymentFlow Try > ZalgoPromise.all > Catch  block", err);
                             return zalgo_promise_src.ZalgoPromise.try(close).then((function() {
                                 throw err;
                             }));
@@ -16073,6 +16247,7 @@ window.spb = function(modules) {
                     }
                 }));
             })).finally((function() {
+                console.log("TEST Pay.js initiatePaymentFlow Finally block");
                 disableLoadingSpinner(button);
             }));
         }
@@ -16088,11 +16263,12 @@ window.spb = function(modules) {
             var facilitatorAccessToken = _ref.facilitatorAccessToken, eligibility = _ref.eligibility, fundingEligibility = _ref.fundingEligibility, buyerGeoCountry = _ref.buyerCountry, sdkMeta = _ref.sdkMeta, buyerAccessToken = _ref.buyerAccessToken, wallet = _ref.wallet, cookies = _ref.cookies, serverCSPNonce = _ref.cspNonce, serverMerchantID = _ref.merchantID, firebaseConfig = _ref.firebaseConfig, content = _ref.content, personalization = _ref.personalization, _ref$correlationID = _ref.correlationID, buttonCorrelationID = void 0 === _ref$correlationID ? "" : _ref$correlationID, _ref$brandedDefault = _ref.brandedDefault, brandedDefault = void 0 === _ref$brandedDefault ? null : _ref$brandedDefault, featureFlags = _ref.featureFlags;
             if (!window.paypal) throw new Error("PayPal SDK not loaded");
             var clientID = window.xprops.clientID;
+            Object(lib.setBuyerAccessToken)(buyerAccessToken);
             var serviceData = getServiceData({
-                eligibility: opts.eligibility,
+                eligibility: eligibility,
                 facilitatorAccessToken: facilitatorAccessToken,
-                buyerGeoCountry: opts.buyerCountry,
-                serverMerchantID: opts.merchantID,
+                buyerGeoCountry: buyerGeoCountry,
+                serverMerchantID: serverMerchantID,
                 fundingEligibility: fundingEligibility,
                 cookies: cookies,
                 sdkMeta: sdkMeta,
@@ -16110,6 +16286,20 @@ window.spb = function(modules) {
                 featureFlags: featureFlags
             });
             var env = props.env, sessionID = props.sessionID, partnerAttributionID = props.partnerAttributionID, commit = props.commit, sdkCorrelationID = props.sdkCorrelationID, locale = props.locale, onShippingChange = props.onShippingChange, buttonSessionID = props.buttonSessionID, merchantDomain = props.merchantDomain, onInit = props.onInit, getPrerenderDetails = props.getPrerenderDetails, rememberFunding = props.rememberFunding, getQueriedEligibleFunding = props.getQueriedEligibleFunding, experience = props.experience, style = props.style, fundingSource = props.fundingSource, intent = props.intent, createBillingAgreement = props.createBillingAgreement, createSubscription = props.createSubscription, stickinessID = props.stickinessID;
+            console.log("TEST ....... setupButton ", {
+                enableInContextWallet: enableInContextWallet,
+                orderID: orderID,
+                buyerAccessToken: buyerAccessToken
+            });
+            if (enableInContextWallet && orderID && buyerAccessToken) {
+                Object(lib.getLogger)().info("smart_buttons_incontext_wallet_enable", {
+                    orderID: orderID
+                });
+                props.createOrder = function() {
+                    console.log("TEST Button.js createOrder resolved");
+                    return zalgo_promise_src.ZalgoPromise.resolve(orderID);
+                };
+            }
             var config = getConfig({
                 serverCSPNonce: serverCSPNonce,
                 firebaseConfig: firebaseConfig
@@ -16157,7 +16347,7 @@ window.spb = function(modules) {
                 }));
             }
             menu_menu = null;
-            Object(src.querySelectorAll)("[ " + constants.DATA_ATTRIBUTES.FUNDING_SOURCE + " ]").forEach((function(button) {
+            getButtons().forEach((function(button) {
                 var menuToggle = function(button) {
                     var menu = button.querySelector("[" + constants.DATA_ATTRIBUTES.MENU + "]");
                     if (menu) return menu;
@@ -16191,6 +16381,9 @@ window.spb = function(modules) {
                 };
                 Object(src.preventClickFocus)(button);
                 Object(src.onClick)(button, (function(event) {
+                    console.log("TEST Button.js onElementClick", {
+                        button: button
+                    });
                     event.preventDefault();
                     event.stopPropagation();
                     var paymentProps = getButtonProps({
