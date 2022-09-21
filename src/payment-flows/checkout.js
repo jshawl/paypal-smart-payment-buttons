@@ -276,14 +276,13 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     .finally(() => close().then(noop))
                     .catch(noop);
             },
-            
+
             onSmartWalletEligible: ({accessToken}) => {
                 const access_token = accessToken ? accessToken : buyerAccessToken;
-                const { enableOrdersApprovalSmartWallet } = props;
-                // If enableOrdersApprovalSmartWallet is true then it means this checkout flow was running in the context of fallback or buyer selecting different instrument.
-                if (window.innerWidth < 300 || enableOrdersApprovalSmartWallet) {
+                // If buyerIntent is change FI/Shipping or Account then its not eligible for Smart Wallet Orders Approval
+                if (window.innerWidth < 300 || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT) {
                     getLogger().info(`checkout_smart_wallet_not_eligible `, {
-                        enableOrdersApprovalSmartWallet,
+                        buyerIntent,
                         width: window.innerWidth
                     })
                     return ZalgoPromise.resolve({
