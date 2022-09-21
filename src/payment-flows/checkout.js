@@ -279,11 +279,11 @@ function initCheckout({ props, components, serviceData, payment, config, restart
 
             onSmartWalletEligible: ({accessToken}) => {
                 const access_token = accessToken ? accessToken : buyerAccessToken;
-                const { enableInContextWallet } = serviceData;
-                // If enableInContextWallet is true then it means this checkout flow was running in the context of fallback or buyer selecting different instrument.
-                if (window.innerWidth < 300 || enableInContextWallet) {
+                const { enableOrdersApprovalSmartWallet } = serviceData;
+                // If enableOrdersApprovalSmartWallet is true then it means this checkout flow was running in the context of fallback or buyer selecting different instrument.
+                if (window.innerWidth < 300 || enableOrdersApprovalSmartWallet) {
                     getLogger().info(`checkout_smart_wallet_not_eligible `, {
-                        enableInContextWallet,
+                        enableOrdersApprovalSmartWallet,
                         width: window.innerWidth
                     })
                     return ZalgoPromise.resolve({
@@ -309,7 +309,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                             body: {
                                 buyerAccessToken: access_token,
                                 orderID,
-                                enableInContextWallet: true
+                                enableOrdersApprovalSmartWallet: true
                             }
                         });
                     });
