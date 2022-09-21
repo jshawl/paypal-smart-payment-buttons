@@ -276,10 +276,10 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     .finally(() => close().then(noop))
                     .catch(noop);
             },
-
+            
             onSmartWalletEligible: ({accessToken}) => {
                 const access_token = accessToken ? accessToken : buyerAccessToken;
-                const { enableOrdersApprovalSmartWallet } = serviceData;
+                const { enableOrdersApprovalSmartWallet } = props;
                 // If enableOrdersApprovalSmartWallet is true then it means this checkout flow was running in the context of fallback or buyer selecting different instrument.
                 if (window.innerWidth < 300 || enableOrdersApprovalSmartWallet) {
                     getLogger().info(`checkout_smart_wallet_not_eligible `, {
@@ -308,7 +308,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                             target: '_self',
                             body: {
                                 buyerAccessToken: access_token,
-                                orderID,
+                                smartWalletOrderID: orderID,
                                 enableOrdersApprovalSmartWallet: true
                             }
                         });

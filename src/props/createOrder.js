@@ -160,7 +160,7 @@ type CreateOrderXProps = {|
     paymentSource : $Values<typeof FUNDING> | null
 |};
 
-export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription } : {| facilitatorAccessToken : string, createBillingAgreement? : ?CreateBillingAgreement, createSubscription? : ?CreateSubscription |}) : CreateOrder {
+export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID } : {| facilitatorAccessToken : string, createBillingAgreement? : ?CreateBillingAgreement, createSubscription? : ?CreateSubscription, enableOrdersApprovalSmartWallet? : boolean, smartWalletOrderID? : string |}) : CreateOrder {
     const data = buildXCreateOrderData({ paymentSource });
     const actions = buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID });
 
@@ -168,6 +168,11 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
         const queryOrderID = getQueryParam('orderID');
         if (queryOrderID) {
             return ZalgoPromise.resolve(queryOrderID);
+        }
+
+        // TODO: add a check to handle funding source?
+        if(enableOrdersApprovalSmartWallet && smartWalletOrderID) {
+            return ZalgoPromise.resolve(smartWalletOrderID);
         }
 
         const startTime = Date.now();
