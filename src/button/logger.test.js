@@ -3,12 +3,12 @@
 import { COUNTRY } from '@paypal/sdk-constants/src';
 import { getPageRenderTime, isIEIntranet, isObject, uniqueID } from '@krakenjs/belter/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
+
 jest.mock('@krakenjs/belter/src', () => ({
     ...jest.requireActual('@krakenjs/belter/src'),
     isIEIntranet: jest.fn(),
     getPageRenderTime: jest.fn()
 }))
-
 jest.mock('../lib', () => ({
     ...jest.requireActual('../lib'),
     isIOSSafari: jest.fn(),
@@ -120,9 +120,8 @@ describe('getButtonProps', () => {
         expect(warnMock).toHaveBeenCalled()
     })
 
-    it('covers all conditions', async () => {
+    it('covers all possible logging environment conditions', async () => {
         jest.spyOn(logger, 'info').mockImplementation(infoMock)
-        
         isIOSSafari.mockImplementation(() => true)
         isStorageStateFresh.mockImplementation(() => true)
         await setupButtonLogger(buttonLoggerProps);
@@ -133,23 +132,16 @@ describe('getButtonProps', () => {
         isStorageStateFresh.mockImplementation(() => false)
         prepareLatencyInstrumentationPayload.mockImplementation(() => ({comp: true}))
         getPageRenderTime.mockImplementation(() => 123)
-        
         buttonLoggerProps.style.tagline = undefined
         await setupButtonLogger(buttonLoggerProps);
         expect(infoMock).toHaveBeenCalledWith('button_render_android_chrome_storage_state_not_fresh')
-    })
 
-    it('covers conditional taglines', async () => {
         buttonLoggerProps.style.tagline = false
         await setupButtonLogger(buttonLoggerProps);
-    })
 
-    it('covers conditional onShippingChange', async () => {
         buttonLoggerProps.onShippingChange = false
         await setupButtonLogger(buttonLoggerProps);
-    })
 
-    it('gets info from the DOM', async () => {
         document.body.innerHTML = `<span ${DATA_ATTRIBUTES.FUNDING_SOURCE}="paypal"></span><span ${DATA_ATTRIBUTES.INSTRUMENT_TYPE}="paypal"></span>`
         await setupButtonLogger({...buttonLoggerProps, commit: false, experience: 'inline'});
     })
