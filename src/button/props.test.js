@@ -36,10 +36,10 @@ describe('getButtonProps', () => {
 
     it('should fail if intent is tokenize but no createBillingAgreement', () => {
         window.xprops.intent = INTENT.TOKENIZE;
+        window.xprops.vault = true;
         expect(() => getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource }))
             .toThrowError('Must pass createBillingAgreement with intent=tokenize');
         window.xprops.createBillingAgreement = jest.fn();
-        window.xprops.vault = true;
         expect(() => getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource }))
             .not.toThrowError();
     });
@@ -87,11 +87,17 @@ describe('getButtonProps', () => {
         expect(() => getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource })).not.toThrowError();
     });
 
-    it('gets components', () => {
-        window.paypal = {}
-        getComponents()
-        getConfig({})
-        getServiceData({eligibility: false})
-        getServiceData({eligibility: true})
-    })
+    it('exports a helper for components', () => {
+        window.paypal = {};
+        expect(getComponents()).toEqual(expect.any(Object));
+    });
+
+    it('exports a helper for config', () => {
+        expect(getConfig({})).toEqual(expect.any(Object));
+    });
+
+    it('exports a helper for serviceData', () => {
+        expect(getServiceData({eligibility: false})).toEqual(expect.any(Object));
+        expect(getServiceData({eligibility: true})).toEqual(expect.any(Object));
+    });
 });
