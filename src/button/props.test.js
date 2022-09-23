@@ -2,7 +2,7 @@
 
 import { INTENT } from '@paypal/sdk-constants/src';
 
-import { getButtonProps } from './props';
+import { getButtonProps, getComponents, getConfig, getServiceData } from './props';
 
 describe('getButtonProps', () => {
     const brandedDefault = true;
@@ -36,7 +36,12 @@ describe('getButtonProps', () => {
 
     it('should fail if intent is tokenize but no createBillingAgreement', () => {
         window.xprops.intent = INTENT.TOKENIZE;
-        expect(() => getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource })).toThrowError();
+        expect(() => getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource }))
+            .toThrowError('Must pass createBillingAgreement with intent=tokenize');
+        window.xprops.createBillingAgreement = jest.fn();
+        window.xprops.vault = true;
+        expect(() => getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource }))
+            .not.toThrowError();
     });
 
     it('should fail if intent is tokenize but contains createOrder', () => {
@@ -81,4 +86,12 @@ describe('getButtonProps', () => {
         window.xprops.createSubscription = jest.fn();
         expect(() => getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource })).not.toThrowError();
     });
+
+    it('gets components', () => {
+        window.paypal = {}
+        getComponents()
+        getConfig({})
+        getServiceData({eligibility: false})
+        getServiceData({eligibility: true})
+    })
 });
