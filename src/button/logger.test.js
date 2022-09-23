@@ -83,8 +83,8 @@ describe('getButtonProps', () => {
     });
 
     it('should fail to get performance marks', async () => {
-        jest.spyOn(logger, 'info').mockImplementation(infoMock)
-        jest.spyOn(logger, 'track').mockImplementation(trackMock)
+        jest.spyOn(logger, 'info').mockImplementation(infoMock);
+        jest.spyOn(logger, 'track').mockImplementation(trackMock);
         jest
             .spyOn(window, 'performance', 'get')
             .mockImplementation(() => ({}));
@@ -93,8 +93,8 @@ describe('getButtonProps', () => {
     });
 
     it('should not execute cpl instrumentation', async () => {
-        jest.spyOn(logger, 'info').mockImplementation(infoMock)
-        jest.spyOn(logger, 'track').mockImplementation(trackMock)
+        jest.spyOn(logger, 'info').mockImplementation(infoMock);
+        jest.spyOn(logger, 'track').mockImplementation(trackMock);
         jest
             .spyOn(window, 'performance', 'get')
             .mockImplementation(() => null);
@@ -106,45 +106,45 @@ describe('getButtonProps', () => {
         // This test exists to show that the builders inside of `setupButtonLogger`
         // are invoked correctly. note that this test does not have
         // jest.spyOn for 'track' (or 'info').
-        const builderMock = jest.fn()
-        jest.spyOn(logger, 'addTrackingBuilder').mockImplementation(builderMock)
+        const builderMock = jest.fn();
+        jest.spyOn(logger, 'addTrackingBuilder').mockImplementation(builderMock);
         await setupButtonLogger(buttonLoggerProps);
-        expect(builderMock).toHaveBeenCalled()
+        expect(builderMock).toHaveBeenCalled();
     });
 
     it('warns on IE intranet', async () => {
-        const warnMock = jest.fn()
-        jest.spyOn(logger, 'warn').mockImplementation(warnMock)
-        isIEIntranet.mockImplementation(() => true)
+        const warnMock = jest.fn();
+        jest.spyOn(logger, 'warn').mockImplementation(warnMock);
+        isIEIntranet.mockImplementation(() => true);
         await setupButtonLogger(buttonLoggerProps);
-        expect(warnMock).toHaveBeenCalled()
-    })
+        expect(warnMock).toHaveBeenCalled();
+    });
 
     it('covers all possible logging environment conditions', async () => {
-        jest.spyOn(logger, 'info').mockImplementation(infoMock)
-        isIOSSafari.mockImplementation(() => true)
-        isStorageStateFresh.mockImplementation(() => true)
+        jest.spyOn(logger, 'info').mockImplementation(infoMock);
+        isIOSSafari.mockImplementation(() => true);
+        isStorageStateFresh.mockImplementation(() => true);
         await setupButtonLogger(buttonLoggerProps);
-        expect(infoMock).toHaveBeenCalledWith('button_render_ios_safari_storage_state_fresh')
+        expect(infoMock).toHaveBeenCalledWith('button_render_ios_safari_storage_state_fresh');
 
-        isIOSSafari.mockImplementation(() => false)
-        isAndroidChrome.mockImplementation(() => true)
-        isStorageStateFresh.mockImplementation(() => false)
-        prepareLatencyInstrumentationPayload.mockImplementation(() => ({comp: true}))
-        getPageRenderTime.mockImplementation(() => 123)
-        buttonLoggerProps.style.tagline = undefined
+        isIOSSafari.mockImplementation(() => false);
+        isAndroidChrome.mockImplementation(() => true);
+        isStorageStateFresh.mockImplementation(() => false);
+        prepareLatencyInstrumentationPayload.mockImplementation(() => ({comp: true}));
+        getPageRenderTime.mockImplementation(() => 123);
+        buttonLoggerProps.style.tagline = undefined;
         await setupButtonLogger(buttonLoggerProps);
-        expect(infoMock).toHaveBeenCalledWith('button_render_android_chrome_storage_state_not_fresh')
+        expect(infoMock).toHaveBeenCalledWith('button_render_android_chrome_storage_state_not_fresh');
 
-        buttonLoggerProps.style.tagline = false
-        await setupButtonLogger(buttonLoggerProps);
-
-        buttonLoggerProps.onShippingChange = false
+        buttonLoggerProps.style.tagline = false;
         await setupButtonLogger(buttonLoggerProps);
 
-        document.body.innerHTML = `<span ${DATA_ATTRIBUTES.FUNDING_SOURCE}="paypal"></span><span ${DATA_ATTRIBUTES.INSTRUMENT_TYPE}="paypal"></span>`
+        buttonLoggerProps.onShippingChange = false;
+        await setupButtonLogger(buttonLoggerProps);
+
+        document.body.innerHTML = `<span ${DATA_ATTRIBUTES.FUNDING_SOURCE}="paypal"></span><span ${DATA_ATTRIBUTES.INSTRUMENT_TYPE}="paypal"></span>`;
         await setupButtonLogger({...buttonLoggerProps, commit: false, experience: 'inline'});
-    })
+    });
 
     afterEach(() => {
         jest.clearAllMocks();
