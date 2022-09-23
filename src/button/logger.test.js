@@ -1,27 +1,27 @@
 /* @flow */
 
 import { COUNTRY } from '@paypal/sdk-constants/src';
-import { getPageRenderTime, isIEIntranet, isObject, uniqueID } from '@krakenjs/belter/src';
+import { getPageRenderTime, isIEIntranet, uniqueID } from '@krakenjs/belter/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
+
+import { getLogger, isIOSSafari, isAndroidChrome, isStorageStateFresh, prepareLatencyInstrumentationPayload } from '../lib';
+import {DATA_ATTRIBUTES} from '../constants';
+
+import { setupButtonLogger } from './logger';
 
 jest.mock('@krakenjs/belter/src', () => ({
     ...jest.requireActual('@krakenjs/belter/src'),
     isIEIntranet: jest.fn(),
     getPageRenderTime: jest.fn()
-}))
+}));
+
 jest.mock('../lib', () => ({
     ...jest.requireActual('../lib'),
     isIOSSafari: jest.fn(),
     isAndroidChrome: jest.fn(),
     isStorageStateFresh: jest.fn(),
     prepareLatencyInstrumentationPayload: jest.fn()
-}))
-
-import { getLogger, isIOSSafari, isAndroidChrome, isStorageStateFresh, prepareLatencyInstrumentationPayload } from '../lib';
-
-import { setupButtonLogger } from './logger';
-
-import {DATA_ATTRIBUTES} from '../constants';
+}));
 
 describe('getButtonProps', () => {
 
@@ -106,7 +106,7 @@ describe('getButtonProps', () => {
         // This test exists to show that the builders inside of `setupButtonLogger`
         // are invoked correctly. note that this test does not have
         // jest.spyOn for 'track' (or 'info').
-        let builderMock = jest.fn()
+        const builderMock = jest.fn()
         jest.spyOn(logger, 'addTrackingBuilder').mockImplementation(builderMock)
         await setupButtonLogger(buttonLoggerProps);
         expect(builderMock).toHaveBeenCalled()
