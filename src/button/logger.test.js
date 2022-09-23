@@ -5,7 +5,7 @@ import { getPageRenderTime, isIEIntranet, uniqueID } from '@krakenjs/belter/src'
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import { getLogger, isIOSSafari, isAndroidChrome, isStorageStateFresh, prepareLatencyInstrumentationPayload } from '../lib';
-import {DATA_ATTRIBUTES} from '../constants';
+import { DATA_ATTRIBUTES } from '../constants';
 
 import { setupButtonLogger } from './logger';
 
