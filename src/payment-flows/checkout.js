@@ -1,7 +1,7 @@
 /* @flow */
 
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { memoize, noop, supportsPopups, stringifyError, extendUrl, PopupOpenError, parseQuery,  submitForm } from '@krakenjs/belter/src';
+import { memoize, noop, supportsPopups, stringifyError, extendUrl, PopupOpenError, parseQuery, submitForm } from '@krakenjs/belter/src';
 import { FUNDING, FPTI_KEY, APM_LIST } from '@paypal/sdk-constants/src';
 import { getParent, getTop, type CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 
@@ -14,7 +14,7 @@ import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
 
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, InitOptions } from './types';
-import {enableLoadingSpinner, getButtons} from "../button/dom";
+import { enableLoadingSpinner, getButtons g} from "../button/dom";
 
 export const CHECKOUT_POPUP_DIMENSIONS = {
     WIDTH:  500,
@@ -132,7 +132,6 @@ function getContext({ win, isClick, merchantRequestedPopupsDisabled } : {| win :
 export const getDimensions = (fundingSource : string) : {| width : number, height : number |} => {
     getLogger().info(`popup_dimensions_${ fundingSource }`).flush();
     return { width: CHECKOUT_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_POPUP_DIMENSIONS.HEIGHT };
-
 }
 
 function initCheckout({ props, components, serviceData, payment, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
@@ -277,7 +276,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     .catch(noop);
             },
 
-            onSmartWalletEligible: ({accessToken}) => {
+            onSmartWalletEligible: ({ accessToken }) => {
                 const access_token = accessToken ? accessToken : buyerAccessToken;
                 // If buyerIntent is change FI/Shipping or Account then its not eligible for Smart Wallet Orders Approval
                 if (window.innerWidth < 300 || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT) {
@@ -341,7 +340,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     if (!data.shipping_address) {
                         throw new Error('Must pass shipping_address in data to handle changes in shipping address.');
                     }
-
+                    
                     return onShippingAddressChange({ ...data }, actions);
                 } : null,
 
@@ -350,7 +349,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     if (!data.selected_shipping_option) {
                         throw new Error('Must pass selected_shipping_option in data to handle changes in shipping options.');
                     }
-
+                    
                     return onShippingOptionsChange({ ...data }, actions);
                 } : null,
 
