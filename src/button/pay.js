@@ -188,7 +188,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                     featureFlags: serviceData.featureFlags
                 });
             });
-
+             
             const confirmOrderPromise = createOrder().then((orderID) => {
                 return window.xprops.sessionState.get(
                     `__confirm_${ fundingSource }_payload__`
