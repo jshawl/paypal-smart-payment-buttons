@@ -38,7 +38,7 @@ export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, 
                 $currency: String
                 $amount: String
                 $userIDToken: String
-                $orderID:     String
+                $orderID: String
                 $vetted: Boolean
                 $paymentMethodToken: String
                 $branded: Boolean,
@@ -46,7 +46,7 @@ export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, 
             ) {
                 smartWallet(
                     clientId: $clientID
-                    orderID:  $orderID
+                    orderID: $orderID
                     merchantId: $merchantID
                     currency: $currency
                     amount: $amount
@@ -107,7 +107,7 @@ export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, 
         variables: { clientID, merchantID, currency, amount, userIDToken, vetted, paymentMethodToken, branded, allowBillingPayments, orderID },
         headers:   {
             [HEADERS.CLIENT_METADATA_ID]: clientMetadataID,
-            [HEADERS.ACCESS_TOKEN]:       buyerAccessToken
+            [HEADERS.ACCESS_TOKEN]: buyerAccessToken
         }
     }).then(({ smartWallet }) => {
         return smartWallet;
