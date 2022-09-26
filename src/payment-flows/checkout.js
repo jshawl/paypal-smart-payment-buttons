@@ -14,7 +14,7 @@ import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
 
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, InitOptions } from './types';
-import { enableLoadingSpinner, getButtons g} from "../button/dom";
+import { enableLoadingSpinner, getButtons } from "../button/dom";
 
 export const CHECKOUT_POPUP_DIMENSIONS = {
     WIDTH:  500,
