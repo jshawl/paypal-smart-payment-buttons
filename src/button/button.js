@@ -108,7 +108,7 @@ export function setupButton({
 
     const config = getConfig({ serverCSPNonce, firebaseConfig });
     const { sdkVersion } = config;
-
+    
     const components = getComponents();
 
     const { initPromise, isEnabled } = onInit({ correlationID: buttonCorrelationID });
@@ -126,7 +126,7 @@ export function setupButton({
             const { onClick } = paymentProps;
 
             const smartFields = getSmartFieldsByFundingSource(paymentFundingSource);
-
+            
             if (smartFields) {
                 if (!smartFields.isValid()) {
                     if (win) {
@@ -152,7 +152,7 @@ export function setupButton({
                 }
             }
         }).catch(err => {
-
+            
             getLogger()
                 .info('smart_buttons_payment_error', { err: stringifyError(err) })
                 .track({
@@ -186,7 +186,7 @@ export function setupButton({
     }
 
     clearButtonSmartMenu();
-
+    
     getButtons().forEach(button => {
         const menuToggle = getMenuButton(button);
         const { fundingSource: paymentFundingSource, card, paymentMethodID, instrumentID, instrumentType } = getSelectedFunding(button);
