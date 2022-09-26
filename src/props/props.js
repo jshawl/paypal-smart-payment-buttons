@@ -34,7 +34,8 @@ import type { CreateOrder, XCreateOrder, CreateBillingAgreement, XCreateBillingA
 export const TYPES = true;
 
 export type XOnSmartWalletEligibleDataType = {|
-    accessToken : ?string
+    accessToken : ?string,
+    eligibilityReason : ?string
 |};
 
 export type onSmartWalletEligible = (params : XOnSmartWalletEligibleDataType) => ZalgoPromise<any>;
