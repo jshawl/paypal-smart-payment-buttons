@@ -8,7 +8,7 @@ import type { MenuChoices, Wallet, WalletInstrument } from '../types';
 import { getSupplementalOrderInfo, oneClickApproveOrder, getSmartWallet, loadFraudnet, updateButtonClientConfig } from '../api';
 import { BUYER_INTENT, FPTI_TRANSITION, FPTI_MENU_OPTION } from '../constants';
 import { type ButtonProps } from '../button/props';
-import {getBuyerAccessToken, getLogger} from '../lib';
+import { getBuyerAccessToken, getLogger } from '../lib';
 
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, IsEligibleOptions, IsPaymentEligibleOptions, InitOptions, MenuOptions, Payment } from './types';
 import { checkout, CHECKOUT_POPUP_DIMENSIONS } from './checkout';
@@ -116,7 +116,6 @@ function isWalletCapturePaymentEligible({ serviceData, payment } : IsPaymentElig
 }
 
 function initWalletCapture({ props, components, payment, serviceData, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
-
     const { createOrder, onApprove, clientMetadataID, vault, onAuth, enableOrdersApprovalSmartWallet } = props;
     const { fundingSource, instrumentID } = payment;
     const { wallet } = serviceData;
@@ -139,6 +138,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
         if(getBuyerAccessToken()) {
             return getBuyerAccessToken();
         }
+
         return smartWalletPromise.then(smartWallet => {
             const { accessToken } = getInstrument(smartWallet, fundingSource, instrumentID);
 
@@ -168,6 +168,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
         getLogger().info('web_checkout_fallback').flush();
         return getWebCheckoutFallback().start();
     };
+
     // One click checkout is ineligible if the flow was using (userIDToken  + vault)
     // One click checkout is Eligible for (vault + enableOrdersApprovalSmartWallet)
 
@@ -197,7 +198,6 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
         });
     };
 
-
     const start = () => {
         console.log('TEST Wallet Capture Start')
         return ZalgoPromise.hash({
@@ -215,7 +215,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
             if (!instrumentType) {
                 throw new Error(`Instrument has no type`);
             }
-
+            
             return ZalgoPromise.hash({
                 requireShipping: shippingRequired(orderID),
                 orderApproval:   oneClickApproveOrder({ orderID, instrumentType, buyerAccessToken, instrumentID, clientMetadataID }),
@@ -228,7 +228,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
 
                 const { payerID } = orderApproval;
                 return onApprove({ payerID, buyerAccessToken }, { restart }).catch(noop);
-
+                
             });
         }).catch(err => {
             console.log('TEST Wallet Capture Start Promise Catch')
@@ -271,7 +271,6 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
     console.log('TEST setupWalletMenu validated')
 
     const updateMenuClientConfig = () => {
-
         console.log('TEST setupWalletMenu updateMenuClientConfig')
         return ZalgoPromise.try(() => {
             return createOrder();
@@ -364,7 +363,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
             CHOOSE_ACCOUNT
         ];
     }
-
+    
     throw new Error(`Can not render menu for ${ fundingSource }`);
 }
 
@@ -375,7 +374,7 @@ function updateWalletClientConfig({ orderID, payment }) : ZalgoPromise<void> {
 
 export const walletCapture : PaymentFlow = {
     name:                   'wallet_capture',
-    setup:                 (...args) => { let res = setupWalletCapture(...args); console.log('TEST setupWalletCapture', res, args); return res;  },
+    setup:                  (...args) => { let res = setupWalletCapture(...args); console.log('TEST setupWalletCapture', res, args); return res;  },
     isEligible:             (...args) => { let res = isWalletCaptureEligible(...args); console.log('TEST isWalletCaptureEligible', res, args); return res;  },
     isPaymentEligible:      (...args) => { let res = isWalletCapturePaymentEligible(...args); console.log('TEST isWalletCapturePaymentEligible', res, args); return res; },
     init:                   (...args) => { let res = initWalletCapture(...args); console.log('TEST initWalletCapture', res, args); return res; },
