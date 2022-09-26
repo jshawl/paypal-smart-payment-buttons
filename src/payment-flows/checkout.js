@@ -285,7 +285,8 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                         width: window.innerWidth
                     })
                     return ZalgoPromise.resolve({
-                        smartWalletRendered: false
+                        smartWalletRendered: false,
+                        buyerIntent
                     });
                 }
                 let timer = null;
