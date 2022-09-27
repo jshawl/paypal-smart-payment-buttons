@@ -151,7 +151,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
     };
 
     const getWebCheckoutFallback = () => {
-        console.log('TEST Wallet Capture fallbackToWebCheckout > getWebCheckoutFallback')
+        console.log('TEST Wallet Capture fallbackToWebCheckout > getWebCheckoutFallback');
         return checkout.init({
             props, components, serviceData, payment: {
                 ...payment,
@@ -164,7 +164,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
     };
 
     const fallbackToWebCheckout = () => {
-        console.log('TEST Wallet Capture fallbackToWebCheckout')
+        console.log('TEST Wallet Capture fallbackToWebCheckout');
         getLogger().info('web_checkout_fallback').flush();
         return getWebCheckoutFallback().start();
     };
@@ -178,7 +178,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
             smartWalletErrored,
             vault,
             enableOrdersApprovalSmartWallet
-        })
+        });
         return getWebCheckoutFallback();
     }
 
@@ -199,12 +199,12 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
     };
 
     const start = () => {
-        console.log('TEST Wallet Capture Start')
+        console.log('TEST Wallet Capture Start');
         return ZalgoPromise.hash({
             orderID:     createOrder(),
             smartWallet: smartWalletPromise
         }).then(({ orderID, smartWallet }) => {
-            console.log('TEST Wallet Capture Start Promise Resolved', { orderID, smartWallet })
+            console.log('TEST Wallet Capture Start Promise Resolved', { orderID, smartWallet });
             const buyerAccessToken = (enableOrdersApprovalSmartWallet && getBuyerAccessToken()) || getInstrument(smartWallet, fundingSource, instrumentID).accessToken;
 
             if (!buyerAccessToken) {
@@ -221,7 +221,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
                 orderApproval:   oneClickApproveOrder({ orderID, instrumentType, buyerAccessToken, instrumentID, clientMetadataID }),
                 onAuth:          onAuth({ accessToken: buyerAccessToken })
             }).then(({ requireShipping, orderApproval }) => {
-                console.log('TEST Wallet Capture Start > ZalgoPromise.hash', {requireShipping, orderApproval})
+                console.log('TEST Wallet Capture Start > ZalgoPromise.hash', {requireShipping, orderApproval});
                 if (requireShipping) {
                     return fallbackToWebCheckout();
                 }
@@ -231,7 +231,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
                 
             });
         }).catch(err => {
-            console.log('TEST Wallet Capture Start Promise Catch')
+            console.log('TEST Wallet Capture Start Promise Catch');
             getLogger().warn('approve_order_error', { err: stringifyError(err) }).flush();
             return fallbackToWebCheckout();
         });
@@ -249,7 +249,7 @@ const POPUP_OPTIONS = {
 };
 
 function setupWalletMenu({ props, payment, serviceData, components, config, restart } : MenuOptions) : MenuChoices {
-    console.log('TEST setupWalletMenu', { props, payment, serviceData, components, config, restart })
+    console.log('TEST setupWalletMenu', { props, payment, serviceData, components, config, restart });
     const { createOrder, enableOrdersApprovalSmartWallet } = props;
     const { fundingSource, instrumentID } = payment;
     const { wallet, content } = serviceData;
@@ -268,14 +268,14 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
         throw new Error(`Can not render wallet menu without instrument`);
     }
 
-    console.log('TEST setupWalletMenu validated')
+    console.log('TEST setupWalletMenu validated');
 
     const updateMenuClientConfig = () => {
-        console.log('TEST setupWalletMenu updateMenuClientConfig')
+        console.log('TEST setupWalletMenu updateMenuClientConfig');
         return ZalgoPromise.try(() => {
             return createOrder();
         }).then(orderID => {
-            console.log('TEST setupWalletMenu updateMenuClientConfig  > then ', {orderID})
+            console.log('TEST setupWalletMenu updateMenuClientConfig  > then ', {orderID});
             return updateButtonClientConfig({ fundingSource, orderID, inline: false });
         });
     };
@@ -296,7 +296,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
         popup:    POPUP_OPTIONS,
         onSelect: ({ win }) => {
 
-            console.log('TEST setupWalletMenu > onSelect', {win})
+            console.log('TEST setupWalletMenu > onSelect', {win});
 
             getLogger().info('click_choose_funding').track({
                 [FPTI_KEY.TRANSITION]:      FPTI_TRANSITION.CLICK_CHOOSE_FUNDING,
@@ -304,10 +304,10 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
             }).flush();
 
             return ZalgoPromise.try(() => {
-                console.log('TEST setupWalletMenu > onSelect > try')
+                console.log('TEST setupWalletMenu > onSelect > try');
                 return updateMenuClientConfig();
             }).then(() => {
-                console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout', {payment})
+                console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout', {payment});
                 return loadCheckout({
                     payment: {
                         ...payment,
@@ -319,11 +319,11 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
 
                             return smartWalletPromise.then(smartWallet => {
                                 if(enableOrdersApprovalSmartWallet && getBuyerAccessToken()) {
-                                    console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken > then getBuyerAccessToken', {accessToken: getBuyerAccessToken()})
+                                    console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken > then getBuyerAccessToken', {accessToken: getBuyerAccessToken()});
                                     return getBuyerAccessToken();
                                 }
                                 const smartInstrument = getInstrument(smartWallet, fundingSource, instrumentID);
-                                console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken > then', {smartInstrument})
+                                console.log('TEST setupWalletMenu > onSelect > try > then > call loadCheckout> createAccessToken > then', {smartInstrument});
                                 if (!smartInstrument) {
                                     throw new Error(`Instrument not found`);
                                 }
