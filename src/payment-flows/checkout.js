@@ -158,7 +158,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     let forceClosed = false;
 
     const init = () => {
-        console.log('TEST Checkout.js Init')
+        console.log('TEST Checkout.js Init');
         return Checkout({
             window:   win,
             sessionID,
@@ -283,7 +283,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     getLogger().info(`checkout_smart_wallet_not_eligible `, {
                         buyerIntent,
                         width: window.innerWidth
-                    })
+                    });
                     return ZalgoPromise.resolve({
                         smartWalletRendered: false,
                         buyerIntent
@@ -295,7 +295,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     timer = setTimeout(() => {
                         resolve({
                             smartWalletRendered: false
-                        })
+                        });
                     }, 1000);
                 })
                 createOrder().then(orderID => { // use memoized version
@@ -409,7 +409,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     };
 
     const start = memoize(() => {
-        console.log('TEST Checkout.js Start')
+        console.log('TEST Checkout.js Start');
         instance = init();
         return instance.renderTo(getRenderWindow(), TARGET_ELEMENT.BODY, context);
     });
@@ -423,7 +423,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     });
 
     const click = () => {
-        console.log('TEST Checkout.js Click')
+        console.log('TEST Checkout.js Click');
         return ZalgoPromise.try(() => {
             if (acceleratedXO) {
                 context = CONTEXT.IFRAME;
