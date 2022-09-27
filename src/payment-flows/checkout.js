@@ -299,6 +299,10 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     }, 1000);
                 })
                 createOrder().then(orderID => { // use memoized version
+                    getLogger().info(`checkout_smart_wallet_eligible `, {
+                        buyerIntent,
+                        eligibilityReason
+                    });
                     close().then(() => {
                         getButtons().forEach(button => enableLoadingSpinner(button));
                         clearTimeout(timer);
