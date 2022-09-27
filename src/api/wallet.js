@@ -16,8 +16,6 @@ type GetSmartWalletOptions = {|
     amount : ?string,
     clientMetadataID : string,
     userIDToken : string,
-    buyerAccessToken? : string,
-    orderID? : string,
     vetted? : boolean,
     paymentMethodToken? : ?string,
     branded? : ?boolean,
@@ -28,7 +26,7 @@ const DEFAULT_AMOUNT = '0.00';
 
 type GetSmartWallet = (GetSmartWalletOptions) => ZalgoPromise<Wallet>;
 
-export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, currency, amount = DEFAULT_AMOUNT, clientMetadataID, userIDToken, vetted = true, paymentMethodToken, branded, allowBillingPayments = true, orderID, buyerAccessToken }) => {
+export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, currency, amount = DEFAULT_AMOUNT, clientMetadataID, userIDToken, vetted = true, paymentMethodToken, branded, allowBillingPayments = true }) => {
     return callGraphQL({
         name:  'GetSmartWallet',
         query: `
@@ -38,7 +36,6 @@ export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, 
                 $currency: String
                 $amount: String
                 $userIDToken: String
-                $orderID: String
                 $vetted: Boolean
                 $paymentMethodToken: String
                 $branded: Boolean,
@@ -46,7 +43,6 @@ export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, 
             ) {
                 smartWallet(
                     clientId: $clientID
-                    orderID: $orderID
                     merchantId: $merchantID
                     currency: $currency
                     amount: $amount
@@ -104,10 +100,9 @@ export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, 
                 }
             }
         `,
-        variables: { clientID, merchantID, currency, amount, userIDToken, vetted, paymentMethodToken, branded, allowBillingPayments, orderID },
+        variables: { clientID, merchantID, currency, amount, userIDToken, vetted, paymentMethodToken, branded, allowBillingPayments },
         headers:   {
-            [HEADERS.CLIENT_METADATA_ID]: clientMetadataID,
-            [HEADERS.ACCESS_TOKEN]: buyerAccessToken
+            [HEADERS.CLIENT_METADATA_ID]: clientMetadataID
         }
     }).then(({ smartWallet }) => {
         return smartWallet;
