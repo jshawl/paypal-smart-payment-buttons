@@ -93,11 +93,13 @@ describe('getButtonProps', () => {
     });
 
     it('exports a helper for config', () => {
-        expect(getConfig({})).toEqual(expect.any(Object));
+        expect(getConfig({firebaseConfig: {apiKey: '', appId: '', authDomain: '', databaseURL: '', measurementId: '', messagingSenderId: '', projectId: '', storageBucket: ''}, serverCSPNonce: ''})).toEqual(expect.any(Object));
     });
 
     it('exports a helper for serviceData', () => {
+        // $FlowFixMe
         expect(getServiceData({eligibility: false})).toEqual(expect.any(Object));
+        // $FlowFixMe
         expect(getServiceData({eligibility: true})).toEqual(expect.any(Object));
     });
 });
