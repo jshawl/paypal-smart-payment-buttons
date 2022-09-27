@@ -68,15 +68,11 @@ type InitiatePaymentOptions = {|
 |};
 
 export function initiatePaymentFlow({ payment, serviceData, config, components, props } : InitiatePaymentOptions) : ZalgoPromise<void> {
-
-    console.log('TEST Pay.js initiatePaymentFlow', { payment, serviceData, config, components, props });
-
     const { button, fundingSource, instrumentType, buyerIntent } = payment;
     const buttonLabel = props.style?.label;
 
     return ZalgoPromise.try(() => {
-        console.log('TEST Pay.js initiatePaymentFlow Try block');
-        const { merchantID, personalization, fundingEligibility, buyerCountry, orderID, buyerAccessToken, enableOrdersApprovalSmartWallet } = serviceData;
+        const { merchantID, personalization, fundingEligibility, buyerCountry } = serviceData;
         const { clientID, onClick, createOrder, env, vault, partnerAttributionID, userExperienceFlow, buttonSessionID, intent, currency,
             clientAccessToken, createBillingAgreement, createSubscription, commit, disableFunding, disableCard, userIDToken, enableNativeCheckout, inlinexo } = props;
         
@@ -138,13 +134,10 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
         clickPromise.catch(noop);
 
         return ZalgoPromise.try(() => {
-            console.log('TEST Pay.js initiatePaymentFlow Callback for Try > Callback 2 for ZalgoPromise.try');
             return onClick ? onClick({ fundingSource }) : true;
         }).then(valid => {
-            console.log('TEST Pay.js initiatePaymentFlow Callback for Try > Callback 2 for ZalgoPromise.try > then valid=' + valid);
             return valid ? clickPromise : false;
         }).then(valid => {
-            console.log('TEST Pay.js initiatePaymentFlow Callback for Try > Callback 2 for ZalgoPromise.try > then2 valid=' + valid);
             if (valid === false) {
                 return;
             }
@@ -215,7 +208,6 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 startPromise,
                 confirmOrderPromise
             ]).catch(err => {
-                console.warn('TEST Pay.js initiatePaymentFlow Try > ZalgoPromise.all > Catch  block', err);
                 return ZalgoPromise.try(close).then(() => {
                     throw err;
                 });
@@ -223,7 +215,6 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
         });
 
     }).finally(() => {
-        console.log('TEST Pay.js initiatePaymentFlow Finally block');
         disableLoadingSpinner(button);
     });
 }
