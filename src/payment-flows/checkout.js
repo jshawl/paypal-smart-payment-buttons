@@ -130,8 +130,13 @@ function getContext({ win, isClick, merchantRequestedPopupsDisabled } : {| win :
 }
 
 export const getDimensions = (fundingSource : string) : {| width : number, height : number |} => {
-    getLogger().info(`popup_dimensions_${ fundingSource }`).flush();
-    return { width: CHECKOUT_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_POPUP_DIMENSIONS.HEIGHT };
+    if (APM_LIST.indexOf(fundingSource) !== -1) {
+        getLogger().info(`popup_dimensions_value_${ fundingSource }`).flush();
+        return { width: CHECKOUT_APM_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_APM_POPUP_DIMENSIONS.HEIGHT };
+    } else {
+        getLogger().info(`popup_dimensions_${ fundingSource }`).flush();
+        return { width: CHECKOUT_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_POPUP_DIMENSIONS.HEIGHT };
+    }
 }
 
 function initCheckout({ props, components, serviceData, payment, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
