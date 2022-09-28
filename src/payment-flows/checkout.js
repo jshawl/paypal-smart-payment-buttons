@@ -289,15 +289,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                         buyerIntent
                     });
                 }
-                let timer = null;
-                const returnPromise = new ZalgoPromise(resolve => {
-                    // If we are unable to load the wallet, let the UI client know that they need to continue.
-                    timer = setTimeout(() => {
-                        resolve({
-                            smartWalletRendered: false
-                        });
-                    }, 1000);
-                })
+
                 createOrder().then(orderID => { // use memoized version
                     getLogger().info(`checkout_smart_wallet_eligible `, {
                         buyerIntent,
@@ -305,7 +297,6 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     });
                     close().then(() => {
                         getButtons().forEach(button => enableLoadingSpinner(button));
-                        clearTimeout(timer);
                         submitForm({
                             url: document.location.href,
                             target: '_self',
@@ -318,7 +309,10 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     });
                 });
 
-                return returnPromise;
+                return ZalgoPromise.resolve({
+                    smartWalletRendered: true,
+                    buyerIntent
+                });
             },
 
             onAuth: ({ accessToken }) => {
