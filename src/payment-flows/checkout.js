@@ -276,7 +276,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     .catch(noop);
             },
 
-            onSmartWalletEligible: ({ accessToken, eligibilityReason }) => {
+            onSmartWalletEligible: ({ accessToken, eligibilityReason }) : ZalgoPromise<any> => {
                 const access_token = accessToken ? accessToken : buyerAccessToken;
                 // If buyerIntent is change FI/Shipping or Account then its not eligible for Smart Wallet Orders Approval
                 if (window.innerWidth < 300 || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT) {
