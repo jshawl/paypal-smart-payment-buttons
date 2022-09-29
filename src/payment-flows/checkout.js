@@ -301,7 +301,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                         eligibilityReason
                     }).track({
                         [FPTI_KEY.STATE]:        FPTI_STATE.ELIGIBILITY_CHECK,
-                        [FPTI_KEY.TRANSITION]:   FPTI_TRANSITION.PPOF_ELIGIBLE,
+                        [FPTI_KEY.TRANSITION]:   `${eligibilityReason}_eligible`,
                         [FPTI_KEY.CONTEXT_ID]:   orderID,
                         [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID
                     }).flush().then(() => {
