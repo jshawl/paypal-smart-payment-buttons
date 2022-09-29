@@ -181,9 +181,7 @@ export const FPTI_TRANSITION = {
     
     HONEY_IDENTIFY:                         ('honey_identify' : 'honey_identify'),
     
-    CALL_REST_API:                          ('call_rest_api' : 'call_rest_api'),
-
-    PPOF_ELIGIBLE:                          ('ppof_eligible' : 'ppof_eligible')
+    CALL_REST_API:                          ('call_rest_api' : 'call_rest_api')
 };
 
 export const FPTI_MENU_OPTION = {
