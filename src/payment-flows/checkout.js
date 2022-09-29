@@ -8,7 +8,7 @@ import { getParent, getTop, type CrossDomainWindowType } from '@krakenjs/cross-d
 import type { ProxyWindow, ConnectOptions } from '../types';
 import { type CreateBillingAgreement, type CreateSubscription } from '../props';
 import { exchangeAccessTokenForAuthCode, getConnectURL, updateButtonClientConfig, getSmartWallet, loadFraudnet  } from '../api';
-import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, PRODUCT_FLOW } from '../constants';
+import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, PRODUCT_FLOW, FPTI_STATE } from '../constants';
 import { unresolvedPromise, getLogger, setBuyerAccessToken } from '../lib';
 import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
@@ -299,17 +299,23 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     getLogger().info(`checkout_smart_wallet_eligible `, {
                         buyerIntent,
                         eligibilityReason
-                    });
-                    close().then(() => {
-                        getButtons().forEach(button => enableLoadingSpinner(button));
-                        submitForm({
-                            url: document.location.href,
-                            target: '_self',
-                            body: {
-                                buyerAccessToken: access_token,
-                                smartWalletOrderID: orderID,
-                                enableOrdersApprovalSmartWallet: true
-                            }
+                    }).track({
+                        [FPTI_KEY.STATE]:        FPTI_STATE.ELIGIBILITY_CHECK,
+                        [FPTI_KEY.TRANSITION]:   FPTI_TRANSITION.PPOF_ELIGIBLE,
+                        [FPTI_KEY.CONTEXT_ID]:   orderID,
+                        [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID
+                    }).flush().then(() => {
+                        close().then(() => {
+                            getButtons().forEach(button => enableLoadingSpinner(button));
+                            submitForm({
+                                url: document.location.href,
+                                target: '_self',
+                                body: {
+                                    buyerAccessToken: access_token,
+                                    smartWalletOrderID: orderID,
+                                    enableOrdersApprovalSmartWallet: true
+                                }
+                            });
                         });
                     });
                 });

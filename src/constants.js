@@ -87,9 +87,10 @@ export const FPTI_CONTEXT_TYPE = {
 };
 
 export const FPTI_STATE = {
-    BUTTON:   ('smart_button' : 'smart_button'),
-    WALLET:   ('smart_wallet' : 'smart_wallet'),
-    PXP:      ('PXP_CHECK' : 'PXP_CHECK')
+    BUTTON:            ('smart_button' : 'smart_button'),
+    WALLET:            ('smart_wallet' : 'smart_wallet'),
+    PXP:               ('PXP_CHECK' : 'PXP_CHECK'),
+    ELIGIBILITY_CHECK: ('eligibility_check' : 'eligibility_check')
 };
 
 export const FPTI_TRANSITION = {
@@ -180,7 +181,9 @@ export const FPTI_TRANSITION = {
     
     HONEY_IDENTIFY:                         ('honey_identify' : 'honey_identify'),
     
-    CALL_REST_API:                          ('call_rest_api' : 'call_rest_api')
+    CALL_REST_API:                          ('call_rest_api' : 'call_rest_api'),
+
+    PPOF_ELIGIBLE:                          ('ppof_eligible' : 'ppof_eligible')
 };
 
 export const FPTI_MENU_OPTION = {
