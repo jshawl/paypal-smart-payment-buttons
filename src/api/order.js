@@ -621,10 +621,11 @@ type OneClickApproveOrderOptions = {|
     instrumentType : $Values<typeof WALLET_INSTRUMENT>,
     instrumentID : string,
     buyerAccessToken : string,
-    clientMetadataID : ?string
+    clientMetadataID : ?string,
+    planID? : ?string
 |};
 
-export function oneClickApproveOrder({ orderID, instrumentType, instrumentID, buyerAccessToken, clientMetadataID } : OneClickApproveOrderOptions) : ZalgoPromise<ApproveData> {
+export function oneClickApproveOrder({ orderID, instrumentType, instrumentID, buyerAccessToken, clientMetadataID, planID } : OneClickApproveOrderOptions) : ZalgoPromise<ApproveData> {
     return callGraphQL({
         name:  'OneClickApproveOrder',
         query: `
@@ -632,11 +633,13 @@ export function oneClickApproveOrder({ orderID, instrumentType, instrumentID, bu
                 $orderID : String!
                 $instrumentType : String!
                 $instrumentID : String!
+                $planID: String
             ) {
                 oneClickPayment(
                     token: $orderID
                     selectedInstrumentType : $instrumentType
                     selectedInstrumentId : $instrumentID
+                    selectedPlanId: $planID
                 ) {
                     userId
                     auth {
@@ -645,7 +648,7 @@ export function oneClickApproveOrder({ orderID, instrumentType, instrumentID, bu
                 }
             }
         `,
-        variables: { orderID, instrumentType, instrumentID },
+        variables: { orderID, instrumentType, instrumentID, planID },
         headers:   {
             [HEADERS.ACCESS_TOKEN]:       buyerAccessToken,
             [HEADERS.CLIENT_CONTEXT]:     orderID,

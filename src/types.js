@@ -58,7 +58,8 @@ export type CheckoutProps = {|
     onApprove : ({| accelerated? : boolean, payerID : string, paymentID : ?string, billingToken : ?string, subscriptionID : ?string, authCode : ?string |}) => ZalgoPromise<void> | void,
     onComplete : () => ZalgoPromise<void> | void,
     onAuth : ({| accessToken : string |}) => ZalgoPromise<void> | void,
-    onSmartWalletEligible : ({| accessToken : string, eligibilityReason : string |}) => ZalgoPromise<void> | void,
+    // TODO: fix onSmartWalletEligible return type
+    onSmartWalletEligible : ({| accessToken : string, eligibilityReason : string, locale : LocaleType |}) => ZalgoPromise<void> | void,
     onCancel : () => ZalgoPromise<void> | void,
     onShippingChange : ?(data : OnShippingChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
     onShippingAddressChange : ?(data : OnShippingAddressChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
@@ -217,7 +218,8 @@ export type WalletInstrument = {|
     vendor? : $Values<typeof CARD>,
     oneClick : boolean,
     accessToken? : ?string,
-    branded : boolean | null
+    branded : boolean | null,
+    planID? : ?string
 |};
 
 export type WalletPaymentType = {|
