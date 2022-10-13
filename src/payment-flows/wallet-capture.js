@@ -130,6 +130,8 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
 
     const instrument = getInstrument(wallet, fundingSource, instrumentID);
 
+    const planID = instrument?.planID;
+
     const createAccessToken = () => {
         if (!smartWalletPromise) {
             throw new Error(`No smart wallet found`);
@@ -218,7 +220,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
             
             return ZalgoPromise.hash({
                 requireShipping: shippingRequired(orderID),
-                orderApproval:   oneClickApproveOrder({ orderID, instrumentType, buyerAccessToken, instrumentID, clientMetadataID }),
+                orderApproval:   oneClickApproveOrder({ orderID, instrumentType, buyerAccessToken, instrumentID, clientMetadataID, planID }),
                 onAuth:          onAuth({ accessToken: buyerAccessToken })
             }).then(({ requireShipping, orderApproval }) => {
                 console.log('TEST Wallet Capture Start > ZalgoPromise.hash', {requireShipping, orderApproval});
