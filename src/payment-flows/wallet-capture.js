@@ -217,10 +217,11 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
             if (!instrumentType) {
                 throw new Error(`Instrument has no type`);
             }
-            
+            const useExistingPlanning = Boolean(props.smartWalletOrderID);
+
             return ZalgoPromise.hash({
                 requireShipping: shippingRequired(orderID),
-                orderApproval:   oneClickApproveOrder({ orderID, instrumentType, buyerAccessToken, instrumentID, clientMetadataID, planID }),
+                orderApproval:   oneClickApproveOrder({ orderID, instrumentType, buyerAccessToken, instrumentID, clientMetadataID, planID, useExistingPlanning }),
                 onAuth:          onAuth({ accessToken: buyerAccessToken })
             }).then(({ requireShipping, orderApproval }) => {
                 console.log('TEST Wallet Capture Start > ZalgoPromise.hash', {requireShipping, orderApproval});
@@ -230,7 +231,7 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
 
                 const { payerID } = orderApproval;
                 return onApprove({ payerID, buyerAccessToken }, { restart }).catch(noop);
-                
+
             });
         }).catch(err => {
             console.log('TEST Wallet Capture Start Promise Catch');
@@ -360,12 +361,15 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
     };
 
     if (fundingSource === FUNDING.PAYPAL || fundingSource === FUNDING.CREDIT) {
+        if (props.smartWalletOrderID) {
+            return [CHOOSE_FUNDING_SHIPPING];
+        }
         return [
             CHOOSE_FUNDING_SHIPPING,
             CHOOSE_ACCOUNT
         ];
     }
-    
+
     throw new Error(`Can not render menu for ${ fundingSource }`);
 }
 
