@@ -5,7 +5,7 @@ import { EXPERIENCE } from '@paypal/checkout-components/src/constants/button';
 import { FPTI_KEY, ENV, FUNDING, FPTI_USER_ACTION, COUNTRY } from '@paypal/sdk-constants/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
-import type { LocaleType } from '../types';
+import type { LocaleType, Wallet } from '../types';
 import {
     getLogger,
     setupLogger,
@@ -57,11 +57,12 @@ type ButtonLoggerOptions = {|
     stickinessID : string,
     buyerCountry : $Values<typeof COUNTRY>,
     onShippingChange : ?OnShippingChange,
-    experience? : string
+    experience? : string,
+    wallet? : ?Wallet
 |};
 
 export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, partnerAttributionID, commit, sdkCorrelationID, buttonCorrelationID, locale,
-    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, experience } : ButtonLoggerOptions) : ZalgoPromise<void> {
+    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, experience, wallet } : ButtonLoggerOptions) : ZalgoPromise<void> {
 
     const logger = getLogger();
 
@@ -158,12 +159,23 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             logger.info(`button_render_CPL_instrumentation_not_executed`);
         }
 
+        const getFI_ID = function () {
+            let FI_ID;
+            if (wallet?.paypal?.instruments[0]?.secondaryInstruments) {
+                FI_ID = `${ wallet.paypal.instruments[0].instrumentID },${ wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID }`;
+            } else {
+                FI_ID = `${ wallet.paypal.instruments[0].instrumentID }`;
+            }
+            return FI_ID;
+        }
+
         logger.track({
             [FPTI_KEY.STATE]:                           FPTI_STATE.BUTTON,
             [FPTI_KEY.TRANSITION]:                      FPTI_TRANSITION.BUTTON_LOAD,
             [FPTI_KEY.EVENT_NAME]:                      FPTI_TRANSITION.BUTTON_LOAD,
             [FPTI_KEY.FUNDING_LIST]:                    fundingSources.join(':'),
             [FPTI_KEY.FI_LIST]:                         walletInstruments.join(':'),
+            [FPTI_KEY.FI_ID]:                           getFI_ID(),
             [FPTI_KEY.SELECTED_FI]:                     fundingSource,
             [FPTI_KEY.FUNDING_COUNT]:                   fundingSources.length.toString(),
             [FPTI_KEY.PAGE_LOAD_TIME]:                  pageRenderTime ? pageRenderTime.toString() : '',
