@@ -161,9 +161,9 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
 
         const getFI_ID = function () {
             let FI_ID;
-            if (wallet?.paypal?.instruments[0]?.secondaryInstruments) {
+            if (wallet?.paypal?.instruments[0]?.secondaryInstruments && wallet.paypal.instruments[0].instrumentID) {
                 FI_ID = `${ wallet.paypal.instruments[0].instrumentID },${ wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID }`;
-            } else {
+            } else if (wallet?.paypal?.instruments[0]?.instrumentID) {
                 FI_ID = `${ wallet.paypal.instruments[0].instrumentID }`;
             }
             return FI_ID;
