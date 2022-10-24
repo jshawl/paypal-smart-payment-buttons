@@ -281,7 +281,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     .catch(noop);
             },
 
-            onSmartWalletEligible: ({ accessToken, eligibilityReason, locale }) : ZalgoPromise<any> => {
+            onSmartWalletEligible: ({ accessToken, eligibilityReason, locale, orderID }) : ZalgoPromise<any> => {
                 const {country = props.locale.country, lang = props.locale.lang } = locale || props.locale;
                 const access_token = accessToken ? accessToken : buyerAccessToken;
                 // If buyerIntent is change FI/Shipping or Account then its not eligible for Smart Wallet Orders Approval
@@ -289,7 +289,12 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     getLogger().info(`checkout_smart_wallet_not_eligible `, {
                         buyerIntent,
                         width: window.innerWidth
-                    });
+                    }).track({
+                        [FPTI_KEY.STATE]:        FPTI_STATE.ELIGIBILITY_CHECK,
+                        [FPTI_KEY.TRANSITION]:   `${eligibilityReason}_ineligible`,
+                        [FPTI_KEY.CONTEXT_ID]:   orderID,
+                        [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID
+                    }).flush();
                     return ZalgoPromise.resolve({
                         smartWalletRendered: false,
                         buyerIntent
