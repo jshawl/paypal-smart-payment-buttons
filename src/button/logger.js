@@ -58,11 +58,12 @@ type ButtonLoggerOptions = {|
     buyerCountry : $Values<typeof COUNTRY>,
     onShippingChange : ?OnShippingChange,
     experience? : string,
-    wallet? : ?Wallet
+    wallet? : ?Wallet,
+    smartWalletOrderID? : string
 |};
 
 export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, partnerAttributionID, commit, sdkCorrelationID, buttonCorrelationID, locale,
-    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, experience, wallet } : ButtonLoggerOptions) : ZalgoPromise<void> {
+    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, experience, wallet, smartWalletOrderID } : ButtonLoggerOptions) : ZalgoPromise<void> {
 
     const logger = getLogger();
 
@@ -90,7 +91,8 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             [FPTI_KEY.SELLER_ID]:                    merchantID[0],
             [FPTI_KEY.MERCHANT_DOMAIN]:              merchantDomain,
             [FPTI_CUSTOM_KEY.EXPERIENCE]:            experience === EXPERIENCE.INLINE ? 'accelerated' : 'default',
-            [FPTI_KEY.TIMESTAMP]:                    Date.now().toString()
+            [FPTI_KEY.TIMESTAMP]:                    Date.now().toString(),
+            [FPTI_KEY.TOKEN]:                        smartWalletOrderID
         };
     });
 
