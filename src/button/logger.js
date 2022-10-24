@@ -107,8 +107,10 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             return el.getAttribute(DATA_ATTRIBUTES.FUNDING_SOURCE);
         }).filter(Boolean);
 
-        const walletInstruments = querySelectorAll(`[${ DATA_ATTRIBUTES.INSTRUMENT_TYPE }]`).map(el => {
-            return el.getAttribute(DATA_ATTRIBUTES.INSTRUMENT_TYPE);
+        const walletInstruments = querySelectorAll(`[${ DATA_ATTRIBUTES.INSTRUMENT_TYPE }]`).flatMap(el => {
+            const instrumentTypes = [el.getAttribute(DATA_ATTRIBUTES.INSTRUMENT_TYPE)];
+            el.getAttribute(DATA_ATTRIBUTES.SECONDARY_INSTRUMENT_TYPE) ? instrumentTypes.push(el.getAttribute(DATA_ATTRIBUTES.SECONDARY_INSTRUMENT_TYPE)) : null;
+            return instrumentTypes;
         }).filter(Boolean);
 
         const payNow = querySelectorAll(`[${ DATA_ATTRIBUTES.FUNDING_SOURCE }]`).map(el => {
