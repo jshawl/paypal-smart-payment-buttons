@@ -58,7 +58,7 @@ export type CheckoutProps = {|
     onApprove : ({| accelerated? : boolean, payerID : string, paymentID : ?string, billingToken : ?string, subscriptionID : ?string, authCode : ?string |}) => ZalgoPromise<void> | void,
     onComplete : () => ZalgoPromise<void> | void,
     onAuth : ({| accessToken : string |}) => ZalgoPromise<void> | void,
-    onSmartWalletEligible : ({| accessToken : string, eligibilityReason : string, orderID : string |}) => ZalgoPromise<void> | void,
+    onSmartWalletEligible : ({| accessToken : string, eligibilityReason : string, locale : LocaleType, orderID : string |}) => ZalgoPromise<void> | void,
     onCancel : () => ZalgoPromise<void> | void,
     onShippingChange : ?(data : OnShippingChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
     onShippingAddressChange : ?(data : OnShippingAddressChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
