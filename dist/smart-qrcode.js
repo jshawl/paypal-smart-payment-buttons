@@ -591,7 +591,7 @@
                 return target;
             }).apply(this, arguments);
         }
-        var preact_module_n, l, preact_module_u, preact_module_t, preact_module_o, f = {}, e = [], c = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
+        var n, l, preact_module_u, preact_module_t, preact_module_o, f = {}, e = [], c = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
         function s(n, l) {
             for (var u in l) n[u] = l[u];
             return n;
@@ -603,7 +603,7 @@
         function h(l, u, i) {
             var t, o, r, f = {};
             for (r in u) "key" == r ? t = u[r] : "ref" == r ? o = u[r] : f[r] = u[r];
-            if (arguments.length > 2 && (f.children = arguments.length > 3 ? preact_module_n.call(arguments, 2) : i), 
+            if (arguments.length > 2 && (f.children = arguments.length > 3 ? n.call(arguments, 2) : i), 
             "function" == typeof l && null != l.defaultProps) for (r in l.defaultProps) void 0 === f[r] && (f[r] = l.defaultProps[r]);
             return v(l, f, t, o, null);
         }
@@ -784,7 +784,7 @@
                 r = null, c = !1;
             }
             if (null === d) y === p || c && l.data === p || (l.data = p); else {
-                if (r = r && preact_module_n.call(l.childNodes), h = (y = i.props || f).dangerouslySetInnerHTML, 
+                if (r = r && n.call(l.childNodes), h = (y = i.props || f).dangerouslySetInnerHTML, 
                 v = p.dangerouslySetInnerHTML, !c) {
                     if (null != r) for (y = {}, k = 0; k < l.attributes.length; k++) y[l.attributes[k].name] = l.attributes[k].value;
                     (v || h) && (v && (h && v.__html == h.__html || v.__html === l.innerHTML) || (l.innerHTML = v && v.__html || ""));
@@ -818,13 +818,13 @@
                 }
                 t.base = t.__P = null, n.__c = void 0;
             }
-            if (t = n.__k) for (o = 0; o < t.length; o++) t[o] && N(t[o], u, "function" != typeof n.type);
+            if (t = n.__k) for (o = 0; o < t.length; o++) t[o] && N(t[o], u, i || "function" != typeof n.type);
             i || null == n.__e || preact_module_a(n.__e), n.__ = n.__e = n.__d = void 0;
         }
         function O(n, l, u) {
             return this.constructor(n, u);
         }
-        preact_module_n = e.slice, l = {
+        n = e.slice, l = {
             __e: function(n, l, u, i) {
                 for (var t, o, r; l = l.__; ) if ((t = l.__c) && !t.__) try {
                     if ((o = t.constructor) && null != o.getDerivedStateFromError && (t.setState(o.getDerivedStateFromError(n)), 
@@ -843,27 +843,27 @@
         }, d.prototype.forceUpdate = function(n) {
             this.__v && (this.__e = !0, n && this.__h.push(n), b(this));
         }, d.prototype.render = p, preact_module_t = [], g.__r = 0;
-        var hooks_module_r, hooks_module_u, hooks_module_i, hooks_module_o, hooks_module_f = 0, hooks_module_c = [], hooks_module_e = [], hooks_module_a = l.__b, hooks_module_v = l.__r, hooks_module_l = l.diffed, hooks_module_m = l.__c, hooks_module_d = l.unmount;
-        function hooks_module_p(t, r) {
-            l.__h && l.__h(hooks_module_u, t, hooks_module_f || r), hooks_module_f = 0;
-            var i = hooks_module_u.__H || (hooks_module_u.__H = {
+        var hooks_module_t, hooks_module_r, hooks_module_u, hooks_module_i, hooks_module_o = 0, hooks_module_f = [], hooks_module_c = [], hooks_module_e = l.__b, hooks_module_a = l.__r, hooks_module_v = l.diffed, hooks_module_l = l.__c, hooks_module_m = l.unmount;
+        function hooks_module_d(t, u) {
+            l.__h && l.__h(hooks_module_r, t, hooks_module_o || u), hooks_module_o = 0;
+            var i = hooks_module_r.__H || (hooks_module_r.__H = {
                 __: [],
                 __h: []
             });
             return t >= i.__.length && i.__.push({
-                __V: hooks_module_e
+                __V: hooks_module_c
             }), i.__[t];
         }
-        function hooks_module_y(n) {
-            return hooks_module_f = 1, function(n, t, i) {
-                var o = hooks_module_p(hooks_module_r++, 2);
-                if (o.t = n, !o.__c && (o.__ = [ hooks_module_C(void 0, t), function(n) {
+        function hooks_module_p(n) {
+            return hooks_module_o = 1, function(n, u, i) {
+                var o = hooks_module_d(hooks_module_t++, 2);
+                if (o.t = n, !o.__c && (o.__ = [ hooks_module_B(void 0, u), function(n) {
                     var t = o.__N ? o.__N[0] : o.__[0], r = o.t(t, n);
                     t !== r && (o.__N = [ r, o.__[1] ], o.__c.setState({}));
-                } ], o.__c = hooks_module_u, !hooks_module_u.u)) {
-                    hooks_module_u.u = !0;
-                    var f = hooks_module_u.shouldComponentUpdate;
-                    hooks_module_u.shouldComponentUpdate = function(n, t, r) {
+                } ], o.__c = hooks_module_r, !hooks_module_r.u)) {
+                    hooks_module_r.u = !0;
+                    var f = hooks_module_r.shouldComponentUpdate;
+                    hooks_module_r.shouldComponentUpdate = function(n, t, r) {
                         if (!o.__c.__H) return !0;
                         var u = o.__c.__H.__.filter((function(n) {
                             return n.__c;
@@ -877,77 +877,77 @@
                                 var t = n.__[0];
                                 n.__ = n.__N, n.__N = void 0, t !== n.__[0] && (i = !0);
                             }
-                        })), !!i && (!f || f.call(this, n, t, r));
+                        })), !(!i && o.__c.props === n) && (!f || f.call(this, n, t, r));
                     };
                 }
                 return o.__N || o.__;
-            }(hooks_module_C, n);
+            }(hooks_module_B, n);
         }
-        function hooks_module_g() {
-            for (var t; t = hooks_module_c.shift(); ) if (t.__P && t.__H) try {
-                t.__H.__h.forEach(hooks_module_w), t.__H.__h.forEach(hooks_module_z), t.__H.__h = [];
+        function hooks_module_b() {
+            for (var t; t = hooks_module_f.shift(); ) if (t.__P && t.__H) try {
+                t.__H.__h.forEach(hooks_module_k), t.__H.__h.forEach(hooks_module_w), t.__H.__h = [];
             } catch (r) {
                 t.__H.__h = [], l.__e(r, t.__v);
             }
         }
         l.__b = function(n) {
-            "function" != typeof n.type || n.o || n.type === p ? n.o || (n.o = n.__ && n.__.o ? n.__.o : "") : n.o = (n.__ && n.__.o ? n.__.o : "") + (n.__ && n.__.__k ? n.__.__k.indexOf(n) : 0), 
-            hooks_module_u = null, hooks_module_a && hooks_module_a(n);
+            "function" != typeof n.type || n.__m || null === n.__ ? n.__m || (n.__m = n.__ && n.__.__m ? n.__.__m : "") : n.__m = (n.__ && n.__.__m ? n.__.__m : "") + (n.__ && n.__.__k ? n.__.__k.indexOf(n) : 0), 
+            hooks_module_r = null, hooks_module_e && hooks_module_e(n);
         }, l.__r = function(n) {
-            hooks_module_v && hooks_module_v(n), hooks_module_r = 0;
-            var t = (hooks_module_u = n.__c).__H;
-            t && (hooks_module_i === hooks_module_u ? (t.__h = [], hooks_module_u.__h = [], 
-            t.__.forEach((function(n) {
-                n.__N && (n.__ = n.__N), n.__V = hooks_module_e, n.__N = n.i = void 0;
-            }))) : (t.__h.forEach(hooks_module_w), t.__h.forEach(hooks_module_z), t.__h = [])), 
-            hooks_module_i = hooks_module_u;
+            hooks_module_a && hooks_module_a(n), hooks_module_t = 0;
+            var i = (hooks_module_r = n.__c).__H;
+            i && (hooks_module_u === hooks_module_r ? (i.__h = [], hooks_module_r.__h = [], 
+            i.__.forEach((function(n) {
+                n.__N && (n.__ = n.__N), n.__V = hooks_module_c, n.__N = n.i = void 0;
+            }))) : (i.__h.forEach(hooks_module_k), i.__h.forEach(hooks_module_w), i.__h = [])), 
+            hooks_module_u = hooks_module_r;
         }, l.diffed = function(t) {
-            hooks_module_l && hooks_module_l(t);
-            var r = t.__c;
-            r && r.__H && (r.__H.__h.length && (1 !== hooks_module_c.push(r) && hooks_module_o === l.requestAnimationFrame || ((hooks_module_o = l.requestAnimationFrame) || hooks_module_k)(hooks_module_g)), 
-            r.__H.__.forEach((function(n) {
-                n.i && (n.__H = n.i), n.__V !== hooks_module_e && (n.__ = n.__V), n.i = void 0, 
-                n.__V = hooks_module_e;
-            }))), hooks_module_i = hooks_module_u = null;
+            hooks_module_v && hooks_module_v(t);
+            var o = t.__c;
+            o && o.__H && (o.__H.__h.length && (1 !== hooks_module_f.push(o) && hooks_module_i === l.requestAnimationFrame || ((hooks_module_i = l.requestAnimationFrame) || hooks_module_j)(hooks_module_b)), 
+            o.__H.__.forEach((function(n) {
+                n.i && (n.__H = n.i), n.__V !== hooks_module_c && (n.__ = n.__V), n.i = void 0, 
+                n.__V = hooks_module_c;
+            }))), hooks_module_u = hooks_module_r = null;
         }, l.__c = function(t, r) {
             r.some((function(t) {
                 try {
-                    t.__h.forEach(hooks_module_w), t.__h = t.__h.filter((function(n) {
-                        return !n.__ || hooks_module_z(n);
+                    t.__h.forEach(hooks_module_k), t.__h = t.__h.filter((function(n) {
+                        return !n.__ || hooks_module_w(n);
                     }));
                 } catch (u) {
                     r.some((function(n) {
                         n.__h && (n.__h = []);
                     })), r = [], l.__e(u, t.__v);
                 }
-            })), hooks_module_m && hooks_module_m(t, r);
+            })), hooks_module_l && hooks_module_l(t, r);
         }, l.unmount = function(t) {
-            hooks_module_d && hooks_module_d(t);
+            hooks_module_m && hooks_module_m(t);
             var r, u = t.__c;
             u && u.__H && (u.__H.__.forEach((function(n) {
                 try {
-                    hooks_module_w(n);
+                    hooks_module_k(n);
                 } catch (n) {
                     r = n;
                 }
             })), u.__H = void 0, r && l.__e(r, u.__v));
         };
-        var hooks_module_j = "function" == typeof requestAnimationFrame;
-        function hooks_module_k(n) {
+        var hooks_module_g = "function" == typeof requestAnimationFrame;
+        function hooks_module_j(n) {
             var t, r = function() {
-                clearTimeout(u), hooks_module_j && cancelAnimationFrame(t), setTimeout(n);
+                clearTimeout(u), hooks_module_g && cancelAnimationFrame(t), setTimeout(n);
             }, u = setTimeout(r, 100);
-            hooks_module_j && (t = requestAnimationFrame(r));
+            hooks_module_g && (t = requestAnimationFrame(r));
+        }
+        function hooks_module_k(n) {
+            var t = hooks_module_r, u = n.__c;
+            "function" == typeof u && (n.__c = void 0, u()), hooks_module_r = t;
         }
         function hooks_module_w(n) {
-            var t = hooks_module_u, r = n.__c;
-            "function" == typeof r && (n.__c = void 0, r()), hooks_module_u = t;
+            var t = hooks_module_r;
+            n.__c = n.__(), hooks_module_r = t;
         }
-        function hooks_module_z(n) {
-            var t = hooks_module_u;
-            n.__c = n.__(), hooks_module_u = t;
-        }
-        function hooks_module_C(n, t) {
+        function hooks_module_B(n, t) {
             return "function" == typeof t ? t(n) : t;
         }
         function utils_isPromise(item) {
@@ -3305,17 +3305,17 @@
         function QRCard(_ref) {
             var svgString = _ref.svgString;
             var _useXProps = function() {
-                var _useState = hooks_module_y(window.xprops), xprops = _useState[0], setXProps = _useState[1];
-                t = function() {
+                var _useState = hooks_module_p(window.xprops), xprops = _useState[0], setXProps = _useState[1];
+                u = function() {
                     return xprops.onProps((function(newProps) {
                         setXProps(_extends({}, newProps));
                     }));
-                }, i = [], o = hooks_module_p(hooks_module_r++, 3), !l.__s && function(n, t) {
+                }, i = [], o = hooks_module_d(hooks_module_t++, 3), !l.__s && function(n, t) {
                     return !n || n.length !== t.length || t.some((function(t, r) {
                         return t !== n[r];
                     }));
-                }(o.__H, i) && (o.__ = t, o.i = i, hooks_module_u.__H.__h.push(o));
-                var t, i, o;
+                }(o.__H, i) && (o.__ = u, o.i = i, hooks_module_r.__H.__h.push(o));
+                var u, i, o;
                 return _extends({}, xprops, {
                     setState: function(newState) {
                         setXProps(_extends({}, xprops, {
@@ -3325,7 +3325,7 @@
                 });
             }(), state = _useXProps.state, errorText = _useXProps.errorText, setState = _useXProps.setState, close = _useXProps.close, cancel = _useXProps.onCancel;
             var survey = function() {
-                var _useState = hooks_module_y({
+                var _useState = hooks_module_p({
                     isEnabled: !1,
                     reason: "prefer_not_to_say"
                 }), state = _useState[0], setState = _useState[1];
@@ -3500,7 +3500,7 @@
             qrcard_logger = setupNativeQRLogger();
             !function(u, i, t) {
                 var r, e;
-                l.__ && l.__(u, i), r = !1 ? null : i.__k, e = [], j(i, u = i.__k = h(p, null, [ u ]), r || f, f, void 0 !== i.ownerSVGElement, r ? null : i.firstChild ? preact_module_n.call(i.childNodes) : null, e, r ? r.__e : i.firstChild, !1), 
+                l.__ && l.__(u, i), r = !1 ? null : i.__k, e = [], j(i, u = i.__k = h(p, null, [ u ]), r || f, f, void 0 !== i.ownerSVGElement, r ? null : i.firstChild ? n.call(i.childNodes) : null, e, r ? r.__e : i.firstChild, !1), 
                 z(e, u);
             }(h(QRCard, {
                 svgString: svgString
