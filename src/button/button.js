@@ -103,9 +103,7 @@ export function setupButton({
         buttonSessionID, merchantDomain, onInit,
         getPrerenderDetails, rememberFunding, getQueriedEligibleFunding, experience,
         style, fundingSource, intent, createBillingAgreement, createSubscription, stickinessID } = props;
-
-    console.log('TEST ....... setupButton ', {enableOrdersApprovalSmartWallet, smartWalletOrderID, buyerAccessToken});
-
+        
     const config = getConfig({ serverCSPNonce, firebaseConfig });
     const { sdkVersion } = config;
     
@@ -116,7 +114,6 @@ export function setupButton({
     let paymentProcessing = false;
 
     function initiatePayment({ payment, props: paymentProps } : {| props : ButtonProps, payment : Payment |}) : ZalgoPromise<void> {
-        console.log('TEST Button.js initiatePayment', { payment, props });
         return ZalgoPromise.try(() => {
             if (paymentProcessing) {
                 return;
@@ -195,7 +192,6 @@ export function setupButton({
 
         preventClickFocus(button);
         onElementClick(button, event => {
-            console.log('TEST Button.js onElementClick', { button });
             event.preventDefault();
             event.stopPropagation();
 

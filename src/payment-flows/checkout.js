@@ -12,9 +12,9 @@ import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TY
 import { unresolvedPromise, getLogger, setBuyerAccessToken } from '../lib';
 import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
+import { enableLoadingSpinner, getButtons } from "../button/dom";
 
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, InitOptions } from './types';
-import { enableLoadingSpinner, getButtons } from "../button/dom";
 
 export const CHECKOUT_POPUP_DIMENSIONS = {
     WIDTH:  500,
@@ -52,7 +52,6 @@ function getRenderWindow() : Object {
 }
 
 function setupCheckout({ components } : SetupOptions) : ZalgoPromise<void> {
-    console.log('TEST Checkout.js setupCheckout', { components });
     const { Checkout } = components;
 
     const [ parent, top ] = [ getParent(window), getTop(window) ];
@@ -140,7 +139,6 @@ export const getDimensions = (fundingSource : string) : {| width : number, heigh
 }
 
 function initCheckout({ props, components, serviceData, payment, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
-    console.log('TEST Checkout.js initCheckout', { props, components, serviceData, payment, config, fullRestart });
     const { Checkout } = components;
     const { sessionID, buttonSessionID, createOrder, onApprove, onComplete, onCancel,
         onShippingChange, onShippingAddressChange, onShippingOptionsChange, locale, commit, onError, vault, clientAccessToken,
@@ -163,7 +161,6 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     let forceClosed = false;
 
     const init = () => {
-        console.log('TEST Checkout.js Init');
         return Checkout({
             window:   win,
             sessionID,
@@ -175,7 +172,6 @@ function initCheckout({ props, components, serviceData, payment, config, restart
             smokeHash,
 
             createAuthCode: () => {
-                console.log('TEST checkout.js >> createAuthCode');
                 return ZalgoPromise.try(() => {
                     const fundingSkipLogin = FUNDING_SKIP_LOGIN[fundingSource];
 
@@ -281,10 +277,9 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     .catch(noop);
             },
 
-            onSmartWalletEligible: ({ accessToken, eligibilityReason, locale, orderID }) : ZalgoPromise<any> => {
+            onSmartWalletEligible: ({ accessToken, eligibilityReason, orderID }) : ZalgoPromise<{| smartWalletRendered : boolean, buyerIntent : string |}> => {
                 const {country = props.locale.country, lang = props.locale.lang } = locale || props.locale;
                 const access_token = accessToken ? accessToken : buyerAccessToken;
-                // If buyerIntent is change FI/Shipping or Account then its not eligible for Smart Wallet Orders Approval
                 if (window.innerWidth < 300 || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT) {
                     getLogger().info(`checkout_smart_wallet_not_eligible `, {
                         buyerIntent,
@@ -301,24 +296,25 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     });
                 }
 
-                createOrder().then(orderID => { // use memoized version
+                createOrder().then(walletOrderID => {
                     getLogger().info(`checkout_smart_wallet_eligible `, {
                         buyerIntent,
                         eligibilityReason
                     }).track({
                         [FPTI_KEY.STATE]:        FPTI_STATE.ELIGIBILITY_CHECK,
                         [FPTI_KEY.TRANSITION]:   `${eligibilityReason}_eligible`,
-                        [FPTI_KEY.CONTEXT_ID]:   orderID,
+                        [FPTI_KEY.CONTEXT_ID]:   walletOrderID,
                         [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID
                     }).flush().then(() => {
+                        // eslint-disable-next-line no-use-before-define
                         close().then(() => {
-                            getButtons().forEach(button => enableLoadingSpinner(button));
+                            getButtons().forEach(smartButton => enableLoadingSpinner(smartButton));
                             submitForm({
                                 url: document.location.href,
                                 target: '_self',
                                 body: {
                                     buyerAccessToken: access_token,
-                                    smartWalletOrderID: orderID,
+                                    smartWalletOrderID: walletOrderID,
                                     enableOrdersApprovalSmartWallet: true,
                                     'locale.country': country,
                                     'locale.lang': lang
@@ -422,7 +418,6 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     };
 
     const start = memoize(() => {
-        console.log('TEST Checkout.js Start');
         instance = init();
         return instance.renderTo(getRenderWindow(), TARGET_ELEMENT.BODY, context);
     });
@@ -436,7 +431,6 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     });
 
     const click = () => {
-        console.log('TEST Checkout.js Click');
         return ZalgoPromise.try(() => {
             if (acceleratedXO) {
                 context = CONTEXT.IFRAME;
