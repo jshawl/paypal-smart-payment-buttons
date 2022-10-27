@@ -170,7 +170,6 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
             return ZalgoPromise.resolve(queryOrderID);
         }
 
-        // TODO: add a check to handle funding source?
         if(enableOrdersApprovalSmartWallet && smartWalletOrderID) {
             return ZalgoPromise.resolve(smartWalletOrderID);
         }

@@ -110,8 +110,9 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
         }).filter(Boolean);
 
         const walletInstruments = querySelectorAll(`[${ DATA_ATTRIBUTES.INSTRUMENT_TYPE }]`).flatMap(el => {
-            const instrumentTypes = [el.getAttribute(DATA_ATTRIBUTES.INSTRUMENT_TYPE)];
-            el.getAttribute(DATA_ATTRIBUTES.SECONDARY_INSTRUMENT_TYPE) ? instrumentTypes.push(el.getAttribute(DATA_ATTRIBUTES.SECONDARY_INSTRUMENT_TYPE)) : null;
+            const dataInstrumentType = el.getAttribute(DATA_ATTRIBUTES.INSTRUMENT_TYPE);
+            const dataSecondaryInstrumentType = el.getAttribute(DATA_ATTRIBUTES.SECONDARY_INSTRUMENT_TYPE);
+            const instrumentTypes = [dataInstrumentType, dataSecondaryInstrumentType];
             return instrumentTypes;
         }).filter(Boolean);
 
@@ -163,8 +164,8 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             logger.info(`button_render_CPL_instrumentation_not_executed`);
         }
 
-        const getFI_ID = function () {
-            let FI_ID;
+        const getFI_ID = function () : string {
+            let FI_ID = "";
             if (wallet?.paypal?.instruments[0]?.secondaryInstruments && wallet.paypal.instruments[0].instrumentID) {
                 FI_ID = `${ wallet.paypal.instruments[0].instrumentID },${ wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID }`;
             } else if (wallet?.paypal?.instruments[0]?.instrumentID) {

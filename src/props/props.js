@@ -38,7 +38,7 @@ export type XOnSmartWalletEligibleDataType = {|
     eligibilityReason : ?string
 |};
 
-export type onSmartWalletEligible = (params : XOnSmartWalletEligibleDataType) => ZalgoPromise<any>;
+export type onSmartWalletEligible = (params : XOnSmartWalletEligibleDataType) => ZalgoPromise<{| smartWalletRendered : boolean, buyerIntent : string |}>;
 
 export type PrerenderDetailsType = {|
     win ? : ? ProxyWindow,
