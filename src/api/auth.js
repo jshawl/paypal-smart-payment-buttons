@@ -127,7 +127,7 @@ export function upgradeFacilitatorAccessToken(facilitatorAccessToken : string, {
     });
 }
 
-export function exchangeAccessTokenForAuthCode(buyerAccessToken : string) : ZalgoPromise<string> {
+export function exchangeAccessTokenForAuthCode(buyerAccessToken : string | ZalgoPromise<string>) : ZalgoPromise<string> {
     return callGraphQL({
         name:  'ExchangeAuthCode',
         query: `
