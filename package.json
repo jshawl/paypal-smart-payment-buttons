@@ -80,7 +80,7 @@
     "@krakenjs/jsx-pragmatic": "^3.0.0",
     "@krakenjs/post-robot": "^11.0.0",
     "@krakenjs/zalgo-promise": "^2.0.0",
-    "@paypal/checkout-components": "^5.0.238",
+    "@paypal/checkout-components": "5.0.241-kitty",
     "@paypal/common-components": "^1.0.33",
     "@paypal/installments": "^1.0.0",
     "@paypal/sdk-client": "^4.0.156",
