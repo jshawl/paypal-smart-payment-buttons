@@ -42,10 +42,11 @@ type LoggerOptions = {|
     locale : LocaleType,
     buyerCountry : $Values<typeof COUNTRY>,
     sdkVersion : string,
-    fundingSource : ?$Values<typeof FUNDING>
+    fundingSource : ?$Values<typeof FUNDING>,
+    enableOrdersApprovalSmartWallet? : boolean
 |};
 
-export function setupLogger({ env, sessionID, clientID, sdkCorrelationID, buyerCountry, locale, sdkVersion, fundingSource } : LoggerOptions) {
+export function setupLogger({ env, sessionID, clientID, sdkCorrelationID, buyerCountry, locale, sdkVersion, fundingSource, enableOrdersApprovalSmartWallet } : LoggerOptions) {
     const logger = getLogger();
 
     logger.addPayloadBuilder(() => {
@@ -62,6 +63,7 @@ export function setupLogger({ env, sessionID, clientID, sdkCorrelationID, buyerC
         const { lang, country } = locale;
 
         return {
+            [FPTI_KEY.PRODUCT]:                enableOrdersApprovalSmartWallet ? 'ppof' : null,
             [FPTI_KEY.FEED]:                   FPTI_FEED.PAYMENTS_SDK,
             [FPTI_KEY.DATA_SOURCE]:            FPTI_DATA_SOURCE.PAYMENTS_SDK,
             [FPTI_KEY.CLIENT_ID]:              clientID,
