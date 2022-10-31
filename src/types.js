@@ -4,6 +4,7 @@ import type { CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 import type { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { COUNTRY, LANG, CARD, CURRENCY, WALLET_INSTRUMENT, FUNDING } from '@paypal/sdk-constants/src';
 import type { ProxyWindow as _ProxyWindow } from '@krakenjs/post-robot/src';
+import type { SecondaryInstruments } from '@paypal/checkout-components/src/types';
 
 import { CONTEXT, QRCODE_STATE } from './constants';
 import type { OnShippingChangeData } from './props/onShippingChange';
@@ -208,12 +209,6 @@ export type PayPal = {|
     postRobot : PostRobot
 |};
 
-type SecondaryInstruments = {|
-    type : string,
-    label : string,
-    instrumentID : string
-|};
-
 export type WalletInstrument = {|
     type? : $Values<typeof WALLET_INSTRUMENT>,
     label? : string,
@@ -225,7 +220,7 @@ export type WalletInstrument = {|
     accessToken? : ?string,
     branded : boolean | null,
     planID? : ?string,
-    secondaryInstruments? : $ReadOnlyArray<SecondaryInstruments>
+    secondaryInstruments? : SecondaryInstruments
 |};
 
 export type WalletPaymentType = {|
