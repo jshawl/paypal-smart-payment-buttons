@@ -63,6 +63,7 @@ export function setupLogger({ env, sessionID, clientID, sdkCorrelationID, buyerC
         const { lang, country } = locale;
 
         return {
+            [FPTI_KEY.STATE]:                  'smart_buttons',
             [FPTI_KEY.PRODUCT]:                enableOrdersApprovalSmartWallet ? 'ppof' : null,
             [FPTI_KEY.FEED]:                   FPTI_FEED.PAYMENTS_SDK,
             [FPTI_KEY.DATA_SOURCE]:            FPTI_DATA_SOURCE.PAYMENTS_SDK,
