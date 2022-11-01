@@ -60,15 +60,16 @@ type ButtonLoggerOptions = {|
     experience? : string,
     wallet? : ?Wallet,
     smartWalletOrderID? : string,
-    enableOrdersApprovalSmartWallet? : boolean
+    enableOrdersApprovalSmartWallet? : boolean,
+    product? : string
 |};
 
 export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, partnerAttributionID, commit, sdkCorrelationID, buttonCorrelationID, locale,
-    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, experience, wallet, smartWalletOrderID, enableOrdersApprovalSmartWallet } : ButtonLoggerOptions) : ZalgoPromise<void> {
+    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, experience, wallet, smartWalletOrderID, product } : ButtonLoggerOptions) : ZalgoPromise<void> {
 
     const logger = getLogger();
 
-    setupLogger({ env, sessionID, clientID, sdkCorrelationID, locale, sdkVersion, buyerCountry, fundingSource, enableOrdersApprovalSmartWallet, smartWalletOrderID });
+    setupLogger({ env, sessionID, clientID, sdkCorrelationID, locale, sdkVersion, buyerCountry, fundingSource, smartWalletOrderID, product });
 
     logger.addPayloadBuilder(() => {
         return {

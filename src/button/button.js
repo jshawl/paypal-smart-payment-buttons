@@ -41,7 +41,8 @@ export type SetupButtonOptions = {|
     brandedDefault? : boolean | null,
     featureFlags: FeatureFlags,
     smartWalletOrderID? : string,
-    enableOrdersApprovalSmartWallet? : boolean
+    enableOrdersApprovalSmartWallet? : boolean,
+    product? : string
 |};
 
 try {
@@ -257,7 +258,7 @@ export function setupButton({
     const setupButtonLogsTask = setupButtonLogger({
         style, env, sdkVersion, sessionID, clientID, partnerAttributionID, commit, sdkCorrelationID,
         stickinessID, buttonCorrelationID, locale, merchantID, buttonSessionID, merchantDomain,
-        fundingSource, getQueriedEligibleFunding, buyerCountry, onShippingChange, experience, wallet, smartWalletOrderID, enableOrdersApprovalSmartWallet });
+        fundingSource, getQueriedEligibleFunding, buyerCountry, onShippingChange, experience, wallet, smartWalletOrderID, enableOrdersApprovalSmartWallet, product });
     const setupPaymentFlowsTask = setupPaymentFlows({ props, config, serviceData, components });
     const setupExportsTask = setupExports({ props, isEnabled, facilitatorAccessToken, fundingEligibility, merchantID });
 
