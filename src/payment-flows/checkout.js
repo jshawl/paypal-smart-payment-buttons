@@ -324,7 +324,8 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                                     smartWalletOrderID: walletOrderID,
                                     enableOrdersApprovalSmartWallet: true,
                                     'locale.country': country,
-                                    'locale.lang': lang
+                                    'locale.lang': lang,
+                                    product: eligibilityReason
                                 }
                             });
                         });
