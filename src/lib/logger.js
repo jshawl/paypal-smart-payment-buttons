@@ -63,9 +63,8 @@ export function setupLogger({ env, sessionID, clientID, sdkCorrelationID, buyerC
     logger.addTrackingBuilder(() => {
         const { lang, country } = locale;
 
-        return {
+        const tracking = {
             [FPTI_KEY.STATE]:                  FPTI_STATE.BUTTON,
-            [FPTI_KEY.PRODUCT]:                enableOrdersApprovalSmartWallet ? 'ppof' : null,
             [FPTI_KEY.FEED]:                   FPTI_FEED.PAYMENTS_SDK,
             [FPTI_KEY.DATA_SOURCE]:            FPTI_DATA_SOURCE.PAYMENTS_SDK,
             [FPTI_KEY.CLIENT_ID]:              clientID,
@@ -82,6 +81,12 @@ export function setupLogger({ env, sessionID, clientID, sdkCorrelationID, buyerC
             [FPTI_KEY.TIMESTAMP]:              Date.now().toString(),
             [FPTI_KEY.CHOSEN_FUNDING]:         fundingSource
         };
+
+        if (enableOrdersApprovalSmartWallet) {
+            tracking[`${FPTI_KEY.PRODUCT}`] = "ppof";
+        }
+
+        return tracking;
     });
 
     ZalgoPromise.onPossiblyUnhandledException(err => {
