@@ -8,7 +8,7 @@ import type { ContentType, Wallet, PersonalizationType, FeatureFlags, InlinePaym
 import { getLogger, getSmartFieldsByFundingSource, setBuyerAccessToken } from '../lib';
 
 import { type FirebaseConfig } from '../api';
-import { DATA_ATTRIBUTES, BUYER_INTENT } from '../constants';
+import { DATA_ATTRIBUTES, BUYER_INTENT, FPTI_STATE } from '../constants';
 import { type Payment } from '../payment-flows';
 
 import { getButtonProps, getConfig, getComponents, getServiceData, type ButtonProps } from './props';
@@ -154,6 +154,7 @@ export function setupButton({
             getLogger()
                 .info('smart_buttons_payment_error', { err: stringifyError(err) })
                 .track({
+                    [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
                     [FPTI_KEY.ERROR_CODE]: 'smart_buttons_payment_error',
                     [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(err)
                 });
@@ -175,6 +176,7 @@ export function setupButton({
             getLogger()
                 .info('smart_buttons_payment_error', { err: stringifyError(err) })
                 .track({
+                    [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
                     [FPTI_KEY.ERROR_CODE]: 'smart_buttons_payment_error',
                     [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(err)
                 });

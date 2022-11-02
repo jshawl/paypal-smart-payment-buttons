@@ -216,6 +216,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                         getLogger()
                             .info('connect_redirect', { connectURL })
                             .track({
+                                [FPTI_KEY.STATE]:        FPTI_STATE.BUTTON,
                                 [FPTI_KEY.TRANSITION]:   FPTI_TRANSITION.CONNECT_REDIRECT,
                                 [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID,
                                 [FPTI_KEY.TOKEN]:        orderID,
@@ -292,6 +293,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                         buyerIntent,
                         width: window.innerWidth
                     }).track({
+                        [FPTI_KEY.STATE]:        FPTI_STATE.BUTTON,
                         [FPTI_KEY.STATE]:        FPTI_STATE.ELIGIBILITY_CHECK,
                         [FPTI_KEY.TRANSITION]:   `${eligibilityReason}_ineligible`,
                         [FPTI_KEY.CONTEXT_ID]:   orderID,
@@ -308,6 +310,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                         buyerIntent,
                         eligibilityReason
                     }).track({
+                        [FPTI_KEY.STATE]:        FPTI_STATE.BUTTON,
                         [FPTI_KEY.STATE]:        FPTI_STATE.ELIGIBILITY_CHECK,
                         [FPTI_KEY.TRANSITION]:   `${eligibilityReason}_eligible`,
                         [FPTI_KEY.CONTEXT_ID]:   walletOrderID,
@@ -390,6 +393,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 getLogger()
                     .info(`checkout_flow_error `, { err: stringifyError(err) })
                     .track({
+                        [FPTI_KEY.STATE]:        FPTI_STATE.BUTTON,
                         [FPTI_KEY.TRANSITION]:   FPTI_TRANSITION.CHECKOUT_ERROR,
                         [FPTI_KEY.EVENT_NAME]:   FPTI_TRANSITION.CHECKOUT_ERROR,
                         [FPTI_KEY.ERROR_DESC]:   stringifyError(err)
