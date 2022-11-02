@@ -7,7 +7,6 @@ import { FPTI_KEY, FPTI_FEED, FPTI_DATA_SOURCE, FPTI_SDK_NAME, ENV, COUNTRY, MOB
 
 import type { LocaleType } from '../types';
 import { LOGGER_URL, AMPLITUDE_API_KEY } from '../config';
-import { FPTI_STATE } from '../constants';
 
 export function getLogger() : LoggerType {
     return inlineMemoize(getLogger, () =>
@@ -65,7 +64,6 @@ export function setupLogger({ env, sessionID, clientID, sdkCorrelationID, buyerC
         const { lang, country } = locale;
 
         const tracking = {
-            [FPTI_KEY.STATE]:                  FPTI_STATE.BUTTON,
             [FPTI_KEY.FEED]:                   FPTI_FEED.PAYMENTS_SDK,
             [FPTI_KEY.DATA_SOURCE]:            FPTI_DATA_SOURCE.PAYMENTS_SDK,
             [FPTI_KEY.CLIENT_ID]:              clientID,
