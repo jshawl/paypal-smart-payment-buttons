@@ -65,7 +65,6 @@ export function setupLogger({ env, sessionID, clientID, sdkCorrelationID, buyerC
         const { lang, country } = locale;
 
         const tracking = {
-            [FPTI_KEY.TOKEN]:                  smartWalletOrderID,
             [FPTI_KEY.STATE]:                  FPTI_STATE.BUTTON,
             [FPTI_KEY.FEED]:                   FPTI_FEED.PAYMENTS_SDK,
             [FPTI_KEY.DATA_SOURCE]:            FPTI_DATA_SOURCE.PAYMENTS_SDK,
@@ -86,6 +85,10 @@ export function setupLogger({ env, sessionID, clientID, sdkCorrelationID, buyerC
 
         if (product) {
             tracking[`${FPTI_KEY.PRODUCT}`] = product;
+        }
+
+        if (smartWalletOrderID) {
+            tracking[`${FPTI_KEY.TOKEN}`] = smartWalletOrderID;
         }
 
         return tracking;
