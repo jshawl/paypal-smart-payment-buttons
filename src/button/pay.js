@@ -99,8 +99,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                     [FPTI_KEY.CONTEXT_ID]:         buttonSessionID,
                     [FPTI_KEY.BUTTON_SESSION_UID]: buttonSessionID,
                     [AMPLITUDE_KEY.USER_ID]:       buttonSessionID,
-                    [AMPLITUDE_KEY.TIME]:          Date.now().toString(),
-                    [FPTI_KEY.TOKEN]:              null
+                    [AMPLITUDE_KEY.TIME]:          Date.now().toString()
                 };
             })
             .track({
