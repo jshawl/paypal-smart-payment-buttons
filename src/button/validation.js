@@ -6,7 +6,7 @@ import { INTENT, SDK_QUERY_KEYS, CURRENCY, ENV, FPTI_KEY, SDK_SETTINGS, VAULT } 
 
 import type {FeatureFlags} from '../types'
 import type { CreateBillingAgreement, CreateSubscription } from '../props';
-import { BUTTON_LABEL, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY, ITEM_CATEGORY } from '../constants';
+import { BUTTON_LABEL, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY, ITEM_CATEGORY, FPTI_TRANSITION } from '../constants';
 import { getSupplementalOrderInfo } from '../api';
 import { getLogger, isEmailAddress } from '../lib';
 
@@ -79,7 +79,7 @@ function triggerIntegrationError({ error, message = error, orderID, loggerPayloa
     getLogger()
         .warn(error, loggerPayload)
         .track({
-            [ FPTI_KEY.TRANSITION ]:                   'process_order_validate',
+            [ FPTI_KEY.TRANSITION ]:                   FPTI_TRANSITION.ORDER_VALIDATE,
             [ FPTI_KEY.CONTEXT_TYPE ]:                 FPTI_CONTEXT_TYPE.ORDER_ID,
             [ FPTI_KEY.TOKEN ]:                        orderID,
             [ FPTI_KEY.CONTEXT_ID ]:                   orderID,
