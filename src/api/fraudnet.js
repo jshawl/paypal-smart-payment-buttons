@@ -27,6 +27,7 @@ type FraudnetOptions = {|
 type FraudnetConfig = {|
     f : string,
     s : string,
+    u : string,
     cb1 : string,
     sandbox? : boolean
 |};
@@ -42,6 +43,7 @@ export const loadFraudnet : Memoized<LoadFraudnet> = memoize(({ env, clientMetad
         const config : FraudnetConfig = {
             f:   clientMetadataID,
             s:   FRAUDNET_APP_NAME,
+            u:   window.xprops.buttonLocation,
             cb1: 'fnCallback'
         };
 
