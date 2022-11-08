@@ -80,7 +80,10 @@ export function setupButton({
     }
 
     const clientID = window.xprops.clientID;
-    setBuyerAccessToken(buyerAccessToken);
+
+    if (buyerAccessToken && smartWalletOrderID) {
+        setBuyerAccessToken(buyerAccessToken);
+    }
 
     const serviceData = getServiceData({
         eligibility,
