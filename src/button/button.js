@@ -6,7 +6,6 @@ import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import type { ContentType, Wallet, PersonalizationType, FeatureFlags, InlinePaymentFieldsEligibility } from '../types';
 import { getLogger, getSmartFieldsByFundingSource, setBuyerAccessToken } from '../lib';
-
 import { type FirebaseConfig } from '../api';
 import { DATA_ATTRIBUTES, BUYER_INTENT, FPTI_STATE } from '../constants';
 import { type Payment } from '../payment-flows';
@@ -73,7 +72,10 @@ export function setupButton({
     personalization,
     correlationID: buttonCorrelationID = '',
     brandedDefault = null,
-    featureFlags
+    featureFlags,
+    smartWalletOrderID,
+    enableOrdersApprovalSmartWallet,
+    product
 }: SetupButtonOptions) : ZalgoPromise<void> {
     if (!window.paypal) {
         throw new Error(`PayPal SDK not loaded`);
