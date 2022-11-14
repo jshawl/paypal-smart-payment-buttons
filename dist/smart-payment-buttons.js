@@ -16089,10 +16089,10 @@ window.spb = function(modules) {
             if (!window.paypal) throw new Error("PayPal SDK not loaded");
             var clientID = window.xprops.clientID;
             var serviceData = getServiceData({
-                eligibility: opts.eligibility,
+                eligibility: eligibility,
                 facilitatorAccessToken: facilitatorAccessToken,
-                buyerGeoCountry: opts.buyerCountry,
-                serverMerchantID: opts.merchantID,
+                buyerGeoCountry: buyerGeoCountry,
+                serverMerchantID: serverMerchantID,
                 fundingEligibility: fundingEligibility,
                 cookies: cookies,
                 sdkMeta: sdkMeta,
