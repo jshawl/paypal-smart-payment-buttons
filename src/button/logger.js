@@ -165,8 +165,8 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             logger.info(`button_render_CPL_instrumentation_not_executed`);
         }
 
-        const getFI_ID = function () : string {
-            let FI_ID = "";
+        const getFI_ID = function () : string | void {
+            let FI_ID;
             if (wallet?.paypal?.instruments[0]?.secondaryInstruments && wallet.paypal.instruments[0].instrumentID) {
                 FI_ID = `${ wallet.paypal.instruments[0].instrumentID },${ wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID }`;
             } else if (wallet?.paypal?.instruments[0]?.instrumentID) {
@@ -175,13 +175,12 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             return FI_ID;
         }
 
-        logger.track({
+        const tracking = {
             [FPTI_KEY.STATE]:                           FPTI_STATE.BUTTON,
             [FPTI_KEY.TRANSITION]:                      FPTI_TRANSITION.BUTTON_LOAD,
             [FPTI_KEY.EVENT_NAME]:                      FPTI_TRANSITION.BUTTON_LOAD,
             [FPTI_KEY.FUNDING_LIST]:                    fundingSources.join(':'),
             [FPTI_KEY.FI_LIST]:                         walletInstruments.join(':'),
-            [FPTI_KEY.FI_ID]:                           getFI_ID(),
             [FPTI_KEY.SELECTED_FI]:                     fundingSource,
             [FPTI_KEY.FUNDING_COUNT]:                   fundingSources.length.toString(),
             [FPTI_KEY.PAGE_LOAD_TIME]:                  pageRenderTime ? pageRenderTime.toString() : '',
@@ -196,7 +195,13 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             [FPTI_BUTTON_KEY.BUTTON_TYPE]:              FPTI_BUTTON_TYPE.IFRAME,
             [FPTI_BUTTON_KEY.BUTTON_TAGLINE_ENABLED]:   tagline ? '1' : '0',
             [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_PASSED]: onShippingChange ? '1' : '0'
-        });
+        }
+
+        if (getFI_ID()) {
+            tracking[`${ FPTI_KEY.FI_ID }`] = getFI_ID();
+        }
+
+        logger.track(tracking);
 
         logger.flush();
     });
