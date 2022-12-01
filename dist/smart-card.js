@@ -5301,7 +5301,6 @@ window.smartCard = function(modules) {
         }
     }
     l.__b = function(n) {
-        "function" != typeof n.type || n.__m || null === n.__ ? n.__m || (n.__m = n.__ && n.__.__m ? n.__.__m : "") : n.__m = (n.__ && n.__.__m ? n.__.__m : "") + (n.__ && n.__.__k ? n.__.__k.indexOf(n) : 0), 
         hooks_module_r = null, hooks_module_e && hooks_module_e(n);
     }, l.__r = function(n) {
         hooks_module_a && hooks_module_a(n), hooks_module_t = 0;
