@@ -288,7 +288,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     access_token = buyerAccessToken;
                 }
                 
-                if (window.innerWidth < 300 || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT) {
+                if (window.innerWidth < 250 || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT) {
                     getLogger().info(`checkout_smart_wallet_not_eligible `, {
                         buyerIntent,
                         width: window.innerWidth
