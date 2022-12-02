@@ -299,6 +299,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
                                 if(enableOrdersApprovalSmartWallet && getBuyerAccessToken()) {
                                     return getBuyerAccessToken();
                                 }
+
                                 const smartInstrument = getInstrument(smartWallet, fundingSource, instrumentID);
 
                                 if (!smartInstrument) {
@@ -339,6 +340,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
         if (props.smartWalletOrderID) {
             return [CHOOSE_FUNDING_SHIPPING];
         }
+        
         return [
             CHOOSE_FUNDING_SHIPPING,
             CHOOSE_ACCOUNT
