@@ -137,8 +137,10 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
             throw new Error(`No smart wallet found`);
         }
 
-        if(getBuyerAccessToken()) {
-            return getBuyerAccessToken();
+        const buyerAccessToken = getBuyerAccessToken();
+
+        if(buyerAccessToken) {
+            return buyerAccessToken;
         }
 
         return smartWalletPromise.then(smartWallet => {
@@ -296,8 +298,9 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
                         fundingSource:     newFundingSource,
                         createAccessToken: () => {
                             return smartWalletPromise.then(smartWallet => {
-                                if(enableOrdersApprovalSmartWallet && getBuyerAccessToken()) {
-                                    return getBuyerAccessToken();
+                                const buyerAccessToken = getBuyerAccessToken();
+                                if(enableOrdersApprovalSmartWallet && buyerAccessToken) {
+                                    return buyerAccessToken;
                                 }
 
                                 const smartInstrument = getInstrument(smartWallet, fundingSource, instrumentID);
