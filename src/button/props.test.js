@@ -91,4 +91,15 @@ describe('getButtonProps', () => {
         window.xprops.createSubscription = jest.fn();
         expect(() => getButtonProps(defaultArgs)).not.toThrowError();
     });
+
+    it('passes through enableOrdersApprovalSmartWallet and smartWalletOrderID to props', () => {
+        window.xprops.intent = INTENT.CAPTURE;
+        const props = getButtonProps({
+            ...defaultArgs,
+            enableOrdersApprovalSmartWallet: true,
+            smartWalletOrderID: 'abc'
+        });
+        expect(props.enableOrdersApprovalSmartWallet).toBe(true);
+        expect(props.smartWalletOrderID).toEqual('abc');
+    });
 });
