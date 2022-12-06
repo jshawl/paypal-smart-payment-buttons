@@ -35,7 +35,8 @@ export const TYPES = true;
 
 export type XOnSmartWalletEligibleDataType = {|
     accessToken : ?string,
-    eligibilityReason : ?string
+    eligibilityReason : ?string,
+    locale : LocaleType
 |};
 
 export type onSmartWalletEligible = (params : XOnSmartWalletEligibleDataType) => ZalgoPromise<{| smartWalletRendered : boolean, buyerIntent : string |}>;
