@@ -11,6 +11,7 @@ import type { OnShippingChangeData } from './props/onShippingChange';
 import type { OnShippingAddressChangeData } from './props/onShippingAddressChange';
 import type { OnShippingOptionsChangeData } from './props/onShippingOptionsChange';
 import type { ConfirmData } from './api/order';
+import type { onSmartWalletEligible } from './props/props';
 
 // export something to force webpack to see this as an ES module
 export const TYPES = true;
@@ -59,7 +60,7 @@ export type CheckoutProps = {|
     onApprove : ({| accelerated? : boolean, payerID : string, paymentID : ?string, billingToken : ?string, subscriptionID : ?string, authCode : ?string |}) => ZalgoPromise<void> | void,
     onComplete : () => ZalgoPromise<void> | void,
     onAuth : ({| accessToken : string |}) => ZalgoPromise<void> | void,
-    onSmartWalletEligible? : ({| accessToken : string, eligibilityReason : string, locale? : LocaleType, orderID : string |}) => ZalgoPromise<{| smartWalletRendered : boolean, buyerIntent : string |}>,
+    onSmartWalletEligible? : onSmartWalletEligible,
     onCancel : () => ZalgoPromise<void> | void,
     onShippingChange : ?(data : OnShippingChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
     onShippingAddressChange : ?(data : OnShippingAddressChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
