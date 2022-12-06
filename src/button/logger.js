@@ -166,7 +166,7 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             logger.info(`button_render_CPL_instrumentation_not_executed`);
         }
 
-        const getFI_ID = function () : string | void {
+        const getFundingInstrumentID = function () : string | void {
             let FI_ID;
             
             if (wallet?.paypal?.instruments[0]?.secondaryInstruments && wallet.paypal.instruments[0].instrumentID) {
@@ -200,7 +200,7 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_PASSED]: onShippingChange ? '1' : '0'
         }
 
-        const fiID = getFI_ID();
+        const fiID = getFundingInstrumentID();
 
         if (fiID) {
             tracking[`${ FPTI_KEY.FI_ID }`] = fiID;
