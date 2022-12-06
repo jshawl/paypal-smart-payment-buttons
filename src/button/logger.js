@@ -200,8 +200,10 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_PASSED]: onShippingChange ? '1' : '0'
         }
 
-        if (getFI_ID()) {
-            tracking[`${ FPTI_KEY.FI_ID }`] = getFI_ID();
+        const fiID = getFI_ID();
+
+        if (fiID) {
+            tracking[`${ FPTI_KEY.FI_ID }`] = fiID;
         }
 
         logger.track(tracking);
