@@ -161,8 +161,6 @@ export default {
       p24: {
         eligible: false,
       },
-      // $FlowFixMe
-      verkkopankki: {},
       payu: {
         eligible: false,
       },
@@ -170,12 +168,6 @@ export default {
         eligible: false,
       },
       trustly: {
-        eligible: false,
-      },
-      zimpler: {
-        eligible: false,
-      },
-      maxima: {
         eligible: false,
       },
       oxxo: {
@@ -188,9 +180,6 @@ export default {
         eligible: false,
       },
       wechatpay: {
-        eligible: false,
-      },
-      mercadopago: {
         eligible: false,
       },
       multibanco: {
