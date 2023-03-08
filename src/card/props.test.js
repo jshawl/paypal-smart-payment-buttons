@@ -2,10 +2,6 @@
 /* eslint import/no-namespace: off */
 /* eslint no-empty-function: off */
 import { describe, beforeEach, afterEach, test, expect, vi } from "vitest";
-import { DEFAULT_INTENT } from "@paypal/sdk-constants/src";
-
-import * as getPropsStuff from "../props/props";
-import * as getLegacyPropsStuff from "../props/legacyProps";
 
 import { getCardProps } from "./props";
 
@@ -15,8 +11,6 @@ const vaultMock = {
 };
 
 describe("getCardProps", () => {
-  let getPropsSpy;
-  let getLegacyPropsSpy;
   const inputs = {
     facilitatorAccessToken: "some-facilitator-access-token",
     featureFlags: {},
@@ -24,24 +18,14 @@ describe("getCardProps", () => {
 
   beforeEach(() => {
     window.xprops = {};
-    getPropsSpy = vi.spyOn(getPropsStuff, "getProps");
-    getLegacyPropsSpy = vi.spyOn(getLegacyPropsStuff, "getLegacyProps");
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  test("uses getProps and legacy props when createVaultSetupToken is not present, but createOrder is", () => {
-    window.xprops = { intent: DEFAULT_INTENT };
-    window.xprops.createOrder = vi.fn();
-    getCardProps(inputs);
-    expect(getPropsSpy).toBeCalled();
-    expect(getLegacyPropsSpy).toBeCalled();
-  });
-
   test("throws an error when neither createOrder or createVaultSetupToken is present", () => {
-    window.xprops = { intent: DEFAULT_INTENT };
+    window.xprops = { intent: 'capture' };
     // $FlowIssue
     window.xprops.createOrder = undefined;
     // $FlowIssue

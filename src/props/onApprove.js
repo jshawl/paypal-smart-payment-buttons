@@ -14,6 +14,7 @@ import { ENABLE_PAYMENT_API } from '../config';
 import type {FeatureFlags} from '../types'
 
 import type { CreateOrder } from './createOrder';
+import type { CreateVaultSetupToken } from './createVaultSetupToken';
 import type { CreateBillingAgreement } from './createBillingAgreement';
 import type { CreateSubscription } from './createSubscription';
 import type { OnError } from './onError';
@@ -51,6 +52,14 @@ export type XOnApproveSubscriptionDataType = {|
     facilitatorAccessToken : string,
     paymentSource : $Values<typeof FUNDING> | null
 |};
+
+export type XOnApproveCreateVaultSetupTokenDataType = {|
+  payerID : ?string,
+  facilitatorAccessToken: string,
+  paymentSource : $Values<typeof FUNDING> | null,
+  vaultSetupToken: ?string
+|};
+
 
 export type OrderActions = {|
     capture : () => ZalgoPromise<OrderResponse>,
@@ -226,8 +235,9 @@ export type XOnApproveOrder = (XOnApproveOrderDataType, XOnApproveOrderActionsTy
 export type XOnApproveBilling = (XOnApproveBillingDataType, XOnApproveBillingActionsType) => ZalgoPromise<void>;
 export type XOnApproveTokenize = (XOnApproveTokenizeDataType, XOnApproveTokenizeActionsType) => ZalgoPromise<void>;
 export type XOnApproveSubscription = (XOnApproveSubscriptionDataType, XOnApproveSubscriptionActionsType) => ZalgoPromise<void>;
+export type XOnApproveCreateVaultSetupToken = (XOnApproveCreateVaultSetupTokenDataType) => ZalgoPromise<void>;
 
-export type XOnApprove = XOnApproveOrder & XOnApproveBilling & XOnApproveTokenize & XOnApproveSubscription;
+export type XOnApprove = XOnApproveOrder & XOnApproveBilling & XOnApproveTokenize & XOnApproveSubscription & XOnApproveCreateVaultSetupToken;
 
 type ApproveOrderActionOptions = {|
     orderID : string,
@@ -502,6 +512,15 @@ type GetOnApproveSubscriptionOptions = {|
     paymentSource : $Values<typeof FUNDING> | null
 |};
 
+type GetOnApproveVaultWithoutPurchaseOptions = {|
+  onApprove : ?XOnApproveCreateVaultSetupToken,
+  onError : OnError,
+  facilitatorAccessToken : string,
+  createOrder : CreateOrder,
+  createVaultSetupToken: CreateVaultSetupToken,
+  paymentSource : $Values<typeof FUNDING> | null
+|};
+
 function getDefaultOnApproveSubscription() : XOnApproveSubscription {
     return () => {
         throw new Error(`Expected onApprove`);
@@ -543,6 +562,36 @@ export function getOnApproveSubscription({ onApprove = getDefaultOnApproveSubscr
     });
 }
 
+export function getOnApproveVaultWithoutPurchase({ onApprove, onError, facilitatorAccessToken, createOrder, paymentSource, createVaultSetupToken } : GetOnApproveVaultWithoutPurchaseOptions) : OnApprove {
+  if (!onApprove) {
+      throw new Error(`Expected onApprove`);
+  }
+  return memoize(({ payerID } : OnApproveData) => {
+      return createOrder().then(orderID => {
+          getLogger()
+              .info('button_approve')
+              .track({
+                  [FPTI_KEY.TRANSITION]:   FPTI_TRANSITION.CHECKOUT_APPROVE,
+                  [FPTI_KEY.EVENT_NAME]:   FPTI_TRANSITION.CHECKOUT_APPROVE,
+                  [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID,
+                  [FPTI_KEY.TOKEN]:        orderID,
+                  [FPTI_KEY.CONTEXT_ID]:   orderID
+              }).flush();
+
+          return createVaultSetupToken().then( (vaultSetupToken) => {
+            const data = { payerID, facilitatorAccessToken, paymentSource, vaultSetupToken };
+            return onApprove(data).catch(err => {
+                return ZalgoPromise.try(() => {
+                    return onError(err);
+                }).then(() => {
+                    throw err;
+                });
+            });
+          });
+      });
+  });
+}
+
 type GetOnApproveOptions = {|
     intent : $Values<typeof INTENT>,
     onApprove : ?XOnApprove,
@@ -557,10 +606,17 @@ type GetOnApproveOptions = {|
     createBillingAgreement : ?CreateBillingAgreement,
     createSubscription : ?CreateSubscription,
     paymentSource : $Values<typeof FUNDING> | null,
-    featureFlags: FeatureFlags
+    featureFlags: FeatureFlags,
+    createVaultSetupToken: ?CreateVaultSetupToken,
+    flow: ?string
 |};
 
-export function getOnApprove({ intent, createBillingAgreement, createSubscription, onApprove, partnerAttributionID, onError, clientAccessToken, vault, clientID, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags } : GetOnApproveOptions) : OnApprove {
+export function getOnApprove({ intent, createBillingAgreement, createSubscription, onApprove, partnerAttributionID, onError, clientAccessToken, vault, clientID, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags, createVaultSetupToken, flow } : GetOnApproveOptions) : OnApprove {
+
+    if (flow && flow === "vault_without_purchase" && createVaultSetupToken) {
+        return getOnApproveVaultWithoutPurchase({ onApprove, onError, facilitatorAccessToken, createOrder, paymentSource, createVaultSetupToken });
+    }
+
     if (createBillingAgreement) {
         return getOnApproveBilling({ onApprove, onError, facilitatorAccessToken, createOrder, paymentSource });
     }

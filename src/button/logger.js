@@ -171,7 +171,7 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
 
         const getFundingInstrumentID = function () : string | void {
             let FI_ID;
-            
+
             if (wallet?.paypal?.instruments[0]?.secondaryInstruments && wallet.paypal.instruments[0].instrumentID) {
                 FI_ID = `${ wallet.paypal.instruments[0].instrumentID },${ wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID }`;
             } else if (wallet?.paypal?.instruments[0]?.instrumentID) {

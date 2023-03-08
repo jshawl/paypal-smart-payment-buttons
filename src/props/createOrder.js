@@ -9,9 +9,14 @@ import { createOrderID, billingTokenToOrderID, subscriptionIdToCartId, createPay
 import { FPTI_STATE, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_BUTTON_KEY } from '../constants';
 import { getLogger, isEmailAddress } from '../lib';
 import { ENABLE_PAYMENT_API } from '../config';
+import {
+  getVaultSetupToken,
+  vaultApprovalSessionIdToOrderId,
+} from "../api/vault";
 
 import type { CreateSubscription } from './createSubscription';
 import type { CreateBillingAgreement } from './createBillingAgreement';
+import type { CreateVaultSetupToken } from "./createVaultSetupToken";
 
 export type XCreateOrderDataType = {|
     paymentSource : $Values<typeof FUNDING> | null
@@ -160,7 +165,32 @@ type CreateOrderXProps = {|
     paymentSource : $Values<typeof FUNDING> | null
 |};
 
-export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID } : {| facilitatorAccessToken : string, createBillingAgreement? : ?CreateBillingAgreement, createSubscription? : ?CreateSubscription, enableOrdersApprovalSmartWallet? : boolean, smartWalletOrderID? : string |}) : CreateOrder {
+function getVaultWithoutPurchaseOrderId(
+  vaultSetupToken: string,
+  facilitatorAccessToken: string
+): ZalgoPromise<string> {
+  return getVaultSetupToken({
+    vaultSetupToken,
+    facilitatorAccessToken,
+  }).then((result) => {
+    if (result.status === "PAYER_ACTION_REQUIRED") {
+      for (let i = 0; i < result.links.length; i++) {
+        if (
+          result.links[i].method === "GET" &&
+          result.links[i].rel === "approve"
+        ) {
+          return vaultSetupToken;
+        }
+      }
+
+      throw new Error(`Could not find approval_session_id`);
+    }
+
+    throw new Error(`Setup token must be in status=PAYER_ACTION_REQUIRED`);
+  }).then(vaultApprovalSessionIdToOrderId);
+}
+
+export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow } : {| facilitatorAccessToken : string, createBillingAgreement? : ?CreateBillingAgreement, createSubscription? : ?CreateSubscription, enableOrdersApprovalSmartWallet? : boolean, smartWalletOrderID? : string, createVaultSetupToken? : ?CreateVaultSetupToken, flow: ?string |}) : CreateOrder {
     const data = buildXCreateOrderData({ paymentSource });
     const actions = buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID });
 
@@ -177,7 +207,12 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
         const startTime = Date.now();
 
         return ZalgoPromise.try(() => {
-            if (createBillingAgreement) {
+          if (flow === "vault_without_purchase" && createVaultSetupToken) {
+            return createVaultSetupToken()
+              .then((vaultSetupToken) =>
+                getVaultWithoutPurchaseOrderId(vaultSetupToken, facilitatorAccessToken)
+              );
+          } else if (createBillingAgreement) {
                 return createBillingAgreement().then(billingTokenToOrderID);
             } else if (createSubscription) {
                 return createSubscription().then(subscriptionIdToCartId);

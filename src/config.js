@@ -18,7 +18,8 @@ export const SMART_API_URI = {
     CHECKOUT:       `${ BASE_SMART_API_URL }/checkout`,
     ORDER:          `${ BASE_SMART_API_URL }/order`,
     PAYMENT:        `${ BASE_SMART_API_URL }/payment`,
-    SUBSCRIPTION:   `${ BASE_SMART_API_URL }/billagmt/subscriptions`
+    SUBSCRIPTION:   `${ BASE_SMART_API_URL }/billagmt/subscriptions`,
+    VAULT:          `${ BASE_SMART_API_URL }/vault`,
 };
 
 export const GRAPHQL_URI = '/graphql';

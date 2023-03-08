@@ -3,6 +3,10 @@ import { describe, expect, test, vi } from "vitest";
 
 import { getCreateVaultSetupToken } from "./createVaultSetupToken";
 
+vi.mock(`@krakenjs/belter/src`, () => ({
+  memoize: vi.fn((value) => value),
+}));
+
 describe("decorate createVaultSetupToken", () => {
   test("should fail if createVaultSetupToken does not return a setupToken", () => {
     const createVaultSetupToken = vi.fn().mockResolvedValue(undefined);

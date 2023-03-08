@@ -37,7 +37,7 @@ export type ButtonXProps = {|
     style : ButtonStyle,
     buttonSessionID : string
 |};
-    
+
 export type ButtonProps = {|
     ...Props,
     ...LegacyProps,
@@ -75,10 +75,17 @@ export function getButtonProps({
         clientID,
         clientAccessToken,
         vault = false,
-        currency
+        currency,
+        flow
     } = xprops;
 
     branded = branded ?? brandedDefault;
+
+    if (xprops.createVaultSetupToken) {
+      if (xprops.createOrder) {
+        throw new Error(`Do not pass both createVaultSetupToken and createOrder`);
+      }
+    }
 
     if (xprops.createBillingAgreement) {
         if (xprops.createOrder) {
@@ -150,7 +157,9 @@ export function getButtonProps({
       onCancel: xprops.onCancel,
       onShippingChange: xprops.onShippingChange,
       onShippingAddressChange: xprops.onShippingAddressChange,
-      onShippingOptionsChange: xprops.onShippingOptionsChange
+      onShippingOptionsChange: xprops.onShippingOptionsChange,
+      createVaultSetupToken: xprops.createVaultSetupToken,
+      flow
     })
     return {
         ...props,

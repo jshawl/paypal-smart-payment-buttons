@@ -45,6 +45,8 @@ describe("legacyProps", () => {
       onShippingChange: vi.fn(),
       onShippingAddressChange: vi.fn(),
       onShippingOptionsChange: vi.fn(),
+      createVaultSetupToken: vi.fn(),
+      flow: null,
     };
 
     const result = getLegacyProps(inputs);
