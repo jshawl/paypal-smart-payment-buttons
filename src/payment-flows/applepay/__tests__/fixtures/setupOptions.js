@@ -182,6 +182,9 @@ export default {
       wechatpay: {
         eligible: false,
       },
+      mercadopago: {
+        eligible: false,
+      },
       multibanco: {
         eligible: false,
       },

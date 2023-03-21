@@ -21,3 +21,4 @@
 - `oxxo`
 - `boleto`
 - `wechatpay`
+- `mercadopago`
