@@ -102,7 +102,7 @@ function Page({ cspNonce, props, featureFlags } : PageProps) : mixed {
         fields[currentField] = {
             isEmpty: isEmpty(fieldValue),
             isFocused: fieldFocus,
-            isFieldPotentiallyValid: fieldPotentiallyValid,
+            isPotentiallyValid: fieldPotentiallyValid,
             isValid: fieldValid
         }
         if (currentField === 'cardNumberField') {
