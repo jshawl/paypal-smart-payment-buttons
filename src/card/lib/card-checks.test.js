@@ -138,7 +138,7 @@ describe("card-checks", () => {
       window.xprops = {};
     });
 
-    it("should find the card eligible when the vendor is eligible", () => {
+    it("should find the card eligible when the vendor is eligible for purchaese flow", () => {
       window.xprops.fundingEligibility = {
         card: {
           eligible: true,
@@ -151,10 +151,13 @@ describe("card-checks", () => {
       };
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType)).toBe(true);
+      const isVaultFlow = false;
+      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
+        true
+      );
     });
 
-    it("should find the card not eligible when the vendor in not eligible", () => {
+    it("should find the card ineligible when the card type is ineligible for purchaese flow", () => {
       window.xprops.fundingEligibility = {
         card: {
           eligible: true,
@@ -167,7 +170,48 @@ describe("card-checks", () => {
       };
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType)).toBe(false);
+      const isVaultFlow = false;
+      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
+        false
+      );
+    });
+
+    it("should find the card eligible when the card type is eligible for vaulting", () => {
+      window.xprops.fundingEligibility = {
+        card: {
+          eligible: true,
+          vendors: {
+            discover: {
+              vaultable: true,
+            },
+          },
+        },
+      };
+      const cardNumber = "6011000990139424";
+      const cardType = detectCardType(cardNumber)[0];
+      const isVaultFlow = true;
+      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
+        true
+      );
+    });
+
+    it("should find the card ineligible when the card type is ineligible for vaulting", () => {
+      window.xprops.fundingEligibility = {
+        card: {
+          eligible: true,
+          vendors: {
+            discover: {
+              vaultable: false,
+            },
+          },
+        },
+      };
+      const cardNumber = "6011000990139424";
+      const cardType = detectCardType(cardNumber)[0];
+      const isVaultFlow = true;
+      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
+        false
+      );
     });
 
     it("should find card payments not eligible when the merchant is not onboarded for card payments", () => {
@@ -178,7 +222,8 @@ describe("card-checks", () => {
       };
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType)).toBe(false);
+      expect(checkCardEligibility(cardNumber, cardType, true)).toBe(false);
+      expect(checkCardEligibility(cardNumber, cardType, false)).toBe(false);
     });
 
     it("should find unbranded card payments not eligible if the merchant is only eligible for branded payments", () => {
@@ -187,22 +232,24 @@ describe("card-checks", () => {
           branded: true,
         },
       };
-
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType)).toBe(false);
+      expect(checkCardEligibility(cardNumber, cardType, true)).toBe(false);
+      expect(checkCardEligibility(cardNumber, cardType, false)).toBe(false);
     });
 
     it("should default to ineligible if there is no funding eligibility specified", () => {
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType)).toBe(false);
+      expect(checkCardEligibility(cardNumber, cardType, true)).toBe(false);
+      expect(checkCardEligibility(cardNumber, cardType, false)).toBe(false);
     });
 
     it("should default to eligible if there is no card number entered", () => {
       const cardNumber = "";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType)).toBe(true);
+      expect(checkCardEligibility(cardNumber, cardType, true)).toBe(true);
+      expect(checkCardEligibility(cardNumber, cardType, false)).toBe(true);
     });
   });
 });

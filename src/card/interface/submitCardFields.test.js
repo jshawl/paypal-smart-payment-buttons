@@ -74,7 +74,7 @@ describe("submitCardFields", () => {
     );
   });
 
-  test("should use the provided save action", async () => {
+  test("should do a vault without purchase", async () => {
     const createVaultSetupToken = vi.fn().mockResolvedValue("setup-token");
     const onApprove = vi.fn();
 
@@ -92,7 +92,7 @@ describe("submitCardFields", () => {
     expect(resetGQLErrors).toHaveBeenCalledOnce();
     expect(savePaymentSource).toHaveBeenCalledWith({
       ...mockGetCardPropsReturn,
-      facilitatorAccessToken: defaultOptions.facilitatorAccessToken,
+      idToken: "",
       paymentSource: {
         card: {
           billingAddress: {

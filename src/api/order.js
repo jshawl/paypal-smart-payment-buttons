@@ -33,7 +33,7 @@ export type OrderConfirmResponse = {||};
 export type OrderGetResponse = {||};
 export type OrderAuthorizeResponse = {||};
 
-type OrderAPIOptions = {|
+export type OrderAPIOptions = {|
     facilitatorAccessToken : string,
     buyerAccessToken? : ?string,
     partnerAttributionID : ?string,
@@ -265,7 +265,7 @@ export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyer
     });
 }
 
-type PatchData = mixed;
+export type PatchData = mixed;
 
 export function patchOrder(orderID : string, data : PatchData, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`patch_order_lsat_upgrade_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`);
@@ -325,8 +325,13 @@ export function patchOrder(orderID : string, data : PatchData, { facilitatorAcce
         return patchData;
     });
 }
+export type PatchShippingArgs = {|
+    clientID: string;
+    orderID: string;
+    data: PatchData,
+|}
 
-export function patchShipping({ clientID, orderID, data } : {|clientID : string, orderID : string, data : PatchData |}) : ZalgoPromise<OrderResponse> {
+export function patchShipping({ clientID, orderID, data } : PatchShippingArgs) : ZalgoPromise<OrderResponse> {
     return callGraphQL({
         name:  'UpdateShipping',
         query: `

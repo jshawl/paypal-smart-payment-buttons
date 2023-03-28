@@ -137,7 +137,7 @@ export const DEFAULT_CARD_TYPE : CardType = {
     niceType: 'Unknown',
     code:     {
         name: 'CVV',
-        size: 4
+        size: 3
     }
 };
 

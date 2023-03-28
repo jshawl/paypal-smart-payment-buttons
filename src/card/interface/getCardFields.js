@@ -2,12 +2,13 @@
 
 import { FRAME_NAME } from '../../constants';
 import { CARD_ERRORS } from '../constants';
-import type { Card } from '../types';
+import type { Card, CardType } from '../types';
+import { checkCardEligibility } from '../lib';
 
 import { getExportsByFrameName } from './getExportsByFrameName';
 import { getCardFrames } from './getCardFrames';
 
-export function getCardFields(): Card {
+export function getCardFields(isVaultFlow?: boolean = false): Card {
   const card = {};
   const cardFrame = getExportsByFrameName(FRAME_NAME.CARD_FIELD);
 
@@ -25,7 +26,14 @@ export function getCardFields(): Card {
 
   // 3 Required fields for HCFs purchase
   if (cardNumberFrame && cardNumberFrame.isFieldValid()) {
-    card.number = cardNumberFrame.getFieldValue();
+    const cardNumber: string = cardNumberFrame.getFieldValue();
+    const cardType: CardType = cardNumberFrame.getPotentialCardTypes()[0];
+
+    if (checkCardEligibility(cardNumber, cardType, isVaultFlow)) {
+      card.number = cardNumber;
+    } else {
+      throw new Error(CARD_ERRORS.INELIGIBLE_CARD_VENDOR);
+    }
   } else {
     throw new Error(CARD_ERRORS.INVALID_NUMBER);
   }

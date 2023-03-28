@@ -17,6 +17,7 @@ describe("decorate onApprove - save action", () => {
 
     await decoratedOnApprove(onApproveData);
 
+    expect.assertions(2);
     expect(onApprove).toHaveBeenCalledWith(onApproveData);
     expect(onError).not.toHaveBeenCalled();
   });
@@ -33,8 +34,10 @@ describe("decorate onApprove - save action", () => {
       onError,
     });
 
-    await decoratedOnApprove(onApproveData);
-
+    expect.assertions(3);
+    await expect(decoratedOnApprove(onApproveData)).rejects.toThrow(
+      onApproveError
+    );
     expect(onApprove).toHaveBeenCalledWith(onApproveData);
     expect(onError).toHaveBeenCalledWith(onApproveError);
   });
@@ -49,8 +52,10 @@ describe("decorate onApprove - save action", () => {
       onError,
     });
 
-    await decoratedOnApprove(onApproveData);
-
+    expect.assertions(3);
+    await expect(decoratedOnApprove(onApproveData)).rejects.toThrow(
+      onApproveError
+    );
     expect(onApprove).toHaveBeenCalledWith(onApproveData);
     expect(onError).toHaveBeenCalledWith(onApproveError);
   });

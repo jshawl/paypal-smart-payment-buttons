@@ -4915,7 +4915,7 @@
                 },
                 metric: function(metricPayload) {
                     if (!dom_isBrowser()) return logger;
-                    print("debug", "metric." + metricPayload.name, metricPayload.dimensions);
+                    print("debug", "metric." + metricPayload.name, metricPayload.dimensions || {});
                     metrics.push(metricPayload);
                     return logger;
                 },
@@ -4946,8 +4946,22 @@
                     opts.flushInterval && (flushInterval = opts.flushInterval);
                     opts.enableSendBeacon && (enableSendBeacon = opts.enableSendBeacon);
                     return logger;
+                },
+                __buffer__: {
+                    get events() {
+                        return events;
+                    },
+                    get tracking() {
+                        return tracking;
+                    },
+                    get metrics() {
+                        return metrics;
+                    }
                 }
             };
+            Object.defineProperty(logger, "__buffer__", {
+                writable: !1
+            });
             return logger;
         }
         var _FUNDING_SKIP_LOGIN, _AMPLITUDE_API_KEY;
@@ -5065,7 +5079,7 @@
                 logger.addTrackingBuilder((function() {
                     var _ref3;
                     return (_ref3 = {}).state_name = "smart_button", _ref3.context_type = "button_session_id", 
-                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.131", 
+                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.133", 
                     _ref3.selected_payment_method = fundingSource, _ref3.user_id = buttonSessionID, 
                     _ref3.time = Date.now().toString(), _ref3;
                 }));

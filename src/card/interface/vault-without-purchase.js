@@ -3,7 +3,6 @@
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
 import {
-  getVaultSetupToken,
   updateVaultSetupToken,
   type PaymentSourceInput,
 } from "../../api/vault";
@@ -11,52 +10,50 @@ import {
   vaultWithoutPurchaseSuccess,
   vaultWithoutPurchaseFailure,
 } from "../logger";
-import type { XOnError, XCreateVaultSetupToken, SaveActionOnApprove } from "../../props";
-
-const onVaultWithoutPurchaseError = ({vaultToken, onError}: {|vaultToken?: string, onError: XOnError|}) => (error: mixed) => {
-  vaultWithoutPurchaseFailure({
-    vaultToken, error
-  })
-
-  onError(error)
-}
+import type {
+  XOnError,
+  XCreateVaultSetupToken,
+  SaveActionOnApprove,
+} from "../../props";
 
 type VaultPaymenSourceOptions = {|
   createVaultSetupToken: XCreateVaultSetupToken,
   onApprove: SaveActionOnApprove,
   onError: XOnError,
   clientID: string,
-  facilitatorAccessToken: string,
   paymentSource: PaymentSourceInput,
+  idToken: string,
 |};
 
 export const savePaymentSource = ({
   createVaultSetupToken,
   onApprove,
   onError,
-  facilitatorAccessToken,
   clientID,
   paymentSource,
+  idToken,
 }: VaultPaymenSourceOptions): ZalgoPromise<void> => {
-
+  let vaultToken;
   return createVaultSetupToken()
-    .then((vaultSetupToken) =>
-      getVaultSetupToken({
+    .then((vaultSetupToken) => {
+      vaultToken = vaultSetupToken;
+      return updateVaultSetupToken({
         vaultSetupToken,
-        facilitatorAccessToken,
+        clientID,
+        paymentSource,
+        // passing the id token here is a temporary fix until we can deploy xobuyernodeserv
+        // to treak idToken as an optional field.
+        idToken,
       })
-        .then(() =>
-          updateVaultSetupToken({
-            vaultSetupToken,
-            clientID,
-            paymentSource,
-          })
-        )
-        .then(() => onApprove({ vaultSetupToken }))
-        .then(() =>
-          vaultWithoutPurchaseSuccess({ vaultToken: vaultSetupToken })
-        )
-        .catch(onVaultWithoutPurchaseError({onError, vaultToken: vaultSetupToken}))
-    )
-    .catch(onVaultWithoutPurchaseError({onError}));
+    })
+    .then(() => onApprove({ vaultSetupToken: vaultToken }))
+    .then(() => vaultWithoutPurchaseSuccess({ vaultToken }))
+    .catch((error) => {
+      if (typeof error === "string") {
+        error = new Error(error);
+      }
+      vaultWithoutPurchaseFailure({ error, vaultToken });
+      onError(error);
+      throw error;
+    });
 };

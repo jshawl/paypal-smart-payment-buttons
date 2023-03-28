@@ -35,6 +35,7 @@ describe("legacyProps", () => {
       vault: false,
       clientAccessToken: "some access token",
       featureFlags: {},
+      experiments: {},
       createBillingAgreement: vi.fn(),
       createSubscription: vi.fn(),
       createOrder: vi.fn(),

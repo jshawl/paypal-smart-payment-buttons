@@ -92,20 +92,21 @@ export function addGapsToCardNumber(cardNumber : string, cardType? : CardType) :
     return cardNumber;
 }
 
-export function checkCardEligibility(value : string, cardType : CardType) : boolean  {
+export function checkCardEligibility(cardNumber : string, cardType : CardType, isVaultFlow? : boolean) : boolean  {
     // check if the card type is eligible
     const fundingEligibility = window.xprops.fundingEligibility;
     const type = VALIDATOR_TO_TYPE_MAP[cardType.type];
-    if (value.length === 0) {
+    if (cardNumber.length === 0) {
         return true;
     }
-    if (fundingEligibility && fundingEligibility.card && fundingEligibility.card.eligible) {
+    if (fundingEligibility?.card?.eligible && type && fundingEligibility.card.vendors && !fundingEligibility.card.branded) {
         // mark as eligible if the card vendor is explicitly set to be eligible
-        if (type && fundingEligibility.card.vendors) {
-            const vendor = fundingEligibility.card.vendors[type];
-            if (vendor && vendor.eligible && !vendor.branded) {
-                return true;
-            }
+        const vendor = fundingEligibility.card.vendors[type];
+        if (isVaultFlow && vendor?.vaultable) {
+            return true;
+        }
+        else if (!isVaultFlow && vendor?.eligible) {
+            return true;
         }
     }
     // otherwise default to be not eligible

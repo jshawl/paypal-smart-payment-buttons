@@ -648,12 +648,14 @@ export const getSaveActionOnApprove =
     onError: (error: mixed) => ZalgoPromise<void>,
   |}): ((SaveActionOnApproveData) => ZalgoPromise<void>) =>
   (data) => {
-    try {
-      return onApprove(data)?.catch((error) => {
-        return onError(error);
+    return ZalgoPromise.try(() => {
+      return onApprove(data);
+    }).catch((err) => {
+      return ZalgoPromise.try(() => {
+        onError(err);
+      }).finally(() => {
+        throw err;
       });
-    } catch (error) {
-      return onError(error);
-    }
+    });
   };
 

@@ -2,7 +2,7 @@
 
 import { INTENT, FUNDING, CURRENCY } from '@paypal/sdk-constants/src';
 
-import type { FeatureFlags } from '../types';
+import type { Experiments, FeatureFlags } from '../types';
 
 import { getCreateBillingAgreement } from "./createBillingAgreement"
 import { getCreateSubscription } from "./createSubscription"
@@ -34,6 +34,7 @@ export type LegacyPropOptions = {|
   branded : boolean | null,
   clientAccessToken : ?string,
   vault : boolean,
+  experiments?: Experiments;
   featureFlags: FeatureFlags,
   onApprove : ?XOnApprove,
   onComplete? : ?XOnComplete,
@@ -83,6 +84,7 @@ export function getLegacyProps({
   branded,
   clientAccessToken,
   vault = false,
+  experiments = {},
   featureFlags,
   createBillingAgreement: inputCreateBillingAgreement,
   createSubscription: inputCreateSubscription,
@@ -107,7 +109,7 @@ export function getLegacyProps({
    const onApprove = getOnApprove({ onApprove: inputOnApprove, createBillingAgreement, createSubscription, intent, onError, partnerAttributionID, clientAccessToken, vault, clientID, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags, createVaultSetupToken, flow });
    const onComplete = getOnComplete({ intent, onComplete: inputOnComplete, partnerAttributionID, onError, clientID, facilitatorAccessToken, createOrder, featureFlags });
    const onCancel = getOnCancel({ onCancel: inputOnCancel, onError }, { createOrder });
-   const onShippingChange = getOnShippingChange({ onShippingChange: inputOnShippingChange, partnerAttributionID, featureFlags  }, { facilitatorAccessToken, createOrder });
+   const onShippingChange = getOnShippingChange({ onShippingChange: inputOnShippingChange, partnerAttributionID, experiments, featureFlags, clientID }, { facilitatorAccessToken, createOrder });
    const onShippingAddressChange = getOnShippingAddressChange({ onShippingAddressChange: inputOnShippingAddressChange, clientID }, { createOrder });
    const onShippingOptionsChange = getOnShippingOptionsChange({ onShippingOptionsChange: inputOnShippingOptionsChange, clientID }, { createOrder });
    const onAuth = getOnAuth({ facilitatorAccessToken, createOrder, createSubscription, featureFlags });

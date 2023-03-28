@@ -113,15 +113,7 @@ export function CardField({ cspNonce, onChange, styleObject = {}, placeholder = 
 
         const errors = setErrors({ isCardEligible, isNumberValid: numberValidity.isValid, isCvvValid: cvvValidity.isValid, isExpiryValid: expiryValidity.isValid, gqlErrorsObject });
 
-        if (!isCardEligible) {
-            const element = numberRef?.current?.base;
-            if (element) {
-                element.classList.add('invalid');
-                element.classList.remove('valid');
-            }
-        } else {
-            markValidity(numberRef, numberValidity, hasFocus, touched);
-        }
+        markValidity(numberRef, numberValidity, hasFocus, touched);
         markValidity(expiryRef, expiryValidity, hasFocus, touched);
         markValidity(cvvRef, cvvValidity, hasFocus, touched);
 
@@ -264,15 +256,7 @@ export function CardNumberField({ cspNonce, onChange, onFocus, styleObject = {},
     }, [ gqlErrors ]);
 
     useEffect(() => {
-        if (!isCardEligible) {
-            const element = numberRef?.current?.base;
-            if (element) {
-                element.classList.add('invalid');
-                element.classList.remove('valid');
-            }
-        } else {
-            markValidity(numberRef, numberValidity, hasFocus, touched);
-        }
+        markValidity(numberRef, numberValidity, hasFocus, touched);
         onChange({ value: number, valid: numberValidity.isValid, isFocused: hasFocus, potentiallyValid: numberValidity.isPotentiallyValid, potentialCardTypes: cards });
     }, [ number, isCardEligible, isValid, hasFocus, isPotentiallyValid, cards ]);
 

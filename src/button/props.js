@@ -6,7 +6,7 @@ import type { CustomStyle } from '@paypal/checkout-components/src/types';
 import { EXPERIENCE } from '@paypal/checkout-components/src/constants/button';
 
 import type { ContentType, ProxyWindow, Wallet, CheckoutFlowType, CardFormFlowType,
-    ThreeDomainSecureFlowType, MenuFlowType, PersonalizationType, QRCodeType, PaymentFieldsFlowType, InlinePaymentFieldsEligibility, FeatureFlags } from '../types';
+    ThreeDomainSecureFlowType, MenuFlowType, PersonalizationType, QRCodeType, PaymentFieldsFlowType, InlinePaymentFieldsEligibility, Experiments, FeatureFlags } from '../types';
 import { type FirebaseConfig } from '../api';
 import { getNonce } from '../lib';
 import { getProps, type XProps, type Props } from '../props/props';
@@ -50,6 +50,7 @@ export function getButtonProps({
     facilitatorAccessToken,
     brandedDefault,
     paymentSource,
+    experiments,
     featureFlags,
     enableOrdersApprovalSmartWallet,
     smartWalletOrderID
@@ -57,6 +58,7 @@ export function getButtonProps({
     facilitatorAccessToken : string,
     brandedDefault : boolean | null,
     paymentSource : $Values<typeof FUNDING> | null,
+    experiments: Experiments;
     featureFlags: FeatureFlags,
     enableOrdersApprovalSmartWallet? : boolean,
     smartWalletOrderID? : string
@@ -151,6 +153,7 @@ export function getButtonProps({
       branded,
       clientAccessToken,
       vault,
+      experiments,
       featureFlags,
       createBillingAgreement: xprops.createBillingAgreement,
       createSubscription: xprops.createSubscription,

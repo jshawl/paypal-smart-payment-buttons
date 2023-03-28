@@ -216,6 +216,9 @@ export function getCardProps({
     inputEvents,
     export: parent ? parent.export : xport,
     facilitatorAccessToken,
+    sdkCorrelationID,
+    partnerAttributionID,
+    hcfSessionID,
   };
 
   const baseProps = getProps({ branded });

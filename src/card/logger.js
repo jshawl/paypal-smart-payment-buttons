@@ -121,7 +121,7 @@ export const vaultWithoutPurchaseSuccess = ({
     [FPTI_KEY.TRANSITION]:  "hcf_vault_without_purchase_success",
     [FPTI_KEY.EVENT_NAME]:  "hcf_vault_without_purchase_success",
     [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken
-  })
+  }).flush();
 }
 
 export const vaultWithoutPurchaseFailure = ({
@@ -131,10 +131,9 @@ export const vaultWithoutPurchaseFailure = ({
   // should be Error but other apis are constraining this type
   error: mixed
 |}) => {
-  const payload = {
+  getLogger().track({
     [FPTI_KEY.ERROR_CODE]: "hcf_vault_without_purchase_error",
     [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(error),
     [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken
-  }
-  getLogger().track(payload)
+  }).flush();
 }

@@ -15,7 +15,7 @@ describe("decorate createVaultSetupToken", () => {
     });
 
     expect(decoratedCreateVaultSetupToken()).rejects.toThrowError(
-      "Expected a vault setup token to be passed to createVaultSetupToken"
+      "Expected a vault setup token to be returned from createVaultSetupToken"
     );
   });
 
@@ -32,7 +32,7 @@ describe("decorate createVaultSetupToken", () => {
     });
 
     expect(decoratedCreateVaultSetupToken()).rejects.toThrowError(
-      "Expected a vault setup token to be passed to createVaultSetupToken"
+      "Expected a vault setup token to be returned from createVaultSetupToken"
     );
   });
 
