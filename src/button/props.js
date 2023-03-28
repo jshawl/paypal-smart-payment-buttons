@@ -89,7 +89,7 @@ export function getButtonProps({
           throw new Error(`Do not pass both createVaultSetupToken and createOrder`);
         }
       } else {
-        throw new Error(`Vault without purchase is not currently activated.`)
+        throw new Error(`You are not currently eligible to save a PayPal wallet without purchase.`)
       }
     }
 
