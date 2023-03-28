@@ -21,7 +21,15 @@ export const TYPES = true;
 // how to share this type between the two code bases
 export type FeatureFlags = $Shape<{|
     isLsatUpgradable: boolean;
-    shouldThrowIntegrationError: boolean
+    shouldThrowIntegrationError: boolean;
+|}>
+
+// This type is shared with smartcomponentnodeweb
+// When we move to typescript we should figure out
+// how to share this type between the two code bases
+export type Experiments = $Shape<{|
+    useShippingChangeCallbackMutation?: boolean;
+    payPalWalletVaultWithoutPurchase?: boolean;
 |}>
 
 export type ProxyWindow = _ProxyWindow;

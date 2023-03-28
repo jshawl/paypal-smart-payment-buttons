@@ -82,8 +82,12 @@ export function getButtonProps({
     branded = branded ?? brandedDefault;
 
     if (xprops.createVaultSetupToken) {
-      if (xprops.createOrder) {
-        throw new Error(`Do not pass both createVaultSetupToken and createOrder`);
+      if (experiments.payPalWalletVaultWithoutPurchase){
+        if (xprops.createOrder) {
+          throw new Error(`Do not pass both createVaultSetupToken and createOrder`);
+        }
+      } else {
+        throw new Error(`Vault without purchase is not currently activated.`)
       }
     }
 
