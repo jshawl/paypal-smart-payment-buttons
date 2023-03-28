@@ -252,6 +252,8 @@ export function getCardProps({
       createSubscription: xprops.createSubscription,
       createOrder: xprops.createOrder,
       createBillingAgreement: xprops.createBillingAgreement,
+      createVaultSetupToken: null,
+      flow: null
     });
 
     // $FlowFixMe

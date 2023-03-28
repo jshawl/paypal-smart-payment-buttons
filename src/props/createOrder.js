@@ -9,9 +9,13 @@ import { createOrderID, billingTokenToOrderID, subscriptionIdToCartId, createPay
 import { FPTI_STATE, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_BUTTON_KEY } from '../constants';
 import { getLogger, isEmailAddress } from '../lib';
 import { ENABLE_PAYMENT_API } from '../config';
+import {
+  vaultApprovalSessionIdToOrderId,
+} from "../api/vault";
 
 import type { CreateSubscription } from './createSubscription';
 import type { CreateBillingAgreement } from './createBillingAgreement';
+import type { CreateVaultSetupToken } from "./createVaultSetupToken";
 
 export type XCreateOrderDataType = {|
     paymentSource : $Values<typeof FUNDING> | null
@@ -160,7 +164,7 @@ type CreateOrderXProps = {|
     paymentSource : $Values<typeof FUNDING> | null
 |};
 
-export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID } : {| facilitatorAccessToken : string, createBillingAgreement? : ?CreateBillingAgreement, createSubscription? : ?CreateSubscription, enableOrdersApprovalSmartWallet? : boolean, smartWalletOrderID? : string |}) : CreateOrder {
+export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow } : {| facilitatorAccessToken : string, createBillingAgreement? : ?CreateBillingAgreement, createSubscription? : ?CreateSubscription, enableOrdersApprovalSmartWallet? : boolean, smartWalletOrderID? : string, createVaultSetupToken? : ?CreateVaultSetupToken, flow: ?string |}) : CreateOrder {
     const data = buildXCreateOrderData({ paymentSource });
     const actions = buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID });
 
@@ -177,7 +181,9 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
         const startTime = Date.now();
 
         return ZalgoPromise.try(() => {
-            if (createBillingAgreement) {
+          if (flow === "vault_without_purchase" && createVaultSetupToken) {
+            return createVaultSetupToken().then(vaultApprovalSessionIdToOrderId);
+          } else if (createBillingAgreement) {
                 return createBillingAgreement().then(billingTokenToOrderID);
             } else if (createSubscription) {
                 return createSubscription().then(subscriptionIdToCartId);

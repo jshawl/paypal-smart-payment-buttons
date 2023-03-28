@@ -29,6 +29,7 @@ export type FeatureFlags = $Shape<{|
 // how to share this type between the two code bases
 export type Experiments = $Shape<{|
     useShippingChangeCallbackMutation?: boolean;
+    payPalWalletVaultWithoutPurchase?: boolean;
 |}>
 
 export type ProxyWindow = _ProxyWindow;

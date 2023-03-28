@@ -1,9 +1,9 @@
 /* @flow */
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { VAULT_SETUP_TOKENS_API_URL } from "../config";
+import { VAULT_SETUP_TOKENS_API_URL, SMART_API_URI } from "../config";
 
-import { callRestAPI, callGraphQL } from "./api";
+import { callRestAPI, callGraphQL, callSmartAPI } from "./api";
 
 export type PaymentSourceCardDetails = {|
   number: string,
@@ -136,3 +136,16 @@ export const updateVaultSetupToken = ({
       idToken,
     },
   });
+
+export function vaultApprovalSessionIdToOrderId(
+  approvalSessionId: string
+): ZalgoPromise<string> {
+  return callSmartAPI({
+    authenticated: false,
+    method: "post",
+    eventName: "vault_ectoken",
+    url: `${SMART_API_URI.VAULT}/${approvalSessionId}/ectoken`,
+  }).then(({ data }) => {
+    return data.token;
+  });
+}

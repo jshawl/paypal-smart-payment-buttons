@@ -14,10 +14,11 @@ import { getOnShippingChange } from "./onShippingChange"
 import { getOnShippingAddressChange } from "./onShippingAddressChange"
 import { getOnShippingOptionsChange } from "./onShippingOptionsChange"
 import { getOnAuth } from "./onAuth"
+import { getCreateVaultSetupToken } from './createVaultSetupToken';
 
 import type { CreateOrder, XCreateOrder, CreateBillingAgreement, XCreateBillingAgreement, OnApprove, XOnApprove, OnComplete, XOnComplete, OnCancel, XOnCancel, OnShippingChange, XOnShippingChange, OnShippingAddressChange, XOnShippingAddressChange,
     OnShippingOptionsChange, XOnShippingOptionsChange,
-    OnError, XCreateSubscription, OnAuth
+    OnError, XCreateSubscription, XCreateVaultSetupToken, OnAuth
 } from '.';
 
 export type LegacyPropOptions = {|
@@ -45,12 +46,14 @@ export type LegacyPropOptions = {|
   createOrder : ?XCreateOrder,
   createSubscription : ?XCreateSubscription,
   createBillingAgreement : ?XCreateBillingAgreement,
+  createVaultSetupToken: ?XCreateVaultSetupToken,
+  flow: ?string
 |}
 
 
 export type LegacyProps = {|
   createOrder : CreateOrder,
-  
+
   onApprove : OnApprove,
   onComplete : OnComplete,
   onCancel : OnCancel,
@@ -92,14 +95,18 @@ export function getLegacyProps({
   onCancel: inputOnCancel,
   onShippingChange: inputOnShippingChange,
   onShippingAddressChange: inputOnShippingAddressChange,
-  onShippingOptionsChange: inputOnShippingOptionsChange
+  onShippingOptionsChange: inputOnShippingOptionsChange,
+  createVaultSetupToken: inputCreateVaultSetupToken,
+  flow
 } : LegacyPropOptions) : LegacyProps {
   const createBillingAgreement = getCreateBillingAgreement({ createBillingAgreement: inputCreateBillingAgreement, paymentSource });
   const createSubscription = getCreateSubscription({ createSubscription: inputCreateSubscription, partnerAttributionID, merchantID, clientID, paymentSource }, { facilitatorAccessToken });
 
-   const createOrder = getCreateOrder({ createOrder: inputCreateOrder, currency, intent, merchantID, partnerAttributionID, paymentSource }, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID });
+  const createVaultSetupToken = getCreateVaultSetupToken({ createVaultSetupToken: inputCreateVaultSetupToken });
 
-   const onApprove = getOnApprove({ onApprove: inputOnApprove, createBillingAgreement, createSubscription, intent, onError, partnerAttributionID, clientAccessToken, vault, clientID, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags });
+   const createOrder = getCreateOrder({ createOrder: inputCreateOrder, currency, intent, merchantID, partnerAttributionID, paymentSource }, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow });
+
+   const onApprove = getOnApprove({ onApprove: inputOnApprove, createBillingAgreement, createSubscription, intent, onError, partnerAttributionID, clientAccessToken, vault, clientID, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags, createVaultSetupToken, flow });
    const onComplete = getOnComplete({ intent, onComplete: inputOnComplete, partnerAttributionID, onError, clientID, facilitatorAccessToken, createOrder, featureFlags });
    const onCancel = getOnCancel({ onCancel: inputOnCancel, onError }, { createOrder });
    const onShippingChange = getOnShippingChange({ onShippingChange: inputOnShippingChange, partnerAttributionID, experiments, featureFlags, clientID }, { facilitatorAccessToken, createOrder });
