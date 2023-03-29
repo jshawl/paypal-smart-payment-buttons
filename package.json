@@ -1,6 +1,6 @@
 {
   "name": "@paypal/smart-payment-buttons",
-  "version": "5.0.133",
+  "version": "5.0.134",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
