@@ -712,7 +712,7 @@
                     n[l] = null == u ? "" : u;
                     break n;
                 } catch (n) {}
-                "function" == typeof u || (null == u || !1 === u && -1 == l.indexOf("-") ? n.removeAttribute(l) : n.setAttribute(l, u));
+                "function" == typeof u || (null == u || !1 === u && "-" !== l[4] ? n.removeAttribute(l) : n.setAttribute(l, u));
             }
         }
         function j(n) {
@@ -3231,7 +3231,7 @@
             logger.addTrackingBuilder((function() {
                 var _ref2;
                 return (_ref2 = {}).state_name = "smart_button", _ref2.context_type = "EC-Token", 
-                _ref2.context_id = orderID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.133", 
+                _ref2.context_id = orderID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.134", 
                 _ref2.selected_payment_method = fundingSource, _ref2.user_id = buttonSessionID, 
                 _ref2;
             }));

@@ -183,7 +183,7 @@ window.spb = function(modules) {
                 n[l] = null == u ? "" : u;
                 break n;
             } catch (n) {}
-            "function" == typeof u || (null == u || !1 === u && -1 == l.indexOf("-") ? n.removeAttribute(l) : n.setAttribute(l, u));
+            "function" == typeof u || (null == u || !1 === u && "-" !== l[4] ? n.removeAttribute(l) : n.setAttribute(l, u));
         }
     }
     function j(n) {

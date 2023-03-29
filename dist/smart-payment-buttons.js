@@ -10029,7 +10029,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.133", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.134", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -10932,6 +10932,53 @@ window.spb = function(modules) {
             });
         };
     },
+    "./src/api/vault.js": function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
+        __webpack_require__.r(__webpack_exports__);
+        __webpack_require__.d(__webpack_exports__, "getVaultSetupToken", (function() {
+            return getVaultSetupToken;
+        }));
+        __webpack_require__.d(__webpack_exports__, "updateVaultSetupToken", (function() {
+            return updateVaultSetupToken;
+        }));
+        __webpack_require__.d(__webpack_exports__, "vaultApprovalSessionIdToOrderId", (function() {
+            return vaultApprovalSessionIdToOrderId;
+        }));
+        __webpack_require__("./node_modules/@krakenjs/zalgo-promise/src/index.js");
+        var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/config.js");
+        var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./src/api/api.js");
+        var getVaultSetupToken = function(_ref) {
+            var vaultSetupToken = _ref.vaultSetupToken, facilitatorAccessToken = _ref.facilitatorAccessToken;
+            return Object(_api__WEBPACK_IMPORTED_MODULE_2__.callRestAPI)({
+                accessToken: facilitatorAccessToken,
+                url: _config__WEBPACK_IMPORTED_MODULE_1__.VAULT_SETUP_TOKENS_API_URL + "/" + vaultSetupToken,
+                eventName: "v3_vault_setup_tokens_get"
+            });
+        };
+        var updateVaultSetupToken = function(_ref2) {
+            var clientID = _ref2.clientID, vaultSetupToken = _ref2.vaultSetupToken, paymentSource = _ref2.paymentSource, idToken = _ref2.idToken;
+            return Object(_api__WEBPACK_IMPORTED_MODULE_2__.callGraphQL)({
+                name: "UpdateVaultSetupToken",
+                query: "\n      mutation UpdateVaultSetupToken(\n        $clientID: String!\n        $vaultSetupToken: String!\n        $paymentSource: PaymentSource\n        $idToken: String!\n      ) {\n        updateVaultSetupToken(\n          clientId: $clientID\n          vaultSetupToken: $vaultSetupToken\n          paymentSource: $paymentSource\n          idToken: $idToken\n        ) {\n          id,\n          status\n        }\n      }",
+                variables: {
+                    clientID: clientID,
+                    vaultSetupToken: vaultSetupToken,
+                    paymentSource: paymentSource,
+                    idToken: idToken
+                }
+            });
+        };
+        function vaultApprovalSessionIdToOrderId(approvalSessionId) {
+            return Object(_api__WEBPACK_IMPORTED_MODULE_2__.callSmartAPI)({
+                authenticated: !1,
+                method: "post",
+                eventName: "vault_ectoken",
+                url: _config__WEBPACK_IMPORTED_MODULE_1__.SMART_API_URI.VAULT + "/" + approvalSessionId + "/ectoken"
+            }).then((function(_ref3) {
+                return _ref3.data.token;
+            }));
+        }
+    },
     "./src/button/index.js": function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         __webpack_require__.r(__webpack_exports__);
@@ -10971,8 +11018,9 @@ window.spb = function(modules) {
         var props_onShippingAddressChange = __webpack_require__("./src/props/onShippingAddressChange.js");
         var props_onShippingOptionsChange = __webpack_require__("./src/props/onShippingOptionsChange.js");
         var props_onAuth = __webpack_require__("./src/props/onAuth.js");
+        var props_createVaultSetupToken = __webpack_require__("./src/props/createVaultSetupToken.js");
         function getLegacyProps(_ref) {
-            var paymentSource = _ref.paymentSource, partnerAttributionID = _ref.partnerAttributionID, merchantID = _ref.merchantID, clientID = _ref.clientID, facilitatorAccessToken = _ref.facilitatorAccessToken, currency = _ref.currency, intent = _ref.intent, enableOrdersApprovalSmartWallet = _ref.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref.smartWalletOrderID, branded = _ref.branded, clientAccessToken = _ref.clientAccessToken, _ref$vault = _ref.vault, vault = void 0 !== _ref$vault && _ref$vault, _ref$experiments = _ref.experiments, experiments = void 0 === _ref$experiments ? {} : _ref$experiments, featureFlags = _ref.featureFlags, inputCreateBillingAgreement = _ref.createBillingAgreement, inputCreateSubscription = _ref.createSubscription, inputCreateOrder = _ref.createOrder, onError = _ref.onError, inputOnApprove = _ref.onApprove, inputOnComplete = _ref.onComplete, inputOnCancel = _ref.onCancel, inputOnShippingChange = _ref.onShippingChange, inputOnShippingAddressChange = _ref.onShippingAddressChange, inputOnShippingOptionsChange = _ref.onShippingOptionsChange;
+            var paymentSource = _ref.paymentSource, partnerAttributionID = _ref.partnerAttributionID, merchantID = _ref.merchantID, clientID = _ref.clientID, facilitatorAccessToken = _ref.facilitatorAccessToken, currency = _ref.currency, intent = _ref.intent, enableOrdersApprovalSmartWallet = _ref.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref.smartWalletOrderID, branded = _ref.branded, clientAccessToken = _ref.clientAccessToken, _ref$vault = _ref.vault, vault = void 0 !== _ref$vault && _ref$vault, _ref$experiments = _ref.experiments, experiments = void 0 === _ref$experiments ? {} : _ref$experiments, featureFlags = _ref.featureFlags, inputCreateBillingAgreement = _ref.createBillingAgreement, inputCreateSubscription = _ref.createSubscription, inputCreateOrder = _ref.createOrder, onError = _ref.onError, inputOnApprove = _ref.onApprove, inputOnComplete = _ref.onComplete, inputOnCancel = _ref.onCancel, inputOnShippingChange = _ref.onShippingChange, inputOnShippingAddressChange = _ref.onShippingAddressChange, inputOnShippingOptionsChange = _ref.onShippingOptionsChange, inputCreateVaultSetupToken = _ref.createVaultSetupToken, flow = _ref.flow;
             var createBillingAgreement = Object(props_createBillingAgreement.getCreateBillingAgreement)({
                 createBillingAgreement: inputCreateBillingAgreement,
                 paymentSource: paymentSource
@@ -10986,6 +11034,9 @@ window.spb = function(modules) {
             }, {
                 facilitatorAccessToken: facilitatorAccessToken
             });
+            var createVaultSetupToken = Object(props_createVaultSetupToken.getCreateVaultSetupToken)({
+                createVaultSetupToken: inputCreateVaultSetupToken
+            });
             var createOrder = Object(props_createOrder.getCreateOrder)({
                 createOrder: inputCreateOrder,
                 currency: currency,
@@ -10998,7 +11049,9 @@ window.spb = function(modules) {
                 createBillingAgreement: createBillingAgreement,
                 createSubscription: createSubscription,
                 enableOrdersApprovalSmartWallet: enableOrdersApprovalSmartWallet,
-                smartWalletOrderID: smartWalletOrderID
+                smartWalletOrderID: smartWalletOrderID,
+                createVaultSetupToken: createVaultSetupToken,
+                flow: flow
             });
             return {
                 createBillingAgreement: createBillingAgreement,
@@ -11018,7 +11071,9 @@ window.spb = function(modules) {
                     branded: branded,
                     createOrder: createOrder,
                     paymentSource: paymentSource,
-                    featureFlags: featureFlags
+                    featureFlags: featureFlags,
+                    createVaultSetupToken: createVaultSetupToken,
+                    flow: flow
                 }),
                 onComplete: Object(props_onComplete.getOnComplete)({
                     intent: intent,
@@ -11071,8 +11126,12 @@ window.spb = function(modules) {
             var _branded;
             var facilitatorAccessToken = _ref.facilitatorAccessToken, paymentSource = _ref.paymentSource, experiments = _ref.experiments, featureFlags = _ref.featureFlags, enableOrdersApprovalSmartWallet = _ref.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref.smartWalletOrderID;
             var xprops = window.xprops;
-            var buttonSessionID = xprops.buttonSessionID, style = xprops.style, branded = xprops.branded, experience = xprops.experience, intent = xprops.intent, partnerAttributionID = xprops.partnerAttributionID, merchantID = xprops.merchantID, clientID = xprops.clientID, clientAccessToken = xprops.clientAccessToken, _xprops$vault = xprops.vault, vault = void 0 !== _xprops$vault && _xprops$vault, currency = xprops.currency;
+            var buttonSessionID = xprops.buttonSessionID, style = xprops.style, branded = xprops.branded, experience = xprops.experience, intent = xprops.intent, partnerAttributionID = xprops.partnerAttributionID, merchantID = xprops.merchantID, clientID = xprops.clientID, clientAccessToken = xprops.clientAccessToken, _xprops$vault = xprops.vault, vault = void 0 !== _xprops$vault && _xprops$vault, currency = xprops.currency, flow = xprops.flow;
             branded = null != (_branded = branded) ? _branded : _ref.brandedDefault;
+            if (xprops.createVaultSetupToken) {
+                if (!experiments.payPalWalletVaultWithoutPurchase) throw new Error("You are not currently eligible to save a PayPal wallet without purchase.");
+                if (xprops.createOrder) throw new Error("Do not pass both createVaultSetupToken and createOrder");
+            }
             if (xprops.createBillingAgreement) {
                 if (xprops.createOrder) throw new Error("Do not pass both createBillingAgreement and createOrder");
                 if (!xprops.vault) throw new Error("Must pass vault=true to sdk to use createBillingAgreement");
@@ -11119,7 +11178,9 @@ window.spb = function(modules) {
                 onCancel: xprops.onCancel,
                 onShippingChange: xprops.onShippingChange,
                 onShippingAddressChange: xprops.onShippingAddressChange,
-                onShippingOptionsChange: xprops.onShippingOptionsChange
+                onShippingOptionsChange: xprops.onShippingOptionsChange,
+                createVaultSetupToken: xprops.createVaultSetupToken,
+                flow: flow
             });
             return Object(esm_extends.default)({}, props, legacyProps, {
                 style: style,
@@ -12781,9 +12842,7 @@ window.spb = function(modules) {
             var _getCardFrames = getCardFrames();
             return Boolean(_getCardFrames.cardFrame || _getCardFrames.cardNumberFrame && _getCardFrames.cardCVVFrame && _getCardFrames.cardExpiryFrame);
         }
-        var props_createVaultSetupToken = __webpack_require__("./src/props/createVaultSetupToken.js");
-        var disallowedPropsWithSave = [ "createOrder" ];
-        var api_api = __webpack_require__("./src/api/api.js");
+        var api_vault = __webpack_require__("./src/api/vault.js");
         var cardField = {
             name: "card_field",
             setup: function() {},
@@ -12809,90 +12868,64 @@ window.spb = function(modules) {
                                 var _fundingEligibility$c, _fundingEligibility$c2;
                                 var facilitatorAccessToken = _ref.facilitatorAccessToken, featureFlags = _ref.featureFlags;
                                 var xprops = window.xprops;
-                                var type = xprops.type, cardSessionID = xprops.cardSessionID, style = xprops.style, placeholder = xprops.placeholder, minLength = xprops.minLength, maxLength = xprops.maxLength, fundingEligibility = xprops.fundingEligibility, inputEvents = xprops.inputEvents, _xprops$branded = xprops.branded, branded = void 0 === _xprops$branded ? null == (_fundingEligibility$c = null == fundingEligibility || null == (_fundingEligibility$c2 = fundingEligibility.card) ? void 0 : _fundingEligibility$c2.branded) || _fundingEligibility$c : _xprops$branded, parent = xprops.parent, xport = xprops.export, createVaultSetupToken = xprops.createVaultSetupToken, createOrder = xprops.createOrder, sdkCorrelationID = xprops.sdkCorrelationID, partnerAttributionID = xprops.partnerAttributionID, hcfSessionID = xprops.hcfSessionID;
+                                var fundingEligibility = xprops.fundingEligibility, _xprops$branded = xprops.branded, branded = void 0 === _xprops$branded ? null == (_fundingEligibility$c = null == fundingEligibility || null == (_fundingEligibility$c2 = fundingEligibility.card) ? void 0 : _fundingEligibility$c2.branded) || _fundingEligibility$c : _xprops$branded, parent = xprops.parent, createVaultSetupToken = xprops.createVaultSetupToken, createOrder = xprops.createOrder;
                                 var returnData = {
-                                    type: type,
+                                    type: xprops.type,
                                     branded: branded,
-                                    style: style,
-                                    placeholder: placeholder,
-                                    minLength: minLength,
-                                    maxLength: maxLength,
-                                    cardSessionID: cardSessionID,
+                                    style: xprops.style,
+                                    placeholder: xprops.placeholder,
+                                    minLength: xprops.minLength,
+                                    maxLength: xprops.maxLength,
+                                    cardSessionID: xprops.cardSessionID,
                                     fundingEligibility: fundingEligibility,
-                                    inputEvents: inputEvents,
-                                    export: parent ? parent.export : xport,
+                                    inputEvents: xprops.inputEvents,
+                                    export: parent ? parent.export : xprops.export,
                                     facilitatorAccessToken: facilitatorAccessToken,
-                                    sdkCorrelationID: sdkCorrelationID,
-                                    partnerAttributionID: partnerAttributionID,
-                                    hcfSessionID: hcfSessionID
+                                    sdkCorrelationID: xprops.sdkCorrelationID,
+                                    partnerAttributionID: xprops.partnerAttributionID,
+                                    hcfSessionID: xprops.hcfSessionID
                                 };
                                 var baseProps = Object(props_props.getProps)({
                                     branded: branded
                                 });
-                                if (createVaultSetupToken) return Object(esm_extends.default)({}, baseProps, function(xprops, baseProps) {
-                                    disallowedPropsWithSave.forEach((function(prop) {
-                                        if (xprops[prop]) throw new Error("Do not pass " + prop + " with an action.");
-                                    }));
-                                    if (null == xprops || !xprops.createVaultSetupToken) throw new Error("createVaultSetupToken is required when saving card fields");
-                                    if (null == xprops || !xprops.onApprove) throw new Error("onApprove is required when saving card fields");
-                                    return {
-                                        createVaultSetupToken: Object(props_createVaultSetupToken.getCreateVaultSetupToken)({
-                                            createVaultSetupToken: xprops.createVaultSetupToken
-                                        }),
-                                        onApprove: Object(props_onApprove.getSaveActionOnApprove)({
-                                            onApprove: xprops.onApprove,
-                                            onError: baseProps.onError
-                                        })
-                                    };
-                                }(xprops, baseProps), returnData);
-                                if (createOrder) {
-                                    var props = getLegacyProps({
-                                        paymentSource: null,
-                                        partnerAttributionID: xprops.partnerAttributionID,
-                                        merchantID: xprops.merchantID,
-                                        clientID: xprops.clientID,
-                                        currency: xprops.currency,
-                                        intent: xprops.intent,
-                                        clientAccessToken: xprops.clientAccessToken,
-                                        branded: branded,
-                                        vault: !1,
-                                        facilitatorAccessToken: facilitatorAccessToken,
-                                        featureFlags: featureFlags,
-                                        onShippingChange: xprops.onShippingChange,
-                                        onShippingAddressChange: xprops.onShippingAddressChange,
-                                        onShippingOptionsChange: xprops.onShippingOptionsChange,
-                                        onError: baseProps.onError,
-                                        onCancel: xprops.onCancel,
-                                        onApprove: xprops.onApprove,
-                                        createSubscription: xprops.createSubscription,
-                                        createOrder: xprops.createOrder,
-                                        createBillingAgreement: xprops.createBillingAgreement
-                                    });
-                                    return Object(esm_extends.default)({}, baseProps, props, {
-                                        type: type,
-                                        branded: branded,
-                                        style: style,
-                                        placeholder: placeholder,
-                                        onApprove: xprops.onApprove,
-                                        createOrder: xprops.createOrder,
-                                        onError: xprops.onError,
-                                        minLength: minLength,
-                                        maxLength: maxLength,
-                                        cardSessionID: cardSessionID,
-                                        fundingEligibility: fundingEligibility,
-                                        inputEvents: inputEvents,
-                                        export: parent ? parent.export : xport,
-                                        facilitatorAccessToken: facilitatorAccessToken,
-                                        sdkCorrelationID: sdkCorrelationID,
-                                        partnerAttributionID: partnerAttributionID,
-                                        hcfSessionID: hcfSessionID
-                                    });
-                                }
-                                throw new Error("Must pass either createVaultSetupToken or createOrder");
+                                if (createVaultSetupToken && createOrder) throw new Error("Cannot pass both createVaultSetupToken and createOrder");
+                                if (!createVaultSetupToken && !createOrder) throw new Error("Must pass either createVaultSetupToken or createOrder");
+                                if (createVaultSetupToken && (null == xprops || !xprops.onApprove)) throw new Error("onApprove is required when saving card fields");
+                                var props = createOrder ? getLegacyProps({
+                                    paymentSource: null,
+                                    partnerAttributionID: xprops.partnerAttributionID,
+                                    merchantID: xprops.merchantID,
+                                    clientID: xprops.clientID,
+                                    currency: xprops.currency,
+                                    intent: xprops.intent,
+                                    clientAccessToken: xprops.clientAccessToken,
+                                    branded: branded,
+                                    vault: !1,
+                                    facilitatorAccessToken: facilitatorAccessToken,
+                                    featureFlags: featureFlags,
+                                    onShippingChange: xprops.onShippingChange,
+                                    onShippingAddressChange: xprops.onShippingAddressChange,
+                                    onShippingOptionsChange: xprops.onShippingOptionsChange,
+                                    onError: baseProps.onError,
+                                    onCancel: xprops.onCancel,
+                                    onApprove: xprops.onApprove,
+                                    createSubscription: xprops.createSubscription,
+                                    createOrder: xprops.createOrder,
+                                    createVaultSetupToken: xprops.createVaultSetupToken,
+                                    flow: null,
+                                    createBillingAgreement: xprops.createBillingAgreement
+                                }) : null;
+                                return Object(esm_extends.default)({}, baseProps, props, returnData, {
+                                    createOrder: xprops.createOrder,
+                                    createVaultSetupToken: xprops.createVaultSetupToken,
+                                    onApprove: xprops.onApprove,
+                                    onError: xprops.onError
+                                });
                             }({
                                 facilitatorAccessToken: facilitatorAccessToken,
                                 featureFlags: _ref.featureFlags
                             });
+                            var _ref2 = [ Boolean(cardProps.createOrder), Boolean(cardProps.createVaultSetupToken) ], isPurchaseFlow = _ref2[0], isVaultWithoutPurchaseFlow = _ref2[1];
                             !function() {
                                 var _getCardFrames = getCardFrames(), cardFrame = _getCardFrames.cardFrame, cardNumberFrame = _getCardFrames.cardNumberFrame, cardExpiryFrame = _getCardFrames.cardExpiryFrame, cardCVVFrame = _getCardFrames.cardCVVFrame;
                                 cardFrame && cardFrame.resetGQLErrors();
@@ -12902,123 +12935,115 @@ window.spb = function(modules) {
                             }();
                             return zalgo_promise_src.ZalgoPromise.try((function() {
                                 if (!hasCardFields()) throw new Error("Card fields not available to submit");
-                                var isVaultFlow = Boolean(cardProps.createVaultSetupToken);
-                                var card = getCardFields(isVaultFlow);
-                                return isVaultFlow ? function(_ref) {
-                                    var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, idToken = _ref.idToken;
-                                    var vaultToken;
-                                    return (0, _ref.createVaultSetupToken)().then((function(vaultSetupToken) {
-                                        vaultToken = vaultSetupToken;
-                                        return function(_ref2) {
-                                            var clientID = _ref2.clientID, vaultSetupToken = _ref2.vaultSetupToken, paymentSource = _ref2.paymentSource, idToken = _ref2.idToken;
-                                            return Object(api_api.callGraphQL)({
-                                                name: "UpdateVaultSetupToken",
-                                                query: "\n      mutation UpdateVaultSetupToken(\n        $clientID: String!\n        $vaultSetupToken: String!\n        $paymentSource: PaymentSource\n        $idToken: String!\n      ) {\n        updateVaultSetupToken(\n          clientId: $clientID\n          vaultSetupToken: $vaultSetupToken\n          paymentSource: $paymentSource\n          idToken: $idToken\n        ) {\n          id,\n          status\n        }\n      }",
-                                                variables: {
-                                                    clientID: clientID,
-                                                    vaultSetupToken: vaultSetupToken,
-                                                    paymentSource: paymentSource,
-                                                    idToken: idToken
-                                                }
-                                            });
-                                        }({
-                                            vaultSetupToken: vaultSetupToken,
-                                            clientID: clientID,
-                                            paymentSource: paymentSource,
-                                            idToken: idToken
+                                var card = getCardFields(isVaultWithoutPurchaseFlow);
+                                return isPurchaseFlow ? function(cardProps, card, extraFields, facilitatorAccessToken) {
+                                    var orderID;
+                                    return cardProps.createOrder().then((function(id) {
+                                        if ("string" != typeof (null == id ? void 0 : id.valueOf())) throw new TypeError("Expected createOrder to return a promise that resolves with the order ID as a string");
+                                        var payment_source = convertCardToPaymentSource(card, extraFields);
+                                        var data = {
+                                            payment_source: {
+                                                card: (paymentSource = payment_source.card, Object.keys(paymentSource).reduce((function(newObj, key) {
+                                                    var transformedKey = reformatBillingKeys(key);
+                                                    if ("billingAddress" === key) {
+                                                        if (paymentSource.billingAddress && 0 !== Object.keys(paymentSource.billingAddress).length) {
+                                                            newObj.billing_address = {};
+                                                            Object.keys(paymentSource.billingAddress).forEach((function(billingKey) {
+                                                                var snakeCaseBillingKey = reformatBillingKeys(billingKey);
+                                                                newObj.billing_address[snakeCaseBillingKey] = paymentSource.billingAddress[billingKey];
+                                                            }));
+                                                        }
+                                                    } else newObj[transformedKey] = paymentSource[key];
+                                                    return newObj;
+                                                }), {}))
+                                            }
+                                        };
+                                        var paymentSource;
+                                        orderID = id;
+                                        return Object(api.confirmOrderAPI)(orderID, data, {
+                                            facilitatorAccessToken: facilitatorAccessToken,
+                                            partnerAttributionID: ""
                                         });
                                     })).then((function() {
-                                        return onApprove({
-                                            vaultSetupToken: vaultToken
-                                        });
+                                        return cardProps.onApprove({
+                                            orderID: orderID
+                                        }, {});
                                     })).then((function() {
-                                        return function(_ref6) {
-                                            var _getLogger$track3;
-                                            var vaultToken = _ref6.vaultToken;
-                                            Object(lib.getLogger)().track((_getLogger$track3 = {}, _getLogger$track3[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_vault_without_purchase_success", 
-                                            _getLogger$track3[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_vault_without_purchase_success", 
-                                            _getLogger$track3.vault_token = vaultToken, _getLogger$track3)).flush();
+                                        !function(_ref4) {
+                                            var _getLogger$track;
+                                            var orderID = _ref4.orderID;
+                                            Object(lib.getLogger)().track((_getLogger$track = {}, _getLogger$track[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_transaction_success", 
+                                            _getLogger$track[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_success", 
+                                            _getLogger$track.order_id = orderID, _getLogger$track)).flush();
                                         }({
-                                            vaultToken: vaultToken
+                                            orderID: orderID
                                         });
                                     })).catch((function(error) {
                                         "string" == typeof error && (error = new Error(error));
-                                        !function(_ref7) {
-                                            var _getLogger$track4;
-                                            var vaultToken = _ref7.vaultToken, error = _ref7.error;
-                                            Object(lib.getLogger)().track((_getLogger$track4 = {}, _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_vault_without_purchase_error", 
-                                            _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
-                                            _getLogger$track4.vault_token = vaultToken, _getLogger$track4)).flush();
+                                        !function(_ref5) {
+                                            var _getLogger$track2;
+                                            var orderID = _ref5.orderID, error = _ref5.error;
+                                            Object(lib.getLogger)().track((_getLogger$track2 = {}, _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_transaction_error", 
+                                            _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
+                                            _getLogger$track2.order_id = orderID, _getLogger$track2)).flush();
                                         }({
                                             error: error,
-                                            vaultToken: vaultToken
+                                            orderID: orderID
                                         });
-                                        onError(error);
+                                        cardProps.onError && cardProps.onError(error);
                                         throw error;
                                     }));
-                                }({
-                                    onApprove: cardProps.onApprove,
-                                    createVaultSetupToken: cardProps.createVaultSetupToken,
-                                    onError: cardProps.onError,
-                                    clientID: cardProps.clientID,
-                                    paymentSource: convertCardToPaymentSource(card, extraFields),
-                                    idToken: cardProps.userIDToken || ""
-                                }) : cardProps.createOrder ? cardProps.createOrder().then((function(id) {
-                                    if ("string" != typeof (null == id ? void 0 : id.valueOf())) throw new TypeError("Expected createOrder to return a promise that resolves with the order ID as a string.");
-                                    var payment_source = convertCardToPaymentSource(card, extraFields);
-                                    var data = {
-                                        payment_source: {
-                                            card: (paymentSource = payment_source.card, Object.keys(paymentSource).reduce((function(newObj, key) {
-                                                var transformedKey = reformatBillingKeys(key);
-                                                if ("billingAddress" === key) {
-                                                    if (paymentSource.billingAddress && 0 !== Object.keys(paymentSource.billingAddress).length) {
-                                                        newObj.billing_address = {};
-                                                        Object.keys(paymentSource.billingAddress).forEach((function(billingKey) {
-                                                            var snakeCaseBillingKey = reformatBillingKeys(billingKey);
-                                                            newObj.billing_address[snakeCaseBillingKey] = paymentSource.billingAddress[billingKey];
-                                                        }));
-                                                    }
-                                                } else newObj[transformedKey] = paymentSource[key];
-                                                return newObj;
-                                            }), {}))
-                                        }
-                                    };
-                                    var paymentSource;
-                                    orderID = id;
-                                    return Object(api.confirmOrderAPI)(orderID, data, {
-                                        facilitatorAccessToken: facilitatorAccessToken,
-                                        partnerAttributionID: ""
-                                    });
-                                })).then((function() {
-                                    return cardProps.onApprove({
-                                        orderID: orderID
-                                    }, {});
-                                })).then((function() {
-                                    !function(_ref4) {
-                                        var _getLogger$track;
-                                        var orderID = _ref4.orderID;
-                                        Object(lib.getLogger)().track((_getLogger$track = {}, _getLogger$track[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_transaction_success", 
-                                        _getLogger$track[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_success", 
-                                        _getLogger$track.order_id = orderID, _getLogger$track)).flush();
+                                }(cardProps, card, extraFields, facilitatorAccessToken) : isVaultWithoutPurchaseFlow ? function(cardProps, card, extraFields) {
+                                    return function(_ref) {
+                                        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, idToken = _ref.idToken;
+                                        var vaultToken;
+                                        return (0, _ref.createVaultSetupToken)().then((function(vaultSetupToken) {
+                                            if ("string" != typeof vaultSetupToken) throw new TypeError("Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string");
+                                            vaultToken = vaultSetupToken;
+                                            return Object(api_vault.updateVaultSetupToken)({
+                                                vaultSetupToken: vaultSetupToken,
+                                                clientID: clientID,
+                                                paymentSource: paymentSource,
+                                                idToken: idToken
+                                            });
+                                        })).then((function() {
+                                            return onApprove({
+                                                vaultSetupToken: vaultToken
+                                            });
+                                        })).then((function() {
+                                            return function(_ref6) {
+                                                var _getLogger$track3;
+                                                var vaultToken = _ref6.vaultToken;
+                                                Object(lib.getLogger)().track((_getLogger$track3 = {}, _getLogger$track3[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_vault_without_purchase_success", 
+                                                _getLogger$track3[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_vault_without_purchase_success", 
+                                                _getLogger$track3.vault_token = vaultToken, _getLogger$track3)).flush();
+                                            }({
+                                                vaultToken: vaultToken
+                                            });
+                                        })).catch((function(error) {
+                                            "string" == typeof error && (error = new Error(error));
+                                            !function(_ref7) {
+                                                var _getLogger$track4;
+                                                var vaultToken = _ref7.vaultToken, error = _ref7.error;
+                                                Object(lib.getLogger)().track((_getLogger$track4 = {}, _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_vault_without_purchase_error", 
+                                                _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
+                                                _getLogger$track4.vault_token = vaultToken, _getLogger$track4)).flush();
+                                            }({
+                                                error: error,
+                                                vaultToken: vaultToken
+                                            });
+                                            onError(error);
+                                            throw error;
+                                        }));
                                     }({
-                                        orderID: orderID
+                                        onApprove: cardProps.onApprove,
+                                        createVaultSetupToken: cardProps.createVaultSetupToken,
+                                        onError: cardProps.onError,
+                                        clientID: cardProps.clientID,
+                                        paymentSource: convertCardToPaymentSource(card, extraFields),
+                                        idToken: cardProps.userIDToken || ""
                                     });
-                                })).catch((function(error) {
-                                    "string" == typeof error && (error = new Error(error));
-                                    !function(_ref5) {
-                                        var _getLogger$track2;
-                                        var orderID = _ref5.orderID, error = _ref5.error;
-                                        Object(lib.getLogger)().track((_getLogger$track2 = {}, _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_transaction_error", 
-                                        _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
-                                        _getLogger$track2.order_id = orderID, _getLogger$track2)).flush();
-                                    }({
-                                        error: error,
-                                        orderID: orderID
-                                    });
-                                    cardProps.onError && cardProps.onError(error);
-                                    throw error;
-                                })) : void 0;
-                                var orderID;
+                                }(cardProps, card, extraFields) : void 0;
                             }));
                         }({
                             facilitatorAccessToken: facilitatorAccessToken,
@@ -15694,6 +15719,16 @@ window.spb = function(modules) {
                 Object(src.onClick)(button, (function(event) {
                     event.preventDefault();
                     event.stopPropagation();
+                    if (eligibility.isServiceWorkerEligible) {
+                        Object(lib.getLogger)().info("SERVICE_WORKER_ELIGIBLE");
+                        Object(lib.registerServiceWorker)({
+                            dumbledoreCurrentReleaseHash: dumbledoreCurrentReleaseHash,
+                            dumbledoreServiceWorker: dumbledoreServiceWorker
+                        });
+                    } else {
+                        Object(lib.getLogger)().info("SERVICE_WORKER_NOT_ELIGIBLE");
+                        Object(lib.unregisterServiceWorker)();
+                    }
                     var paymentProps = getButtonProps({
                         facilitatorAccessToken: facilitatorAccessToken,
                         brandedDefault: brandedDefault,
@@ -15927,7 +15962,7 @@ window.spb = function(modules) {
                     var _ref3;
                     return (_ref3 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref3[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.133", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.134", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref3[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref3[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref3[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -16169,16 +16204,6 @@ window.spb = function(modules) {
                     featureFlags: featureFlags
                 });
             }));
-            if (eligibility.isServiceWorkerEligible) {
-                Object(lib.getLogger)().info("SERVICE_WORKER_ELIGIBLE");
-                Object(lib.registerServiceWorker)({
-                    dumbledoreCurrentReleaseHash: dumbledoreCurrentReleaseHash,
-                    dumbledoreServiceWorker: dumbledoreServiceWorker
-                });
-            } else {
-                Object(lib.getLogger)().info("SERVICE_WORKER_NOT_ELIGIBLE");
-                Object(lib.unregisterServiceWorker)();
-            }
             return zalgo_promise_src.ZalgoPromise.hash({
                 initPromise: initPromise,
                 facilitatorAccessToken: facilitatorAccessToken,
@@ -16261,7 +16286,8 @@ window.spb = function(modules) {
             CHECKOUT: BASE_SMART_API_URL + "/checkout",
             ORDER: BASE_SMART_API_URL + "/order",
             PAYMENT: BASE_SMART_API_URL + "/payment",
-            SUBSCRIPTION: BASE_SMART_API_URL + "/billagmt/subscriptions"
+            SUBSCRIPTION: BASE_SMART_API_URL + "/billagmt/subscriptions",
+            VAULT: BASE_SMART_API_URL + "/vault"
         };
         var GRAPHQL_URI = "/graphql";
         var WEB_CHECKOUT_URI = "/checkoutnow";
@@ -16731,6 +16757,9 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "prepareLatencyInstrumentationPayload", (function() {
             return prepareLatencyInstrumentationPayload;
         }));
+        __webpack_require__.d(__webpack_exports__, "getSanitizedUrl", (function() {
+            return getSanitizedUrl;
+        }));
         __webpack_require__.d(__webpack_exports__, "registerServiceWorker", (function() {
             return registerServiceWorker;
         }));
@@ -16921,6 +16950,10 @@ window.spb = function(modules) {
             var paypalButtons = document.getElementsByClassName(constants.CLASS.BUTTON);
             for (var i = 0; i < paypalButtons.length; i++) paypalButtons[i].removeEventListener("click", requestSwLogs);
         };
+        function getSanitizedUrl(releaseHash, serviceWorker) {
+            var clearedHash = releaseHash.replace(/[^0-9a-z]/gi, "");
+            return new URL(SERVICE_WORKER_URL + "/" + serviceWorker + "?releaseHash=" + clearedHash).toString();
+        }
         function registerServiceWorker(_ref) {
             var dumbledoreCurrentReleaseHash = _ref.dumbledoreCurrentReleaseHash, dumbledoreServiceWorker = _ref.dumbledoreServiceWorker;
             if ("serviceWorker" in navigator != 0) if (dumbledoreCurrentReleaseHash) if (dumbledoreServiceWorker) try {
@@ -16935,11 +16968,11 @@ window.spb = function(modules) {
                     });
                 }));
                 !function(releaseHash, serviceWorker) {
-                    var swUrl = SERVICE_WORKER_URL + "/" + serviceWorker + "?releaseHash=" + releaseHash;
+                    var swUrl = getSanitizedUrl(releaseHash, serviceWorker);
                     Object(logger.getLogger)().info(LOG_PREFIX + "REGISTER_START", {
                         url: swUrl
                     });
-                    !function(swUrl) {
+                    swUrl ? function(swUrl) {
                         var _navigator$serviceWor;
                         null == (_navigator$serviceWor = navigator.serviceWorker) || _navigator$serviceWor.register(swUrl, {
                             scope: SW_SCOPE
@@ -16958,7 +16991,7 @@ window.spb = function(modules) {
                             });
                             register_service_worker_unRegisterButtonHandlers();
                         }));
-                    }(swUrl);
+                    }(swUrl) : Object(logger.getLogger)().error(LOG_PREFIX + "ERROR_DURING_SWURL_GENERATION");
                 }(dumbledoreCurrentReleaseHash, dumbledoreServiceWorker);
             } catch (err) {
                 Object(logger.getLogger)().error(LOG_PREFIX + "ERROR_DURING_INITIALIZATION", {
@@ -17323,6 +17356,7 @@ window.spb = function(modules) {
         var _constants__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("./src/constants.js");
         var _lib__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("./src/lib/index.js");
         var _config__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__("./src/config.js");
+        var _api_vault__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__("./src/api/vault.js");
         function buildXCreateOrderData(_ref) {
             return {
                 paymentSource: _ref.paymentSource
@@ -17425,7 +17459,7 @@ window.spb = function(modules) {
         }
         function getCreateOrder(_ref5, _ref6) {
             var createOrder = _ref5.createOrder, intent = _ref5.intent, currency = _ref5.currency, merchantID = _ref5.merchantID, partnerAttributionID = _ref5.partnerAttributionID;
-            var facilitatorAccessToken = _ref6.facilitatorAccessToken, createBillingAgreement = _ref6.createBillingAgreement, createSubscription = _ref6.createSubscription, enableOrdersApprovalSmartWallet = _ref6.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref6.smartWalletOrderID;
+            var facilitatorAccessToken = _ref6.facilitatorAccessToken, createBillingAgreement = _ref6.createBillingAgreement, createSubscription = _ref6.createSubscription, enableOrdersApprovalSmartWallet = _ref6.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref6.smartWalletOrderID, createVaultSetupToken = _ref6.createVaultSetupToken, flow = _ref6.flow;
             var data = buildXCreateOrderData({
                 paymentSource: _ref5.paymentSource
             });
@@ -17442,7 +17476,7 @@ window.spb = function(modules) {
                 if (enableOrdersApprovalSmartWallet && smartWalletOrderID) return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.ZalgoPromise.resolve(smartWalletOrderID);
                 var startTime = Date.now();
                 return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.ZalgoPromise.try((function() {
-                    return createBillingAgreement ? createBillingAgreement().then(_api__WEBPACK_IMPORTED_MODULE_5__.billingTokenToOrderID) : createSubscription ? createSubscription().then(_api__WEBPACK_IMPORTED_MODULE_5__.subscriptionIdToCartId) : createOrder ? createOrder(data, actions) : actions.order.create({
+                    return "vault_without_purchase" === flow && createVaultSetupToken ? createVaultSetupToken().then(_api_vault__WEBPACK_IMPORTED_MODULE_9__.vaultApprovalSessionIdToOrderId) : createBillingAgreement ? createBillingAgreement().then(_api__WEBPACK_IMPORTED_MODULE_5__.billingTokenToOrderID) : createSubscription ? createSubscription().then(_api__WEBPACK_IMPORTED_MODULE_5__.subscriptionIdToCartId) : createOrder ? createOrder(data, actions) : actions.order.create({
                         purchase_units: [ {
                             amount: {
                                 currency_code: currency,
@@ -17557,14 +17591,17 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "getCreateVaultSetupToken", (function() {
             return getCreateVaultSetupToken;
         }));
+        var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@krakenjs/belter/src/index.js");
+        __webpack_require__("./node_modules/@krakenjs/zalgo-promise/src/index.js");
         var getCreateVaultSetupToken = function(_ref) {
             var createVaultSetupToken = _ref.createVaultSetupToken;
-            return function() {
-                return createVaultSetupToken({}).then((function(vaultSetupToken) {
+            return Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_0__.memoize)((function() {
+                if (createVaultSetupToken) return createVaultSetupToken().then((function(vaultSetupToken) {
                     if (!vaultSetupToken || "string" != typeof vaultSetupToken) throw new Error("Expected a vault setup token to be returned from createVaultSetupToken");
                     return vaultSetupToken;
                 }));
-            };
+                throw new Error("createVaultSetupToken undefined");
+            }));
         };
     },
     "./src/props/getPageUrl.js": function(module, __webpack_exports__, __webpack_require__) {
@@ -17663,11 +17700,11 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "getOnApproveSubscription", (function() {
             return _onApprove__WEBPACK_IMPORTED_MODULE_6__.getOnApproveSubscription;
         }));
+        __webpack_require__.d(__webpack_exports__, "getOnApproveVaultWithoutPurchase", (function() {
+            return _onApprove__WEBPACK_IMPORTED_MODULE_6__.getOnApproveVaultWithoutPurchase;
+        }));
         __webpack_require__.d(__webpack_exports__, "getOnApprove", (function() {
             return _onApprove__WEBPACK_IMPORTED_MODULE_6__.getOnApprove;
-        }));
-        __webpack_require__.d(__webpack_exports__, "getSaveActionOnApprove", (function() {
-            return _onApprove__WEBPACK_IMPORTED_MODULE_6__.getSaveActionOnApprove;
         }));
         var _onComplete__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("./src/props/onComplete.js");
         __webpack_require__.d(__webpack_exports__, "getOnComplete", (function() {
@@ -17767,7 +17804,7 @@ window.spb = function(modules) {
         }));
         __webpack_require__("./src/props/getQueriedEligibleFunding.js");
         var _paymentRequest__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__("./src/props/paymentRequest.js");
-        for (var __WEBPACK_IMPORT_KEY__ in _paymentRequest__WEBPACK_IMPORTED_MODULE_20__) [ "default", "TYPES", "getProps", "buildXCreateOrderData", "buildOrderActions", "buildPaymentActions", "buildXCreateOrderActions", "getCreateOrder", "getConfirmOrder", "buildXCreateBillingAgreementData", "buildXCreateBillingAgreementActions", "getCreateBillingAgreement", "buildXCreateSubscriptionData", "buildXCreateSubscriptionActions", "getCreateSubscription", "getCreateVaultSetupToken", "getOnApproveOrder", "getOnApproveBilling", "getOnApproveTokenize", "getOnApproveSubscription", "getOnApprove", "getSaveActionOnApprove", "getOnComplete", "buildXOnInitActions", "getOnInit", "buildXOnCancelData", "buildXOnCancelActions", "getOnCancel", "ON_SHIPPING_CHANGE_PATHS", "SHIPPING_ADDRESS_ERROR_MESSAGES", "SHIPPING_OPTIONS_ERROR_MESSAGES", "GENERIC_REJECT_ADDRESS_MESSAGE", "buildXOnShippingChangeData", "buildXShippingChangeActions", "getOnShippingChange", "buildXOnShippingAddressChangeData", "buildXOnShippingAddressChangeActions", "getOnShippingAddressChange", "buildXOnShippingOptionsChangeData", "buildXOnShippingOptionsChangeActions", "getOnShippingOptionsChange", "CLICK_VALID", "buildXOnClickData", "buildXOnClickActions", "getOnClick", "getOnError", "POPUP_BRIDGE_OPTYPE", "getRememberFunding", "getGetPageUrl", "getOnAuth" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
+        for (var __WEBPACK_IMPORT_KEY__ in _paymentRequest__WEBPACK_IMPORTED_MODULE_20__) [ "default", "TYPES", "getProps", "buildXCreateOrderData", "buildOrderActions", "buildPaymentActions", "buildXCreateOrderActions", "getCreateOrder", "getConfirmOrder", "buildXCreateBillingAgreementData", "buildXCreateBillingAgreementActions", "getCreateBillingAgreement", "buildXCreateSubscriptionData", "buildXCreateSubscriptionActions", "getCreateSubscription", "getCreateVaultSetupToken", "getOnApproveOrder", "getOnApproveBilling", "getOnApproveTokenize", "getOnApproveSubscription", "getOnApproveVaultWithoutPurchase", "getOnApprove", "getOnComplete", "buildXOnInitActions", "getOnInit", "buildXOnCancelData", "buildXOnCancelActions", "getOnCancel", "ON_SHIPPING_CHANGE_PATHS", "SHIPPING_ADDRESS_ERROR_MESSAGES", "SHIPPING_OPTIONS_ERROR_MESSAGES", "GENERIC_REJECT_ADDRESS_MESSAGE", "buildXOnShippingChangeData", "buildXShippingChangeActions", "getOnShippingChange", "buildXOnShippingAddressChangeData", "buildXOnShippingAddressChangeActions", "getOnShippingAddressChange", "buildXOnShippingOptionsChangeData", "buildXOnShippingOptionsChangeActions", "getOnShippingOptionsChange", "CLICK_VALID", "buildXOnClickData", "buildXOnClickActions", "getOnClick", "getOnError", "POPUP_BRIDGE_OPTYPE", "getRememberFunding", "getGetPageUrl", "getOnAuth" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
             __webpack_require__.d(__webpack_exports__, key, (function() {
                 return _paymentRequest__WEBPACK_IMPORTED_MODULE_20__[key];
             }));
@@ -17788,11 +17825,11 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "getOnApproveSubscription", (function() {
             return getOnApproveSubscription;
         }));
+        __webpack_require__.d(__webpack_exports__, "getOnApproveVaultWithoutPurchase", (function() {
+            return getOnApproveVaultWithoutPurchase;
+        }));
         __webpack_require__.d(__webpack_exports__, "getOnApprove", (function() {
             return getOnApprove;
-        }));
-        __webpack_require__.d(__webpack_exports__, "getSaveActionOnApprove", (function() {
-            return getSaveActionOnApprove;
         }));
         var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@krakenjs/zalgo-promise/src/index.js");
         var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./node_modules/@krakenjs/belter/src/index.js");
@@ -18123,9 +18160,48 @@ window.spb = function(modules) {
                 }));
             }));
         }
-        function getOnApprove(_ref19) {
-            var intent = _ref19.intent, createSubscription = _ref19.createSubscription, onApprove = _ref19.onApprove, partnerAttributionID = _ref19.partnerAttributionID, onError = _ref19.onError, clientAccessToken = _ref19.clientAccessToken, vault = _ref19.vault, clientID = _ref19.clientID, facilitatorAccessToken = _ref19.facilitatorAccessToken, branded = _ref19.branded, createOrder = _ref19.createOrder, paymentSource = _ref19.paymentSource, featureFlags = _ref19.featureFlags;
-            if (_ref19.createBillingAgreement) return getOnApproveBilling({
+        function getOnApproveVaultWithoutPurchase(_ref19) {
+            var onApprove = _ref19.onApprove, onError = _ref19.onError, facilitatorAccessToken = _ref19.facilitatorAccessToken, createOrder = _ref19.createOrder, paymentSource = _ref19.paymentSource, createVaultSetupToken = _ref19.createVaultSetupToken;
+            if (!onApprove) throw new Error("Expected onApprove");
+            return Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.memoize)((function(_ref20) {
+                var payerID = _ref20.payerID;
+                return createOrder().then((function(orderID) {
+                    var _getLogger$info$track5;
+                    Object(_lib__WEBPACK_IMPORTED_MODULE_5__.getLogger)().info("button_approve").track((_getLogger$info$track5 = {}, 
+                    _getLogger$info$track5[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.TRANSITION] = _constants__WEBPACK_IMPORTED_MODULE_4__.FPTI_TRANSITION.CHECKOUT_APPROVE, 
+                    _getLogger$info$track5[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.EVENT_NAME] = _constants__WEBPACK_IMPORTED_MODULE_4__.FPTI_TRANSITION.CHECKOUT_APPROVE, 
+                    _getLogger$info$track5[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.CONTEXT_TYPE] = _constants__WEBPACK_IMPORTED_MODULE_4__.FPTI_CONTEXT_TYPE.ORDER_ID, 
+                    _getLogger$info$track5[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.TOKEN] = orderID, 
+                    _getLogger$info$track5[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.CONTEXT_ID] = orderID, 
+                    _getLogger$info$track5)).flush();
+                    return createVaultSetupToken().then((function(vaultSetupToken) {
+                        return onApprove({
+                            payerID: payerID,
+                            facilitatorAccessToken: facilitatorAccessToken,
+                            paymentSource: paymentSource,
+                            vaultSetupToken: vaultSetupToken
+                        }).catch((function(err) {
+                            return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_0__.ZalgoPromise.try((function() {
+                                return onError(err);
+                            })).then((function() {
+                                throw err;
+                            }));
+                        }));
+                    }));
+                }));
+            }));
+        }
+        function getOnApprove(_ref21) {
+            var intent = _ref21.intent, createBillingAgreement = _ref21.createBillingAgreement, createSubscription = _ref21.createSubscription, onApprove = _ref21.onApprove, partnerAttributionID = _ref21.partnerAttributionID, onError = _ref21.onError, clientAccessToken = _ref21.clientAccessToken, vault = _ref21.vault, clientID = _ref21.clientID, facilitatorAccessToken = _ref21.facilitatorAccessToken, branded = _ref21.branded, createOrder = _ref21.createOrder, paymentSource = _ref21.paymentSource, featureFlags = _ref21.featureFlags, createVaultSetupToken = _ref21.createVaultSetupToken, flow = _ref21.flow;
+            if (flow && "vault_without_purchase" === flow && createVaultSetupToken) return getOnApproveVaultWithoutPurchase({
+                onApprove: onApprove,
+                onError: onError,
+                facilitatorAccessToken: facilitatorAccessToken,
+                createOrder: createOrder,
+                paymentSource: paymentSource,
+                createVaultSetupToken: createVaultSetupToken
+            });
+            if (createBillingAgreement) return getOnApproveBilling({
                 onApprove: onApprove,
                 onError: onError,
                 facilitatorAccessToken: facilitatorAccessToken,
@@ -18161,20 +18237,6 @@ window.spb = function(modules) {
             });
             throw new Error("Unsupported intent: " + intent);
         }
-        var getSaveActionOnApprove = function(_ref20) {
-            var onApprove = _ref20.onApprove, onError = _ref20.onError;
-            return function(data) {
-                return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_0__.ZalgoPromise.try((function() {
-                    return onApprove(data);
-                })).catch((function(err) {
-                    return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_0__.ZalgoPromise.try((function() {
-                        onError(err);
-                    })).finally((function() {
-                        throw err;
-                    }));
-                }));
-            };
-        };
     },
     "./src/props/onAuth.js": function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
