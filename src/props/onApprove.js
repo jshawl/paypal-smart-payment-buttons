@@ -638,24 +638,3 @@ export function getOnApprove({ intent, createBillingAgreement, createSubscriptio
 
 export type SaveActionOnApproveData = {| vaultSetupToken: string |};
 export type SaveActionOnApprove = (SaveActionOnApproveData) => ZalgoPromise<void>;
-
-export const getSaveActionOnApprove =
-  ({
-    onApprove,
-    onError,
-  }: {|
-    onApprove: SaveActionOnApprove,
-    onError: (error: mixed) => ZalgoPromise<void>,
-  |}): ((SaveActionOnApproveData) => ZalgoPromise<void>) =>
-  (data) => {
-    return ZalgoPromise.try(() => {
-      return onApprove(data);
-    }).catch((err) => {
-      return ZalgoPromise.try(() => {
-        onError(err);
-      }).finally(() => {
-        throw err;
-      });
-    });
-  };
-

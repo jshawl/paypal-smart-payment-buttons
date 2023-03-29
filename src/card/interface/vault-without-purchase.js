@@ -15,6 +15,7 @@ import type {
   XCreateVaultSetupToken,
   SaveActionOnApprove,
 } from "../../props";
+import { SUBMIT_ERRORS } from "../constants";
 
 type VaultPaymenSourceOptions = {|
   createVaultSetupToken: XCreateVaultSetupToken,
@@ -36,6 +37,9 @@ export const savePaymentSource = ({
   let vaultToken;
   return createVaultSetupToken()
     .then((vaultSetupToken) => {
+      if (typeof vaultSetupToken !== "string") {
+        throw new TypeError(SUBMIT_ERRORS.VAULT_TOKEN_TYPE_ERROR);
+      }
       vaultToken = vaultSetupToken;
       return updateVaultSetupToken({
         vaultSetupToken,

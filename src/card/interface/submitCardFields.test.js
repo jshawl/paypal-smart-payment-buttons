@@ -5,6 +5,7 @@ import { INTENT } from "@paypal/sdk-constants";
 import { getCardProps } from "../props";
 import { confirmOrderAPI } from "../../api";
 import { hcfTransactionSuccess, hcfTransactionError } from "../logger";
+import { SUBMIT_ERRORS } from "../constants";
 
 import { savePaymentSource } from "./vault-without-purchase";
 import { resetGQLErrors } from "./gql";
@@ -70,7 +71,7 @@ describe("submitCardFields", () => {
     expect.assertions(1);
 
     expect(submitCardFields(defaultOptions)).rejects.toThrowError(
-      "Card fields not available to submit"
+      SUBMIT_ERRORS.UNABLE_TO_SUBMIT
     );
   });
 

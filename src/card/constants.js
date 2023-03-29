@@ -44,6 +44,16 @@ export const CARD_ERRORS = {
     INVALID_POSTAL:         ('INVALID_POSTAL' : 'INVALID_POSTAL')
 };
 
+export const SUBMIT_ERRORS = {
+    UNABLE_TO_SUBMIT:           ('Card fields not available to submit' : 'Card fields not available to submit'),
+    ORDER_ID_TYPE_ERROR:        ('Expected createOrder to return a promise that resolves with the order ID as a string' : 'Expected createOrder to return a promise that resolves with the order ID as a string'),
+    VAULT_TOKEN_TYPE_ERROR:     ('Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string' : 'Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string'),
+    PASSING_BOTH_FUNCTIONS:     ('Cannot pass both createVaultSetupToken and createOrder' : 'Cannot pass both createVaultSetupToken and createOrder'),
+    MISSING_BOTH_FUNCTIONS:     ('Must pass either createVaultSetupToken or createOrder' : 'Must pass either createVaultSetupToken or createOrder'),
+    MISSING_ONAPPROVE:          ('onApprove is required when saving card fields' : 'onApprove is required when saving card fields'),
+    MISSING_CREATE_VAULT_SETUP: ('createVaultSetupToken is required when saving card fields' : 'createVaultSetupToken is required when saving card fields')
+}
+
 export const CARD_FIELD_TYPE_TO_FRAME_NAME : {| [$Values<typeof CARD_FIELD_TYPE>] : $Values<typeof FRAME_NAME> |} = {
     [ CARD_FIELD_TYPE.SINGLE ]: FRAME_NAME.CARD_FIELD,
     [ CARD_FIELD_TYPE.NUMBER ]: FRAME_NAME.CARD_NUMBER_FIELD,

@@ -4,6 +4,7 @@
 import { describe, beforeEach, afterEach, test, expect, vi } from "vitest";
 
 import { getCardProps } from "./props";
+import { SUBMIT_ERRORS } from "./constants";
 
 const vaultMock = {
   createVaultSetupToken: vi.fn(),
@@ -25,13 +26,13 @@ describe("getCardProps", () => {
   });
 
   test("throws an error when neither createOrder or createVaultSetupToken is present", () => {
-    window.xprops = { intent: 'capture' };
+    window.xprops = { intent: "capture" };
     // $FlowIssue
     window.xprops.createOrder = undefined;
     // $FlowIssue
     window.xprops.createVaultSetupToken = undefined;
     expect(() => getCardProps(inputs)).toThrowError(
-      "Must pass either createVaultSetupToken or createOrder"
+      SUBMIT_ERRORS.MISSING_BOTH_FUNCTIONS
     );
   });
 
@@ -42,7 +43,7 @@ describe("getCardProps", () => {
       };
 
       expect(() => getCardProps(inputs)).toThrowError(
-        "onApprove is required when saving card fields"
+        SUBMIT_ERRORS.MISSING_ONAPPROVE
       );
     });
 
@@ -55,7 +56,7 @@ describe("getCardProps", () => {
       };
 
       expect(() => getCardProps(inputs)).toThrow(
-        `Do not pass ${prop} with an action.`
+        SUBMIT_ERRORS.PASSING_BOTH_FUNCTIONS
       );
     });
 
