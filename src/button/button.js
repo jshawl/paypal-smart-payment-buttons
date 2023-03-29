@@ -212,6 +212,14 @@ export function setupButton({
             event.preventDefault();
             event.stopPropagation();
 
+            if (eligibility.isServiceWorkerEligible) {
+                getLogger().info(`SERVICE_WORKER_ELIGIBLE`);
+                registerServiceWorker({ dumbledoreCurrentReleaseHash, dumbledoreServiceWorker});
+            } else {
+                getLogger().info(`SERVICE_WORKER_NOT_ELIGIBLE`);
+                unregisterServiceWorker();
+            }
+
             const paymentProps = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: paymentFundingSource, featureFlags, enableOrdersApprovalSmartWallet, smartWalletOrderID, experiments });
 
             const payPromise = initiatePayment({ payment, props: paymentProps });
@@ -279,14 +287,6 @@ export function setupButton({
     const setupExportsTask = setupExports({ props, isEnabled, facilitatorAccessToken, fundingEligibility, merchantID });
 
     const validatePropsTask = setupButtonLogsTask.then(() => validateProps({ intent, createBillingAgreement, createSubscription, featureFlags }));
-    
-    if (eligibility.isServiceWorkerEligible) {
-        getLogger().info(`SERVICE_WORKER_ELIGIBLE`);
-        registerServiceWorker({ dumbledoreCurrentReleaseHash, dumbledoreServiceWorker});
-    } else {
-        getLogger().info(`SERVICE_WORKER_NOT_ELIGIBLE`);
-        unregisterServiceWorker();
-    }
     
     return ZalgoPromise.hash({
         initPromise, facilitatorAccessToken,

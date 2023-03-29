@@ -98,14 +98,25 @@ const startRegistration = (swUrl) => {
         });
 }
 
+export function getSanitizedUrl (releaseHash: string, serviceWorker: string): string {
+    const clearedHash = releaseHash.replace(/[^0-9a-z]/gi, '');
+    // eslint-disable-next-line compat/compat
+    const sanitizedUrl = new URL(`${SERVICE_WORKER_URL}/${serviceWorker}?releaseHash=${clearedHash}`);
+    return sanitizedUrl.toString();
+}
+
 const executeServiceWorker = (releaseHash: string, serviceWorker: string) => {
-    const swUrl = `${SERVICE_WORKER_URL}/${serviceWorker}?releaseHash=${releaseHash}`;
+    const swUrl = getSanitizedUrl(releaseHash, serviceWorker);
         
     getLogger().info(`${ LOG_PREFIX }REGISTER_START`, {
         url: swUrl
     });
-
-    startRegistration(swUrl);
+    if(swUrl){
+        startRegistration(swUrl);
+    }
+    else {
+        getLogger().error(`${ LOG_PREFIX }ERROR_DURING_SWURL_GENERATION`);
+    }
 }
 
 export function registerServiceWorker({ dumbledoreCurrentReleaseHash, dumbledoreServiceWorker }: RegisterServiceWorkerParams) {
