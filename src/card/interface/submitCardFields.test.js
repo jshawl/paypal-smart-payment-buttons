@@ -62,6 +62,9 @@ describe("submitCardFields", () => {
     facilitatorAccessToken: "test-access-token",
     extraFields: {},
     featureFlags: {},
+    experiments: {
+      hostedCardFields: true,
+    },
   };
 
   test("should throw an error if we do not have card fields", () => {

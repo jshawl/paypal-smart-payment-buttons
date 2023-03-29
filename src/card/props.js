@@ -136,12 +136,20 @@ export type CardProps = LegacyCardProps | SaveCardFieldsProps
 type GetCardPropsOptions = {|
   facilitatorAccessToken: string,
   featureFlags: FeatureFlags,
+  experiments: {
+    hostedCardFields: boolean
+  }
 |};
 
 export function getCardProps({
   facilitatorAccessToken,
   featureFlags,
+  experiments,
 }: GetCardPropsOptions): LegacyCardProps | SaveCardFieldsProps {
+  if (!experiments.hostedCardFields) {
+    throw new Error(SUBMIT_ERRORS.NOT_FEATURE_FLAGGED)
+  }
+
   const xprops: CardXProps = window.xprops;
 
   const {

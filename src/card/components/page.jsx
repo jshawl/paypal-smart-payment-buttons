@@ -18,10 +18,13 @@ import { CardField, CardNumberField, CardCVVField, CardExpiryField, CardNameFiel
 type PageProps = {|
     cspNonce : string,
     props : CardProps,
-    featureFlags: FeatureFlags
+    featureFlags: FeatureFlags,
+    experiments: {|
+        hostedCardFields: boolean
+    |}
 |};
 
-function Page({ cspNonce, props, featureFlags } : PageProps) : mixed {
+function Page({ cspNonce, props, featureFlags, experiments } : PageProps) : mixed {
     const { facilitatorAccessToken, style, disableAutocomplete, placeholder, type, export: xport, inputEvents, minLength, maxLength } = props;
     const { onChange, onFocus, onBlur, onInputSubmitRequest } = inputEvents || {};
     const [ fieldValue, setFieldValue ] = useState();
@@ -199,7 +202,7 @@ function Page({ cspNonce, props, featureFlags } : PageProps) : mixed {
         xport({
             submit: (extraData) => {
                 const extraFields = filterExtraFields(extraData);
-                return submitCardFields({ facilitatorAccessToken, extraFields, featureFlags });
+                return submitCardFields({ facilitatorAccessToken, extraFields, featureFlags, experiments });
             },
             getState: () => {
                 const cardFieldState = getCardFieldState()
@@ -328,11 +331,13 @@ function Page({ cspNonce, props, featureFlags } : PageProps) : mixed {
     );
 }
 
-export function setupCard({ cspNonce, facilitatorAccessToken, featureFlags, buyerCountry, metadata } : SetupCardOptions) {
+export function setupCard({ cspNonce, facilitatorAccessToken, featureFlags, experiments, buyerCountry, metadata } : SetupCardOptions) {
     const props = getCardProps({
         facilitatorAccessToken,
-        featureFlags
+        featureFlags,
+        experiments,
     });
+
     const {
         env,
         sessionID,
@@ -363,5 +368,5 @@ export function setupCard({ cspNonce, facilitatorAccessToken, featureFlags, buye
         hcfSessionID
     })
 
-    render(<Page cspNonce={ cspNonce } props={ props } featureFlags={featureFlags} />, getBody());
+    render(<Page cspNonce={ cspNonce } props={ props } featureFlags={featureFlags} experiments={experiments} />, getBody());
 }

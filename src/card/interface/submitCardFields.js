@@ -21,6 +21,9 @@ type SubmitCardFieldsOptions = {|
   extraFields?: {|
     billingAddress?: BillingAddress,
   |},
+  experiments: {|
+    hostedCardFields: boolean
+  |}
 |};
 
 function handleVaultWithoutPurchaseFlow(cardProps: SaveCardFieldsProps, card: Card, extraFields?: ExtraFields): ZalgoPromise<void> {
@@ -81,10 +84,12 @@ export function submitCardFields({
   facilitatorAccessToken,
   extraFields,
   featureFlags,
+  experiments,
 }: SubmitCardFieldsOptions): ZalgoPromise<void> {
   const cardProps = getCardProps({
     facilitatorAccessToken,
     featureFlags,
+    experiments,
   });
 
   // $FlowIssue

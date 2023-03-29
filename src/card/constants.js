@@ -51,7 +51,8 @@ export const SUBMIT_ERRORS = {
     PASSING_BOTH_FUNCTIONS:     ('Cannot pass both createVaultSetupToken and createOrder' : 'Cannot pass both createVaultSetupToken and createOrder'),
     MISSING_BOTH_FUNCTIONS:     ('Must pass either createVaultSetupToken or createOrder' : 'Must pass either createVaultSetupToken or createOrder'),
     MISSING_ONAPPROVE:          ('onApprove is required when saving card fields' : 'onApprove is required when saving card fields'),
-    MISSING_CREATE_VAULT_SETUP: ('createVaultSetupToken is required when saving card fields' : 'createVaultSetupToken is required when saving card fields')
+    MISSING_CREATE_VAULT_SETUP: ('createVaultSetupToken is required when saving card fields' : 'createVaultSetupToken is required when saving card fields'),
+    NOT_FEATURE_FLAGGED:        ('Not feature flagged to use CardFields' : 'Not feature flagged to use CardFields')
 }
 
 export const CARD_FIELD_TYPE_TO_FRAME_NAME : {| [$Values<typeof CARD_FIELD_TYPE>] : $Values<typeof FRAME_NAME> |} = {

@@ -15,6 +15,9 @@ describe("getCardProps", () => {
   const inputs = {
     facilitatorAccessToken: "some-facilitator-access-token",
     featureFlags: {},
+    experiments: {
+      hostedCardFields: true,
+    },
   };
 
   beforeEach(() => {
@@ -23,6 +26,16 @@ describe("getCardProps", () => {
 
   afterEach(() => {
     vi.clearAllMocks();
+  });
+
+  test("throws an error when hosted card fields experiment is false", () => {
+    window.xprops = { intent: "capture", createOrder: vi.fn() };
+    expect(() =>
+      getCardProps({
+        ...inputs,
+        experiments: { hostedCardFields: false },
+      })
+    ).toThrowError(SUBMIT_ERRORS.NOT_FEATURE_FLAGGED);
   });
 
   test("throws an error when neither createOrder or createVaultSetupToken is present", () => {

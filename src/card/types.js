@@ -13,6 +13,9 @@ export type SetupCardOptions = {|
     metadata: {|
         correlationID: string,
         spbVersion: string
+    |},
+    experiments: {|
+        hostedCardFields: boolean
     |}
 |};
 

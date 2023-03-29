@@ -290,7 +290,7 @@ export function setupMocks() {
                     };
                 },
                 submit: () => {
-                    return submitCardFields({ facilitatorAccessToken: 'ABCDEF12345', featureFlags: {} });
+                    return submitCardFields({ facilitatorAccessToken: 'ABCDEF12345', featureFlags: {}, experiments: {hostedCardFields: true} });
                 }
             };
         },
@@ -1652,6 +1652,9 @@ export async function mockSetupCardFields() : Promise<void> {
         metadata: {
             correlationID: 'ABCXYZ',
             spbVersion: 'v3'
+        },
+        experiments: {
+            hostedCardFields: true
         }
     });
 }
