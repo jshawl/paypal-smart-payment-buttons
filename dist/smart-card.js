@@ -9192,6 +9192,7 @@ window.smartCard = function(modules) {
     function getCardProps(_ref) {
         var _fundingEligibility$c, _fundingEligibility$c2;
         var facilitatorAccessToken = _ref.facilitatorAccessToken, featureFlags = _ref.featureFlags;
+        if (!_ref.experiments.hostedCardFields) throw new Error("Not feature flagged to use CardFields");
         var xprops = window.xprops;
         var fundingEligibility = xprops.fundingEligibility, _xprops$branded = xprops.branded, branded = void 0 === _xprops$branded ? null == (_fundingEligibility$c = null == fundingEligibility || null == (_fundingEligibility$c2 = fundingEligibility.card) ? void 0 : _fundingEligibility$c2.branded) || _fundingEligibility$c : _xprops$branded, parent = xprops.parent, createVaultSetupToken = xprops.createVaultSetupToken, createOrder = xprops.createOrder;
         var returnData = {
@@ -9423,7 +9424,8 @@ window.smartCard = function(modules) {
         var facilitatorAccessToken = _ref.facilitatorAccessToken, extraFields = _ref.extraFields;
         var cardProps = getCardProps({
             facilitatorAccessToken: facilitatorAccessToken,
-            featureFlags: _ref.featureFlags
+            featureFlags: _ref.featureFlags,
+            experiments: _ref.experiments
         });
         var _ref2 = [ Boolean(cardProps.createOrder), Boolean(cardProps.createVaultSetupToken) ], isPurchaseFlow = _ref2[0], isVaultWithoutPurchaseFlow = _ref2[1];
         gql_resetGQLErrors();
@@ -10665,7 +10667,7 @@ window.smartCard = function(modules) {
         }));
     }
     function Page(_ref) {
-        var cspNonce = _ref.cspNonce, props = _ref.props, featureFlags = _ref.featureFlags;
+        var cspNonce = _ref.cspNonce, props = _ref.props, featureFlags = _ref.featureFlags, experiments = _ref.experiments;
         var facilitatorAccessToken = props.facilitatorAccessToken, style = props.style, disableAutocomplete = props.disableAutocomplete, placeholder = props.placeholder, type = props.type, xport = props.export, minLength = props.minLength, maxLength = props.maxLength;
         var _ref2 = props.inputEvents || {}, onChange = _ref2.onChange, onFocus = _ref2.onFocus, onBlur = _ref2.onBlur, onInputSubmitRequest = _ref2.onInputSubmitRequest;
         var _useState = hooks_module_h(), fieldValue = _useState[0], setFieldValue = _useState[1];
@@ -10852,7 +10854,8 @@ window.smartCard = function(modules) {
                     return submitCardFields({
                         facilitatorAccessToken: facilitatorAccessToken,
                         extraFields: extraFields,
-                        featureFlags: featureFlags
+                        featureFlags: featureFlags,
+                        experiments: experiments
                     });
                 },
                 getState: function() {
@@ -10958,10 +10961,11 @@ window.smartCard = function(modules) {
         }) : null);
     }
     function setupCard(_ref6) {
-        var cspNonce = _ref6.cspNonce, featureFlags = _ref6.featureFlags, buyerCountry = _ref6.buyerCountry, metadata = _ref6.metadata;
+        var cspNonce = _ref6.cspNonce, featureFlags = _ref6.featureFlags, experiments = _ref6.experiments, buyerCountry = _ref6.buyerCountry, metadata = _ref6.metadata;
         var props = getCardProps({
             facilitatorAccessToken: _ref6.facilitatorAccessToken,
-            featureFlags: featureFlags
+            featureFlags: featureFlags,
+            experiments: experiments
         });
         !function(_ref) {
             var _tracking;
@@ -11014,7 +11018,7 @@ window.smartCard = function(modules) {
             logger.addTrackingBuilder((function() {
                 var _ref2;
                 return (_ref2 = {}).context_type = "hcf_session_id", _ref2.context_id = hcfSessionID, 
-                _ref2.button_version = "5.0.134", _ref2.hcf_session_id = hcfSessionID, _ref2.hcf_correlation_id = cardCorrelationID, 
+                _ref2.button_version = "5.0.135", _ref2.hcf_session_id = hcfSessionID, _ref2.hcf_correlation_id = cardCorrelationID, 
                 _ref2.bn_code = partnerAttributionID, _ref2.merchant_domain = merchantDomain, _ref2.t = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2.checkout = clientID, _ref2.seller_id = null == merchantID ? void 0 : merchantID[0], 
                 _ref2;
@@ -11058,7 +11062,8 @@ window.smartCard = function(modules) {
         }(y(Page, {
             cspNonce: cspNonce,
             props: props,
-            featureFlags: featureFlags
+            featureFlags: featureFlags,
+            experiments: experiments
         }), util_getBody());
     }
 } ]);

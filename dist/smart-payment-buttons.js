@@ -10029,7 +10029,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.134", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.135", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -12867,6 +12867,7 @@ window.spb = function(modules) {
                             var cardProps = function(_ref) {
                                 var _fundingEligibility$c, _fundingEligibility$c2;
                                 var facilitatorAccessToken = _ref.facilitatorAccessToken, featureFlags = _ref.featureFlags;
+                                if (!_ref.experiments.hostedCardFields) throw new Error("Not feature flagged to use CardFields");
                                 var xprops = window.xprops;
                                 var fundingEligibility = xprops.fundingEligibility, _xprops$branded = xprops.branded, branded = void 0 === _xprops$branded ? null == (_fundingEligibility$c = null == fundingEligibility || null == (_fundingEligibility$c2 = fundingEligibility.card) ? void 0 : _fundingEligibility$c2.branded) || _fundingEligibility$c : _xprops$branded, parent = xprops.parent, createVaultSetupToken = xprops.createVaultSetupToken, createOrder = xprops.createOrder;
                                 var returnData = {
@@ -12923,7 +12924,8 @@ window.spb = function(modules) {
                                 });
                             }({
                                 facilitatorAccessToken: facilitatorAccessToken,
-                                featureFlags: _ref.featureFlags
+                                featureFlags: _ref.featureFlags,
+                                experiments: _ref.experiments
                             });
                             var _ref2 = [ Boolean(cardProps.createOrder), Boolean(cardProps.createVaultSetupToken) ], isPurchaseFlow = _ref2[0], isVaultWithoutPurchaseFlow = _ref2[1];
                             !function() {
@@ -13047,7 +13049,10 @@ window.spb = function(modules) {
                             }));
                         }({
                             facilitatorAccessToken: facilitatorAccessToken,
-                            featureFlags: serviceData.featureFlags
+                            featureFlags: serviceData.featureFlags,
+                            experiments: {
+                                hostedCardFields: !0
+                            }
                         });
                     },
                     close: lib.promiseNoop
@@ -15962,7 +15967,7 @@ window.spb = function(modules) {
                     var _ref3;
                     return (_ref3 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref3[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.134", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.135", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref3[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref3[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref3[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
