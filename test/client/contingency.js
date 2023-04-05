@@ -73,6 +73,11 @@ describe('contingency cases', () => {
                 mockFunction(props, 'onApprove', expect('onApprove', ({ original: onApproveOriginal, args: [ data, actions ] }) => {
                     return onApproveOriginal({ ...data, payerID }, actions);
                 }));
+                props.createAuthCode().then(expect('createAuthCodeThen', authCode => {
+                    if (!authCode) {
+                        throw new Error(`Expected auth code`);
+                    }
+                }));
 
                 const checkoutInstance = CheckoutOriginal(props);
 

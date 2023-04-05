@@ -29,6 +29,7 @@ export const CHECKOUT_APM_POPUP_DIMENSIONS = {
 let canRenderTop = false;
 let acceleratedXO = false;
 let smokeHash = '';
+let buyerAccessTokenReceivedOnAuth = null;
 
 function getSmokeHash() : ZalgoPromise<string> {
     return window.xprops.getPageUrl().then(pageUrl => {
@@ -177,6 +178,8 @@ function initCheckout({ props, components, serviceData, payment, config, restart
 
                     if (payment.createAccessToken) {
                         return payment.createAccessToken();
+                    } else if(buyerAccessTokenReceivedOnAuth && fundingSkipLogin) {
+                        return buyerAccessTokenReceivedOnAuth;
                     } else if (buyerAccessToken) {
                         return buyerAccessToken;
                     } else if (clientID && userIDToken && fundingSkipLogin) {
@@ -337,9 +340,10 @@ function initCheckout({ props, components, serviceData, payment, config, restart
             },
 
             onAuth: ({ accessToken }) => {
-                const access_token = accessToken ? accessToken : buyerAccessToken;
+                buyerAccessTokenReceivedOnAuth = accessToken ? accessToken : buyerAccessToken;
 
-                return onAuth({ accessToken: access_token }).then(token => {
+                return onAuth({ accessToken: buyerAccessTokenReceivedOnAuth }).then(token => {
+                    // this seems dead code. the return value is not always buyerAccessToken
                     buyerAccessToken = token;
                 });
             },
