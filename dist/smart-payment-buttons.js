@@ -8552,12 +8552,9 @@ window.spb = function(modules) {
             EPS: "eps",
             MYBANK: "mybank",
             P24: "p24",
-            VERKKOPANKKI: "verkkopankki",
             PAYU: "payu",
             BLIK: "blik",
             TRUSTLY: "trustly",
-            ZIMPLER: "zimpler",
-            MAXIMA: "maxima",
             OXXO: "oxxo",
             BOLETO: "boleto",
             BOLETOBANCARIO: "boletobancario",
@@ -8598,7 +8595,7 @@ window.spb = function(modules) {
             MOBILE: "mobile"
         };
         var TYPES = !0;
-        var APM_LIST = [ FUNDING.IDEAL, FUNDING.BANCONTACT, FUNDING.GIROPAY, FUNDING.SOFORT, FUNDING.EPS, FUNDING.MYBANK, FUNDING.P24, FUNDING.PAYU, FUNDING.BLIK, FUNDING.TRUSTLY, FUNDING.ZIMPLER, FUNDING.MAXIMA, FUNDING.OXXO, FUNDING.BOLETO, FUNDING.BOLETOBANCARIO, FUNDING.WECHATPAY, FUNDING.MERCADOPAGO, FUNDING.MULTIBANCO, FUNDING.SATISPAY, FUNDING.PAIDY ];
+        var APM_LIST = [ FUNDING.IDEAL, FUNDING.BANCONTACT, FUNDING.GIROPAY, FUNDING.SOFORT, FUNDING.EPS, FUNDING.MYBANK, FUNDING.P24, FUNDING.PAYU, FUNDING.BLIK, FUNDING.TRUSTLY, FUNDING.OXXO, FUNDING.BOLETO, FUNDING.BOLETOBANCARIO, FUNDING.WECHATPAY, FUNDING.MERCADOPAGO, FUNDING.MULTIBANCO, FUNDING.SATISPAY, FUNDING.PAIDY ];
     },
     "./node_modules/card-validator/dist/card-number.js": function(module, exports, __webpack_require__) {
         "use strict";
@@ -10029,7 +10026,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.135", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.136", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -11944,6 +11941,7 @@ window.spb = function(modules) {
         var canRenderTop = !1;
         var acceleratedXO = !1;
         var smokeHash = "";
+        var buyerAccessTokenReceivedOnAuth = null;
         var checkout_getDimensions = function(fundingSource) {
             if (-1 !== sdk_constants_src.APM_LIST.indexOf(fundingSource)) {
                 Object(lib.getLogger)().info("popup_dimensions_value_" + fundingSource).flush();
@@ -12038,6 +12036,7 @@ window.spb = function(modules) {
                             return zalgo_promise_src.ZalgoPromise.try((function() {
                                 var fundingSkipLogin = src_config.FUNDING_SKIP_LOGIN[fundingSource];
                                 if (payment.createAccessToken) return payment.createAccessToken();
+                                if (buyerAccessTokenReceivedOnAuth && fundingSkipLogin) return buyerAccessTokenReceivedOnAuth;
                                 if (buyerAccessToken) return buyerAccessToken;
                                 if (clientID && userIDToken && fundingSkipLogin) {
                                     var clientMetadataID = cmid || sessionID;
@@ -12199,7 +12198,7 @@ window.spb = function(modules) {
                         },
                         onAuth: function(_ref10) {
                             return _onAuth({
-                                accessToken: _ref10.accessToken || buyerAccessToken
+                                accessToken: buyerAccessTokenReceivedOnAuth = _ref10.accessToken || buyerAccessToken
                             }).then((function(token) {
                                 buyerAccessToken = token;
                             }));
@@ -15967,7 +15966,7 @@ window.spb = function(modules) {
                     var _ref3;
                     return (_ref3 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref3[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.135", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.136", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref3[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref3[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref3[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 

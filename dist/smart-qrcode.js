@@ -2838,14 +2838,6 @@
             primary: "#1AAD19",
             secondary: "#4D4D4D"
         };
-        var _ZIMPLER_LOGO_COLORS;
-        (_ZIMPLER_LOGO_COLORS = {}).default = {
-            primary: "#00A599"
-        }, _ZIMPLER_LOGO_COLORS.white = {
-            primary: "#FFFFFF"
-        }, _ZIMPLER_LOGO_COLORS.black = {
-            primary: "#00A599"
-        };
         var _PAYU_LOGO_COLORS;
         (_PAYU_LOGO_COLORS = {}).default = {
             primary: "#A6C307"
@@ -2853,29 +2845,6 @@
             primary: "#FFFFFF"
         }, _PAYU_LOGO_COLORS.black = {
             primary: "#2C2E2F"
-        };
-        var _VERKKOPANKKI_LOGO_CO;
-        (_VERKKOPANKKI_LOGO_CO = {}).default = {
-            primary: "#2D59A1",
-            secondary: "#1F3364",
-            tertiary: "#FFFFFF",
-            quaternary: "#CACCC8",
-            quinary: "#FFFFFF",
-            senary: "#FFFFFF"
-        }, _VERKKOPANKKI_LOGO_CO.white = {
-            primary: "#000000",
-            secondary: "#000000",
-            tertiary: "#FFFFFF",
-            quaternary: "#FFFFFF",
-            quinary: "#FFFFFF",
-            senary: "#FFFFFF"
-        }, _VERKKOPANKKI_LOGO_CO.black = {
-            primary: "#2D59A1",
-            secondary: "#1F3364",
-            tertiary: "#FFFFFF",
-            quaternary: "#CACCC8",
-            quinary: "#1B4482",
-            senary: "#4E4E4E"
         };
         var _BLIK_LOGO_COLORS;
         (_BLIK_LOGO_COLORS = {}).default = {
@@ -2923,17 +2892,6 @@
             primary: "#FFFFFF"
         }, _BOLETO_LOGO_COLORS.black = {
             primary: "#000000"
-        };
-        var _MAXIMA_LOGO_COLORS;
-        (_MAXIMA_LOGO_COLORS = {}).default = {
-            primary: "#004A91",
-            secondary: "#ED1921"
-        }, _MAXIMA_LOGO_COLORS.white = {
-            primary: "#004A91",
-            secondary: "#ED1921"
-        }, _MAXIMA_LOGO_COLORS.black = {
-            primary: "#004A91",
-            secondary: "#ED1921"
         };
         var _MERCADOPAGO_LOGO_COL;
         (_MERCADOPAGO_LOGO_COL = {}).default = {
@@ -3231,7 +3189,7 @@
             logger.addTrackingBuilder((function() {
                 var _ref2;
                 return (_ref2 = {}).state_name = "smart_button", _ref2.context_type = "EC-Token", 
-                _ref2.context_id = orderID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.135", 
+                _ref2.context_id = orderID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.136", 
                 _ref2.selected_payment_method = fundingSource, _ref2.user_id = buttonSessionID, 
                 _ref2;
             }));
