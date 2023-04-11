@@ -72,10 +72,10 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
     const buttonLabel = props.style?.label;
 
     return ZalgoPromise.try(() => {
-        const { merchantID, personalization, fundingEligibility, buyerCountry } = serviceData;
+        const { merchantID, personalization, fundingEligibility, buyerCountry, featureFlags } = serviceData;
         const { clientID, onClick, createOrder, env, vault, partnerAttributionID, userExperienceFlow, buttonSessionID, intent, currency,
             clientAccessToken, createBillingAgreement, createSubscription, commit, disableFunding, disableCard, userIDToken, enableNativeCheckout, inlinexo } = props;
-        
+
         sendPersonalizationBeacons(personalization);
 
         const restart = ({ payment: restartPayment }) =>
@@ -152,10 +152,19 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                     return updateFlowClientConfig({ orderID, payment, userExperienceFlow, buttonSessionID, inlinexo });
                 }
 
-                // Do not block by default
-                updateButtonClientConfig({ orderID, fundingSource, inline, userExperienceFlow }).catch(err => {
-                    getLogger().error('update_client_config_error', { err: stringifyError(err) });
-                });
+                function updateButtonClientConfigWrapper() {
+                    return updateButtonClientConfig({ orderID, fundingSource, inline, userExperienceFlow }).catch(err => {
+                        getLogger().error('update_client_config_error', { err: stringifyError(err) });
+                    });
+                }
+
+                // feature flag to control blocking/non-blocking behavior
+                if (featureFlags.isButtonClientConfigCallBlocking) {
+                    return updateButtonClientConfigWrapper();
+                } else {
+                    // non-blocking call by default
+                    updateButtonClientConfigWrapper();
+                }
             }).catch(noop);
 
             const vaultPromise = createOrder().then(orderID => {
@@ -182,7 +191,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                     featureFlags: serviceData.featureFlags
                 });
             });
-             
+
             const confirmOrderPromise = createOrder().then((orderID) => {
                 return window.xprops.sessionState.get(
                     `__confirm_${ fundingSource }_payload__`
