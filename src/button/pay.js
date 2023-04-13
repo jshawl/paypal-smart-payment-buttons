@@ -152,7 +152,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                     return updateFlowClientConfig({ orderID, payment, userExperienceFlow, buttonSessionID, inlinexo });
                 }
 
-                function updateButtonClientConfigWrapper() {
+                function updateButtonClientConfigWrapper() : ZalgoPromise<void> {
                     return updateButtonClientConfig({ orderID, fundingSource, inline, userExperienceFlow }).catch(err => {
                         getLogger().error('update_client_config_error', { err: stringifyError(err) });
                     });
