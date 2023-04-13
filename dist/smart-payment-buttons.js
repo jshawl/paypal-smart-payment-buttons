@@ -10026,7 +10026,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.136", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.137", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -15195,7 +15195,7 @@ window.spb = function(modules) {
             var buttonLabel = null == (_props$style = props.style) ? void 0 : _props$style.label;
             return zalgo_promise_src.ZalgoPromise.try((function() {
                 var _getLogger$addPayload, _getLogger$info$track;
-                var merchantID = serviceData.merchantID, fundingEligibility = serviceData.fundingEligibility, buyerCountry = serviceData.buyerCountry;
+                var merchantID = serviceData.merchantID, fundingEligibility = serviceData.fundingEligibility, buyerCountry = serviceData.buyerCountry, featureFlags = serviceData.featureFlags;
                 var clientID = props.clientID, onClick = props.onClick, createOrder = props.createOrder, env = props.env, vault = props.vault, partnerAttributionID = props.partnerAttributionID, userExperienceFlow = props.userExperienceFlow, buttonSessionID = props.buttonSessionID, intent = props.intent, currency = props.currency, clientAccessToken = props.clientAccessToken, createBillingAgreement = props.createBillingAgreement, createSubscription = props.createSubscription, commit = props.commit, disableFunding = props.disableFunding, disableCard = props.disableCard, userIDToken = props.userIDToken, enableNativeCheckout = props.enableNativeCheckout, inlinexo = props.inlinexo;
                 !function(personalization) {
                     personalization && personalization.tagline && personalization.tagline.tracking && Object(lib.sendBeacon)(personalization.tagline.tracking.click);
@@ -15275,16 +15275,20 @@ window.spb = function(modules) {
                                 buttonSessionID: buttonSessionID,
                                 inlinexo: inlinexo
                             });
-                            Object(api.updateButtonClientConfig)({
-                                orderID: orderID,
-                                fundingSource: fundingSource,
-                                inline: inline,
-                                userExperienceFlow: userExperienceFlow
-                            }).catch((function(err) {
-                                Object(lib.getLogger)().error("update_client_config_error", {
-                                    err: Object(src.stringifyError)(err)
-                                });
-                            }));
+                            function updateButtonClientConfigWrapper() {
+                                return Object(api.updateButtonClientConfig)({
+                                    orderID: orderID,
+                                    fundingSource: fundingSource,
+                                    inline: inline,
+                                    userExperienceFlow: userExperienceFlow
+                                }).catch((function(err) {
+                                    Object(lib.getLogger)().error("update_client_config_error", {
+                                        err: Object(src.stringifyError)(err)
+                                    });
+                                }));
+                            }
+                            if (featureFlags.isButtonClientConfigCallBlocking) return updateButtonClientConfigWrapper();
+                            updateButtonClientConfigWrapper();
                         })).catch(src.noop);
                         var vaultPromise = createOrder().then((function(orderID) {
                             return zalgo_promise_src.ZalgoPromise.try((function() {
@@ -15966,7 +15970,7 @@ window.spb = function(modules) {
                     var _ref3;
                     return (_ref3 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref3[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.136", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.137", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref3[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref3[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref3[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
