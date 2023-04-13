@@ -22,6 +22,7 @@ export const TYPES = true;
 export type FeatureFlags = $Shape<{|
     isLsatUpgradable: boolean;
     shouldThrowIntegrationError: boolean;
+    isButtonClientConfigCallBlocking: boolean;
 |}>
 
 // This type is shared with smartcomponentnodeweb
