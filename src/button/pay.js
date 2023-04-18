@@ -149,7 +149,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
 
             const updateClientConfigPromise = createOrder().then(orderID => {
                 if (updateFlowClientConfig) {
-                    return updateFlowClientConfig({ orderID, payment, userExperienceFlow, buttonSessionID, inlinexo });
+                    return updateFlowClientConfig({ orderID, payment, userExperienceFlow, buttonSessionID, inlinexo, featureFlags });
                 }
 
                 function updateButtonClientConfigWrapper() : ZalgoPromise<void> {

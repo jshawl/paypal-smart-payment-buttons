@@ -2,17 +2,9 @@
 
 import { uniqueID } from "@krakenjs/belter/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
-import { type LoggerType } from "@krakenjs/beaver-logger/src";
 import { describe, beforeEach, test, expect, vi } from "vitest";
 
-import {
-  patchShipping,
-  patchOrder,
-  type PatchData,
-  type OrderAPIOptions,
-  type OrderResponse,
-  type PatchShippingArgs,
-} from "../api";
+import { patchShipping, patchOrder } from "../api";
 import { getLogger } from "../lib";
 
 import { getOnShippingChange } from "./onShippingChange";
@@ -21,17 +13,9 @@ vi.mock("../api");
 vi.mock("./createOrder");
 vi.mock("../lib");
 
-const mockPatchOrder: JestMockFn<
-  [string, PatchData, OrderAPIOptions],
-  ZalgoPromise<OrderResponse>
-> = patchOrder;
-
-const mockPatchShipping: JestMockFn<
-  [PatchShippingArgs],
-  ZalgoPromise<OrderResponse>
-> = patchShipping;
-
-const mockGetLogger: JestMockFn<[], LoggerType> = getLogger;
+const mockPatchOrder = patchOrder;
+const mockPatchShipping = patchShipping;
+const mockGetLogger = getLogger;
 
 describe("onShippingChange", () => {
   describe("getOnShippingChange", () => {

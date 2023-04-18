@@ -479,7 +479,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     return { click, start, close };
 }
 
-function updateCheckoutClientConfig({ orderID, payment, userExperienceFlow, inlinexo }) : ZalgoPromise<void> {
+function updateCheckoutClientConfig({ orderID, payment, userExperienceFlow, inlinexo, featureFlags }) : ZalgoPromise<void> {
     return ZalgoPromise.try(() => {
         const { buyerIntent, fundingSource } = payment;
         
@@ -489,8 +489,9 @@ function updateCheckoutClientConfig({ orderID, payment, userExperienceFlow, inli
         }
         const updateClientConfigPromise = updateButtonClientConfig({ fundingSource, productFlow, orderID, inline: acceleratedXO, userExperienceFlow });
 
+        const isButtonClientConfigCallBlocking = featureFlags && featureFlags.isButtonClientConfigCallBlocking;
         // Block
-        if (buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING) {
+        if (buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING || isButtonClientConfigCallBlocking) {
             return updateClientConfigPromise;
         }
     });
