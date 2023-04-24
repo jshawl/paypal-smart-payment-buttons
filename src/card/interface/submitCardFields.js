@@ -33,7 +33,6 @@ function handleVaultWithoutPurchaseFlow(cardProps: SaveCardFieldsProps, card: Ca
     onError: cardProps.onError,
     clientID: cardProps.clientID,
     paymentSource: convertCardToPaymentSource(card, extraFields),
-    idToken: cardProps.userIDToken || "",
   });
 }
 

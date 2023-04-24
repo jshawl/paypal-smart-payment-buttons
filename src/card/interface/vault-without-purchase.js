@@ -23,7 +23,6 @@ type VaultPaymenSourceOptions = {|
   onError: XOnError,
   clientID: string,
   paymentSource: PaymentSourceInput,
-  idToken: string,
 |};
 
 export const savePaymentSource = ({
@@ -32,7 +31,6 @@ export const savePaymentSource = ({
   onError,
   clientID,
   paymentSource,
-  idToken,
 }: VaultPaymenSourceOptions): ZalgoPromise<void> => {
   let vaultToken;
   return createVaultSetupToken()
@@ -45,9 +43,6 @@ export const savePaymentSource = ({
         vaultSetupToken,
         clientID,
         paymentSource,
-        // passing the id token here is a temporary fix until we can deploy xobuyernodeserv
-        // to treak idToken as an optional field.
-        idToken,
       })
     })
     .then(() => onApprove({ vaultSetupToken: vaultToken }))

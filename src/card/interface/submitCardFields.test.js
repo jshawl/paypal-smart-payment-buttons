@@ -96,7 +96,6 @@ describe("submitCardFields", () => {
     expect(resetGQLErrors).toHaveBeenCalledOnce();
     expect(savePaymentSource).toHaveBeenCalledWith({
       ...mockGetCardPropsReturn,
-      idToken: "",
       paymentSource: {
         card: {
           billingAddress: {
