@@ -177,6 +177,7 @@ export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAc
                 method:      'post',
                 eventName:   'order_capture',
                 url:         `${ SMART_API_URI.ORDER }/${ orderID }/capture`,
+                json:        { data: { facilitatorAccessToken }},
                 headers:     {
                     [HEADERS.CLIENT_CONTEXT]: orderID
                 }
@@ -197,6 +198,7 @@ export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAc
         method:      'post',
         eventName:   'order_capture',
         url:         `${ SMART_API_URI.ORDER }/${ orderID }/capture`,
+        json:        { data: { facilitatorAccessToken }},
         headers:     {
             [HEADERS.CLIENT_CONTEXT]: orderID
         }
@@ -236,6 +238,7 @@ export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyer
                 method:      'post',
                 eventName:   'order_authorize',
                 url:         `${ SMART_API_URI.ORDER }/${ orderID }/authorize`,
+                json:        { data: { facilitatorAccessToken }},
                 headers:     {
                     [HEADERS.CLIENT_CONTEXT]: orderID
                 }
@@ -257,6 +260,7 @@ export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyer
         method:      'post',
         eventName:   'order_authorize',
         url:         `${ SMART_API_URI.ORDER }/${ orderID }/authorize`,
+        json:        { data: { facilitatorAccessToken }},
         headers:     {
             [HEADERS.CLIENT_CONTEXT]: orderID
         }
@@ -290,12 +294,20 @@ export function patchOrder(orderID : string, data : PatchData, { facilitatorAcce
                 getLogger().warn(`patch_order_invalid_resource_id_error`, { restCorrID, orderID, err: stringifyError(err) })
             }
 
+            let requestData : PatchData;
+
+            if (Array.isArray(data)) {
+                requestData = { patch: data, facilitatorAccessToken }
+            } else {
+                requestData = { ...data, facilitatorAccessToken }
+            }
+
             return callSmartAPI({
                 accessToken: buyerAccessToken,
                 method:      'post',
                 eventName:   'order_patch',
                 url:         `${ SMART_API_URI.ORDER }/${ orderID }/patch`,
-                json:        { data: Array.isArray(data) ? { patch: data } : data },
+                json:        { data: requestData },
                 headers:     {
                     [HEADERS.CLIENT_CONTEXT]: orderID
                 }
@@ -312,12 +324,21 @@ export function patchOrder(orderID : string, data : PatchData, { facilitatorAcce
     }
 
     getLogger().info(`lsat_upgrade_false`);
+
+    let requestData : PatchData;
+
+    if (Array.isArray(data)) {
+        requestData = { patch: data, facilitatorAccessToken }
+    } else {
+        requestData = { ...data, facilitatorAccessToken }
+    }
+
     return callSmartAPI({
         accessToken: buyerAccessToken,
         method:      'post',
         eventName:   'order_patch',
         url:         `${ SMART_API_URI.ORDER }/${ orderID }/patch`,
-        json:        { data: Array.isArray(data) ? { patch: data } : data },
+        json:        { data: requestData },
         headers:     {
             [HEADERS.CLIENT_CONTEXT]: orderID
         }

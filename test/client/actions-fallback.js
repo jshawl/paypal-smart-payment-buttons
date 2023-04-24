@@ -780,7 +780,7 @@ describe('actions smart fallback cases', () => {
                 });
                 patchOrderSmartMock.expectCalls();
 
-                await actions.order.patch();
+                await actions.order.patch([]);
                 patchOrderSmartMock.done();
                 patchOrderRESTmock.done();
             }));
@@ -856,7 +856,7 @@ describe('actions smart fallback cases', () => {
                 });
                 patchOrderSmartMock.expectCalls();
 
-                await actions.order.patch();
+                await actions.order.patch([]);
                 patchOrderSmartMock.done();
                 
                 upgradeLSATMock.done();
