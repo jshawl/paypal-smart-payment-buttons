@@ -321,7 +321,9 @@ export const ZERO_PADDED_EXPIRY_PATTERN = "0{{9}} / {{9999}}";
 
 export const FPTI_HCF_KEYS = {
   HCF_SESSION_ID: ("hcf_session_id": "hcf_session_id"),
+  HOSTED_SESSION_ID: ("hosted_session_id": "hosted_session_id"),
   HCF_CORRELATION_ID: ("hcf_correlation_id": "hcf_correlation_id"),
+  HCF_VERSION: ("hcf_version": "hcf_version"),
   SDK_CORRELATION_ID: ("sdk_correlation_id": "sdk_correlation_id"),
   VAULT_TOKEN: ("vault_token": "vault_token"),
   HCF_ORDER_ID: ('order_id' : 'order_id'),

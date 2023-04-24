@@ -10,8 +10,6 @@ import {
   hcfTransactionError,
   hcfTransactionSuccess,
   setupCardLogger,
-  vaultWithoutPurchaseFailure,
-  vaultWithoutPurchaseSuccess,
 } from "./logger";
 
 vi.mock("../lib/logger", () => ({
@@ -98,28 +96,6 @@ describe("card logger", () => {
         event_name: "hcf_transaction_success",
         transition_name: "hcf_transaction_success",
         order_id: "ABCD123",
-      })
-    );
-  });
-
-  it("should call logger.track with vaultWithoutPurchaseSuccess ", async () => {
-    await vaultWithoutPurchaseSuccess({ vaultToken: "ABCD123efgh" });
-    expect(trackMock).toBeCalledWith(
-      expect.objectContaining({
-        event_name: "hcf_vault_without_purchase_success",
-        transition_name: "hcf_vault_without_purchase_success",
-        vault_token: "ABCD123efgh",
-      })
-    );
-  });
-
-  it("should call logger.track with vaultWithoutPurchaseFailure ", async () => {
-    const error = new Error("testing vault without purchase error");
-    await vaultWithoutPurchaseFailure({ error });
-    expect(trackMock).toBeCalledWith(
-      expect.objectContaining({
-        ext_error_code: "hcf_vault_without_purchase_error",
-        ext_error_desc: "testing vault without purchase error",
       })
     );
   });

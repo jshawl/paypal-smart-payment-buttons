@@ -3,8 +3,8 @@ import { describe, afterEach, vi, test, expect, beforeEach } from "vitest";
 
 import { updateVaultSetupToken } from "../../api/vault";
 import {
-  vaultWithoutPurchaseSuccess,
-  vaultWithoutPurchaseFailure,
+hcfTransactionError,
+hcfTransactionSuccess
 } from "../logger";
 
 import { savePaymentSource } from "./vault-without-purchase";
@@ -61,8 +61,8 @@ describe("savePaymentSource", () => {
         ...defaultSave({ createVaultSetupToken: rejectCreateVaultSetupToken }),
       })
     ).rejects.toThrow(createVaultSetupTokenError);
-    expect(vaultWithoutPurchaseSuccess).not.toHaveBeenCalled();
-    expect(vaultWithoutPurchaseFailure).toHaveBeenCalledWith({
+    expect(hcfTransactionSuccess).not.toHaveBeenCalled();
+    expect(hcfTransactionError).toHaveBeenCalledWith({
       error: createVaultSetupTokenError,
     });
     expect(defaultOptions.onError).toBeCalledWith(createVaultSetupTokenError);
@@ -80,8 +80,8 @@ describe("savePaymentSource", () => {
     await expect(savePaymentSource(defaultOptions)).rejects.toBe(
       updateVaultSetupTokenError
     );
-    expect(vaultWithoutPurchaseSuccess).not.toHaveBeenCalled();
-    expect(vaultWithoutPurchaseFailure).toHaveBeenCalledWith({
+    expect(hcfTransactionSuccess).not.toHaveBeenCalled();
+    expect(hcfTransactionError).toHaveBeenCalledWith({
       error: updateVaultSetupTokenError,
       vaultToken: defaultVaultSetupToken,
     });
@@ -99,8 +99,8 @@ describe("savePaymentSource", () => {
         ...defaultSave({ onApprove: rejectOnApprove }),
       })
     ).rejects.toThrow(onApproveError);
-    expect(vaultWithoutPurchaseSuccess).not.toHaveBeenCalled();
-    expect(vaultWithoutPurchaseFailure).toHaveBeenCalledWith({
+    expect(hcfTransactionSuccess).not.toHaveBeenCalled();
+    expect(hcfTransactionError).toHaveBeenCalledWith({
       error: onApproveError,
       vaultToken: defaultVaultSetupToken,
     });
@@ -127,7 +127,7 @@ describe("savePaymentSource", () => {
     expect(defaultOptions.onApprove).toHaveBeenCalledWith({
       vaultSetupToken: "vault-setup-token",
     });
-    expect(vaultWithoutPurchaseSuccess).toHaveBeenCalledWith({
+    expect(hcfTransactionSuccess).toHaveBeenCalledWith({
       vaultToken: defaultVaultSetupToken,
     });
   });
