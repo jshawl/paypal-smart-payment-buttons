@@ -3,7 +3,6 @@
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FUNDING, CARD } from '@paypal/sdk-constants/src';
 import { memoize, querySelectorAll, debounce, noop } from '@krakenjs/belter/src';
-import { EXPERIENCE } from '@paypal/checkout-components/src/constants/button';
 
 import { DATA_ATTRIBUTES } from '../constants';
 import { unresolvedPromise, promiseNoop } from '../lib';
@@ -18,12 +17,8 @@ function setupCardForm() {
 let cardFormOpen = false;
 
 function isCardFormEligible({ props, serviceData } : IsEligibleOptions) : boolean {
-    const { vault, onShippingChange, experience } = props;
+    const { vault, onShippingChange } = props;
     const { eligibility } = serviceData;
-
-    if (experience === EXPERIENCE.INLINE) {
-        return false
-    }
 
     if (vault) {
         return false;

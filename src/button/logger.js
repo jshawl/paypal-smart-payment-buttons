@@ -1,7 +1,6 @@
 /* @flow */
 
 import { isIEIntranet, getPageRenderTime, querySelectorAll } from '@krakenjs/belter/src';
-import { EXPERIENCE } from '@paypal/checkout-components/src/constants/button';
 import { FPTI_KEY, ENV, FUNDING, FPTI_USER_ACTION, COUNTRY } from '@paypal/sdk-constants/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
@@ -57,7 +56,6 @@ type ButtonLoggerOptions = {|
     stickinessID : string,
     buyerCountry : $Values<typeof COUNTRY>,
     onShippingChange : ?OnShippingChange,
-    experience? : string,
     wallet? : ?Wallet,
     smartWalletOrderID? : string,
     enableOrdersApprovalSmartWallet? : boolean,
@@ -65,7 +63,7 @@ type ButtonLoggerOptions = {|
 |};
 
 export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, partnerAttributionID, commit, sdkCorrelationID, buttonCorrelationID, locale,
-    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, experience, wallet, smartWalletOrderID, product } : ButtonLoggerOptions) : ZalgoPromise<void> {
+    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, wallet, smartWalletOrderID, product } : ButtonLoggerOptions) : ZalgoPromise<void> {
 
     const logger = getLogger();
 
@@ -95,7 +93,6 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             [FPTI_KEY.CHOSEN_FUNDING]:               fundingSource,
             [FPTI_KEY.PRODUCT]:                      product,
             [FPTI_KEY.TOKEN]:                        smartWalletOrderID,
-            [FPTI_CUSTOM_KEY.EXPERIENCE]:            experience === EXPERIENCE.INLINE ? 'accelerated' : 'default',
             [FPTI_KEY.TIMESTAMP]:                    Date.now().toString()
         };
     });

@@ -8,7 +8,7 @@ import { getParent, getTop, type CrossDomainWindowType } from '@krakenjs/cross-d
 import type { ProxyWindow, ConnectOptions } from '../types';
 import { type CreateBillingAgreement, type CreateSubscription } from '../props';
 import { exchangeAccessTokenForAuthCode, getConnectURL, updateButtonClientConfig, getSmartWallet, loadFraudnet  } from '../api';
-import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, PRODUCT_FLOW, FPTI_STATE } from '../constants';
+import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_STATE } from '../constants';
 import { unresolvedPromise, getLogger, setBuyerAccessToken } from '../lib';
 import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
@@ -27,7 +27,6 @@ export const CHECKOUT_APM_POPUP_DIMENSIONS = {
 };
 
 let canRenderTop = false;
-let acceleratedXO = false;
 let smokeHash = '';
 let buyerAccessTokenReceivedOnAuth = null;
 
@@ -146,13 +145,11 @@ function initCheckout({ props, components, serviceData, payment, config, restart
         createBillingAgreement, createSubscription, onClick, amount,
         clientID, connect, clientMetadataID: cmid, onAuth, userIDToken, env,
         currency, enableFunding, stickinessID,
-        standaloneFundingSource, branded, paymentMethodToken, allowBillingPayments, merchantRequestedPopupsDisabled, inlinexo } = props;
+        standaloneFundingSource, branded, paymentMethodToken, allowBillingPayments, merchantRequestedPopupsDisabled } = props;
     let { button, win, fundingSource, card, isClick, buyerAccessToken = serviceData.buyerAccessToken,
         venmoPayloadID, buyerIntent } = payment;
     const { buyerCountry, sdkMeta, merchantID } = serviceData;
     const { cspNonce } = config;
-
-    acceleratedXO = inlinexo && fundingSource === FUNDING.CARD;
 
     let context = getContext({ win, isClick, merchantRequestedPopupsDisabled });
     const connectEligible = isConnectEligible({ connect, createBillingAgreement, createSubscription, vault, fundingSource });
@@ -169,7 +166,6 @@ function initCheckout({ props, components, serviceData, payment, config, restart
             stickinessID,
             clientAccessToken,
             venmoPayloadID,
-            inlinexo: acceleratedXO,
             smokeHash,
 
             createAuthCode: () => {
@@ -244,7 +240,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 });
             },
 
-            onApprove: ({ accelerated, approveOnClose = false, payerID, paymentID, billingToken, subscriptionID, authCode } = {}) => {
+            onApprove: ({ approveOnClose = false, payerID, paymentID, billingToken, subscriptionID, authCode } = {}) => {
                 if (approveOnClose) {
                     doApproveOnClose = true;
                     return;
@@ -254,20 +250,11 @@ function initCheckout({ props, components, serviceData, payment, config, restart
 
                 setBuyerAccessToken(buyerAccessToken);
 
-                let valid = true;
                 // eslint-disable-next-line no-use-before-define
-                return onApprove({ accelerated, payerID, paymentID, billingToken, subscriptionID, buyerAccessToken, authCode }, { restart })
-                .finally(() => {
-                    if (accelerated) {
-                        return valid;
-                    } else {
-                        // eslint-disable-next-line no-use-before-define
-                        return close().then(noop);
-                    }
-                })
-                .catch(() => {
-                    valid = false;
-                });
+                return onApprove({ payerID, paymentID, billingToken, subscriptionID, buyerAccessToken, authCode }, { restart })
+                // eslint-disable-next-line no-use-before-define
+                .finally(() => close().then(noop))
+                .catch(noop);
             },
 
             onComplete: () => {
@@ -444,9 +431,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
 
     const click = () => {
         return ZalgoPromise.try(() => {
-            if (acceleratedXO) {
-                context = CONTEXT.IFRAME;
-            } else if (!merchantRequestedPopupsDisabled && !win && supportsPopups()) {
+            if (!merchantRequestedPopupsDisabled && !win && supportsPopups()) {
                 try {
                     const { width, height } = getDimensions(fundingSource);
                     win = openPopup({ width, height });
@@ -479,15 +464,11 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     return { click, start, close };
 }
 
-function updateCheckoutClientConfig({ orderID, payment, userExperienceFlow, inlinexo, featureFlags }) : ZalgoPromise<void> {
+function updateCheckoutClientConfig({ orderID, payment, userExperienceFlow, featureFlags }) : ZalgoPromise<void> {
     return ZalgoPromise.try(() => {
         const { buyerIntent, fundingSource } = payment;
         
-        let productFlow = PRODUCT_FLOW.SMART_PAYMENT_BUTTONS;
-        if (inlinexo) {
-            productFlow = PRODUCT_FLOW.ACCELERATED;
-        }
-        const updateClientConfigPromise = updateButtonClientConfig({ fundingSource, productFlow, orderID, inline: acceleratedXO, userExperienceFlow });
+        const updateClientConfigPromise = updateButtonClientConfig({ fundingSource, orderID, inline: false, userExperienceFlow });
 
         const isButtonClientConfigCallBlocking = featureFlags && featureFlags.isButtonClientConfigCallBlocking;
         // Block

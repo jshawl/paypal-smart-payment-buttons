@@ -205,7 +205,6 @@ function initPaymentFields({ props, components, payment, serviceData, config } :
                         },
                         branded: false,
                         standaloneFundingSource: fundingSource,
-                        inlinexo: false,
                         onCancel: () => {
                             // eslint-disable-next-line no-use-before-define
                             return close().then(() => {

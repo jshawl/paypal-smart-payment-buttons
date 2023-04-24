@@ -93,7 +93,6 @@ export type CheckoutProps = {|
         width : number,
         height : number
     |},
-    inlinexo : boolean | void,
     smokeHash : string
 |};
 

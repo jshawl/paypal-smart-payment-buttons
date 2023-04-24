@@ -2,8 +2,6 @@
 
 import { COUNTRY, FUNDING, CARD, INTENT, type FundingEligibilityType } from '@paypal/sdk-constants/src';
 import type { InstallmentsFlowType } from '@paypal/installments/src/types';
-import type { CustomStyle } from '@paypal/checkout-components/src/types';
-import { EXPERIENCE } from '@paypal/checkout-components/src/constants/button';
 
 import type { ContentType, ProxyWindow, Wallet, CheckoutFlowType, CardFormFlowType,
     ThreeDomainSecureFlowType, MenuFlowType, PersonalizationType, QRCodeType, PaymentFieldsFlowType, InlinePaymentFieldsEligibility, Experiments, FeatureFlags } from '../types';
@@ -27,8 +25,7 @@ export type ButtonStyle = {|
     color : string,
     shape : string,
     label : string,
-    tagline : boolean | void,
-    custom? : CustomStyle
+    tagline : boolean | void
 |};
 
 export type ButtonXProps = {|
@@ -42,7 +39,6 @@ export type ButtonProps = {|
     ...Props,
     ...LegacyProps,
     style : ButtonStyle,
-    inlinexo : boolean,
     buttonSessionID : string
 |};
 
@@ -69,9 +65,7 @@ export function getButtonProps({
         buttonSessionID,
         style,
         branded,
-        experience,
         intent,
-
         partnerAttributionID,
         merchantID,
         clientID,
@@ -173,8 +167,7 @@ export function getButtonProps({
         ...legacyProps,
         style,
         buttonSessionID,
-        branded,
-        inlinexo: experience === EXPERIENCE.INLINE
+        branded
     };
 }
 

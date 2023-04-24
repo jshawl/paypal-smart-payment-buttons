@@ -2,7 +2,6 @@
 
 import type { CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 import { ENV, INTENT, COUNTRY, FUNDING, CARD, PLATFORM, CURRENCY } from '@paypal/sdk-constants/src';
-import { EXPERIENCE } from '@paypal/checkout-components/src/constants/button';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import type { LocaleType, ProxyWindow, Wallet, ConnectOptions } from '../types';
@@ -61,7 +60,6 @@ export type XProps = {|
     enableThreeDomainSecure : boolean,
     enableNativeCheckout : boolean | void,
     enableVaultInstallments : boolean,
-    experience : $Values<typeof EXPERIENCE>,
     getParentDomain : () => string,
     getPageUrl : GetPageURL,
     getParent : () => CrossDomainWindowType,
@@ -121,7 +119,6 @@ export type Props = {|
     enableThreeDomainSecure : boolean,
     enableNativeCheckout : boolean,
     enableVaultInstallments : boolean,
-    experience : string,
     merchantDomain : string,
     getPageUrl : GetPageURL,
     getParent : () => CrossDomainWindowType,
@@ -193,7 +190,6 @@ export function getProps({
         enableThreeDomainSecure,
         enableVaultInstallments,
         enableNativeCheckout = false,
-        experience = '',
         remember: rememberFunding,
         stageHost,
         apiStageHost,
@@ -276,7 +272,6 @@ export function getProps({
         enableThreeDomainSecure,
         enableNativeCheckout,
         enableVaultInstallments,
-        experience,
 
         onClick,
         onInit,

@@ -84,7 +84,6 @@ export type UpdateClientConfigOptions = {|
     payment : Payment,
     userExperienceFlow? : string,
     buttonSessionID? : ?string,
-    inlinexo? : boolean,
     featureFlags? : FeatureFlags
 |};
 

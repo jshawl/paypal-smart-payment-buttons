@@ -116,8 +116,8 @@ export function setupButton({
     const props = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource, featureFlags, enableOrdersApprovalSmartWallet, smartWalletOrderID, experiments});
     const { env, sessionID, partnerAttributionID, commit, sdkCorrelationID, locale, onShippingChange,
         buttonSessionID, merchantDomain, onInit,
-        getPrerenderDetails, rememberFunding, getQueriedEligibleFunding, experience,
-        style, fundingSource, intent, createBillingAgreement, createSubscription, stickinessID } = props;
+        getPrerenderDetails, rememberFunding, getQueriedEligibleFunding, style, fundingSource,
+        intent, createBillingAgreement, createSubscription, stickinessID } = props;
         
     const config = getConfig({ serverCSPNonce, firebaseConfig });
     const { sdkVersion } = config;
@@ -282,7 +282,7 @@ export function setupButton({
     const setupButtonLogsTask = setupButtonLogger({
         style, env, sdkVersion, sessionID, clientID, partnerAttributionID, commit, sdkCorrelationID,
         stickinessID, buttonCorrelationID, locale, merchantID, buttonSessionID, merchantDomain,
-        fundingSource, getQueriedEligibleFunding, buyerCountry, onShippingChange, experience, wallet, smartWalletOrderID, enableOrdersApprovalSmartWallet, product });
+        fundingSource, getQueriedEligibleFunding, buyerCountry, onShippingChange, wallet, smartWalletOrderID, enableOrdersApprovalSmartWallet, product });
     const setupPaymentFlowsTask = setupPaymentFlows({ props, config, serviceData, components });
     const setupExportsTask = setupExports({ props, isEnabled, facilitatorAccessToken, fundingEligibility, merchantID });
 

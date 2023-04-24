@@ -30,7 +30,6 @@ export default {
     disableCard: [],
     enableThreeDomainSecure: false,
     enableNativeCheckout: false,
-    experience: "",
     stageHost: "localhost.paypal.com:8443",
     apiStageHost: "msmaster.qa.paypal.com",
     standaloneFundingSource: "applepay",
@@ -47,7 +46,6 @@ export default {
       menuPlacement: "below",
     },
     buttonSessionID: "uid_83e2df4351_mtk6mdm6nti",
-    inlinexo: false,
   },
   config: {
     sdkVersion: "5.0.317",

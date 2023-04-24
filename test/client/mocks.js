@@ -118,12 +118,6 @@ export function setupMocks() {
                         return props.createOrder();
                     }).then(orderID => {
                         return ZalgoPromise.delay(50).then(() => {
-                            if (props.inlinexo) {
-                                return props.onComplete({ orderID })
-                                    .catch(err => {
-                                        return props.onError(err);
-                                    });
-                            }
                             return props.onApprove({
                                 orderID,
                                 payerID: 'AAABBBCCC'

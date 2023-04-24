@@ -26,8 +26,7 @@ export type XOnApproveOrderDataType = {|
     billingToken : ?string,
     authCode : ?string,
     facilitatorAccessToken : string,
-    paymentSource : $Values<typeof FUNDING> | null,
-    accelerated? : boolean
+    paymentSource : $Values<typeof FUNDING> | null
 |};
 
 export type XOnApproveBillingDataType = {|
@@ -325,8 +324,7 @@ export type OnApproveData = {|
     buyerAccessToken? : ?string,
     authCode? : ?string,
     forceRestAPI? : boolean,
-    paymentMethodToken? : string,
-    accelerated? : boolean
+    paymentMethodToken? : string
 |};
 
 export type OnApproveActions = {|
@@ -367,7 +365,6 @@ export function getOnApproveOrder({ intent, onApprove = getDefaultOnApproveOrder
     }
 
     return memoize(({
-        accelerated = false,
         payerID,
         paymentID,
         billingToken,
@@ -396,7 +393,7 @@ export function getOnApproveOrder({ intent, onApprove = getDefaultOnApproveOrder
                 billingToken = billingToken || (supplementalData && supplementalData.checkoutSession && supplementalData.checkoutSession.cart && supplementalData.checkoutSession.cart.billingToken);
                 paymentID = paymentID || (supplementalData && supplementalData.checkoutSession && supplementalData.checkoutSession.cart && supplementalData.checkoutSession.cart.paymentId);
 
-                const data = { accelerated, orderID, payerID, paymentID, billingToken, facilitatorAccessToken, authCode, paymentSource };
+                const data = { orderID, payerID, paymentID, billingToken, facilitatorAccessToken, authCode, paymentSource };
                 const actions = buildXApproveOrderActions({ orderID, paymentID, payerID, intent, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError });
 
                 return onApprove(data, actions).catch(err => {

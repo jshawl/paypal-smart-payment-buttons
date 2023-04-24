@@ -74,7 +74,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
     return ZalgoPromise.try(() => {
         const { merchantID, personalization, fundingEligibility, buyerCountry, featureFlags } = serviceData;
         const { clientID, onClick, createOrder, env, vault, partnerAttributionID, userExperienceFlow, buttonSessionID, intent, currency,
-            clientAccessToken, createBillingAgreement, createSubscription, commit, disableFunding, disableCard, userIDToken, enableNativeCheckout, inlinexo } = props;
+            clientAccessToken, createBillingAgreement, createSubscription, commit, disableFunding, disableCard, userIDToken, enableNativeCheckout } = props;
 
         sendPersonalizationBeacons(personalization);
 
@@ -149,7 +149,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
 
             const updateClientConfigPromise = createOrder().then(orderID => {
                 if (updateFlowClientConfig) {
-                    return updateFlowClientConfig({ orderID, payment, userExperienceFlow, buttonSessionID, inlinexo, featureFlags });
+                    return updateFlowClientConfig({ orderID, payment, userExperienceFlow, buttonSessionID, featureFlags });
                 }
 
                 function updateButtonClientConfigWrapper() : ZalgoPromise<void> {

@@ -78,7 +78,6 @@ export const USER_EXPERIENCE_FLOW = {
 };
 
 export const PRODUCT_FLOW = {
-    ACCELERATED:           'ACCELERATED_CHECKOUT',
     SMART_PAYMENT_BUTTONS: 'SMART_PAYMENT_BUTTONS'
 };
 
@@ -202,7 +201,6 @@ export const FPTI_BUTTON_TYPE = {
 
 export const FPTI_CUSTOM_KEY = {
     ERR_DESC:                   ('int_error_desc' : 'int_error_desc'),
-    EXPERIENCE:                 ('experience' : 'experience'),
     HONEY_DEVICE_ID:            ('honey_device_id' : 'honey_device_id'),
     HONEY_SESSION_ID:           ('honey_session_id' : 'honey_session_id'),
     INTEGRATION_ISSUE:          ('integration_issue' : 'integration_issue'),
