@@ -71,7 +71,7 @@ describe("card logger", () => {
     expect(trackBuilder).toHaveBeenCalledWith(expect.any(Function));
     expect(trackBuilder.mock.calls[0][0]()).toMatchObject(
       expect.objectContaining({
-        context_type: "hcf_session_id",
+        context_type: "hosted_session_id",
         seller_id: "XYZ12345",
         merchant_domain: "mock://www.paypal.com",
       })
@@ -80,7 +80,7 @@ describe("card logger", () => {
 
   it("should call logger.track with hcfTransactionError ", async () => {
     const error = new Error("testing hcf transaction error");
-    await hcfTransactionError({ error });
+    await hcfTransactionError({ error, flow: "purchase" });
     expect(trackMock).toBeCalledWith(
       expect.objectContaining({
         ext_error_code: "hcf_transaction_error",
@@ -90,7 +90,7 @@ describe("card logger", () => {
   });
 
   it("should call logger.track with hcfTransactionSuccess ", async () => {
-    await hcfTransactionSuccess({ orderID: "ABCD123" });
+    await hcfTransactionSuccess({ orderID: "ABCD123", flow: "vault" });
     expect(trackMock).toBeCalledWith(
       expect.objectContaining({
         event_name: "hcf_transaction_success",

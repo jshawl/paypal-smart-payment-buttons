@@ -127,14 +127,14 @@ export const hcfTransactionError = ({
 export const hcfFieldsSubmit = ({
   isPurchaseFlow,
   isVaultWithoutPurchaseFlow
-}: {|isPurchaseFlow: Boolean,
-  isVaultWithoutPurchaseFlow: Boolean
+}: {|isPurchaseFlow: boolean,
+  isVaultWithoutPurchaseFlow: boolean
   |}) => {
   // eslint-disable-next-line no-nested-ternary
   const flow = isPurchaseFlow ? `with_purchase` : isVaultWithoutPurchaseFlow ? `vault_without_purchase` : ``;
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_fields_submit",
     [FPTI_KEY.EVENT_NAME]:  "hcf_fields_submit",
-    [FPTI_HCF_KEYS.FLOW]: flow
+    [FPTI_KEY.PAYMENT_FLOW]: flow
   })
 }

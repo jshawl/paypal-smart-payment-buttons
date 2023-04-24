@@ -2,10 +2,7 @@
 import { describe, afterEach, vi, test, expect, beforeEach } from "vitest";
 
 import { updateVaultSetupToken } from "../../api/vault";
-import {
-hcfTransactionError,
-hcfTransactionSuccess
-} from "../logger";
+import { hcfTransactionError, hcfTransactionSuccess } from "../logger";
 
 import { savePaymentSource } from "./vault-without-purchase";
 
@@ -64,6 +61,7 @@ describe("savePaymentSource", () => {
     expect(hcfTransactionSuccess).not.toHaveBeenCalled();
     expect(hcfTransactionError).toHaveBeenCalledWith({
       error: createVaultSetupTokenError,
+      flow: "vault_without_purchase",
     });
     expect(defaultOptions.onError).toBeCalledWith(createVaultSetupTokenError);
   });
@@ -84,6 +82,7 @@ describe("savePaymentSource", () => {
     expect(hcfTransactionError).toHaveBeenCalledWith({
       error: updateVaultSetupTokenError,
       vaultToken: defaultVaultSetupToken,
+      flow: "vault_without_purchase",
     });
     expect(defaultOptions.onError).toBeCalledWith(updateVaultSetupTokenError);
   });
@@ -103,6 +102,7 @@ describe("savePaymentSource", () => {
     expect(hcfTransactionError).toHaveBeenCalledWith({
       error: onApproveError,
       vaultToken: defaultVaultSetupToken,
+      flow: "vault_without_purchase",
     });
     expect(defaultOptions.onError).toBeCalledWith(onApproveError);
   });
@@ -129,6 +129,7 @@ describe("savePaymentSource", () => {
     });
     expect(hcfTransactionSuccess).toHaveBeenCalledWith({
       vaultToken: defaultVaultSetupToken,
+      flow: "vault_without_purchase",
     });
   });
 });
