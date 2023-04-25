@@ -11,7 +11,7 @@ import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
 import { getLogger, setupLogger } from "../lib";
 import type { LocaleType } from "../types";
-import { FPTI_STATE } from "../constants";
+import { FPTI_STATE, PAYMENT_FLOWS } from "../constants";
 
 import { FPTI_HCF_KEYS } from "./constants";
 
@@ -57,8 +57,6 @@ export function setupCardLogger({
   });
 
   logger.addTrackingBuilder(() => ({
-    [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HCF_SESSION_ID,
-    [FPTI_KEY.CONTEXT_ID]: hcfSessionID,
     [FPTI_KEY.BUTTON_VERSION]: __SMART_BUTTONS__.__MINOR_VERSION__,
     [FPTI_HCF_KEYS.HCF_SESSION_ID]: hcfSessionID,
     [FPTI_HCF_KEYS.HCF_CORRELATION_ID]: cardCorrelationID,
@@ -68,6 +66,7 @@ export function setupCardLogger({
     [FPTI_HCF_KEYS.SDK_CORRELATION_ID]: sdkCorrelationID,
     [FPTI_DATA_SOURCE.PAYMENTS_SDK]: clientID,
     [FPTI_KEY.SELLER_ID]: merchantID?.[0],
+    [FPTI_HCF_KEYS.HCF_VERSION]: `v2`
   }));
 
   const tracking = {
@@ -81,6 +80,8 @@ export function setupCardLogger({
   }).then(({ pageRenderTime }) => {
     logger.track({
       ...tracking,
+      [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HOSTED_SESSION_ID,
+      [FPTI_KEY.CONTEXT_ID]: hcfSessionID,
       [FPTI_KEY.PAGE_LOAD_TIME]: pageRenderTime
         ? pageRenderTime.toString()
         : "",
@@ -96,7 +97,10 @@ export const hcfTransactionSuccess = ({
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_transaction_success",
     [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_success",
-    [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID
+    [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID,
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.WITH_PURCHASE,
+    [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HCF_ORDER_ID,
+    [FPTI_KEY.CONTEXT_ID]: orderID
   }).flush();
 }
 
@@ -109,8 +113,12 @@ export const hcfTransactionError = ({
 |}) => {
   getLogger().track({
     [FPTI_KEY.ERROR_CODE]: "hcf_transaction_error",
+    [FPTI_KEY.EVENT_NAME]: "hcf_transaction_error",
     [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(error),
-    [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID
+    [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID,
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.WITH_PURCHASE,
+    [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HCF_ORDER_ID,
+    [FPTI_KEY.CONTEXT_ID]: orderID
   }).flush();
 }
 
@@ -118,9 +126,12 @@ export const vaultWithoutPurchaseSuccess = ({
   vaultToken,
 }: {|vaultToken: string|}) => {
   getLogger().track({
-    [FPTI_KEY.TRANSITION]:  "hcf_vault_without_purchase_success",
-    [FPTI_KEY.EVENT_NAME]:  "hcf_vault_without_purchase_success",
-    [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken
+    [FPTI_KEY.TRANSITION]:  "hcf_transaction_success",
+    [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_success",
+    [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken,
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+    [FPTI_KEY.CONTEXT_TYPE]: `vault_setup_token`,
+    [FPTI_KEY.CONTEXT_ID]: vaultToken
   }).flush();
 }
 
@@ -132,8 +143,31 @@ export const vaultWithoutPurchaseFailure = ({
   error: mixed
 |}) => {
   getLogger().track({
-    [FPTI_KEY.ERROR_CODE]: "hcf_vault_without_purchase_error",
+    [FPTI_KEY.ERROR_CODE]: "hcf_transaction_error",
+    [FPTI_KEY.EVENT_NAME]: "hcf_transaction_error",
     [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(error),
-    [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken
+    [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken,
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+    [FPTI_KEY.CONTEXT_TYPE]: `vault_setup_token`,
+    [FPTI_KEY.CONTEXT_ID]: vaultToken
   }).flush();
+}
+
+export const hcfFieldsSubmit = ({
+  isPurchaseFlow,
+  isVaultWithoutPurchaseFlow,
+  hcfSessionID
+}: {|isPurchaseFlow: boolean,
+  isVaultWithoutPurchaseFlow: boolean,
+  hcfSessionID?: string
+|}) => {
+  // eslint-disable-next-line no-nested-ternary
+  const flow = isPurchaseFlow ? PAYMENT_FLOWS.WITH_PURCHASE : isVaultWithoutPurchaseFlow ? PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE : ``;
+  getLogger().track({
+    [FPTI_KEY.TRANSITION]:  "hcf_fields_submit",
+    [FPTI_KEY.EVENT_NAME]:  "hcf_fields_submit",
+    [FPTI_KEY.PAYMENT_FLOW]: flow,
+    [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HOSTED_SESSION_ID,
+    [FPTI_KEY.CONTEXT_ID]: hcfSessionID
+  })
 }

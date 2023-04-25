@@ -4,7 +4,7 @@ import { ZalgoPromise } from "@krakenjs/zalgo-promise/src"
 
 import { getCardProps, type SaveCardFieldsProps, type LegacyCardProps } from "../props"
 import { confirmOrderAPI } from "../../api"
-import { hcfTransactionError, hcfTransactionSuccess } from "../logger"
+import { hcfTransactionError, hcfTransactionSuccess, hcfFieldsSubmit } from "../logger"
 import type { FeatureFlags } from "../../types"
 import type { BillingAddress, Card, ExtraFields } from '../types'
 import {convertCardToPaymentSource, reformatPaymentSource} from '../lib'
@@ -93,7 +93,10 @@ export function submitCardFields({
 
   // $FlowIssue
   const [isPurchaseFlow, isVaultWithoutPurchaseFlow] = [Boolean(cardProps.createOrder), Boolean(cardProps.createVaultSetupToken)];
-
+  const { hcfSessionID } = cardProps;
+  hcfFieldsSubmit({
+    isPurchaseFlow, isVaultWithoutPurchaseFlow, hcfSessionID
+  });
   resetGQLErrors();
 
   return ZalgoPromise.try(() => {
