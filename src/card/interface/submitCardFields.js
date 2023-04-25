@@ -93,10 +93,10 @@ export function submitCardFields({
 
   // $FlowIssue
   const [isPurchaseFlow, isVaultWithoutPurchaseFlow] = [Boolean(cardProps.createOrder), Boolean(cardProps.createVaultSetupToken)];
-  const { hcfSessionID } = cardProps
+  const { hcfSessionID } = cardProps;
   hcfFieldsSubmit({
     isPurchaseFlow, isVaultWithoutPurchaseFlow, hcfSessionID
-  })
+  });
   resetGQLErrors();
 
   return ZalgoPromise.try(() => {
