@@ -7,7 +7,8 @@ import {
   type PaymentSourceInput,
 } from "../../api/vault";
 import {
-  hcfTransactionSuccess, hcfTransactionError
+  vaultWithoutPurchaseSuccess,
+  vaultWithoutPurchaseFailure,
 } from "../logger";
 import type {
   XOnError,
@@ -45,12 +46,12 @@ export const savePaymentSource = ({
       })
     })
     .then(() => onApprove({ vaultSetupToken: vaultToken }))
-    .then(() => hcfTransactionSuccess({ vaultToken, flow: `vault_without_purchase` }))
+    .then(() => vaultWithoutPurchaseSuccess({ vaultToken }))
     .catch((error) => {
       if (typeof error === "string") {
         error = new Error(error);
       }
-      hcfTransactionError({ error, vaultToken, flow: `vault_without_purchase` });
+      vaultWithoutPurchaseFailure({ error, vaultToken });
       onError(error);
       throw error;
     });

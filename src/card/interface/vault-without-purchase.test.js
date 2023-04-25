@@ -2,7 +2,10 @@
 import { describe, afterEach, vi, test, expect, beforeEach } from "vitest";
 
 import { updateVaultSetupToken } from "../../api/vault";
-import { hcfTransactionError, hcfTransactionSuccess } from "../logger";
+import {
+  vaultWithoutPurchaseSuccess,
+  vaultWithoutPurchaseFailure,
+} from "../logger";
 
 import { savePaymentSource } from "./vault-without-purchase";
 
@@ -58,10 +61,9 @@ describe("savePaymentSource", () => {
         ...defaultSave({ createVaultSetupToken: rejectCreateVaultSetupToken }),
       })
     ).rejects.toThrow(createVaultSetupTokenError);
-    expect(hcfTransactionSuccess).not.toHaveBeenCalled();
-    expect(hcfTransactionError).toHaveBeenCalledWith({
+    expect(vaultWithoutPurchaseSuccess).not.toHaveBeenCalled();
+    expect(vaultWithoutPurchaseFailure).toHaveBeenCalledWith({
       error: createVaultSetupTokenError,
-      flow: "vault_without_purchase",
     });
     expect(defaultOptions.onError).toBeCalledWith(createVaultSetupTokenError);
   });
@@ -78,11 +80,10 @@ describe("savePaymentSource", () => {
     await expect(savePaymentSource(defaultOptions)).rejects.toBe(
       updateVaultSetupTokenError
     );
-    expect(hcfTransactionSuccess).not.toHaveBeenCalled();
-    expect(hcfTransactionError).toHaveBeenCalledWith({
+    expect(vaultWithoutPurchaseSuccess).not.toHaveBeenCalled();
+    expect(vaultWithoutPurchaseFailure).toHaveBeenCalledWith({
       error: updateVaultSetupTokenError,
       vaultToken: defaultVaultSetupToken,
-      flow: "vault_without_purchase",
     });
     expect(defaultOptions.onError).toBeCalledWith(updateVaultSetupTokenError);
   });
@@ -98,11 +99,10 @@ describe("savePaymentSource", () => {
         ...defaultSave({ onApprove: rejectOnApprove }),
       })
     ).rejects.toThrow(onApproveError);
-    expect(hcfTransactionSuccess).not.toHaveBeenCalled();
-    expect(hcfTransactionError).toHaveBeenCalledWith({
+    expect(vaultWithoutPurchaseSuccess).not.toHaveBeenCalled();
+    expect(vaultWithoutPurchaseFailure).toHaveBeenCalledWith({
       error: onApproveError,
       vaultToken: defaultVaultSetupToken,
-      flow: "vault_without_purchase",
     });
     expect(defaultOptions.onError).toBeCalledWith(onApproveError);
   });
@@ -127,9 +127,8 @@ describe("savePaymentSource", () => {
     expect(defaultOptions.onApprove).toHaveBeenCalledWith({
       vaultSetupToken: "vault-setup-token",
     });
-    expect(hcfTransactionSuccess).toHaveBeenCalledWith({
+    expect(vaultWithoutPurchaseSuccess).toHaveBeenCalledWith({
       vaultToken: defaultVaultSetupToken,
-      flow: "vault_without_purchase",
     });
   });
 });

@@ -11,7 +11,7 @@ import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
 import { getLogger, setupLogger } from "../lib";
 import type { LocaleType } from "../types";
-import { FPTI_STATE } from "../constants";
+import { FPTI_STATE, PAYMENT_FLOWS } from "../constants";
 
 import { FPTI_HCF_KEYS } from "./constants";
 
@@ -92,59 +92,64 @@ export function setupCardLogger({
 }
 
 export const hcfTransactionSuccess = ({
-  orderID, vaultToken, flow
-}: {|  orderID?: string,
-  vaultToken?: string,
-  flow: string|}) => {
-  
-  let contextId, contextType;
-  if(orderID){
-    contextId = orderID
-    contextType = `order_id`
-  } else if (vaultToken) {
-    contextId = vaultToken
-    contextType = `vault_setup_token` 
-  }
-
+  orderID
+}: {|orderID: string|}) => {
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_transaction_success",
     [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_success",
     [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID,
-    [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken,
-    [FPTI_KEY.PAYMENT_FLOW]: flow,
-    [FPTI_KEY.CONTEXT_TYPE]: contextType,
-    [FPTI_KEY.CONTEXT_ID]: contextId
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.WITH_PURCHASE,
+    [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HCF_ORDER_ID,
+    [FPTI_KEY.CONTEXT_ID]: orderID
   }).flush();
 }
 
 export const hcfTransactionError = ({
-  orderID, vaultToken, error, flow
+  orderID, error
 }: {|
   orderID?: string,
-  vaultToken?: string,
   // should be Error but other apis are constraining this type
-  error: mixed,
-  flow: string
+  error: mixed
 |}) => {
-
-  let contextId, contextType;
-  if(orderID){
-    contextId = orderID
-    contextType = `order_id`
-  } else if (vaultToken) {
-    contextId = vaultToken
-    contextType = `vault_setup_token` 
-  }
-
   getLogger().track({
     [FPTI_KEY.ERROR_CODE]: "hcf_transaction_error",
-    [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_error",
+    [FPTI_KEY.EVENT_NAME]: "hcf_transaction_error",
     [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(error),
     [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID,
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.WITH_PURCHASE,
+    [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HCF_ORDER_ID,
+    [FPTI_KEY.CONTEXT_ID]: orderID
+  }).flush();
+}
+
+export const vaultWithoutPurchaseSuccess = ({
+  vaultToken,
+}: {|vaultToken: string|}) => {
+  getLogger().track({
+    [FPTI_KEY.TRANSITION]:  "hcf_transaction_success",
+    [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_success",
     [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken,
-    [FPTI_KEY.PAYMENT_FLOW]: flow,
-    [FPTI_KEY.CONTEXT_TYPE]: contextType,
-    [FPTI_KEY.CONTEXT_ID]: contextId
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+    [FPTI_KEY.CONTEXT_TYPE]: `vault_setup_token`,
+    [FPTI_KEY.CONTEXT_ID]: vaultToken
+  }).flush();
+}
+
+export const vaultWithoutPurchaseFailure = ({
+  vaultToken, error
+}: {|
+  vaultToken?: string,
+  // should be Error but other apis are constraining this type
+  error: mixed
+|}) => {
+  getLogger().track({
+    [FPTI_KEY.ERROR_CODE]: "hcf_transaction_error",
+    [FPTI_KEY.EVENT_NAME]: "hcf_transaction_error",
+    [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(error),
+    [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken,
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+    [FPTI_KEY.CONTEXT_TYPE]: `vault_setup_token`,
+    [FPTI_KEY.CONTEXT_ID]: vaultToken
   }).flush();
 }
 
@@ -154,10 +159,10 @@ export const hcfFieldsSubmit = ({
   hcfSessionID
 }: {|isPurchaseFlow: boolean,
   isVaultWithoutPurchaseFlow: boolean,
-  hcfSessionID: string
-  |}) => {
+  hcfSessionID?: string
+|}) => {
   // eslint-disable-next-line no-nested-ternary
-  const flow = isPurchaseFlow ? `with_purchase` : isVaultWithoutPurchaseFlow ? `vault_without_purchase` : ``;
+  const flow = isPurchaseFlow ? PAYMENT_FLOWS.WITH_PURCHASE : isVaultWithoutPurchaseFlow ? PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE : ``;
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_fields_submit",
     [FPTI_KEY.EVENT_NAME]:  "hcf_fields_submit",

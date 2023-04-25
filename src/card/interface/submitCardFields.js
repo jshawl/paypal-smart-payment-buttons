@@ -64,13 +64,13 @@ function handlePurchaseFlow(cardProps: LegacyCardProps, card: Card, extraFields:
       return cardProps.onApprove({ orderID }, {});
     })
     .then(() => {
-      hcfTransactionSuccess({ orderID, flow: `with_purchase` });
+      hcfTransactionSuccess({ orderID });
     })
     .catch((error) => {
       if (typeof error === "string") {
         error = new Error(error);
       }
-      hcfTransactionError({ error, orderID, flow: `with_purchase` });
+      hcfTransactionError({ error, orderID });
       if (cardProps.onError) {
         cardProps.onError(error);
       }

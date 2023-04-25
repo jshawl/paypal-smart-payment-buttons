@@ -288,3 +288,8 @@ export const SERVICE_WORKER = {
     LOGS_CHANNEL_NAME:               'logs-channel',
     GET_SW_LOGS_RESPONSE_EVENT_NAME: 'GET_SW_LOGS_RESPONSE'
 };
+
+export const PAYMENT_FLOWS = {
+    WITH_PURCHASE: 'with_purchase',
+    VAULT_WITHOUT_PURCHASE: `vault_without_purchase`
+}

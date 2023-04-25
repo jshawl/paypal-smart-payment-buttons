@@ -9,6 +9,8 @@ import { getLogger } from "../lib/logger";
 import {
   hcfTransactionError,
   hcfTransactionSuccess,
+  vaultWithoutPurchaseFailure,
+  vaultWithoutPurchaseSuccess,
   setupCardLogger,
 } from "./logger";
 
@@ -80,7 +82,7 @@ describe("card logger", () => {
 
   it("should call logger.track with hcfTransactionError ", async () => {
     const error = new Error("testing hcf transaction error");
-    await hcfTransactionError({ error, flow: "purchase" });
+    await hcfTransactionError({ error });
     expect(trackMock).toBeCalledWith(
       expect.objectContaining({
         ext_error_code: "hcf_transaction_error",
@@ -90,12 +92,34 @@ describe("card logger", () => {
   });
 
   it("should call logger.track with hcfTransactionSuccess ", async () => {
-    await hcfTransactionSuccess({ orderID: "ABCD123", flow: "vault" });
+    await hcfTransactionSuccess({ orderID: "ABCD123" });
     expect(trackMock).toBeCalledWith(
       expect.objectContaining({
         event_name: "hcf_transaction_success",
         transition_name: "hcf_transaction_success",
         order_id: "ABCD123",
+      })
+    );
+  });
+
+  it("should call logger.track with vaultWithoutPurchaseSuccess ", async () => {
+    await vaultWithoutPurchaseSuccess({ vaultToken: "ABCD123efgh" });
+    expect(trackMock).toBeCalledWith(
+      expect.objectContaining({
+        event_name: "hcf_transaction_success",
+        transition_name: "hcf_transaction_success",
+        vault_token: "ABCD123efgh",
+      })
+    );
+  });
+
+  it("should call logger.track with vaultWithoutPurchaseFailure ", async () => {
+    const error = new Error("testing vault without purchase error");
+    await vaultWithoutPurchaseFailure({ error });
+    expect(trackMock).toBeCalledWith(
+      expect.objectContaining({
+        ext_error_code: "hcf_transaction_error",
+        ext_error_desc: "testing vault without purchase error",
       })
     );
   });

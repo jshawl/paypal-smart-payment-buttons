@@ -150,7 +150,6 @@ describe("submitCardFields", () => {
     );
     expect(hcfTransactionSuccess).toHaveBeenCalledWith({
       orderID: "test-order-id",
-      flow: "with_purchase",
     });
   });
 
@@ -174,7 +173,6 @@ describe("submitCardFields", () => {
     expect(hcfTransactionError).toHaveBeenCalledWith({
       error: onApproveError,
       orderID: "test-order-id",
-      flow: "with_purchase",
     });
     expect(mockGetCardPropsReturn.onError).toHaveBeenCalledWith(onApproveError);
   });
@@ -200,7 +198,6 @@ describe("submitCardFields", () => {
     expect(hcfTransactionError).toHaveBeenCalledWith({
       error,
       orderID: "test-order-id",
-      flow: "with_purchase",
     });
     expect(hcfTransactionSuccess).not.toHaveBeenCalled();
     expect.assertions(4);
@@ -223,7 +220,6 @@ describe("submitCardFields", () => {
     // $FlowIssue
     expect(hcfTransactionError).toHaveBeenCalledWith({
       error,
-      flow: "with_purchase",
     });
     expect(hcfTransactionSuccess).not.toHaveBeenCalled();
     expect(mockGetCardPropsReturn.onError).toHaveBeenCalledWith(error);
