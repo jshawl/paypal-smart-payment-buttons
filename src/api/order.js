@@ -1007,7 +1007,6 @@ type UpdateButtonClientConfigOptions = {|
     featureFlags: FeatureFlags,
     userExperienceFlow? : string,
     buttonSessionID? : ?string,
-    featureFlags?: FeatureFlags
 |};
 
 export function updateButtonClientConfig({ orderID, fundingSource, inline = false, userExperienceFlow, buttonSessionID, featureFlags } : UpdateButtonClientConfigOptions) : ZalgoPromise<void> {
