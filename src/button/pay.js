@@ -197,7 +197,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
             let confirmedOrderID;
 
             const confirmOrderPromise = createOrder().then((orderID) => {
-                confirmedOrderID = orderID
+                confirmedOrderID = orderID;
                 return window.xprops.sessionState.get(
                     `__confirm_${ fundingSource }_payload__`
                 ).then(confirmOrderPayload => {
