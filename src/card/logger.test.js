@@ -71,7 +71,7 @@ describe("card logger", () => {
     expect(trackBuilder).toHaveBeenCalledWith(expect.any(Function));
     expect(trackBuilder.mock.calls[0][0]()).toMatchObject(
       expect.objectContaining({
-        context_type: "hosted_session_id",
+        hcf_version: "v2",
         seller_id: "XYZ12345",
         merchant_domain: "mock://www.paypal.com",
       })

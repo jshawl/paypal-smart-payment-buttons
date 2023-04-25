@@ -57,8 +57,6 @@ export function setupCardLogger({
   });
 
   logger.addTrackingBuilder(() => ({
-    [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HOSTED_SESSION_ID,
-    [FPTI_KEY.CONTEXT_ID]: hcfSessionID,
     [FPTI_KEY.BUTTON_VERSION]: __SMART_BUTTONS__.__MINOR_VERSION__,
     [FPTI_HCF_KEYS.HCF_SESSION_ID]: hcfSessionID,
     [FPTI_HCF_KEYS.HCF_CORRELATION_ID]: cardCorrelationID,
@@ -82,6 +80,8 @@ export function setupCardLogger({
   }).then(({ pageRenderTime }) => {
     logger.track({
       ...tracking,
+      [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HOSTED_SESSION_ID,
+      [FPTI_KEY.CONTEXT_ID]: hcfSessionID,
       [FPTI_KEY.PAGE_LOAD_TIME]: pageRenderTime
         ? pageRenderTime.toString()
         : "",
@@ -96,12 +96,24 @@ export const hcfTransactionSuccess = ({
 }: {|  orderID?: string,
   vaultToken?: string,
   flow: string|}) => {
+  
+  let contextId, contextType;
+  if(orderID){
+    contextId = orderID
+    contextType = `order_id`
+  } else if (vaultToken) {
+    contextId = vaultToken
+    contextType = `vault_setup_token` 
+  }
+
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_transaction_success",
     [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_success",
     [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID,
     [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken,
-    [FPTI_KEY.PAYMENT_FLOW]: flow
+    [FPTI_KEY.PAYMENT_FLOW]: flow,
+    [FPTI_KEY.CONTEXT_TYPE]: contextType,
+    [FPTI_KEY.CONTEXT_ID]: contextId
   }).flush();
 }
 
@@ -114,27 +126,43 @@ export const hcfTransactionError = ({
   error: mixed,
   flow: string
 |}) => {
+
+  let contextId, contextType;
+  if(orderID){
+    contextId = orderID
+    contextType = `order_id`
+  } else if (vaultToken) {
+    contextId = vaultToken
+    contextType = `vault_setup_token` 
+  }
+
   getLogger().track({
     [FPTI_KEY.ERROR_CODE]: "hcf_transaction_error",
     [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_error",
     [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(error),
     [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID,
     [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken,
-    [FPTI_KEY.PAYMENT_FLOW]: flow
+    [FPTI_KEY.PAYMENT_FLOW]: flow,
+    [FPTI_KEY.CONTEXT_TYPE]: contextType,
+    [FPTI_KEY.CONTEXT_ID]: contextId
   }).flush();
 }
 
 export const hcfFieldsSubmit = ({
   isPurchaseFlow,
-  isVaultWithoutPurchaseFlow
+  isVaultWithoutPurchaseFlow,
+  hcfSessionID
 }: {|isPurchaseFlow: boolean,
-  isVaultWithoutPurchaseFlow: boolean
+  isVaultWithoutPurchaseFlow: boolean,
+  hcfSessionID: string
   |}) => {
   // eslint-disable-next-line no-nested-ternary
   const flow = isPurchaseFlow ? `with_purchase` : isVaultWithoutPurchaseFlow ? `vault_without_purchase` : ``;
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_fields_submit",
     [FPTI_KEY.EVENT_NAME]:  "hcf_fields_submit",
-    [FPTI_KEY.PAYMENT_FLOW]: flow
+    [FPTI_KEY.PAYMENT_FLOW]: flow,
+    [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HOSTED_SESSION_ID,
+    [FPTI_KEY.CONTEXT_ID]: hcfSessionID
   })
 }

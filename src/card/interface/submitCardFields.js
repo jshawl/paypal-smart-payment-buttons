@@ -93,8 +93,9 @@ export function submitCardFields({
 
   // $FlowIssue
   const [isPurchaseFlow, isVaultWithoutPurchaseFlow] = [Boolean(cardProps.createOrder), Boolean(cardProps.createVaultSetupToken)];
+  const { hcfSessionID } = cardProps
   hcfFieldsSubmit({
-    isPurchaseFlow, isVaultWithoutPurchaseFlow
+    isPurchaseFlow, isVaultWithoutPurchaseFlow, hcfSessionID
   })
   resetGQLErrors();
 
