@@ -17,6 +17,8 @@ describe('contingency cases', () => {
             const payerID = 'YYYYYYYYYY';
             const accessToken = MOCK_BUYER_ACCESS_TOKEN;
 
+            let checkoutRestarted = false;
+
             window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
                 return ZalgoPromise.try(() => {
                     return orderID;
@@ -64,6 +66,8 @@ describe('contingency cases', () => {
                 captureOrderMock.expectCalls();
                 actions.order.capture();
                 captureOrderMock.done();
+                // checkout will auto restart as instrument is declined.
+                checkoutRestarted = true;
             });
 
             window.xprops.onApprove = mockAsyncProp(expect('onApprove', (data, actions) => onApprove(data, actions)));
@@ -74,8 +78,12 @@ describe('contingency cases', () => {
                     return onApproveOriginal({ ...data, payerID }, actions);
                 }));
                 props.createAuthCode().then(expect('createAuthCodeThen', authCode => {
-                    if (!authCode) {
-                        throw new Error(`Expected auth code`);
+                    if(checkoutRestarted && !authCode) {
+                        throw new Error(`Expected auth code in restart flow`);
+                    }
+
+                    if (!checkoutRestarted && authCode) {
+                        throw new Error(`Expected no auth code for non restart flow`);
                     }
                 }));
 

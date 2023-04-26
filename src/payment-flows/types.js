@@ -27,6 +27,7 @@ export type Payment = {|
     paymentMethodID? : ?string,
     instrumentID? : ?string,
     isClick? : boolean,
+    checkoutRestart? : boolean,
     buyerAccessToken? : ?string,
     venmoPayloadID? : string,
     buyerIntent : $Values<typeof BUYER_INTENT>,

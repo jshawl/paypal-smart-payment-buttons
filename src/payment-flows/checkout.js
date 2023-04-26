@@ -147,7 +147,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
         currency, enableFunding, stickinessID,
         standaloneFundingSource, branded, paymentMethodToken, allowBillingPayments, merchantRequestedPopupsDisabled } = props;
     let { button, win, fundingSource, card, isClick, buyerAccessToken = serviceData.buyerAccessToken,
-        venmoPayloadID, buyerIntent } = payment;
+        venmoPayloadID, buyerIntent, checkoutRestart } = payment;
     const { buyerCountry, sdkMeta, merchantID } = serviceData;
     const { cspNonce } = config;
 
@@ -174,7 +174,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
 
                     if (payment.createAccessToken) {
                         return payment.createAccessToken();
-                    } else if(buyerAccessTokenReceivedOnAuth && fundingSkipLogin) {
+                    } else if(checkoutRestart && buyerAccessTokenReceivedOnAuth && fundingSkipLogin) {
                         return buyerAccessTokenReceivedOnAuth;
                     } else if (buyerAccessToken) {
                         return buyerAccessToken;
@@ -235,6 +235,8 @@ function initCheckout({ props, components, serviceData, payment, config, restart
             } : null,
 
             createOrder: () => {
+                // reset the buyerAccessTokenReceivedOnAuth
+                buyerAccessTokenReceivedOnAuth = null;
                 return createOrder().then(orderID => {
                     return orderID;
                 });
@@ -424,7 +426,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
     const restart = memoize(() : ZalgoPromise<void> => {
         // Closing any previous checkout popup before restarting
         return close().finally(() => {
-            return initCheckout({ props, components, serviceData, config, payment: { button, fundingSource, card, buyerIntent, isClick: false }, restart })
+            return initCheckout({ props, components, serviceData, config, payment: { button, fundingSource, card, buyerIntent, isClick: false, checkoutRestart: true }, restart })
                 .start().finally(unresolvedPromise);
         });
     });
