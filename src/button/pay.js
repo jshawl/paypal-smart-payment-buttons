@@ -153,14 +153,16 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 }
 
                 function updateButtonClientConfigWrapper() : ZalgoPromise<void> {
-                    return updateButtonClientConfig({ orderID, fundingSource, inline, userExperienceFlow }).catch(err => {
+                    return updateButtonClientConfig({ orderID, fundingSource, inline, userExperienceFlow, featureFlags }).catch(err => {
                         getLogger().error('update_client_config_error', { err: stringifyError(err) });
                     });
                 }
 
                 // feature flag to control blocking/non-blocking behavior
                 if (featureFlags.isButtonClientConfigCallBlocking) {
-                    return updateButtonClientConfigWrapper();
+                    return updateButtonClientConfigWrapper().then(() => {
+                        getLogger().info('update_button_client_config_resolved', {time: String(new Date().getTime()), fundingSource, ecToken: orderID, buttonSessionID})
+                    });
                 } else {
                     // non-blocking call by default
                     updateButtonClientConfigWrapper();
@@ -192,7 +194,10 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 });
             });
 
+            let confirmedOrderID;
+
             const confirmOrderPromise = createOrder().then((orderID) => {
+                confirmedOrderID = orderID;
                 return window.xprops.sessionState.get(
                     `__confirm_${ fundingSource }_payload__`
                 ).then(confirmOrderPayload => {
@@ -221,7 +226,11 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 return ZalgoPromise.try(close).then(() => {
                     throw err;
                 });
-            }).then(noop);
+            }).then((noop)).finally(() => {
+              if (featureFlags.isButtonClientConfigCallBlocking) {
+                  getLogger().info('redirect_to_xorouter', {time: String(new Date().getTime()), fundingSource, ecToken: confirmedOrderID, buttonSessionID})
+              }
+            });
         });
 
     }).finally(() => {

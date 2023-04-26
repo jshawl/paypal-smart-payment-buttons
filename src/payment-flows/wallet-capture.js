@@ -242,7 +242,7 @@ const POPUP_OPTIONS = {
 function setupWalletMenu({ props, payment, serviceData, components, config, restart } : MenuOptions) : MenuChoices {
     const { createOrder, enableOrdersApprovalSmartWallet } = props;
     const { fundingSource, instrumentID } = payment;
-    const { wallet, content } = serviceData;
+    const { wallet, content, featureFlags } = serviceData;
 
     if (!wallet) {
         throw new Error(`Can not render wallet menu without wallet`);
@@ -262,7 +262,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
         return ZalgoPromise.try(() => {
             return createOrder();
         }).then(orderID => {
-            return updateButtonClientConfig({ fundingSource, orderID, inline: false });
+            return updateButtonClientConfig({ fundingSource, orderID, inline: false, featureFlags });
         });
     };
 
@@ -353,9 +353,9 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
     throw new Error(`Can not render menu for ${ fundingSource }`);
 }
 
-function updateWalletClientConfig({ orderID, payment }) : ZalgoPromise<void> {
+function updateWalletClientConfig({ orderID, payment, featureFlags }) : ZalgoPromise<void> {
     const { fundingSource } = payment;
-    return updateButtonClientConfig({ fundingSource, orderID, inline: true });
+    return updateButtonClientConfig({ fundingSource, orderID, inline: true, featureFlags });
 }
 
 export const walletCapture : PaymentFlow = {

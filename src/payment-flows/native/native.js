@@ -248,11 +248,11 @@ function initNative({ props, components, config, payment, serviceData, restart }
     };
 }
 
-function updateNativeClientConfig({ orderID, payment, userExperienceFlow, buttonSessionID }) : ZalgoPromise<void> {
+function updateNativeClientConfig({ orderID, payment, userExperienceFlow, buttonSessionID, featureFlags }) : ZalgoPromise<void> {
 
     return ZalgoPromise.try(() => {
         const { fundingSource } = payment;
-        return updateButtonClientConfig({ fundingSource, orderID, inline: false, userExperienceFlow, buttonSessionID });
+        return updateButtonClientConfig({ fundingSource, orderID, inline: false, userExperienceFlow, buttonSessionID, featureFlags });
     });
 }
 

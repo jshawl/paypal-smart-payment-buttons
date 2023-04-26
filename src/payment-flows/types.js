@@ -85,7 +85,7 @@ export type UpdateClientConfigOptions = {|
     payment : Payment,
     userExperienceFlow? : string,
     buttonSessionID? : ?string,
-    featureFlags? : FeatureFlags
+    featureFlags : FeatureFlags
 |};
 
 export type PaymentFlow = {|

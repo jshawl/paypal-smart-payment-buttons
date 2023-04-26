@@ -10,6 +10,7 @@ import { getLogger, setBuyerAccessToken } from '../lib';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, HEADERS, SMART_PAYMENT_BUTTONS,
     INTEGRATION_ARTIFACT, ITEM_CATEGORY, USER_EXPERIENCE_FLOW, PRODUCT_FLOW, PREFER, ORDER_API_ERROR } from '../constants';
 import type { ShippingMethod, ShippingAddress } from '../payment-flows/types';
+import type { FeatureFlags } from '../types';
 
 import { callSmartAPI, callGraphQL, callRestAPI, getResponseCorrelationID, getErrorResponseCorrelationID } from './api';
 import { getLsatUpgradeError, getLsatUpgradeCalled } from './auth';
@@ -587,10 +588,15 @@ type ClientConfig = {|
     integrationArtifact : string,
     userExperienceFlow : string,
     productFlow : string,
-    buttonSessionID : ?string
+    buttonSessionID : ?string,
+    featureFlags?: FeatureFlags
 |};
 
-export function updateClientConfig({ orderID, fundingSource, integrationArtifact, userExperienceFlow, productFlow, buttonSessionID } : ClientConfig) : ZalgoPromise<void> {
+export function updateClientConfig({ orderID, fundingSource, integrationArtifact, userExperienceFlow, productFlow, buttonSessionID, featureFlags } : ClientConfig) : ZalgoPromise<void> {
+    if (featureFlags && featureFlags.isButtonClientConfigCallBlocking) {
+      getLogger().info('update_button_client_config_called_as_blocking', {time: String(new Date().getTime()), ecToken: orderID, buttonSessionID, fundingSource})
+    }
+
     return callGraphQL({
         name:  'UpdateClientConfig',
         query: `
@@ -998,11 +1004,12 @@ type UpdateButtonClientConfigOptions = {|
     orderID : string,
     fundingSource : $Values<typeof FUNDING>,
     inline : boolean | void,
+    featureFlags: FeatureFlags,
     userExperienceFlow? : string,
     buttonSessionID? : ?string
 |};
 
-export function updateButtonClientConfig({ orderID, fundingSource, inline = false, userExperienceFlow, buttonSessionID } : UpdateButtonClientConfigOptions) : ZalgoPromise<void> {
+export function updateButtonClientConfig({ orderID, fundingSource, inline = false, userExperienceFlow, buttonSessionID, featureFlags } : UpdateButtonClientConfigOptions) : ZalgoPromise<void> {
     const experienceFlow = inline ? USER_EXPERIENCE_FLOW.INLINE : USER_EXPERIENCE_FLOW.INCONTEXT;
     return updateClientConfig({
         orderID,
@@ -1010,7 +1017,8 @@ export function updateButtonClientConfig({ orderID, fundingSource, inline = fals
         integrationArtifact: INTEGRATION_ARTIFACT.PAYPAL_JS_SDK,
         userExperienceFlow:  userExperienceFlow ? userExperienceFlow : experienceFlow,
         productFlow:         PRODUCT_FLOW.SMART_PAYMENT_BUTTONS,
-        buttonSessionID
+        buttonSessionID,
+        featureFlags
     });
 }
 

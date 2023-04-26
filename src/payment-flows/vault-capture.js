@@ -246,7 +246,7 @@ const POPUP_OPTIONS = {
 function setupVaultMenu({ props, payment, serviceData, components, config, restart } : MenuOptions) : MenuChoices {
     const { clientAccessToken, createOrder, enableThreeDomainSecure, partnerAttributionID, sessionID, clientMetadataID, userIDToken } = props;
     const { fundingSource, paymentMethodID, button } = payment;
-    const { content, facilitatorAccessToken } = serviceData;
+    const { content, facilitatorAccessToken, featureFlags } = serviceData;
 
     if (!clientAccessToken || !paymentMethodID) {
         throw new Error(`Client access token and payment method id required`);
@@ -256,7 +256,7 @@ function setupVaultMenu({ props, payment, serviceData, components, config, resta
         return ZalgoPromise.try(() => {
             return createOrder();
         }).then(orderID => {
-            return updateButtonClientConfig({ fundingSource, orderID, inline: false });
+            return updateButtonClientConfig({ fundingSource, orderID, inline: false, featureFlags });
         });
     };
 
@@ -348,9 +348,9 @@ function setupVaultMenu({ props, payment, serviceData, components, config, resta
     throw new Error(`Can not render menu for ${ fundingSource }`);
 }
 
-function updateVaultClientConfig({ orderID, payment }) : ZalgoPromise<void> {
+function updateVaultClientConfig({ orderID, payment, featureFlags }) : ZalgoPromise<void> {
     const { fundingSource } = payment;
-    return updateButtonClientConfig({ fundingSource, orderID, inline: true });
+    return updateButtonClientConfig({ fundingSource, orderID, inline: true, featureFlags });
 }
 
 export const vaultCapture : PaymentFlow = {

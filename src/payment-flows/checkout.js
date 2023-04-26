@@ -470,7 +470,7 @@ function updateCheckoutClientConfig({ orderID, payment, userExperienceFlow, feat
     return ZalgoPromise.try(() => {
         const { buyerIntent, fundingSource } = payment;
         
-        const updateClientConfigPromise = updateButtonClientConfig({ fundingSource, orderID, inline: false, userExperienceFlow });
+        const updateClientConfigPromise = updateButtonClientConfig({ fundingSource, orderID, inline: false, userExperienceFlow, featureFlags });
 
         const isButtonClientConfigCallBlocking = featureFlags && featureFlags.isButtonClientConfigCallBlocking;
         // Block
