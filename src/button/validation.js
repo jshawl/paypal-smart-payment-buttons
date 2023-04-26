@@ -319,55 +319,55 @@ export function validateOrder(orderID : string, { env, merchantID, currency, int
         }).join(',');
 
         const xpropMerchantID = window.xprops.merchantID;
+        const payeesShouldMatch = !window.xprops.createVaultSetupToken;
 
-        if (xpropMerchantID && xpropMerchantID.length) {
-
-            // Validate merchant-id value(s) passed explicitly to SDK
-            if (!isValidMerchantIDs(xpropMerchantID, uniquePayees)) {
-                if (uniquePayees.length === 1) {
-                    triggerIntegrationError({
-                        error:      'smart_button_validation_error_payee_no_match',
-                        message:    `Payee(s) passed in transaction does not match expected merchant id. Please ensure you are passing ${ SDK_QUERY_KEYS.MERCHANT_ID }=${ payeesStr } or ${ SDK_QUERY_KEYS.MERCHANT_ID }=${ (uniquePayees[0] && uniquePayees[0].email && uniquePayees[0].email.stringValue) ? uniquePayees[0].email.stringValue : 'payee@merchant.com' } to the sdk url. https://developer.paypal.com/docs/checkout/reference/customize-sdk/`,
-                        featureFlags,
-                        orderID
-                    });
-                } else {
-                    triggerIntegrationError({
-                        error:      'smart_button_validation_error_payee_no_match',
-                        message:    `Payee(s) passed in transaction does not match expected merchant id. Please ensure you are passing ${ SDK_QUERY_KEYS.MERCHANT_ID }=* to the sdk url and ${ SDK_SETTINGS.MERCHANT_ID }="${ payeesStr }" in the sdk script tag. https://developer.paypal.com/docs/checkout/reference/customize-sdk/`,
-                        featureFlags,
-                        orderID
-                    });
-                }
-            }
-        } else {
-
-            // Validate merchant-id value derived from client id
-            if (!isValidMerchantIDs(merchantID, uniquePayees)) {
-                logger.warn(`smart_button_validation_error_derived_payee_transaction_mismatch`, { payees: JSON.stringify(uniquePayees), merchantID: JSON.stringify(merchantID) });
-
-                if (uniquePayees.length === 1) {
-                    if (env === ENV.SANDBOX) {
-                        logger.warn(`smart_button_validation_error_derived_payee_transaction_mismatch_sandbox`, { payees: JSON.stringify(payees), merchantID: JSON.stringify(merchantID) });
+        if (payeesShouldMatch) {
+            if (xpropMerchantID && xpropMerchantID.length) {
+                // Validate merchant-id value(s) passed explicitly to SDK
+                if (!isValidMerchantIDs(xpropMerchantID, uniquePayees)) {
+                    if (uniquePayees.length === 1) {
+                        triggerIntegrationError({
+                            error:      'smart_button_validation_error_payee_no_match',
+                            message:    `Payee(s) passed in transaction does not match expected merchant id. Please ensure you are passing ${ SDK_QUERY_KEYS.MERCHANT_ID }=${ payeesStr } or ${ SDK_QUERY_KEYS.MERCHANT_ID }=${ (uniquePayees[0] && uniquePayees[0].email && uniquePayees[0].email.stringValue) ? uniquePayees[0].email.stringValue : 'payee@merchant.com' } to the sdk url. https://developer.paypal.com/docs/checkout/reference/customize-sdk/`,
+                            featureFlags,
+                            orderID
+                        });
+                    } else {
+                        triggerIntegrationError({
+                            error:      'smart_button_validation_error_payee_no_match',
+                            message:    `Payee(s) passed in transaction does not match expected merchant id. Please ensure you are passing ${ SDK_QUERY_KEYS.MERCHANT_ID }=* to the sdk url and ${ SDK_SETTINGS.MERCHANT_ID }="${ payeesStr }" in the sdk script tag. https://developer.paypal.com/docs/checkout/reference/customize-sdk/`,
+                            featureFlags,
+                            orderID
+                        });
                     }
-
-                    triggerIntegrationError({
-                        error:      'smart_button_validation_error_payee_no_match',
-                        message:    `Payee(s) passed in transaction does not match expected merchant id. Please ensure you are passing ${ SDK_QUERY_KEYS.MERCHANT_ID }=${ payeesStr } or ${ SDK_QUERY_KEYS.MERCHANT_ID }=${ (uniquePayees[0] && uniquePayees[0].email && uniquePayees[0].email.stringValue) ? uniquePayees[0].email.stringValue : 'payee@merchant.com' } to the sdk url. https://developer.paypal.com/docs/checkout/reference/customize-sdk/`,
-                        featureFlags,
-                        orderID,
-                        throwError: false
-                    });
-                } else {
-                    triggerIntegrationError({
-                        error:      'smart_button_validation_error_payee_no_match',
-                        message:    `Payee(s) passed in transaction does not match expected merchant id. Please ensure you are passing ${ SDK_QUERY_KEYS.MERCHANT_ID }=* to the sdk url and ${ SDK_SETTINGS.MERCHANT_ID }="${ payeesStr }" in the sdk script tag. https://developer.paypal.com/docs/checkout/reference/customize-sdk/`,
-                        featureFlags,
-                        orderID
-                    });
+                }
+            } else {
+                // Validate merchant-id value derived from client id
+                if (!isValidMerchantIDs(merchantID, uniquePayees)) {
+                    logger.warn(`smart_button_validation_error_derived_payee_transaction_mismatch`, { payees: JSON.stringify(uniquePayees), merchantID: JSON.stringify(merchantID) });
+    
+                    if (uniquePayees.length === 1) {
+                        if (env === ENV.SANDBOX) {
+                            logger.warn(`smart_button_validation_error_derived_payee_transaction_mismatch_sandbox`, { payees: JSON.stringify(payees), merchantID: JSON.stringify(merchantID) });
+                        }
+    
+                        triggerIntegrationError({
+                            error:      'smart_button_validation_error_payee_no_match',
+                            message:    `Payee(s) passed in transaction does not match expected merchant id. Please ensure you are passing ${ SDK_QUERY_KEYS.MERCHANT_ID }=${ payeesStr } or ${ SDK_QUERY_KEYS.MERCHANT_ID }=${ (uniquePayees[0] && uniquePayees[0].email && uniquePayees[0].email.stringValue) ? uniquePayees[0].email.stringValue : 'payee@merchant.com' } to the sdk url. https://developer.paypal.com/docs/checkout/reference/customize-sdk/`,
+                            featureFlags,
+                            orderID,
+                            throwError: false
+                        });
+                    } else {
+                        triggerIntegrationError({
+                            error:      'smart_button_validation_error_payee_no_match',
+                            message:    `Payee(s) passed in transaction does not match expected merchant id. Please ensure you are passing ${ SDK_QUERY_KEYS.MERCHANT_ID }=* to the sdk url and ${ SDK_SETTINGS.MERCHANT_ID }="${ payeesStr }" in the sdk script tag. https://developer.paypal.com/docs/checkout/reference/customize-sdk/`,
+                            featureFlags,
+                            orderID
+                        });
+                    }
                 }
             }
         }
-
     });
 }

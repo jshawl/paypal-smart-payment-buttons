@@ -1081,7 +1081,7 @@ describe('validation cases', () => {
 
 
 
-it('should not throw integration error when `shouldThrowIntegrationError` is set to false and intent is incorrect', async () => {
+    it('should not throw integration error when `shouldThrowIntegrationError` is set to false and intent is incorrect', async () => {
         return await wrapPromise(async ({ expect }) => {
 
             const orderID = generateOrderID();
@@ -1154,5 +1154,4 @@ it('should not throw integration error when `shouldThrowIntegrationError` is set
             gqlMock.done();
         });
     });
-
 });
