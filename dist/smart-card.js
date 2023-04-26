@@ -6994,7 +6994,7 @@ window.smartCard = function(modules) {
         if (0 === cardNumber.length) return !0;
         if (null != fundingEligibility && null != (_fundingEligibility$c = fundingEligibility.card) && _fundingEligibility$c.eligible && type && fundingEligibility.card.vendors && !fundingEligibility.card.branded) {
             var vendor = fundingEligibility.card.vendors[type];
-            if (isVaultFlow && null != vendor && vendor.vaultable) return !0;
+            if (isVaultFlow && null != vendor && vendor.vaultable && null != vendor && vendor.eligible) return !0;
             if (!isVaultFlow && null != vendor && vendor.eligible) return !0;
         }
         return !1;
@@ -7532,15 +7532,20 @@ window.smartCard = function(modules) {
                     orderID: orderID,
                     err: stringifyError(err)
                 });
+                var requestData;
+                requestData = Array.isArray(data) ? {
+                    patch: data,
+                    facilitatorAccessToken: facilitatorAccessToken
+                } : _extends({}, data, {
+                    facilitatorAccessToken: facilitatorAccessToken
+                });
                 return callSmartAPI({
                     accessToken: buyerAccessToken,
                     method: "post",
                     eventName: "order_patch",
                     url: "/smart/api/order/" + orderID + "/patch",
                     json: {
-                        data: Array.isArray(data) ? {
-                            patch: data
-                        } : data
+                        data: requestData
                     },
                     headers: (_headers12 = {}, _headers12["paypal-client-context"] = orderID, _headers12)
                 }).then((function(res) {
@@ -7564,15 +7569,20 @@ window.smartCard = function(modules) {
             }));
         }
         getLogger().info("lsat_upgrade_false");
+        var requestData;
+        requestData = Array.isArray(data) ? {
+            patch: data,
+            facilitatorAccessToken: facilitatorAccessToken
+        } : _extends({}, data, {
+            facilitatorAccessToken: facilitatorAccessToken
+        });
         return callSmartAPI({
             accessToken: buyerAccessToken,
             method: "post",
             eventName: "order_patch",
             url: "/smart/api/order/" + orderID + "/patch",
             json: {
-                data: Array.isArray(data) ? {
-                    patch: data
-                } : data
+                data: requestData
             },
             headers: (_headers13 = {}, _headers13["paypal-client-context"] = orderID, _headers13)
         }).then((function(_ref9) {
@@ -8068,7 +8078,7 @@ window.smartCard = function(modules) {
             }(intent) : _ref7$onApprove, partnerAttributionID = _ref7.partnerAttributionID, onError = _ref7.onError, clientAccessToken = _ref7.clientAccessToken, vault = _ref7.vault, facilitatorAccessToken = _ref7.facilitatorAccessToken, branded = _ref7.branded, createOrder = _ref7.createOrder, paymentSource = _ref7.paymentSource, featureFlags = _ref7.featureFlags;
             if (!onApprove) throw new Error("Expected onApprove");
             return memoize((function(_ref8, _ref9) {
-                var _ref8$accelerated = _ref8.accelerated, accelerated = void 0 !== _ref8$accelerated && _ref8$accelerated, payerID = _ref8.payerID, paymentID = _ref8.paymentID, billingToken = _ref8.billingToken, buyerAccessToken = _ref8.buyerAccessToken, authCode = _ref8.authCode, _ref8$forceRestAPI = _ref8.forceRestAPI, forceRestAPI = void 0 === _ref8$forceRestAPI ? featureFlags.isLsatUpgradable : _ref8$forceRestAPI;
+                var payerID = _ref8.payerID, paymentID = _ref8.paymentID, billingToken = _ref8.billingToken, buyerAccessToken = _ref8.buyerAccessToken, authCode = _ref8.authCode, _ref8$forceRestAPI = _ref8.forceRestAPI, forceRestAPI = void 0 === _ref8$forceRestAPI ? featureFlags.isLsatUpgradable : _ref8$forceRestAPI;
                 var restart = _ref9.restart;
                 return createOrder().then((function(orderID) {
                     var _getLogger$info$track;
@@ -8081,7 +8091,6 @@ window.smartCard = function(modules) {
                     }).flush();
                     return getSupplementalOrderInfo(orderID).then((function(supplementalData) {
                         var data = {
-                            accelerated: accelerated,
                             orderID: orderID,
                             payerID: payerID,
                             paymentID: paymentID = paymentID || supplementalData && supplementalData.checkoutSession && supplementalData.checkoutSession.cart && supplementalData.checkoutSession.cart.paymentId,
@@ -8140,6 +8149,11 @@ window.smartCard = function(modules) {
                                                     method: "post",
                                                     eventName: "order_capture",
                                                     url: "/smart/api/order/" + orderID + "/capture",
+                                                    json: {
+                                                        data: {
+                                                            facilitatorAccessToken: facilitatorAccessToken
+                                                        }
+                                                    },
                                                     headers: (_headers6 = {}, _headers6["paypal-client-context"] = orderID, _headers6)
                                                 }).then((function(res) {
                                                     var smartCorrID = getResponseCorrelationID(res);
@@ -8166,6 +8180,11 @@ window.smartCard = function(modules) {
                                             method: "post",
                                             eventName: "order_capture",
                                             url: "/smart/api/order/" + orderID + "/capture",
+                                            json: {
+                                                data: {
+                                                    facilitatorAccessToken: facilitatorAccessToken
+                                                }
+                                            },
                                             headers: (_headers7 = {}, _headers7["paypal-client-context"] = orderID, _headers7)
                                         }).then((function(_ref5) {
                                             return _ref5.data;
@@ -8216,6 +8235,11 @@ window.smartCard = function(modules) {
                                                     method: "post",
                                                     eventName: "order_authorize",
                                                     url: "/smart/api/order/" + orderID + "/authorize",
+                                                    json: {
+                                                        data: {
+                                                            facilitatorAccessToken: facilitatorAccessToken
+                                                        }
+                                                    },
                                                     headers: (_headers9 = {}, _headers9["paypal-client-context"] = orderID, _headers9)
                                                 }).then((function(res) {
                                                     var smartCorrID = getResponseCorrelationID(res);
@@ -8243,6 +8267,11 @@ window.smartCard = function(modules) {
                                             method: "post",
                                             eventName: "order_authorize",
                                             url: "/smart/api/order/" + orderID + "/authorize",
+                                            json: {
+                                                data: {
+                                                    facilitatorAccessToken: facilitatorAccessToken
+                                                }
+                                            },
                                             headers: (_headers10 = {}, _headers10["paypal-client-context"] = orderID, _headers10)
                                         }).then((function(_ref7) {
                                             return _ref7.data;
@@ -9214,7 +9243,7 @@ window.smartCard = function(modules) {
         var baseProps = function(_ref) {
             var branded = _ref.branded, enableOrdersApprovalSmartWallet = _ref.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref.smartWalletOrderID;
             var xprops = window.xprops;
-            var uid = xprops.uid, env = xprops.env, _xprops$vault = xprops.vault, vault = void 0 !== _xprops$vault && _xprops$vault, commit = xprops.commit, locale = xprops.locale, platform = xprops.platform, sessionID = xprops.sessionID, clientID = xprops.clientID, partnerAttributionID = xprops.partnerAttributionID, merchantRequestedPopupsDisabled = xprops.merchantRequestedPopupsDisabled, clientMetadataID = xprops.clientMetadataID, sdkCorrelationID = xprops.sdkCorrelationID, getParentDomain = xprops.getParentDomain, clientAccessToken = xprops.clientAccessToken, getPopupBridge = xprops.getPopupBridge, getPrerenderDetails = xprops.getPrerenderDetails, getPageUrl = xprops.getPageUrl, enableThreeDomainSecure = xprops.enableThreeDomainSecure, enableVaultInstallments = xprops.enableVaultInstallments, _xprops$enableNativeC = xprops.enableNativeCheckout, enableNativeCheckout = void 0 !== _xprops$enableNativeC && _xprops$enableNativeC, _xprops$experience = xprops.experience, experience = void 0 === _xprops$experience ? "" : _xprops$experience, rememberFunding = xprops.remember, stageHost = xprops.stageHost, apiStageHost = xprops.apiStageHost, getParent = xprops.getParent, fundingSource = xprops.fundingSource, currency = xprops.currency, connect = xprops.connect, intent = xprops.intent, merchantID = xprops.merchantID, amount = xprops.amount, userIDToken = xprops.userIDToken, enableFunding = xprops.enableFunding, disableFunding = xprops.disableFunding, disableCard = xprops.disableCard, disableAutocomplete = xprops.disableAutocomplete, wallet = xprops.wallet, _xprops$paymentMethod = xprops.paymentMethodToken, paymentMethodToken = void 0 === _xprops$paymentMethod ? xprops.paymentMethodNonce : _xprops$paymentMethod, _xprops$getQueriedEli = xprops.getQueriedEligibleFunding, getQueriedEligibleFunding = void 0 === _xprops$getQueriedEli ? function() {
+            var uid = xprops.uid, env = xprops.env, _xprops$vault = xprops.vault, vault = void 0 !== _xprops$vault && _xprops$vault, commit = xprops.commit, locale = xprops.locale, platform = xprops.platform, sessionID = xprops.sessionID, clientID = xprops.clientID, partnerAttributionID = xprops.partnerAttributionID, merchantRequestedPopupsDisabled = xprops.merchantRequestedPopupsDisabled, clientMetadataID = xprops.clientMetadataID, sdkCorrelationID = xprops.sdkCorrelationID, getParentDomain = xprops.getParentDomain, clientAccessToken = xprops.clientAccessToken, getPopupBridge = xprops.getPopupBridge, getPrerenderDetails = xprops.getPrerenderDetails, getPageUrl = xprops.getPageUrl, enableThreeDomainSecure = xprops.enableThreeDomainSecure, enableVaultInstallments = xprops.enableVaultInstallments, _xprops$enableNativeC = xprops.enableNativeCheckout, enableNativeCheckout = void 0 !== _xprops$enableNativeC && _xprops$enableNativeC, rememberFunding = xprops.remember, stageHost = xprops.stageHost, apiStageHost = xprops.apiStageHost, getParent = xprops.getParent, fundingSource = xprops.fundingSource, currency = xprops.currency, connect = xprops.connect, intent = xprops.intent, merchantID = xprops.merchantID, amount = xprops.amount, userIDToken = xprops.userIDToken, enableFunding = xprops.enableFunding, disableFunding = xprops.disableFunding, disableCard = xprops.disableCard, disableAutocomplete = xprops.disableAutocomplete, wallet = xprops.wallet, _xprops$paymentMethod = xprops.paymentMethodToken, paymentMethodToken = void 0 === _xprops$paymentMethod ? xprops.paymentMethodNonce : _xprops$paymentMethod, _xprops$getQueriedEli = xprops.getQueriedEligibleFunding, getQueriedEligibleFunding = void 0 === _xprops$getQueriedEli ? function() {
                 return promise_ZalgoPromise.resolve([]);
             } : _xprops$getQueriedEli, storageID = xprops.storageID, applePay = xprops.applePay, userExperienceFlow = xprops.userExperienceFlow, allowBillingPayments = xprops.allowBillingPayments, paymentRequest = xprops.paymentRequest;
             var onInit = function(_ref) {
@@ -9312,7 +9341,6 @@ window.smartCard = function(modules) {
                 enableThreeDomainSecure: enableThreeDomainSecure,
                 enableNativeCheckout: enableNativeCheckout,
                 enableVaultInstallments: enableVaultInstallments,
-                experience: experience,
                 onClick: onClick,
                 onInit: onInit,
                 onError: getOnError({
@@ -9369,24 +9397,22 @@ window.smartCard = function(modules) {
         });
     }
     var vault_without_purchase_savePaymentSource = function(_ref) {
-        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, idToken = _ref.idToken;
+        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource;
         var vaultToken;
         return (0, _ref.createVaultSetupToken)().then((function(vaultSetupToken) {
             if ("string" != typeof vaultSetupToken) throw new TypeError("Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string");
             vaultToken = vaultSetupToken;
             return callGraphQL({
                 name: "UpdateVaultSetupToken",
-                query: "\n      mutation UpdateVaultSetupToken(\n        $clientID: String!\n        $vaultSetupToken: String!\n        $paymentSource: PaymentSource\n        $idToken: String!\n      ) {\n        updateVaultSetupToken(\n          clientId: $clientID\n          vaultSetupToken: $vaultSetupToken\n          paymentSource: $paymentSource\n          idToken: $idToken\n        ) {\n          id,\n          status\n        }\n      }",
+                query: "\n      mutation UpdateVaultSetupToken(\n        $clientID: String!\n        $vaultSetupToken: String!\n        $paymentSource: PaymentSource\n      ) {\n        updateVaultSetupToken(\n          clientId: $clientID\n          vaultSetupToken: $vaultSetupToken\n          paymentSource: $paymentSource\n        ) {\n          id,\n          status\n        }\n      }",
                 variables: {
                     clientID: (_ref2 = {
                         vaultSetupToken: vaultSetupToken,
                         clientID: clientID,
-                        paymentSource: paymentSource,
-                        idToken: idToken
+                        paymentSource: paymentSource
                     }).clientID,
                     vaultSetupToken: _ref2.vaultSetupToken,
-                    paymentSource: _ref2.paymentSource,
-                    idToken: _ref2.idToken
+                    paymentSource: _ref2.paymentSource
                 }
             });
             var _ref2;
@@ -9398,9 +9424,10 @@ window.smartCard = function(modules) {
             return function(_ref6) {
                 var _getLogger$track3;
                 var vaultToken = _ref6.vaultToken;
-                getLogger().track((_getLogger$track3 = {}, _getLogger$track3.transition_name = "hcf_vault_without_purchase_success", 
-                _getLogger$track3.event_name = "hcf_vault_without_purchase_success", _getLogger$track3.vault_token = vaultToken, 
-                _getLogger$track3)).flush();
+                getLogger().track((_getLogger$track3 = {}, _getLogger$track3.transition_name = "hcf_transaction_success", 
+                _getLogger$track3.event_name = "hcf_transaction_success", _getLogger$track3.vault_token = vaultToken, 
+                _getLogger$track3.payment_flow = "vault_without_purchase", _getLogger$track3.context_type = "vault_setup_token", 
+                _getLogger$track3.context_id = vaultToken, _getLogger$track3)).flush();
             }({
                 vaultToken: vaultToken
             });
@@ -9409,8 +9436,10 @@ window.smartCard = function(modules) {
             !function(_ref7) {
                 var _getLogger$track4;
                 var vaultToken = _ref7.vaultToken, error = _ref7.error;
-                getLogger().track((_getLogger$track4 = {}, _getLogger$track4.ext_error_code = "hcf_vault_without_purchase_error", 
-                _getLogger$track4.ext_error_desc = stringifyErrorMessage(error), _getLogger$track4.vault_token = vaultToken, 
+                getLogger().track((_getLogger$track4 = {}, _getLogger$track4.ext_error_code = "hcf_transaction_error", 
+                _getLogger$track4.event_name = "hcf_transaction_error", _getLogger$track4.ext_error_desc = stringifyErrorMessage(error), 
+                _getLogger$track4.vault_token = vaultToken, _getLogger$track4.payment_flow = "vault_without_purchase", 
+                _getLogger$track4.context_type = "vault_setup_token", _getLogger$track4.context_id = vaultToken, 
                 _getLogger$track4)).flush();
             }({
                 error: error,
@@ -9428,6 +9457,16 @@ window.smartCard = function(modules) {
             experiments: _ref.experiments
         });
         var _ref2 = [ Boolean(cardProps.createOrder), Boolean(cardProps.createVaultSetupToken) ], isPurchaseFlow = _ref2[0], isVaultWithoutPurchaseFlow = _ref2[1];
+        hcfSessionID = (_ref8 = {
+            isPurchaseFlow: isPurchaseFlow,
+            isVaultWithoutPurchaseFlow: isVaultWithoutPurchaseFlow,
+            hcfSessionID: cardProps.hcfSessionID
+        }).hcfSessionID, flow = _ref8.isPurchaseFlow ? "with_purchase" : _ref8.isVaultWithoutPurchaseFlow ? "vault_without_purchase" : "", 
+        getLogger().track(((_getLogger$track5 = {}).transition_name = "hcf_fields_submit", 
+        _getLogger$track5.event_name = "hcf_fields_submit", _getLogger$track5.payment_flow = flow, 
+        _getLogger$track5.context_type = "hosted_session_id", _getLogger$track5.context_id = hcfSessionID, 
+        _getLogger$track5));
+        var _ref8, _getLogger$track5, hcfSessionID, flow;
         gql_resetGQLErrors();
         return promise_ZalgoPromise.try((function() {
             if (!hasCardFields()) throw new Error("Card fields not available to submit");
@@ -9480,7 +9519,8 @@ window.smartCard = function(modules) {
                         var orderID = _ref4.orderID;
                         getLogger().track((_getLogger$track = {}, _getLogger$track.transition_name = "hcf_transaction_success", 
                         _getLogger$track.event_name = "hcf_transaction_success", _getLogger$track.order_id = orderID, 
-                        _getLogger$track)).flush();
+                        _getLogger$track.payment_flow = "with_purchase", _getLogger$track.context_type = "order_id", 
+                        _getLogger$track.context_id = orderID, _getLogger$track)).flush();
                     }({
                         orderID: orderID
                     });
@@ -9490,7 +9530,9 @@ window.smartCard = function(modules) {
                         var _getLogger$track2;
                         var orderID = _ref5.orderID, error = _ref5.error;
                         getLogger().track((_getLogger$track2 = {}, _getLogger$track2.ext_error_code = "hcf_transaction_error", 
-                        _getLogger$track2.ext_error_desc = stringifyErrorMessage(error), _getLogger$track2.order_id = orderID, 
+                        _getLogger$track2.event_name = "hcf_transaction_error", _getLogger$track2.ext_error_desc = stringifyErrorMessage(error), 
+                        _getLogger$track2.order_id = orderID, _getLogger$track2.payment_flow = "with_purchase", 
+                        _getLogger$track2.context_type = "order_id", _getLogger$track2.context_id = orderID, 
                         _getLogger$track2)).flush();
                     }({
                         error: error,
@@ -9505,8 +9547,7 @@ window.smartCard = function(modules) {
                     createVaultSetupToken: cardProps.createVaultSetupToken,
                     onError: cardProps.onError,
                     clientID: cardProps.clientID,
-                    paymentSource: convertCardToPaymentSource(card, extraFields),
-                    idToken: cardProps.userIDToken || ""
+                    paymentSource: convertCardToPaymentSource(card, extraFields)
                 });
             }(cardProps, card, extraFields) : void 0;
         }));
@@ -11017,11 +11058,11 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {}).context_type = "hcf_session_id", _ref2.context_id = hcfSessionID, 
-                _ref2.button_version = "5.0.138", _ref2.hcf_session_id = hcfSessionID, _ref2.hcf_correlation_id = cardCorrelationID, 
-                _ref2.bn_code = partnerAttributionID, _ref2.merchant_domain = merchantDomain, _ref2.t = Date.now().toString(), 
-                _ref2.sdk_correlation_id = sdkCorrelationID, _ref2.checkout = clientID, _ref2.seller_id = null == merchantID ? void 0 : merchantID[0], 
-                _ref2;
+                return (_ref2 = {}).button_version = "5.0.139", _ref2.hcf_session_id = hcfSessionID, 
+                _ref2.hcf_correlation_id = cardCorrelationID, _ref2.bn_code = partnerAttributionID, 
+                _ref2.merchant_domain = merchantDomain, _ref2.t = Date.now().toString(), _ref2.sdk_correlation_id = sdkCorrelationID, 
+                _ref2.checkout = clientID, _ref2.seller_id = null == merchantID ? void 0 : merchantID[0], 
+                _ref2.hcf_version = "v2", _ref2;
             }));
             var tracking = ((_tracking = {}).state_name = "card_field", _tracking.transition_name = "hcf_" + type + "_field_rendered", 
             _tracking.event_name = "hcf_" + type + "_field_rendered", _tracking);
@@ -11036,7 +11077,8 @@ window.smartCard = function(modules) {
             }).then((function(_ref3) {
                 var _extends2;
                 var pageRenderTime = _ref3.pageRenderTime;
-                logger.track(_extends({}, tracking, ((_extends2 = {}).page_load_time = pageRenderTime ? pageRenderTime.toString() : "", 
+                logger.track(_extends({}, tracking, ((_extends2 = {}).context_type = "hosted_session_id", 
+                _extends2.context_id = hcfSessionID, _extends2.page_load_time = pageRenderTime ? pageRenderTime.toString() : "", 
                 _extends2)));
                 logger.flush();
             }));
