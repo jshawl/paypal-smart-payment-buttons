@@ -8,7 +8,8 @@ import type {FeatureFlags} from '../types'
 import type { CreateBillingAgreement, CreateSubscription } from '../props';
 import { BUTTON_LABEL, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY, ITEM_CATEGORY, FPTI_TRANSITION, FPTI_STATE } from '../constants';
 import { getSupplementalOrderInfo } from '../api';
-import { getLogger, isEmailAddress } from '../lib';
+import { isEmailAddress } from '../lib';
+import { getLogger } from '../lib/logger'
 
 type Payee = {|
     merchantId? : string,
@@ -207,7 +208,7 @@ export function validateOrder(orderID : string, { env, merchantID, currency, int
             });
         }
 
-        if (cartBillingType && !vault) {
+        if (cartBillingType && !vault && !window.xprops.createVaultSetupToken) {
             triggerIntegrationError({
                 error:         `smart_button_validation_error_billing_${ cartAmount ? 'with' : 'without' }_purchase_no_vault`,
                 message:       `Expected ${ SDK_QUERY_KEYS.VAULT }=${ VAULT.TRUE.toString() } for a billing transaction`,
@@ -218,7 +219,16 @@ export function validateOrder(orderID : string, { env, merchantID, currency, int
             });
         }
 
-        if (vault && !cartBillingType && !window.xprops.createBillingAgreement && !window.xprops.createSubscription && !window.xprops.clientAccessToken && !window.xprops.userIDToken) {
+        if (vault && window.xprops.createVaultSetupToken) {
+            triggerIntegrationError({
+                error:         "smart_button_validation_error_vault_passed_with_create_vault_setup_token",
+                message:       `Query parameter ${ SDK_QUERY_KEYS.VAULT } is not needed when using createVaultSetupToken`,
+                featureFlags,
+                orderID,
+                loggerPayload: { vault, cartBillingType },
+                throwError:    false
+            });
+        } else if (vault && !cartBillingType && !window.xprops.createBillingAgreement && !window.xprops.createSubscription && !window.xprops.clientAccessToken && !window.xprops.userIDToken) {
             triggerIntegrationError({
                 error:         `smart_button_validation_error_vault_passed_not_needed`,
                 message:       `Expected ${ SDK_QUERY_KEYS.VAULT }=${ VAULT.FALSE.toString() } for a non-billing, non-subscription transaction`,
@@ -229,7 +239,7 @@ export function validateOrder(orderID : string, { env, merchantID, currency, int
             });
         }
 
-        if (cartBillingType && !cartAmount && intent !== INTENT.TOKENIZE) {
+        if (cartBillingType && !cartAmount && intent !== INTENT.TOKENIZE && !window.xprops.createVaultSetupToken) {
             triggerIntegrationError({
                 error:         `smart_button_validation_error_billing_without_purchase_intent_tokenize_not_passed`,
                 message:       `Expected ${ SDK_QUERY_KEYS.INTENT }=${ INTENT.TOKENIZE } for a billing-without-purchase transaction`,
