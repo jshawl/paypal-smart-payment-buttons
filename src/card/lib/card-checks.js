@@ -102,7 +102,8 @@ export function checkCardEligibility(cardNumber : string, cardType : CardType, i
     if (fundingEligibility?.card?.eligible && type && fundingEligibility.card.vendors && !fundingEligibility.card.branded) {
         // mark as eligible if the card vendor is explicitly set to be eligible
         const vendor = fundingEligibility.card.vendors[type];
-        if (isVaultFlow && vendor?.vaultable) {
+        // We're only allowing cards to be vaulted if they're both vaultable and eligible for purchase
+        if (isVaultFlow && vendor?.vaultable && vendor?.eligible) {
             return true;
         }
         else if (!isVaultFlow && vendor?.eligible) {

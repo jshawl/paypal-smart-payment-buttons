@@ -176,13 +176,14 @@ describe("card-checks", () => {
       );
     });
 
-    it("should find the card eligible when the card type is eligible for vaulting", () => {
+    it("should find the card eligible for vaulting when the card type is eligible for vaulting and purchase", () => {
       window.xprops.fundingEligibility = {
         card: {
           eligible: true,
           vendors: {
             discover: {
               vaultable: true,
+              eligible: true,
             },
           },
         },
@@ -192,6 +193,26 @@ describe("card-checks", () => {
       const isVaultFlow = true;
       expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
         true
+      );
+    });
+
+    it("should find the card ineligible for vaulting when the card type is vaultable but ineligible for purchase", () => {
+      window.xprops.fundingEligibility = {
+        card: {
+          eligible: true,
+          vendors: {
+            discover: {
+              vaultable: true,
+              eligible: false,
+            },
+          },
+        },
+      };
+      const cardNumber = "6011000990139424";
+      const cardType = detectCardType(cardNumber)[0];
+      const isVaultFlow = true;
+      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
+        false
       );
     });
 
