@@ -11058,7 +11058,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {}).button_version = "5.0.139", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {}).button_version = "5.0.140", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2.bn_code = partnerAttributionID, 
                 _ref2.merchant_domain = merchantDomain, _ref2.t = Date.now().toString(), _ref2.sdk_correlation_id = sdkCorrelationID, 
                 _ref2.checkout = clientID, _ref2.seller_id = null == merchantID ? void 0 : merchantID[0], 
