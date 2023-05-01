@@ -222,11 +222,11 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 return ZalgoPromise.try(close).then(() => {
                     throw err;
                 });
-            }).then((noop)).finally(() => {
-              if (featureFlags.isButtonClientConfigCallBlocking) {
-                  getLogger().info('redirect_to_xorouter', {time: String(new Date().getTime()), fundingSource, buttonSessionID})
-              }
-            });
+            }).then(() => {
+                if (featureFlags.isButtonClientConfigCallBlocking) {
+                    getLogger().info('redirect_to_xorouter', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                }
+            })
         });
 
     }).finally(() => {
