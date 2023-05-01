@@ -177,7 +177,12 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
             });
 
             const startPromise = updateClientConfigPromise.then(() => {
-                getLogger().info('update_button_client_config_resolved', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                if (featureFlags.isButtonClientConfigCallBlocking) {
+                    getLogger().info('blocking_cco_call_resolved', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                } else {
+                    getLogger().info('non_blocking_cco_call_resolved', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                }
+
                 return start();
             });
 
@@ -224,7 +229,9 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 });
             }).then(() => {
                 if (featureFlags.isButtonClientConfigCallBlocking) {
-                    getLogger().info('redirect_to_xorouter', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                    getLogger().info('redirect_to_xorouter_blocking_cco', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                } else {
+                    getLogger().info('redirect_to_xorouter_non_blocking_cco', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
                 }
             })
         });
