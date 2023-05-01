@@ -160,7 +160,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
 
                 // feature flag to control blocking/non-blocking behavior
                 if (featureFlags.isButtonClientConfigCallBlocking) {
-                    return updateButtonClientConfigWrapper()
+                    return updateButtonClientConfigWrapper();
                 } else {
                     // non-blocking call by default
                     updateButtonClientConfigWrapper();
@@ -177,7 +177,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
             });
 
             const startPromise = updateClientConfigPromise.then(() => {
-              getLogger().info('update_button_client_config_resolved', {time: String(new Date().getTime()), fundingSource, buttonSessionID})
+                getLogger().info('update_button_client_config_resolved', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
                 return start();
             });
 
