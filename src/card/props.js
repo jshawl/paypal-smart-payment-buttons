@@ -22,7 +22,8 @@ import type {
   XCreateOrder,
   XCreateBillingAgreement,
   XCreateSubscription,
-  XCreateVaultSetupToken,
+  XCreateVaultSetupTokenCardFields,
+  CreateVaultSetupToken,
   SaveActionOnApprove,
 } from "../props";
 
@@ -99,7 +100,7 @@ export type CardXProps = {|
   createOrder: ?XCreateOrder,
   createBillingAgreement: ?XCreateBillingAgreement,
   createSubscription: ?XCreateSubscription,
-  createVaultSetupToken: ?XCreateVaultSetupToken,
+  createVaultSetupToken: XCreateVaultSetupTokenCardFields,
   hcfSessionID: string
 |};
 
@@ -127,7 +128,7 @@ export type LegacyCardProps = {|
 
 export type SaveCardFieldsProps = {|
   ...BaseCardProps,
-  createVaultSetupToken: XCreateVaultSetupToken,
+  createVaultSetupToken: CreateVaultSetupToken,
   onApprove: SaveActionOnApprove
 |}
 

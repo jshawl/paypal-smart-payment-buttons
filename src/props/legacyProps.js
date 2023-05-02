@@ -102,7 +102,7 @@ export function getLegacyProps({
   const createBillingAgreement = getCreateBillingAgreement({ createBillingAgreement: inputCreateBillingAgreement, paymentSource });
   const createSubscription = getCreateSubscription({ createSubscription: inputCreateSubscription, partnerAttributionID, merchantID, clientID, paymentSource }, { facilitatorAccessToken });
 
-  const createVaultSetupToken = getCreateVaultSetupToken({ createVaultSetupToken: inputCreateVaultSetupToken });
+  const createVaultSetupToken = getCreateVaultSetupToken({ createVaultSetupToken: inputCreateVaultSetupToken, paymentSource });
 
    const createOrder = getCreateOrder({ createOrder: inputCreateOrder, currency, intent, merchantID, partnerAttributionID, paymentSource }, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow });
 

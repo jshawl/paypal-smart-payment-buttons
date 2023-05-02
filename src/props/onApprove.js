@@ -575,7 +575,7 @@ export function getOnApproveVaultWithoutPurchase({ onApprove, onError, facilitat
                   [FPTI_KEY.CONTEXT_ID]:   orderID
               }).flush();
 
-          return createVaultSetupToken().then( (vaultSetupToken) => {
+          return createVaultSetupToken().then(vaultSetupToken => {
             const data = { payerID, facilitatorAccessToken, paymentSource, vaultSetupToken };
             return onApprove(data).catch(err => {
                 return ZalgoPromise.try(() => {

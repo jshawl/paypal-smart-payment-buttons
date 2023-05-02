@@ -2,26 +2,58 @@
 
 import { memoize } from "@krakenjs/belter/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import { FUNDING } from "@paypal/sdk-constants/src";
 
-export type XCreateVaultSetupTokenDataType = {||};
+type PaymentSource = $Values<typeof FUNDING> | null;
 
-export type XCreateVaultSetupToken = () => ZalgoPromise<string>;
+export type XCreateVaultSetupTokenDataType = {|
+  paymentSource: PaymentSource,
+|};
 
-export type CreateVaultSetupToken = XCreateVaultSetupToken;
+// What's the difference between XCreate... and Create...?
+// XCreate... is the function that is passed through Zoid, usually by the merchant.
+// Calling XCreate... is communicating with the merchant domain
+// Create... is the internal version of the function passed by the merchant.
+// We decorate Create... with our own config, pass through specific options needed,
+// and sometimes making additional API or logging calls.  
+export type XCreateVaultSetupToken = ?(
+  XCreateVaultSetupTokenDataType
+) => ZalgoPromise<string>;
+export type CreateVaultSetupToken = () => ZalgoPromise<string>;
 
-export const getCreateVaultSetupToken = ({ createVaultSetupToken, }: {| createVaultSetupToken: ?XCreateVaultSetupToken, |}):
-  () => ZalgoPromise<string> =>
-  memoize(() => {
-    if (createVaultSetupToken) {
-      return createVaultSetupToken().then((vaultSetupToken) => {
-        if (!vaultSetupToken || typeof vaultSetupToken !== "string") {
-          throw new Error(
+// TODO: move away from using `src/props/...callbacks in CardFields code
+// Callbacks should be defined where they are used (buttons, card, etc)
+export type XCreateVaultSetupTokenCardFields = ?() => ZalgoPromise<string>;
+
+export function buildXCreateVaultSetupTokenData({
+  paymentSource,
+}: {|
+  paymentSource: PaymentSource,
+|}): XCreateVaultSetupTokenDataType {
+  return { paymentSource };
+}
+
+export const getCreateVaultSetupToken = ({
+  createVaultSetupToken,
+  paymentSource,
+}: {|
+  createVaultSetupToken: XCreateVaultSetupToken,
+  paymentSource: PaymentSource,
+|}): CreateVaultSetupToken => {
+  const data = buildXCreateVaultSetupTokenData({ paymentSource });
+
+  return memoize(() => {
+    if (!createVaultSetupToken) {
+      throw new Error(`createVaultSetupToken undefined`);
+    }
+
+    return createVaultSetupToken(data).then((vaultSetupToken) => {
+      if (!vaultSetupToken || typeof vaultSetupToken !== "string") {
+        throw new Error(
           `Expected a vault setup token to be returned from createVaultSetupToken`
         );
       }
       return vaultSetupToken;
     });
-  } else {
-    throw new Error(`createVaultSetupToken undefined`);
-  }
-});
+  });
+};

@@ -12,13 +12,13 @@ import {
 } from "../logger";
 import type {
   XOnError,
-  XCreateVaultSetupToken,
+  CreateVaultSetupToken,
   SaveActionOnApprove,
 } from "../../props";
 import { SUBMIT_ERRORS } from "../constants";
 
 type VaultPaymenSourceOptions = {|
-  createVaultSetupToken: XCreateVaultSetupToken,
+  createVaultSetupToken: CreateVaultSetupToken,
   onApprove: SaveActionOnApprove,
   onError: XOnError,
   clientID: string,
@@ -43,7 +43,7 @@ export const savePaymentSource = ({
         vaultSetupToken,
         clientID,
         paymentSource,
-      })
+      });
     })
     .then(() => onApprove({ vaultSetupToken: vaultToken }))
     .then(() => vaultWithoutPurchaseSuccess({ vaultToken }))

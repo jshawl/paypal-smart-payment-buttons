@@ -164,7 +164,17 @@ type CreateOrderXProps = {|
     paymentSource : $Values<typeof FUNDING> | null
 |};
 
-export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow } : {| facilitatorAccessToken : string, createBillingAgreement? : ?CreateBillingAgreement, createSubscription? : ?CreateSubscription, enableOrdersApprovalSmartWallet? : boolean, smartWalletOrderID? : string, createVaultSetupToken? : ?CreateVaultSetupToken, flow: ?string |}) : CreateOrder {
+type CreateOrderProps = {|
+    facilitatorAccessToken: string,
+    createBillingAgreement?: ?CreateBillingAgreement,
+    createSubscription?: ?CreateSubscription,
+    createVaultSetupToken?: CreateVaultSetupToken,
+    enableOrdersApprovalSmartWallet?: boolean,
+    flow: ?string,
+    smartWalletOrderID?: string,
+  |};
+
+export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow } : CreateOrderProps) : CreateOrder {
     const data = buildXCreateOrderData({ paymentSource });
     const actions = buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID });
 
