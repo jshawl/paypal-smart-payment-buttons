@@ -594,7 +594,9 @@ type ClientConfig = {|
 
 export function updateClientConfig({ orderID, fundingSource, integrationArtifact, userExperienceFlow, productFlow, buttonSessionID, featureFlags } : ClientConfig) : ZalgoPromise<void> {
     if (featureFlags && featureFlags.isButtonClientConfigCallBlocking) {
-      getLogger().info('update_button_client_config_called_as_blocking', {time: String(new Date().getTime()), ecToken: orderID, buttonSessionID, fundingSource})
+        getLogger().info('blocking_cco_call', {time: String(new Date().getTime()), buttonSessionID, fundingSource});
+    } else {
+        getLogger().info('non_blocking_cco_call', {time: String(new Date().getTime()), buttonSessionID, fundingSource});
     }
 
     return callGraphQL({

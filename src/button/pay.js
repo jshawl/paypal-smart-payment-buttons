@@ -160,9 +160,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
 
                 // feature flag to control blocking/non-blocking behavior
                 if (featureFlags.isButtonClientConfigCallBlocking) {
-                    return updateButtonClientConfigWrapper().then(() => {
-                        getLogger().info('update_button_client_config_resolved', {time: String(new Date().getTime()), fundingSource, ecToken: orderID, buttonSessionID})
-                    });
+                    return updateButtonClientConfigWrapper();
                 } else {
                     // non-blocking call by default
                     updateButtonClientConfigWrapper();
@@ -179,6 +177,12 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
             });
 
             const startPromise = updateClientConfigPromise.then(() => {
+                if (featureFlags.isButtonClientConfigCallBlocking) {
+                    getLogger().info('blocking_cco_call_resolved', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                } else {
+                    getLogger().info('non_blocking_cco_call_resolved', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                }
+
                 return start();
             });
 
@@ -194,10 +198,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 });
             });
 
-            let confirmedOrderID;
-
             const confirmOrderPromise = createOrder().then((orderID) => {
-                confirmedOrderID = orderID;
                 return window.xprops.sessionState.get(
                     `__confirm_${ fundingSource }_payload__`
                 ).then(confirmOrderPayload => {
@@ -226,11 +227,13 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 return ZalgoPromise.try(close).then(() => {
                     throw err;
                 });
-            }).then((noop)).finally(() => {
-              if (featureFlags.isButtonClientConfigCallBlocking) {
-                  getLogger().info('redirect_to_xorouter', {time: String(new Date().getTime()), fundingSource, ecToken: confirmedOrderID, buttonSessionID})
-              }
-            });
+            }).then(() => {
+                if (featureFlags.isButtonClientConfigCallBlocking) {
+                    getLogger().info('redirect_to_xorouter_blocking_cco', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                } else {
+                    getLogger().info('redirect_to_xorouter_non_blocking_cco', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                }
+            })
         });
 
     }).finally(() => {
