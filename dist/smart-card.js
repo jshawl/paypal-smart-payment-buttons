@@ -8630,17 +8630,21 @@ window.smartCard = function(modules) {
         }, {
             facilitatorAccessToken: facilitatorAccessToken
         });
-        var createVaultSetupToken = function(_ref) {
-            var createVaultSetupToken = _ref.createVaultSetupToken;
+        var createVaultSetupToken = function(_ref2) {
+            var createVaultSetupToken = _ref2.createVaultSetupToken;
+            var data = {
+                paymentSource: _ref2.paymentSource
+            };
             return memoize((function() {
-                if (createVaultSetupToken) return createVaultSetupToken().then((function(vaultSetupToken) {
+                if (!createVaultSetupToken) throw new Error("createVaultSetupToken undefined");
+                return createVaultSetupToken(data).then((function(vaultSetupToken) {
                     if (!vaultSetupToken || "string" != typeof vaultSetupToken) throw new Error("Expected a vault setup token to be returned from createVaultSetupToken");
                     return vaultSetupToken;
                 }));
-                throw new Error("createVaultSetupToken undefined");
             }));
         }({
-            createVaultSetupToken: inputCreateVaultSetupToken
+            createVaultSetupToken: inputCreateVaultSetupToken,
+            paymentSource: paymentSource
         });
         var createOrder = getCreateOrder({
             createOrder: inputCreateOrder,
@@ -11058,7 +11062,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {}).button_version = "5.0.140", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {}).button_version = "5.0.141", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2.bn_code = partnerAttributionID, 
                 _ref2.merchant_domain = merchantDomain, _ref2.t = Date.now().toString(), _ref2.sdk_correlation_id = sdkCorrelationID, 
                 _ref2.checkout = clientID, _ref2.seller_id = null == merchantID ? void 0 : merchantID[0], 

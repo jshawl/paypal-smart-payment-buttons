@@ -9966,7 +9966,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.140", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.141", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -10048,9 +10048,12 @@ window.spb = function(modules) {
         function updateClientConfig(_ref17) {
             var _headers18;
             var orderID = _ref17.orderID, fundingSource = _ref17.fundingSource, integrationArtifact = _ref17.integrationArtifact, userExperienceFlow = _ref17.userExperienceFlow, productFlow = _ref17.productFlow, buttonSessionID = _ref17.buttonSessionID, featureFlags = _ref17.featureFlags;
-            featureFlags && featureFlags.isButtonClientConfigCallBlocking && Object(lib.getLogger)().info("update_button_client_config_called_as_blocking", {
+            featureFlags && featureFlags.isButtonClientConfigCallBlocking ? Object(lib.getLogger)().info("blocking_cco_call", {
                 time: String((new Date).getTime()),
-                ecToken: orderID,
+                buttonSessionID: buttonSessionID,
+                fundingSource: fundingSource
+            }) : Object(lib.getLogger)().info("non_blocking_cco_call", {
+                time: String((new Date).getTime()),
                 buttonSessionID: buttonSessionID,
                 fundingSource: fundingSource
             });
@@ -10976,7 +10979,8 @@ window.spb = function(modules) {
                 facilitatorAccessToken: facilitatorAccessToken
             });
             var createVaultSetupToken = Object(props_createVaultSetupToken.getCreateVaultSetupToken)({
-                createVaultSetupToken: inputCreateVaultSetupToken
+                createVaultSetupToken: inputCreateVaultSetupToken,
+                paymentSource: paymentSource
             });
             var createOrder = Object(props_createOrder.getCreateOrder)({
                 createOrder: inputCreateOrder,
@@ -15247,14 +15251,7 @@ window.spb = function(modules) {
                                     });
                                 }));
                             }
-                            if (featureFlags.isButtonClientConfigCallBlocking) return updateButtonClientConfigWrapper().then((function() {
-                                Object(lib.getLogger)().info("update_button_client_config_resolved", {
-                                    time: String((new Date).getTime()),
-                                    fundingSource: fundingSource,
-                                    ecToken: orderID,
-                                    buttonSessionID: buttonSessionID
-                                });
-                            }));
+                            if (featureFlags.isButtonClientConfigCallBlocking) return updateButtonClientConfigWrapper();
                             updateButtonClientConfigWrapper();
                         })).catch(src.noop);
                         var vaultPromise = createOrder().then((function(orderID) {
@@ -15366,6 +15363,15 @@ window.spb = function(modules) {
                             }));
                         }));
                         var startPromise = updateClientConfigPromise.then((function() {
+                            featureFlags.isButtonClientConfigCallBlocking ? Object(lib.getLogger)().info("blocking_cco_call_resolved", {
+                                time: String((new Date).getTime()),
+                                fundingSource: fundingSource,
+                                buttonSessionID: buttonSessionID
+                            }) : Object(lib.getLogger)().info("non_blocking_cco_call_resolved", {
+                                time: String((new Date).getTime()),
+                                fundingSource: fundingSource,
+                                buttonSessionID: buttonSessionID
+                            });
                             return start();
                         }));
                         var validateOrderPromise = createOrder().then((function(orderID) {
@@ -15560,9 +15566,7 @@ window.spb = function(modules) {
                                 featureFlags: serviceData.featureFlags
                             });
                         }));
-                        var confirmedOrderID;
                         var confirmOrderPromise = createOrder().then((function(orderID) {
-                            confirmedOrderID = orderID;
                             return window.xprops.sessionState.get("__confirm_" + fundingSource + "_payload__").then((function(confirmOrderPayload) {
                                 if (confirmOrderPayload) return Object(confirmOrder.getConfirmOrder)({
                                     orderID: orderID,
@@ -15577,11 +15581,14 @@ window.spb = function(modules) {
                             return zalgo_promise_src.ZalgoPromise.try(close).then((function() {
                                 throw err;
                             }));
-                        })).then(src.noop).finally((function() {
-                            featureFlags.isButtonClientConfigCallBlocking && Object(lib.getLogger)().info("redirect_to_xorouter", {
+                        })).then((function() {
+                            featureFlags.isButtonClientConfigCallBlocking ? Object(lib.getLogger)().info("redirect_to_xorouter_blocking_cco", {
                                 time: String((new Date).getTime()),
                                 fundingSource: fundingSource,
-                                ecToken: confirmedOrderID,
+                                buttonSessionID: buttonSessionID
+                            }) : Object(lib.getLogger)().info("redirect_to_xorouter_non_blocking_cco", {
+                                time: String((new Date).getTime()),
+                                fundingSource: fundingSource,
                                 buttonSessionID: buttonSessionID
                             });
                         }));
@@ -15956,7 +15963,7 @@ window.spb = function(modules) {
                     var _ref3;
                     return (_ref3 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref3[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.140", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.141", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref3[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref3[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref3[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -17586,19 +17593,31 @@ window.spb = function(modules) {
     "./src/props/createVaultSetupToken.js": function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         __webpack_require__.r(__webpack_exports__);
+        __webpack_require__.d(__webpack_exports__, "buildXCreateVaultSetupTokenData", (function() {
+            return buildXCreateVaultSetupTokenData;
+        }));
         __webpack_require__.d(__webpack_exports__, "getCreateVaultSetupToken", (function() {
             return getCreateVaultSetupToken;
         }));
         var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@krakenjs/belter/src/index.js");
         __webpack_require__("./node_modules/@krakenjs/zalgo-promise/src/index.js");
-        var getCreateVaultSetupToken = function(_ref) {
-            var createVaultSetupToken = _ref.createVaultSetupToken;
+        __webpack_require__("./node_modules/@paypal/sdk-constants/src/index.js");
+        function buildXCreateVaultSetupTokenData(_ref) {
+            return {
+                paymentSource: _ref.paymentSource
+            };
+        }
+        var getCreateVaultSetupToken = function(_ref2) {
+            var createVaultSetupToken = _ref2.createVaultSetupToken;
+            var data = buildXCreateVaultSetupTokenData({
+                paymentSource: _ref2.paymentSource
+            });
             return Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_0__.memoize)((function() {
-                if (createVaultSetupToken) return createVaultSetupToken().then((function(vaultSetupToken) {
+                if (!createVaultSetupToken) throw new Error("createVaultSetupToken undefined");
+                return createVaultSetupToken(data).then((function(vaultSetupToken) {
                     if (!vaultSetupToken || "string" != typeof vaultSetupToken) throw new Error("Expected a vault setup token to be returned from createVaultSetupToken");
                     return vaultSetupToken;
                 }));
-                throw new Error("createVaultSetupToken undefined");
             }));
         };
     },
@@ -17682,6 +17701,9 @@ window.spb = function(modules) {
             return _createSubscription__WEBPACK_IMPORTED_MODULE_4__.getCreateSubscription;
         }));
         var _createVaultSetupToken__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__("./src/props/createVaultSetupToken.js");
+        __webpack_require__.d(__webpack_exports__, "buildXCreateVaultSetupTokenData", (function() {
+            return _createVaultSetupToken__WEBPACK_IMPORTED_MODULE_5__.buildXCreateVaultSetupTokenData;
+        }));
         __webpack_require__.d(__webpack_exports__, "getCreateVaultSetupToken", (function() {
             return _createVaultSetupToken__WEBPACK_IMPORTED_MODULE_5__.getCreateVaultSetupToken;
         }));
@@ -17802,7 +17824,7 @@ window.spb = function(modules) {
         }));
         __webpack_require__("./src/props/getQueriedEligibleFunding.js");
         var _paymentRequest__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__("./src/props/paymentRequest.js");
-        for (var __WEBPACK_IMPORT_KEY__ in _paymentRequest__WEBPACK_IMPORTED_MODULE_20__) [ "default", "TYPES", "getProps", "buildXCreateOrderData", "buildOrderActions", "buildPaymentActions", "buildXCreateOrderActions", "getCreateOrder", "getConfirmOrder", "buildXCreateBillingAgreementData", "buildXCreateBillingAgreementActions", "getCreateBillingAgreement", "buildXCreateSubscriptionData", "buildXCreateSubscriptionActions", "getCreateSubscription", "getCreateVaultSetupToken", "getOnApproveOrder", "getOnApproveBilling", "getOnApproveTokenize", "getOnApproveSubscription", "getOnApproveVaultWithoutPurchase", "getOnApprove", "getOnComplete", "buildXOnInitActions", "getOnInit", "buildXOnCancelData", "buildXOnCancelActions", "getOnCancel", "ON_SHIPPING_CHANGE_PATHS", "SHIPPING_ADDRESS_ERROR_MESSAGES", "SHIPPING_OPTIONS_ERROR_MESSAGES", "GENERIC_REJECT_ADDRESS_MESSAGE", "buildXOnShippingChangeData", "buildXShippingChangeActions", "getOnShippingChange", "buildXOnShippingAddressChangeData", "buildXOnShippingAddressChangeActions", "getOnShippingAddressChange", "buildXOnShippingOptionsChangeData", "buildXOnShippingOptionsChangeActions", "getOnShippingOptionsChange", "CLICK_VALID", "buildXOnClickData", "buildXOnClickActions", "getOnClick", "getOnError", "POPUP_BRIDGE_OPTYPE", "getRememberFunding", "getGetPageUrl", "getOnAuth" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
+        for (var __WEBPACK_IMPORT_KEY__ in _paymentRequest__WEBPACK_IMPORTED_MODULE_20__) [ "default", "TYPES", "getProps", "buildXCreateOrderData", "buildOrderActions", "buildPaymentActions", "buildXCreateOrderActions", "getCreateOrder", "getConfirmOrder", "buildXCreateBillingAgreementData", "buildXCreateBillingAgreementActions", "getCreateBillingAgreement", "buildXCreateSubscriptionData", "buildXCreateSubscriptionActions", "getCreateSubscription", "buildXCreateVaultSetupTokenData", "getCreateVaultSetupToken", "getOnApproveOrder", "getOnApproveBilling", "getOnApproveTokenize", "getOnApproveSubscription", "getOnApproveVaultWithoutPurchase", "getOnApprove", "getOnComplete", "buildXOnInitActions", "getOnInit", "buildXOnCancelData", "buildXOnCancelActions", "getOnCancel", "ON_SHIPPING_CHANGE_PATHS", "SHIPPING_ADDRESS_ERROR_MESSAGES", "SHIPPING_OPTIONS_ERROR_MESSAGES", "GENERIC_REJECT_ADDRESS_MESSAGE", "buildXOnShippingChangeData", "buildXShippingChangeActions", "getOnShippingChange", "buildXOnShippingAddressChangeData", "buildXOnShippingAddressChangeActions", "getOnShippingAddressChange", "buildXOnShippingOptionsChangeData", "buildXOnShippingOptionsChangeActions", "getOnShippingOptionsChange", "CLICK_VALID", "buildXOnClickData", "buildXOnClickActions", "getOnClick", "getOnError", "POPUP_BRIDGE_OPTYPE", "getRememberFunding", "getGetPageUrl", "getOnAuth" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
             __webpack_require__.d(__webpack_exports__, key, (function() {
                 return _paymentRequest__WEBPACK_IMPORTED_MODULE_20__[key];
             }));
