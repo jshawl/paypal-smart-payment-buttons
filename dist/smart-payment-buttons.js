@@ -9966,7 +9966,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.141", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.142", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -10963,109 +10963,6 @@ window.spb = function(modules) {
         var props_onShippingOptionsChange = __webpack_require__("./src/props/onShippingOptionsChange.js");
         var props_onAuth = __webpack_require__("./src/props/onAuth.js");
         var props_createVaultSetupToken = __webpack_require__("./src/props/createVaultSetupToken.js");
-        function getLegacyProps(_ref) {
-            var paymentSource = _ref.paymentSource, partnerAttributionID = _ref.partnerAttributionID, merchantID = _ref.merchantID, clientID = _ref.clientID, facilitatorAccessToken = _ref.facilitatorAccessToken, currency = _ref.currency, intent = _ref.intent, enableOrdersApprovalSmartWallet = _ref.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref.smartWalletOrderID, branded = _ref.branded, clientAccessToken = _ref.clientAccessToken, _ref$vault = _ref.vault, vault = void 0 !== _ref$vault && _ref$vault, _ref$experiments = _ref.experiments, experiments = void 0 === _ref$experiments ? {} : _ref$experiments, featureFlags = _ref.featureFlags, inputCreateBillingAgreement = _ref.createBillingAgreement, inputCreateSubscription = _ref.createSubscription, inputCreateOrder = _ref.createOrder, onError = _ref.onError, inputOnApprove = _ref.onApprove, inputOnComplete = _ref.onComplete, inputOnCancel = _ref.onCancel, inputOnShippingChange = _ref.onShippingChange, inputOnShippingAddressChange = _ref.onShippingAddressChange, inputOnShippingOptionsChange = _ref.onShippingOptionsChange, inputCreateVaultSetupToken = _ref.createVaultSetupToken, flow = _ref.flow;
-            var createBillingAgreement = Object(props_createBillingAgreement.getCreateBillingAgreement)({
-                createBillingAgreement: inputCreateBillingAgreement,
-                paymentSource: paymentSource
-            });
-            var createSubscription = Object(props_createSubscription.getCreateSubscription)({
-                createSubscription: inputCreateSubscription,
-                partnerAttributionID: partnerAttributionID,
-                merchantID: merchantID,
-                clientID: clientID,
-                paymentSource: paymentSource
-            }, {
-                facilitatorAccessToken: facilitatorAccessToken
-            });
-            var createVaultSetupToken = Object(props_createVaultSetupToken.getCreateVaultSetupToken)({
-                createVaultSetupToken: inputCreateVaultSetupToken,
-                paymentSource: paymentSource
-            });
-            var createOrder = Object(props_createOrder.getCreateOrder)({
-                createOrder: inputCreateOrder,
-                currency: currency,
-                intent: intent,
-                merchantID: merchantID,
-                partnerAttributionID: partnerAttributionID,
-                paymentSource: paymentSource
-            }, {
-                facilitatorAccessToken: facilitatorAccessToken,
-                createBillingAgreement: createBillingAgreement,
-                createSubscription: createSubscription,
-                enableOrdersApprovalSmartWallet: enableOrdersApprovalSmartWallet,
-                smartWalletOrderID: smartWalletOrderID,
-                createVaultSetupToken: createVaultSetupToken,
-                flow: flow
-            });
-            return {
-                createBillingAgreement: createBillingAgreement,
-                createSubscription: createSubscription,
-                createOrder: createOrder,
-                onApprove: Object(props_onApprove.getOnApprove)({
-                    onApprove: inputOnApprove,
-                    createBillingAgreement: createBillingAgreement,
-                    createSubscription: createSubscription,
-                    intent: intent,
-                    onError: onError,
-                    partnerAttributionID: partnerAttributionID,
-                    clientAccessToken: clientAccessToken,
-                    vault: vault,
-                    clientID: clientID,
-                    facilitatorAccessToken: facilitatorAccessToken,
-                    branded: branded,
-                    createOrder: createOrder,
-                    paymentSource: paymentSource,
-                    featureFlags: featureFlags,
-                    createVaultSetupToken: createVaultSetupToken,
-                    flow: flow
-                }),
-                onComplete: Object(props_onComplete.getOnComplete)({
-                    intent: intent,
-                    onComplete: inputOnComplete,
-                    partnerAttributionID: partnerAttributionID,
-                    onError: onError,
-                    clientID: clientID,
-                    facilitatorAccessToken: facilitatorAccessToken,
-                    createOrder: createOrder,
-                    featureFlags: featureFlags
-                }),
-                onCancel: Object(props_onCancel.getOnCancel)({
-                    onCancel: inputOnCancel,
-                    onError: onError
-                }, {
-                    createOrder: createOrder
-                }),
-                onShippingChange: Object(props_onShippingChange.getOnShippingChange)({
-                    onShippingChange: inputOnShippingChange,
-                    partnerAttributionID: partnerAttributionID,
-                    experiments: experiments,
-                    featureFlags: featureFlags,
-                    clientID: clientID
-                }, {
-                    facilitatorAccessToken: facilitatorAccessToken,
-                    createOrder: createOrder
-                }),
-                onShippingAddressChange: Object(props_onShippingAddressChange.getOnShippingAddressChange)({
-                    onShippingAddressChange: inputOnShippingAddressChange,
-                    clientID: clientID
-                }, {
-                    createOrder: createOrder
-                }),
-                onShippingOptionsChange: Object(props_onShippingOptionsChange.getOnShippingOptionsChange)({
-                    onShippingOptionsChange: inputOnShippingOptionsChange,
-                    clientID: clientID
-                }, {
-                    createOrder: createOrder
-                }),
-                onAuth: Object(props_onAuth.getOnAuth)({
-                    facilitatorAccessToken: facilitatorAccessToken,
-                    createOrder: createOrder,
-                    createSubscription: createSubscription,
-                    featureFlags: featureFlags
-                })
-            };
-        }
         var TYPES = !0;
         function getButtonProps(_ref) {
             var _branded;
@@ -11099,7 +10996,109 @@ window.spb = function(modules) {
                 enableOrdersApprovalSmartWallet: enableOrdersApprovalSmartWallet,
                 smartWalletOrderID: smartWalletOrderID
             });
-            var legacyProps = getLegacyProps({
+            var callbackProps = function(_ref) {
+                var paymentSource = _ref.paymentSource, partnerAttributionID = _ref.partnerAttributionID, merchantID = _ref.merchantID, clientID = _ref.clientID, facilitatorAccessToken = _ref.facilitatorAccessToken, currency = _ref.currency, intent = _ref.intent, enableOrdersApprovalSmartWallet = _ref.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref.smartWalletOrderID, branded = _ref.branded, clientAccessToken = _ref.clientAccessToken, _ref$vault = _ref.vault, vault = void 0 !== _ref$vault && _ref$vault, _ref$experiments = _ref.experiments, experiments = void 0 === _ref$experiments ? {} : _ref$experiments, featureFlags = _ref.featureFlags, inputCreateBillingAgreement = _ref.createBillingAgreement, inputCreateSubscription = _ref.createSubscription, inputCreateOrder = _ref.createOrder, onError = _ref.onError, inputOnApprove = _ref.onApprove, inputOnComplete = _ref.onComplete, inputOnCancel = _ref.onCancel, inputOnShippingChange = _ref.onShippingChange, inputOnShippingAddressChange = _ref.onShippingAddressChange, inputOnShippingOptionsChange = _ref.onShippingOptionsChange, inputCreateVaultSetupToken = _ref.createVaultSetupToken, flow = _ref.flow;
+                var createBillingAgreement = Object(props_createBillingAgreement.getCreateBillingAgreement)({
+                    createBillingAgreement: inputCreateBillingAgreement,
+                    paymentSource: paymentSource
+                });
+                var createSubscription = Object(props_createSubscription.getCreateSubscription)({
+                    createSubscription: inputCreateSubscription,
+                    partnerAttributionID: partnerAttributionID,
+                    merchantID: merchantID,
+                    clientID: clientID,
+                    paymentSource: paymentSource
+                }, {
+                    facilitatorAccessToken: facilitatorAccessToken
+                });
+                var createVaultSetupToken = Object(props_createVaultSetupToken.getCreateVaultSetupToken)({
+                    createVaultSetupToken: inputCreateVaultSetupToken,
+                    paymentSource: paymentSource
+                });
+                var createOrder = Object(props_createOrder.getCreateOrder)({
+                    createOrder: inputCreateOrder,
+                    currency: currency,
+                    intent: intent,
+                    merchantID: merchantID,
+                    partnerAttributionID: partnerAttributionID,
+                    paymentSource: paymentSource
+                }, {
+                    facilitatorAccessToken: facilitatorAccessToken,
+                    createBillingAgreement: createBillingAgreement,
+                    createSubscription: createSubscription,
+                    enableOrdersApprovalSmartWallet: enableOrdersApprovalSmartWallet,
+                    smartWalletOrderID: smartWalletOrderID,
+                    createVaultSetupToken: createVaultSetupToken,
+                    flow: flow
+                });
+                return {
+                    createBillingAgreement: createBillingAgreement,
+                    createSubscription: createSubscription,
+                    createOrder: createOrder,
+                    onApprove: Object(props_onApprove.getOnApprove)({
+                        onApprove: inputOnApprove,
+                        createBillingAgreement: createBillingAgreement,
+                        createSubscription: createSubscription,
+                        intent: intent,
+                        onError: onError,
+                        partnerAttributionID: partnerAttributionID,
+                        clientAccessToken: clientAccessToken,
+                        vault: vault,
+                        clientID: clientID,
+                        facilitatorAccessToken: facilitatorAccessToken,
+                        branded: branded,
+                        createOrder: createOrder,
+                        paymentSource: paymentSource,
+                        featureFlags: featureFlags,
+                        createVaultSetupToken: createVaultSetupToken,
+                        flow: flow
+                    }),
+                    onComplete: Object(props_onComplete.getOnComplete)({
+                        intent: intent,
+                        onComplete: inputOnComplete,
+                        partnerAttributionID: partnerAttributionID,
+                        onError: onError,
+                        clientID: clientID,
+                        facilitatorAccessToken: facilitatorAccessToken,
+                        createOrder: createOrder,
+                        featureFlags: featureFlags
+                    }),
+                    onCancel: Object(props_onCancel.getOnCancel)({
+                        onCancel: inputOnCancel,
+                        onError: onError
+                    }, {
+                        createOrder: createOrder
+                    }),
+                    onShippingChange: Object(props_onShippingChange.getOnShippingChange)({
+                        onShippingChange: inputOnShippingChange,
+                        partnerAttributionID: partnerAttributionID,
+                        experiments: experiments,
+                        featureFlags: featureFlags,
+                        clientID: clientID
+                    }, {
+                        facilitatorAccessToken: facilitatorAccessToken,
+                        createOrder: createOrder
+                    }),
+                    onShippingAddressChange: Object(props_onShippingAddressChange.getOnShippingAddressChange)({
+                        onShippingAddressChange: inputOnShippingAddressChange,
+                        clientID: clientID
+                    }, {
+                        createOrder: createOrder
+                    }),
+                    onShippingOptionsChange: Object(props_onShippingOptionsChange.getOnShippingOptionsChange)({
+                        onShippingOptionsChange: inputOnShippingOptionsChange,
+                        clientID: clientID
+                    }, {
+                        createOrder: createOrder
+                    }),
+                    onAuth: Object(props_onAuth.getOnAuth)({
+                        facilitatorAccessToken: facilitatorAccessToken,
+                        createOrder: createOrder,
+                        createSubscription: createSubscription,
+                        featureFlags: featureFlags
+                    })
+                };
+            }({
                 paymentSource: paymentSource,
                 partnerAttributionID: partnerAttributionID,
                 merchantID: merchantID,
@@ -11127,7 +11126,7 @@ window.spb = function(modules) {
                 createVaultSetupToken: xprops.createVaultSetupToken,
                 flow: flow
             });
-            return Object(esm_extends.default)({}, props, legacyProps, {
+            return Object(esm_extends.default)({}, props, callbackProps, {
                 style: style,
                 buttonSessionID: buttonSessionID,
                 branded: branded
@@ -12780,6 +12779,27 @@ window.spb = function(modules) {
             var _getCardFrames = getCardFrames();
             return Boolean(_getCardFrames.cardFrame || _getCardFrames.cardNumberFrame && _getCardFrames.cardCVVFrame && _getCardFrames.cardExpiryFrame);
         }
+        var createVaultSetupToken_getCreateVaultSetupToken = function(_ref) {
+            var createVaultSetupToken = _ref.createVaultSetupToken;
+            if (createVaultSetupToken) return Object(src.memoize)((function() {
+                return createVaultSetupToken().then((function(vaultSetupToken) {
+                    if (!vaultSetupToken || "string" != typeof vaultSetupToken) throw new Error("Expected a vault setup token to be returned from createVaultSetupToken");
+                    return vaultSetupToken;
+                }));
+            }));
+        };
+        function getCreateOrder(_ref) {
+            var createOrder = _ref.createOrder;
+            if (createOrder) return Object(src.memoize)((function() {
+                return zalgo_promise_src.ZalgoPromise.try((function() {
+                    return createOrder();
+                })).then((function(orderID) {
+                    if (!orderID || "string" != typeof orderID) throw new Error("Expected an order id to be passed");
+                    if (orderID.includes("PAY-") || orderID.includes("PAYID-")) throw new Error("Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead");
+                    return orderID;
+                }));
+            }));
+        }
         var api_vault = __webpack_require__("./src/api/vault.js");
         var cardField = {
             name: "card_field",
@@ -12804,7 +12824,7 @@ window.spb = function(modules) {
                             var facilitatorAccessToken = _ref.facilitatorAccessToken, extraFields = _ref.extraFields;
                             var cardProps = function(_ref) {
                                 var _fundingEligibility$c, _fundingEligibility$c2;
-                                var facilitatorAccessToken = _ref.facilitatorAccessToken, featureFlags = _ref.featureFlags;
+                                var facilitatorAccessToken = _ref.facilitatorAccessToken;
                                 if (!_ref.experiments.hostedCardFields) throw new Error("Not feature flagged to use CardFields");
                                 var xprops = window.xprops;
                                 var fundingEligibility = xprops.fundingEligibility, _xprops$branded = xprops.branded, branded = void 0 === _xprops$branded ? null == (_fundingEligibility$c = null == fundingEligibility || null == (_fundingEligibility$c2 = fundingEligibility.card) ? void 0 : _fundingEligibility$c2.branded) || _fundingEligibility$c : _xprops$branded, parent = xprops.parent, createVaultSetupToken = xprops.createVaultSetupToken, createOrder = xprops.createOrder;
@@ -12830,35 +12850,14 @@ window.spb = function(modules) {
                                 if (createVaultSetupToken && createOrder) throw new Error("Cannot pass both createVaultSetupToken and createOrder");
                                 if (!createVaultSetupToken && !createOrder) throw new Error("Must pass either createVaultSetupToken or createOrder");
                                 if (createVaultSetupToken && (null == xprops || !xprops.onApprove)) throw new Error("onApprove is required when saving card fields");
-                                var props = createOrder ? getLegacyProps({
-                                    paymentSource: null,
-                                    partnerAttributionID: xprops.partnerAttributionID,
-                                    merchantID: xprops.merchantID,
-                                    clientID: xprops.clientID,
-                                    currency: xprops.currency,
-                                    intent: xprops.intent,
-                                    clientAccessToken: xprops.clientAccessToken,
-                                    branded: branded,
-                                    vault: !1,
-                                    facilitatorAccessToken: facilitatorAccessToken,
-                                    featureFlags: featureFlags,
-                                    onShippingChange: xprops.onShippingChange,
-                                    onShippingAddressChange: xprops.onShippingAddressChange,
-                                    onShippingOptionsChange: xprops.onShippingOptionsChange,
-                                    onError: baseProps.onError,
-                                    onCancel: xprops.onCancel,
-                                    onApprove: xprops.onApprove,
-                                    createSubscription: xprops.createSubscription,
-                                    createOrder: xprops.createOrder,
-                                    createVaultSetupToken: xprops.createVaultSetupToken,
-                                    flow: null,
-                                    createBillingAgreement: xprops.createBillingAgreement
-                                }) : null;
-                                return Object(esm_extends.default)({}, baseProps, props, returnData, {
-                                    createOrder: xprops.createOrder,
-                                    createVaultSetupToken: xprops.createVaultSetupToken,
-                                    onApprove: xprops.onApprove,
-                                    onError: xprops.onError
+                                return Object(esm_extends.default)({}, baseProps, returnData, {
+                                    createOrder: getCreateOrder({
+                                        createOrder: xprops.createOrder
+                                    }),
+                                    createVaultSetupToken: createVaultSetupToken_getCreateVaultSetupToken({
+                                        createVaultSetupToken: xprops.createVaultSetupToken
+                                    }),
+                                    onApprove: xprops.onApprove
                                 });
                             }({
                                 facilitatorAccessToken: facilitatorAccessToken,
@@ -12889,7 +12888,6 @@ window.spb = function(modules) {
                                 return isPurchaseFlow ? function(cardProps, card, extraFields, facilitatorAccessToken) {
                                     var orderID;
                                     return cardProps.createOrder().then((function(id) {
-                                        if ("string" != typeof (null == id ? void 0 : id.valueOf())) throw new TypeError("Expected createOrder to return a promise that resolves with the order ID as a string");
                                         var payment_source = convertCardToPaymentSource(card, extraFields);
                                         var data = {
                                             payment_source: {
@@ -15963,7 +15961,7 @@ window.spb = function(modules) {
                     var _ref3;
                     return (_ref3 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref3[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.141", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.142", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref3[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref3[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref3[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
