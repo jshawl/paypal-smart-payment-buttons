@@ -21,7 +21,7 @@ import type { CreateOrder, XCreateOrder, CreateBillingAgreement, XCreateBillingA
     OnError, XCreateSubscription, XCreateVaultSetupToken, OnAuth
 } from '.';
 
-export type LegacyPropOptions = {|
+export type CallbackPropsOptions = {|
   paymentSource : $Values<typeof FUNDING> | null,
   partnerAttributionID : ?string,
   merchantID : $ReadOnlyArray<string>,
@@ -51,7 +51,7 @@ export type LegacyPropOptions = {|
 |}
 
 
-export type LegacyProps = {|
+export type CallbackProps = {|
   createOrder : CreateOrder,
 
   onApprove : OnApprove,
@@ -68,10 +68,10 @@ export type LegacyProps = {|
 |}
 
 /**
- * Props associated with Checkout and Subscriptions. With the introduction of Actions, we ultimately want this model to go away
- * and for Checkout/Subscriptions to be their own actions with their own independent validations/props.
+ * Card Fields has different requirements for callback functions so these have been separated so that SPB and Card Fields
+ * can share some general props but not these callback props
  */
-export function getLegacyProps({
+export function getCallbackProps({
   paymentSource,
   partnerAttributionID,
   merchantID,
@@ -98,7 +98,7 @@ export function getLegacyProps({
   onShippingOptionsChange: inputOnShippingOptionsChange,
   createVaultSetupToken: inputCreateVaultSetupToken,
   flow
-} : LegacyPropOptions) : LegacyProps {
+} : CallbackPropsOptions) : CallbackProps {
   const createBillingAgreement = getCreateBillingAgreement({ createBillingAgreement: inputCreateBillingAgreement, paymentSource });
   const createSubscription = getCreateSubscription({ createSubscription: inputCreateSubscription, partnerAttributionID, merchantID, clientID, paymentSource }, { facilitatorAccessToken });
 

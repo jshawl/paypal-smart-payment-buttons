@@ -2,12 +2,12 @@
 import { vi, describe, test, expect } from "vitest";
 import { INTENT, FUNDING } from "@paypal/sdk-constants/src";
 
-import { getLegacyProps } from "./legacyProps";
+import { getCallbackProps } from "./callbackProps";
 
-// something in legacyProps is making an api request
+// something in callbackProps is making an api request
 vi.mock("../api");
 
-describe("legacyProps", () => {
+describe("callbackProps", () => {
   test("should return list of legacy props", () => {
     const expectedProps = {
       createBillingAgreement: expect.any(Function),
@@ -50,7 +50,7 @@ describe("legacyProps", () => {
       flow: null,
     };
 
-    const result = getLegacyProps(inputs);
+    const result = getCallbackProps(inputs);
     expect(result).toEqual(expectedProps);
   });
 });

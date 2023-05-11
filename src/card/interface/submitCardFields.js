@@ -2,7 +2,7 @@
 
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src"
 
-import { getCardProps, type SaveCardFieldsProps, type LegacyCardProps } from "../props"
+import { getCardProps, type PurchaseFlowCardProps, type VaultWithoutPurchaseFlowCardProps } from "../props"
 import { confirmOrderAPI } from "../../api"
 import { hcfTransactionError, hcfTransactionSuccess, hcfFieldsSubmit } from "../logger"
 import type { FeatureFlags } from "../../types"
@@ -26,9 +26,10 @@ type SubmitCardFieldsOptions = {|
   |}
 |};
 
-function handleVaultWithoutPurchaseFlow(cardProps: SaveCardFieldsProps, card: Card, extraFields?: ExtraFields): ZalgoPromise<void> {
+function handleVaultWithoutPurchaseFlow(cardProps: VaultWithoutPurchaseFlowCardProps, card: Card, extraFields?: ExtraFields): ZalgoPromise<void> {
   return savePaymentSource({
     onApprove: cardProps.onApprove,
+  // $FlowFixMe need to rethink how to pass down these props
     createVaultSetupToken: cardProps.createVaultSetupToken,
     onError: cardProps.onError,
     clientID: cardProps.clientID,
@@ -36,15 +37,13 @@ function handleVaultWithoutPurchaseFlow(cardProps: SaveCardFieldsProps, card: Ca
   });
 }
 
-function handlePurchaseFlow(cardProps: LegacyCardProps, card: Card, extraFields: ExtraFields, facilitatorAccessToken: string): ZalgoPromise<void> {
+function handlePurchaseFlow(cardProps: PurchaseFlowCardProps, card: Card, extraFields: ExtraFields, facilitatorAccessToken: string): ZalgoPromise<void> {
   let orderID;
 
   return cardProps
+  // $FlowFixMe need to rethink how to pass down these props
     .createOrder()
     .then((id) => {
-      if (typeof id?.valueOf() !== "string") {
-        throw new TypeError(SUBMIT_ERRORS.ORDER_ID_TYPE_ERROR);
-      }
       const payment_source = convertCardToPaymentSource(card, extraFields);
       // eslint-disable-next-line flowtype/no-weak-types
       const data: any = {

@@ -8,7 +8,7 @@ import type { ContentType, ProxyWindow, Wallet, CheckoutFlowType, CardFormFlowTy
 import { type FirebaseConfig } from '../api';
 import { getNonce } from '../lib';
 import { getProps, type XProps, type Props } from '../props/props';
-import { getLegacyProps, type LegacyProps, type LegacyPropOptions } from '../props/legacyProps';
+import { getCallbackProps, type CallbackProps, type CallbackPropsOptions } from '../props/callbackProps';
 
 // export something to force webpack to see this as an ES module
 export const TYPES = true;
@@ -30,14 +30,14 @@ export type ButtonStyle = {|
 
 export type ButtonXProps = {|
     ...XProps,
-    ...LegacyPropOptions,
+    ...CallbackPropsOptions,
     style : ButtonStyle,
     buttonSessionID : string
 |};
 
 export type ButtonProps = {|
     ...Props,
-    ...LegacyProps,
+    ...CallbackProps,
     style : ButtonStyle,
     buttonSessionID : string
 |};
@@ -134,7 +134,7 @@ export function getButtonProps({
     const props = getProps({ branded, enableOrdersApprovalSmartWallet, smartWalletOrderID })
 
     // TODO: This is a lot...maybe we consider just passing in `xprops` and having the function handle splitting things off.
-    const legacyProps = getLegacyProps({
+    const callbackProps = getCallbackProps({
       paymentSource,
       partnerAttributionID,
       merchantID,
@@ -164,7 +164,7 @@ export function getButtonProps({
     })
     return {
         ...props,
-        ...legacyProps,
+        ...callbackProps,
         style,
         buttonSessionID,
         branded

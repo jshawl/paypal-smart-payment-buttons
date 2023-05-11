@@ -8,33 +8,29 @@ import {
   type FundingEligibilityType,
 } from "@paypal/sdk-constants/src";
 
-import type { ProxyWindow, FeatureFlags } from "../types";
-import { getProps, type XProps, type Props } from "../props/props";
-import { getLegacyProps, type LegacyProps } from "../props/legacyProps";
+import type { ProxyWindow, FeatureFlags } from "../../types";
+import { getProps, type XProps, type Props } from "../../props/props";
 import type {
+  OnError,
   XOnApprove,
-  XOnComplete,
-  XOnCancel,
   XOnError,
-  XOnShippingChange,
-  XOnShippingAddressChange,
-  XOnShippingOptionsChange,
-  XCreateOrder,
-  XCreateBillingAgreement,
-  XCreateSubscription,
-  XCreateVaultSetupTokenCardFields,
-  CreateVaultSetupToken,
   SaveActionOnApprove,
-} from "../props";
-
+} from "../../props";
 import type {
   CardStyle,
   CardPlaceholder,
   CardFieldsState,
   ParsedCardType,
   FieldsState,
-} from "./types";
-import { CARD_FIELD_TYPE, CARD_ERRORS, SUBMIT_ERRORS } from "./constants";
+} from "../types";
+import { CARD_FIELD_TYPE, CARD_ERRORS, SUBMIT_ERRORS } from "../constants";
+
+import {
+  getCreateVaultSetupToken,
+  type XCreateVaultSetupToken,
+  type CreateVaultSetupToken,
+} from './createVaultSetupToken'
+import {getCreateOrder, type CreateOrder, type XCreateOrder} from './createOrder'
 
 // export something to force webpack to see this as an ES module
 export const TYPES = true;
@@ -90,21 +86,14 @@ export type CardXProps = {|
     props: XProps,
     export: CardExport,
   |},
-  onApprove: ?XOnApprove,
-  onComplete?: ?XOnComplete,
-  onCancel: XOnCancel,
-  onError: XOnError,
-  onShippingChange: ?XOnShippingChange,
-  onShippingAddressChange: ?XOnShippingAddressChange,
-  onShippingOptionsChange: ?XOnShippingOptionsChange,
-  createOrder: ?XCreateOrder,
-  createBillingAgreement: ?XCreateBillingAgreement,
-  createSubscription: ?XCreateSubscription,
-  createVaultSetupToken: XCreateVaultSetupTokenCardFields,
+  onApprove?: ?XOnApprove,
+  onError?: XOnError,
+  createOrder?: XCreateOrder,
+  createVaultSetupToken: XCreateVaultSetupToken,
   hcfSessionID: string
 |};
 
-type BaseCardProps = {|
+export type CardProps = {|
   ...Props,
   type: $Values<typeof CARD_FIELD_TYPE>,
   branded: boolean,
@@ -118,21 +107,22 @@ type BaseCardProps = {|
   inputEvents: InputEvents,
   facilitatorAccessToken: string,
   disableAutocomplete?: boolean,
-  hcfSessionID?: string
+  hcfSessionID?: string,
+  createOrder?: CreateOrder,
+  createVaultSetupToken?: XCreateVaultSetupToken,
+  onApprove: SaveActionOnApprove,
+  onError: OnError,
 |};
 
-export type LegacyCardProps = {|
-  ...BaseCardProps,
-  ...LegacyProps,
-|};
-
-export type SaveCardFieldsProps = {|
-  ...BaseCardProps,
-  createVaultSetupToken: CreateVaultSetupToken,
-  onApprove: SaveActionOnApprove
+export type PurchaseFlowCardProps = {|
+  ...CardProps,
+  createOrder: CreateOrder
 |}
 
-export type CardProps = LegacyCardProps | SaveCardFieldsProps
+export type VaultWithoutPurchaseFlowCardProps = {|
+  ...CardProps,
+  createVaultSetupToken: CreateVaultSetupToken
+|}
 
 type GetCardPropsOptions = {|
   facilitatorAccessToken: string,
@@ -144,9 +134,8 @@ type GetCardPropsOptions = {|
 
 export function getCardProps({
   facilitatorAccessToken,
-  featureFlags,
   experiments,
-}: GetCardPropsOptions): LegacyCardProps | SaveCardFieldsProps {
+}: GetCardPropsOptions): CardProps {
   if (!experiments.hostedCardFields) {
     throw new Error(SUBMIT_ERRORS.NOT_FEATURE_FLAGGED)
   }
@@ -203,40 +192,16 @@ export function getCardProps({
     throw new Error(SUBMIT_ERRORS.MISSING_ONAPPROVE);
   }
 
-  const props = createOrder ? getLegacyProps({
-    paymentSource: null,
-    partnerAttributionID: xprops.partnerAttributionID,
-    merchantID: xprops.merchantID,
-    clientID: xprops.clientID,
-    currency: xprops.currency,
-    intent: xprops.intent,
-    clientAccessToken: xprops.clientAccessToken,
-    branded,
-    vault: false,
-    facilitatorAccessToken,
-    featureFlags,
-    onShippingChange: xprops.onShippingChange,
-    onShippingAddressChange: xprops.onShippingAddressChange,
-    onShippingOptionsChange: xprops.onShippingOptionsChange,
-    onError: baseProps.onError,
-    onCancel: xprops.onCancel,
-    onApprove: xprops.onApprove,
-    createSubscription: xprops.createSubscription,
-    createOrder: xprops.createOrder,
-    createVaultSetupToken: xprops.createVaultSetupToken,
-    flow: null,
-    createBillingAgreement: xprops.createBillingAgreement,
-  }) : null;
-
   // $FlowFixMe
   return {
     ...baseProps,
-    ...props,
     ...returnData,
-    createOrder: xprops.createOrder,
-    createVaultSetupToken: xprops.createVaultSetupToken,
+    // $FlowFixMe 
+    createOrder: getCreateOrder({createOrder: xprops.createOrder}),
+    // $FlowFixMe 
+    createVaultSetupToken: getCreateVaultSetupToken({createVaultSetupToken: xprops.createVaultSetupToken}),
+    // $FlowFixMe 
     onApprove: xprops.onApprove,
-    onError: xprops.onError
   }
 }
 
