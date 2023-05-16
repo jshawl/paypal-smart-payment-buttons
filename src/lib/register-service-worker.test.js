@@ -78,7 +78,7 @@ describe("Test service worker registration script", () => {
 
     await waitForExpect(() => {
       expect(registerSpy).toHaveBeenLastCalledWith(expectedSwUrl, {
-        scope: "/checkoutweb",
+        scope: "/webapps/hermes",
       });
     });
   });

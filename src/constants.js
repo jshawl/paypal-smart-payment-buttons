@@ -283,7 +283,7 @@ export const STATUS_CODES = {
 
 export const SERVICE_WORKER = {
     SERVICE_WORKER_URL:              'https://www.paypal.com/checkout-sw',
-    SW_SCOPE:                        '/checkoutweb',
+    SW_SCOPE:                        '/webapps/hermes',
     GET_SW_LOGS_EVENT_NAME:          'GET_SW_LOGS',
     LOGS_CHANNEL_NAME:               'logs-channel',
     GET_SW_LOGS_RESPONSE_EVENT_NAME: 'GET_SW_LOGS_RESPONSE'
