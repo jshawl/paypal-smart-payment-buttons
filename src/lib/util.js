@@ -161,3 +161,11 @@ export function getNavigationTimeOrigin() : number {
         throw new Error('window.performance not supported');
     }
 }
+
+export function getClientsideTimestamp() : string {
+  try {
+    return String(new Date().getTime());
+  } catch {
+    return "invalid_timestamp"
+  }
+}

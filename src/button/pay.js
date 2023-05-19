@@ -5,7 +5,7 @@ import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FPTI_KEY } from '@paypal/sdk-constants/src';
 
 import { applepay, checkout, cardField, cardForm, paymentFields, native, vaultCapture, walletCapture, popupBridge, type Payment, type PaymentFlow } from '../payment-flows';
-import { getLogger, sendBeacon } from '../lib';
+import { getClientsideTimestamp, getLogger, sendBeacon } from '../lib';
 import { AMPLITUDE_KEY, FPTI_TRANSITION, BUYER_INTENT, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY, FPTI_STATE } from '../constants';
 import { updateButtonClientConfig } from '../api';
 import { getConfirmOrder } from '../props/confirmOrder';
@@ -109,8 +109,9 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 [FPTI_KEY.CHOSEN_FI_TYPE]:    instrumentType,
                 [FPTI_KEY.PAYMENT_FLOW]:      name,
                 [FPTI_KEY.IS_VAULT]:          instrumentType ? '1' : '0',
-                [FPTI_CUSTOM_KEY.INFO_MSG]:   enableNativeCheckout ? 'tester' : ''
-            });
+                [FPTI_CUSTOM_KEY.INFO_MSG]:   enableNativeCheckout ? 'tester' : '',
+                client_time: getClientsideTimestamp()
+              });
 
             getLogger()
                 .info(`cross_site_tracking_${ isCrossSiteTrackingEnabled('enforce_policy') ? 'enabled' : 'disabled' }`)
@@ -178,9 +179,9 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
 
             const startPromise = updateClientConfigPromise.then(() => {
                 if (featureFlags.isButtonClientConfigCallBlocking) {
-                    getLogger().info('blocking_cco_call_resolved', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                    getLogger().info('blocking_cco_call_resolved', {time: getClientsideTimestamp(), fundingSource, buttonSessionID});
                 } else {
-                    getLogger().info('non_blocking_cco_call_resolved', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                    getLogger().info('non_blocking_cco_call_resolved', {time: getClientsideTimestamp(), fundingSource, buttonSessionID});
                 }
 
                 return start();
@@ -229,9 +230,9 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 });
             }).then(() => {
                 if (featureFlags.isButtonClientConfigCallBlocking) {
-                    getLogger().info('redirect_to_xorouter_blocking_cco', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                    getLogger().info('redirect_to_xorouter_blocking_cco', {time: getClientsideTimestamp(), fundingSource, buttonSessionID});
                 } else {
-                    getLogger().info('redirect_to_xorouter_non_blocking_cco', {time: String(new Date().getTime()), fundingSource, buttonSessionID});
+                    getLogger().info('redirect_to_xorouter_non_blocking_cco', {time: getClientsideTimestamp(), fundingSource, buttonSessionID});
                 }
             })
         });

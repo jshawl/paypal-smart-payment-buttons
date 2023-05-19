@@ -6,7 +6,7 @@ import { CURRENCY, FPTI_KEY, FUNDING, WALLET_INSTRUMENT, INTENT } from '@paypal/
 import { request, noop, memoize, stringifyError } from '@krakenjs/belter/src';
 
 import { SMART_API_URI, ORDERS_API_URL, VALIDATE_PAYMENT_METHOD_API } from '../config';
-import { getLogger, setBuyerAccessToken } from '../lib';
+import { getClientsideTimestamp, getLogger, setBuyerAccessToken } from '../lib';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, HEADERS, SMART_PAYMENT_BUTTONS,
     INTEGRATION_ARTIFACT, ITEM_CATEGORY, USER_EXPERIENCE_FLOW, PRODUCT_FLOW, PREFER, ORDER_API_ERROR } from '../constants';
 import type { ShippingMethod, ShippingAddress } from '../payment-flows/types';
@@ -594,9 +594,9 @@ type ClientConfig = {|
 
 export function updateClientConfig({ orderID, fundingSource, integrationArtifact, userExperienceFlow, productFlow, buttonSessionID, featureFlags } : ClientConfig) : ZalgoPromise<void> {
     if (featureFlags && featureFlags.isButtonClientConfigCallBlocking) {
-        getLogger().info('blocking_cco_call', {time: String(new Date().getTime()), buttonSessionID, fundingSource});
+        getLogger().info('blocking_cco_call', {time: getClientsideTimestamp(), buttonSessionID, fundingSource});
     } else {
-        getLogger().info('non_blocking_cco_call', {time: String(new Date().getTime()), buttonSessionID, fundingSource});
+        getLogger().info('non_blocking_cco_call', {time: getClientsideTimestamp(), buttonSessionID, fundingSource});
     }
 
     return callGraphQL({
