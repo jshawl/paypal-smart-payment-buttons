@@ -4,6 +4,7 @@ import { INTENT } from "@paypal/sdk-constants";
 
 import { getCardProps } from "../props";
 import { confirmOrderAPI } from "../../api";
+import { PAYMENT_FLOWS } from "../../constants";
 import { hcfTransactionSuccess, hcfTransactionError } from "../logger";
 import { SUBMIT_ERRORS } from "../constants";
 
@@ -88,7 +89,10 @@ describe("submitCardFields", () => {
       createVaultSetupToken,
     };
     // $FlowIssue
-    getCardProps.mockReturnValueOnce(mockGetCardPropsReturn);
+    getCardProps.mockReturnValue({
+      ...mockGetCardPropsReturn,
+      productAction: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+    });
 
     await submitCardFields(defaultOptions);
 
@@ -114,10 +118,11 @@ describe("submitCardFields", () => {
     const mockGetCardPropsReturn = {
       createOrder: vi.fn().mockResolvedValue("test-order-id"),
       onApprove: vi.fn(),
+      productAction: PAYMENT_FLOWS.WITH_PURCHASE,
     };
 
     // $FlowIssue
-    getCardProps.mockReturnValueOnce(mockGetCardPropsReturn);
+    getCardProps.mockReturnValue(mockGetCardPropsReturn);
 
     expect.assertions(4);
     await submitCardFields(defaultOptions);
@@ -159,10 +164,11 @@ describe("submitCardFields", () => {
       createOrder: vi.fn().mockResolvedValue("test-order-id"),
       onApprove: vi.fn().mockRejectedValue(onApproveError),
       onError: vi.fn(),
+      productAction: PAYMENT_FLOWS.WITH_PURCHASE,
     };
 
     // $FlowIssue
-    getCardProps.mockReturnValueOnce(mockGetCardPropsReturn);
+    getCardProps.mockReturnValue(mockGetCardPropsReturn);
     await expect(submitCardFields(defaultOptions)).rejects.toThrow(
       "error with on approve"
     );
@@ -187,9 +193,10 @@ describe("submitCardFields", () => {
       intent: INTENT.CAPTURE,
       createOrder: vi.fn().mockResolvedValue("test-order-id"),
       onApprove: vi.fn(),
+      productAction: PAYMENT_FLOWS.WITH_PURCHASE,
     };
     // $FlowIssue
-    getCardProps.mockReturnValueOnce(mockGetCardPropsReturn);
+    getCardProps.mockReturnValue(mockGetCardPropsReturn);
     await expect(submitCardFields(defaultOptions)).rejects.toThrow(
       "confirm order api failure test"
     );
@@ -209,10 +216,11 @@ describe("submitCardFields", () => {
     const mockGetCardPropsReturn = {
       createOrder: vi.fn().mockRejectedValue(error),
       onError: vi.fn(),
+      productAction: PAYMENT_FLOWS.WITH_PURCHASE,
     };
 
     // $FlowIssue
-    getCardProps.mockReturnValueOnce(mockGetCardPropsReturn);
+    getCardProps.mockReturnValue(mockGetCardPropsReturn);
     await expect(submitCardFields(defaultOptions)).rejects.toThrow(
       "create order failure test"
     );

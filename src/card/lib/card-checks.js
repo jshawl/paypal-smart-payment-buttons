@@ -3,6 +3,7 @@
 import cardValidator from 'card-validator';
 
 import type { CardType } from '../types';
+import { PAYMENT_FLOWS } from '../../constants';
 import { DEFAULT_CARD_TYPE, VALIDATOR_TO_TYPE_MAP } from '../constants';
 
 import { assertString, splice } from './card-utils';
@@ -92,10 +93,12 @@ export function addGapsToCardNumber(cardNumber : string, cardType? : CardType) :
     return cardNumber;
 }
 
-export function checkCardEligibility(cardNumber : string, cardType : CardType, isVaultFlow? : boolean) : boolean  {
+export function checkCardEligibility(cardNumber : string, cardType : CardType, productAction?: string) : boolean  {
     // check if the card type is eligible
     const fundingEligibility = window.xprops.fundingEligibility;
     const type = VALIDATOR_TO_TYPE_MAP[cardType.type];
+    const isVaultFlow = productAction === PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+
     if (cardNumber.length === 0) {
         return true;
     }

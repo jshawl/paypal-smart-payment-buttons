@@ -9,12 +9,15 @@ import {
 } from "@paypal/sdk-constants/src";
 
 import type { ProxyWindow, FeatureFlags } from "../../types";
-import { getProps, type XProps, type Props } from "../../props/props";
-import type {
-  OnError,
-  XOnApprove,
-  XOnError,
-  SaveActionOnApprove,
+import { PAYMENT_FLOWS } from "../../constants";
+import {
+  getProps,
+  type OnError,
+  type XOnApprove,
+  type XOnError,
+  type SaveActionOnApprove,
+  type XProps,
+  type Props,
 } from "../../props";
 import type {
   CardStyle,
@@ -29,8 +32,12 @@ import {
   getCreateVaultSetupToken,
   type XCreateVaultSetupToken,
   type CreateVaultSetupToken,
-} from './createVaultSetupToken'
-import {getCreateOrder, type CreateOrder, type XCreateOrder} from './createOrder'
+} from "./createVaultSetupToken";
+import {
+  getCreateOrder,
+  type CreateOrder,
+  type XCreateOrder,
+} from "./createOrder";
 
 // export something to force webpack to see this as an ES module
 export const TYPES = true;
@@ -90,7 +97,7 @@ export type CardXProps = {|
   onError?: XOnError,
   createOrder?: XCreateOrder,
   createVaultSetupToken: XCreateVaultSetupToken,
-  hcfSessionID: string
+  hcfSessionID: string,
 |};
 
 export type CardProps = {|
@@ -107,37 +114,60 @@ export type CardProps = {|
   inputEvents: InputEvents,
   facilitatorAccessToken: string,
   disableAutocomplete?: boolean,
-  hcfSessionID?: string,
+  hcfSessionID: string,
   createOrder?: CreateOrder,
   createVaultSetupToken?: XCreateVaultSetupToken,
   onApprove: SaveActionOnApprove,
   onError: OnError,
+  productAction: string,
 |};
 
 export type PurchaseFlowCardProps = {|
   ...CardProps,
-  createOrder: CreateOrder
-|}
+  createOrder: CreateOrder,
+|};
 
 export type VaultWithoutPurchaseFlowCardProps = {|
   ...CardProps,
-  createVaultSetupToken: CreateVaultSetupToken
-|}
+  createVaultSetupToken: CreateVaultSetupToken,
+|};
 
 type GetCardPropsOptions = {|
   facilitatorAccessToken: string,
   featureFlags: FeatureFlags,
   experiments: {
-    hostedCardFields: boolean
-  }
+    hostedCardFields: boolean,
+  },
 |};
+
+const determineProductAction = ({
+  createOrder,
+  createVaultSetupToken,
+}: {
+  createOrder: ?XCreateOrder,
+  createVaultSetupToken: XCreateVaultSetupToken,
+}): string => {
+  if (createOrder) {
+    return PAYMENT_FLOWS.WITH_PURCHASE;
+  }
+
+  if (createVaultSetupToken) {
+    return PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE;
+  }
+
+  // the current props setup guards against this. In a future refactor,
+  // it would be great to determine the flow upfront and throw an error
+  // to the merchant letting them know we can't determine what product
+  // action they are attempting to tie to the Card Fields
+  return "unknown";
+};
 
 export function getCardProps({
   facilitatorAccessToken,
   experiments,
 }: GetCardPropsOptions): CardProps {
   if (!experiments.hostedCardFields) {
-    throw new Error(SUBMIT_ERRORS.NOT_FEATURE_FLAGGED)
+    throw new Error(SUBMIT_ERRORS.NOT_FEATURE_FLAGGED);
   }
 
   const xprops: CardXProps = window.xprops;
@@ -158,7 +188,7 @@ export function getCardProps({
     createOrder,
     sdkCorrelationID,
     partnerAttributionID,
-    hcfSessionID
+    hcfSessionID,
   } = xprops;
 
   const returnData = {
@@ -196,13 +226,21 @@ export function getCardProps({
   return {
     ...baseProps,
     ...returnData,
-    // $FlowFixMe 
-    createOrder: getCreateOrder({createOrder: xprops.createOrder}),
-    // $FlowFixMe 
-    createVaultSetupToken: getCreateVaultSetupToken({createVaultSetupToken: xprops.createVaultSetupToken}),
-    // $FlowFixMe 
+    // $FlowFixMe xprops can be undefined
+    createOrder: getCreateOrder({ createOrder: xprops.createOrder }),
+    // $FlowFixMe xprops can be undefined
+    createVaultSetupToken: getCreateVaultSetupToken({
+      createVaultSetupToken: xprops.createVaultSetupToken,
+    }),
+    // $FlowFixMe xprops can be undefined
     onApprove: xprops.onApprove,
-  }
+    // $FlowFixMe xprops can be undefined
+    onError: xprops.onError,
+    productAction: determineProductAction({
+      createOrder: xprops.createOrder,
+      createVaultSetupToken: xprops.createVaultSetupToken,
+    }),
+  };
 }
 
 /* eslint-enable flowtype/require-exact-type */

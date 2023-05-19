@@ -29,6 +29,7 @@ type CardLoggerOptions = {|
   buyerCountry: $Values<typeof COUNTRY>,
   hcfSessionID?: string,
   type: string,
+  productAction: string,
 |};
 
 export function setupCardLogger({
@@ -44,6 +45,7 @@ export function setupCardLogger({
   buyerCountry,
   type,
   hcfSessionID,
+  productAction,
 }: CardLoggerOptions): ZalgoPromise<void> {
   const logger = getLogger();
 
@@ -66,7 +68,8 @@ export function setupCardLogger({
     [FPTI_HCF_KEYS.SDK_CORRELATION_ID]: sdkCorrelationID,
     [FPTI_DATA_SOURCE.PAYMENTS_SDK]: clientID,
     [FPTI_KEY.SELLER_ID]: merchantID?.[0],
-    [FPTI_HCF_KEYS.HCF_VERSION]: `v2`
+    [FPTI_HCF_KEYS.HCF_VERSION]: `v2`,
+    [FPTI_KEY.PAYMENT_FLOW]: productAction,
   }));
 
   const tracking = {
@@ -116,7 +119,6 @@ export const hcfTransactionError = ({
     [FPTI_KEY.EVENT_NAME]: "hcf_transaction_error",
     [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(error),
     [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID,
-    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.WITH_PURCHASE,
     [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HCF_ORDER_ID,
     [FPTI_KEY.CONTEXT_ID]: orderID
   }).flush();
@@ -129,7 +131,6 @@ export const vaultWithoutPurchaseSuccess = ({
     [FPTI_KEY.TRANSITION]:  "hcf_transaction_success",
     [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_success",
     [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken,
-    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
     [FPTI_KEY.CONTEXT_TYPE]: `vault_setup_token`,
     [FPTI_KEY.CONTEXT_ID]: vaultToken
   }).flush();
@@ -154,19 +155,13 @@ export const vaultWithoutPurchaseFailure = ({
 }
 
 export const hcfFieldsSubmit = ({
-  isPurchaseFlow,
-  isVaultWithoutPurchaseFlow,
   hcfSessionID
-}: {|isPurchaseFlow: boolean,
-  isVaultWithoutPurchaseFlow: boolean,
-  hcfSessionID?: string
+}: {|
+  hcfSessionID: string
 |}) => {
-  // eslint-disable-next-line no-nested-ternary
-  const flow = isPurchaseFlow ? PAYMENT_FLOWS.WITH_PURCHASE : isVaultWithoutPurchaseFlow ? PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE : ``;
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_fields_submit",
     [FPTI_KEY.EVENT_NAME]:  "hcf_fields_submit",
-    [FPTI_KEY.PAYMENT_FLOW]: flow,
     [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HOSTED_SESSION_ID,
     [FPTI_KEY.CONTEXT_ID]: hcfSessionID
   })

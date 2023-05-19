@@ -356,7 +356,7 @@ export function cardExpiryToPaymentSourceExpiry(dateString: string): string {
     throw new Error(`can not convert invalid expiry date: ${dateString}`);
 };
 
-export function convertCardToPaymentSource(card: Card, extraFields?: ExtraFields): PaymentSourceInput {
+export function convertCardToPaymentSource(card: Card, extraFields: ?ExtraFields): PaymentSourceInput {
     const paymentSource = {
         card: {
             number: card.number,

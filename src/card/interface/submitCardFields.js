@@ -1,6 +1,6 @@
 /* @flow */
 
-import { ZalgoPromise } from "@krakenjs/zalgo-promise/src"
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
 import { getCardProps, type PurchaseFlowCardProps, type VaultWithoutPurchaseFlowCardProps } from "../props"
 import { confirmOrderAPI } from "../../api"
@@ -9,11 +9,12 @@ import type { FeatureFlags } from "../../types"
 import type { BillingAddress, Card, ExtraFields } from '../types'
 import {convertCardToPaymentSource, reformatPaymentSource} from '../lib'
 import { SUBMIT_ERRORS } from "../constants"
+import { PAYMENT_FLOWS } from "../../constants";
 
-import { resetGQLErrors } from "./gql"
-import { hasCardFields } from "./hasCardFields"
-import { getCardFields } from "./getCardFields"
-import { savePaymentSource } from "./vault-without-purchase"
+import { resetGQLErrors } from "./gql";
+import { hasCardFields } from "./hasCardFields";
+import { getCardFields } from "./getCardFields";
+import { savePaymentSource } from "./vault-without-purchase";
 
 type SubmitCardFieldsOptions = {|
   facilitatorAccessToken: string,
@@ -22,11 +23,15 @@ type SubmitCardFieldsOptions = {|
     billingAddress?: BillingAddress,
   |},
   experiments: {|
-    hostedCardFields: boolean
-  |}
+    hostedCardFields: boolean,
+  |},
 |};
 
-function handleVaultWithoutPurchaseFlow(cardProps: VaultWithoutPurchaseFlowCardProps, card: Card, extraFields?: ExtraFields): ZalgoPromise<void> {
+function handleVaultWithoutPurchaseFlow(
+  cardProps: VaultWithoutPurchaseFlowCardProps,
+  card: Card,
+  extraFields?: ExtraFields
+): ZalgoPromise<void> {
   return savePaymentSource({
     onApprove: cardProps.onApprove,
   // $FlowFixMe need to rethink how to pass down these props
@@ -37,7 +42,12 @@ function handleVaultWithoutPurchaseFlow(cardProps: VaultWithoutPurchaseFlowCardP
   });
 }
 
-function handlePurchaseFlow(cardProps: PurchaseFlowCardProps, card: Card, extraFields: ExtraFields, facilitatorAccessToken: string): ZalgoPromise<void> {
+function handlePurchaseFlow(
+  cardProps: PurchaseFlowCardProps,
+  card: Card,
+  extraFields: ?ExtraFields,
+  facilitatorAccessToken: string
+): ZalgoPromise<void> {
   let orderID;
 
   return cardProps
@@ -90,11 +100,8 @@ export function submitCardFields({
     experiments,
   });
 
-  // $FlowIssue
-  const [isPurchaseFlow, isVaultWithoutPurchaseFlow] = [Boolean(cardProps.createOrder), Boolean(cardProps.createVaultSetupToken)];
-  const { hcfSessionID } = cardProps;
   hcfFieldsSubmit({
-    isPurchaseFlow, isVaultWithoutPurchaseFlow, hcfSessionID
+    hcfSessionID: cardProps.hcfSessionID,
   });
   resetGQLErrors();
 
@@ -102,14 +109,28 @@ export function submitCardFields({
     if (!hasCardFields()) {
       throw new Error(SUBMIT_ERRORS.UNABLE_TO_SUBMIT);
     }
-    const card = getCardFields(isVaultWithoutPurchaseFlow);
+    const card = getCardFields(cardProps.productAction);
 
-    if (isPurchaseFlow) {
-      // $FlowFixMe
-      return handlePurchaseFlow(cardProps, card, extraFields, facilitatorAccessToken);
-    } else if (isVaultWithoutPurchaseFlow) {
-      // $FlowFixMe
-      return handleVaultWithoutPurchaseFlow(cardProps, card, extraFields)
+    switch (cardProps.productAction) {
+      case PAYMENT_FLOWS.WITH_PURCHASE: {
+        return handlePurchaseFlow(
+        // $FlowIssue need to work on card props with the different production actions
+          cardProps,
+          card,
+          extraFields,
+          facilitatorAccessToken
+        );
+      }
+      case PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE: {
+        // $FlowIssue need to work on card props with the different production actions
+        return handleVaultWithoutPurchaseFlow(cardProps, card, extraFields);
+      }
+      default:
+        // this technically can't happen. eslint makes us use a default case
+        // this should be handled at the getProps level so that theres no
+        // way a merchant could get into the situation where a submit is happening
+        // but we don't know what product action to take
+        throw new Error(SUBMIT_ERRORS.MISSING_BOTH_FUNCTIONS);
     }
   });
 }

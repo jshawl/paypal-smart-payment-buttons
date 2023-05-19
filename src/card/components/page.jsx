@@ -365,7 +365,8 @@ export function setupCard({ cspNonce, facilitatorAccessToken, featureFlags, expe
         merchantDomain,
         buyerCountry,
         type,
-        hcfSessionID
+        hcfSessionID,
+        productAction: props.productAction
     })
 
     render(<Page cspNonce={ cspNonce } props={ props } featureFlags={featureFlags} experiments={experiments} />, getBody());

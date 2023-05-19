@@ -3,7 +3,7 @@
 import { FUNDING } from '@paypal/sdk-constants/src';
 
 import type { PaymentFlow, PaymentFlowInstance, IsEligibleOptions, IsPaymentEligibleOptions, InitOptions } from '../types';
-import { getCardFields, hasCardFields, submitCardFields } from '../../card/interface';
+import { hasCardFields, submitCardFields } from '../../card/interface';
 import { promiseNoop } from '../../lib';
 
 function setupCardField() {
@@ -45,11 +45,9 @@ function isCardFieldPaymentEligible({ payment } : IsPaymentEligibleOptions) : bo
 function initCardField({ serviceData } : InitOptions) : PaymentFlowInstance {
     const { facilitatorAccessToken } = serviceData;
 
-    const click = () => {
-        if (!getCardFields()) {
-            return false;
-        }
-    };
+    // need to delete this whole file, its unused. will do in a follow-up PR
+    // eslint-disable-next-line no-empty-function
+    const click = () => {};
     
     const start = () => {
         // need to delete this whole file, its unused. will do in a follow-up PR

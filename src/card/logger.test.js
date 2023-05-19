@@ -36,6 +36,7 @@ const cardLoggerProps = {
   type: "name",
   hcfSessionID: uniqueID(),
   cardCorrelationID: uniqueID(),
+  productAction: "with_purchase",
 };
 
 describe("card logger", () => {

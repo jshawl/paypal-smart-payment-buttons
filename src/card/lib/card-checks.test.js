@@ -1,6 +1,7 @@
 /* @flow */
 import { describe, it, expect, beforeEach } from "vitest";
 
+import { PAYMENT_FLOWS } from "../../constants";
 import { DEFAULT_CARD_TYPE } from "../constants";
 
 import {
@@ -151,10 +152,9 @@ describe("card-checks", () => {
       };
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      const isVaultFlow = false;
-      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
-        true
-      );
+      expect(
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+      ).toBe(true);
     });
 
     it("should find the card ineligible when the card type is ineligible for purchaese flow", () => {
@@ -170,10 +170,9 @@ describe("card-checks", () => {
       };
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      const isVaultFlow = false;
-      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
-        false
-      );
+      expect(
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+      ).toBe(false);
     });
 
     it("should find the card eligible for vaulting when the card type is eligible for vaulting and purchase", () => {
@@ -190,10 +189,13 @@ describe("card-checks", () => {
       };
       const cardNumber = "6011000990139424";
       const cardType = detectCardType(cardNumber)[0];
-      const isVaultFlow = true;
-      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
-        true
-      );
+      expect(
+        checkCardEligibility(
+          cardNumber,
+          cardType,
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+        )
+      ).toBe(true);
     });
 
     it("should find the card ineligible for vaulting when the card type is vaultable but ineligible for purchase", () => {
@@ -210,10 +212,13 @@ describe("card-checks", () => {
       };
       const cardNumber = "6011000990139424";
       const cardType = detectCardType(cardNumber)[0];
-      const isVaultFlow = true;
-      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
-        false
-      );
+      expect(
+        checkCardEligibility(
+          cardNumber,
+          cardType,
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+        )
+      ).toBe(false);
     });
 
     it("should find the card ineligible when the card type is ineligible for vaulting", () => {
@@ -229,10 +234,13 @@ describe("card-checks", () => {
       };
       const cardNumber = "6011000990139424";
       const cardType = detectCardType(cardNumber)[0];
-      const isVaultFlow = true;
-      expect(checkCardEligibility(cardNumber, cardType, isVaultFlow)).toBe(
-        false
-      );
+      expect(
+        checkCardEligibility(
+          cardNumber,
+          cardType,
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+        )
+      ).toBe(false);
     });
 
     it("should find card payments not eligible when the merchant is not onboarded for card payments", () => {
@@ -243,8 +251,16 @@ describe("card-checks", () => {
       };
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType, true)).toBe(false);
-      expect(checkCardEligibility(cardNumber, cardType, false)).toBe(false);
+      expect(
+        checkCardEligibility(
+          cardNumber,
+          cardType,
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+        )
+      ).toBe(false);
+      expect(
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+      ).toBe(false);
     });
 
     it("should find unbranded card payments not eligible if the merchant is only eligible for branded payments", () => {
@@ -255,22 +271,46 @@ describe("card-checks", () => {
       };
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType, true)).toBe(false);
-      expect(checkCardEligibility(cardNumber, cardType, false)).toBe(false);
+      expect(
+        checkCardEligibility(
+          cardNumber,
+          cardType,
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+        )
+      ).toBe(false);
+      expect(
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+      ).toBe(false);
     });
 
     it("should default to ineligible if there is no funding eligibility specified", () => {
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType, true)).toBe(false);
-      expect(checkCardEligibility(cardNumber, cardType, false)).toBe(false);
+      expect(
+        checkCardEligibility(
+          cardNumber,
+          cardType,
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+        )
+      ).toBe(false);
+      expect(
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+      ).toBe(false);
     });
 
     it("should default to eligible if there is no card number entered", () => {
       const cardNumber = "";
       const cardType = detectCardType(cardNumber)[0];
-      expect(checkCardEligibility(cardNumber, cardType, true)).toBe(true);
-      expect(checkCardEligibility(cardNumber, cardType, false)).toBe(true);
+      expect(
+        checkCardEligibility(
+          cardNumber,
+          cardType,
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+        )
+      ).toBe(true);
+      expect(
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+      ).toBe(true);
     });
   });
 });

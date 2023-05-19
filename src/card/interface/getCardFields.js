@@ -8,7 +8,7 @@ import { checkCardEligibility } from '../lib';
 import { getExportsByFrameName } from './getExportsByFrameName';
 import { getCardFrames } from './getCardFrames';
 
-export function getCardFields(isVaultFlow?: boolean = false): Card {
+export function getCardFields(productAction: string): Card {
   const card = {};
   const cardFrame = getExportsByFrameName(FRAME_NAME.CARD_FIELD);
 
@@ -29,7 +29,7 @@ export function getCardFields(isVaultFlow?: boolean = false): Card {
     const cardNumber: string = cardNumberFrame.getFieldValue();
     const cardType: CardType = cardNumberFrame.getPotentialCardTypes()[0];
 
-    if (checkCardEligibility(cardNumber, cardType, isVaultFlow)) {
+    if (checkCardEligibility(cardNumber, cardType, productAction)) {
       card.number = cardNumber;
     } else {
       throw new Error(CARD_ERRORS.INELIGIBLE_CARD_VENDOR);
