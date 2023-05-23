@@ -32,6 +32,25 @@ export function getLogger(): LoggerType {
   );
 }
 
+export const sendMetric = ({
+  name,
+  dimensions,
+}: {|
+  name: string,
+  dimensions: {
+    [string]: mixed
+  },
+|}) => {
+  // $FlowFixMe beaver-logger types need to be updated
+  getLogger().metric({
+    metricNamespace: name,
+    metricEventName: 'unused',
+    metricValue: 1,
+    // $FlowFixMe beaver-logger types need to be updated
+    dimensions,
+  })
+}
+
 export function enableAmplitude({ env }: {| env: $Values<typeof ENV> |}) {
   getLogger().configure({
     amplitudeApiKey: AMPLITUDE_API_KEY[env],

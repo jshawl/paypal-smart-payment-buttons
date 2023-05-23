@@ -5,7 +5,7 @@ import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FPTI_KEY } from '@paypal/sdk-constants/src';
 
 import { applepay, checkout, cardField, cardForm, paymentFields, native, vaultCapture, walletCapture, popupBridge, type Payment, type PaymentFlow } from '../payment-flows';
-import { getClientsideTimestamp, getLogger, sendBeacon } from '../lib';
+import { getClientsideTimestamp, getLogger, sendBeacon, sendMetric } from '../lib';
 import { AMPLITUDE_KEY, FPTI_TRANSITION, BUYER_INTENT, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY, FPTI_STATE } from '../constants';
 import { updateButtonClientConfig } from '../api';
 import { getConfirmOrder } from '../props/confirmOrder';
@@ -84,14 +84,17 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
         const { name, init, inline, spinner, updateFlowClientConfig } = getPaymentFlow({ props, payment, config, components, serviceData });
         const { click, start, close } = init({ props, config, serviceData, components, payment, restart });
 
+        sendMetric({
+            name: 'pp.app.paypal_sdk.buttons.click.count',
+            dimensions: {
+                fundingSource,
+                spbPaymentFlow: name,
+        }});
+
         getLogger()
             .addPayloadBuilder(() => {
                 return { token: null };
             })
-            .info(`button_click`)
-            .info(`button_click_pay_flow_${ name }`)
-            .info(`button_click_fundingsource_${ fundingSource }`)
-            .info(`button_click_instrument_${ instrumentType || 'default' }`)
             .addTrackingBuilder(() => {
                 return {
                     [FPTI_KEY.CHOSEN_FUNDING]:     fundingSource,
@@ -102,6 +105,10 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                     [AMPLITUDE_KEY.TIME]:          Date.now().toString()
                 };
             })
+            .info(`button_click_pay_flow_${ name }`)
+            .info(`button_click_fundingsource_${ fundingSource }`)
+            .info(`button_click_instrument_${ instrumentType || 'default' }`)
+            .info(`cross_site_tracking_${ isCrossSiteTrackingEnabled('enforce_policy') ? 'enabled' : 'disabled' }`)
             .track({
                 [FPTI_KEY.STATE]:             FPTI_STATE.BUTTON,
                 [FPTI_KEY.TRANSITION]:        FPTI_TRANSITION.BUTTON_CLICK,
@@ -111,14 +118,12 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                 [FPTI_KEY.IS_VAULT]:          instrumentType ? '1' : '0',
                 [FPTI_CUSTOM_KEY.INFO_MSG]:   enableNativeCheckout ? 'tester' : '',
                 client_time: getClientsideTimestamp()
-              });
-
-            getLogger()
-                .info(`cross_site_tracking_${ isCrossSiteTrackingEnabled('enforce_policy') ? 'enabled' : 'disabled' }`)
-                .track({
-                    [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
-                    [FPTI_KEY.TRANSITION]: `cross_site_tracking_${ isCrossSiteTrackingEnabled('enforce_policy') ? 'enabled' : 'disabled' }`
-                }).flush();
+            })
+            .track({
+                [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
+                [FPTI_KEY.TRANSITION]: `cross_site_tracking_${ isCrossSiteTrackingEnabled('enforce_policy') ? 'enabled' : 'disabled' }`
+            })
+            .flush();
 
         const loggingPromise =  ZalgoPromise.try(() => {
             return window.xprops.sessionState.get(`__confirm_${ fundingSource }_payload__`).then(confirmPayload => {

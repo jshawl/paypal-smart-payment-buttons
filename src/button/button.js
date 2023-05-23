@@ -5,7 +5,7 @@ import { FUNDING, COUNTRY, FPTI_KEY, type FundingEligibilityType } from '@paypal
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import type { ContentType, Wallet, PersonalizationType, Experiments, FeatureFlags, InlinePaymentFieldsEligibility } from '../types';
-import { getLogger, getSmartFieldsByFundingSource, setBuyerAccessToken, registerServiceWorker, unregisterServiceWorker } from '../lib';
+import { sendMetric, getLogger, getSmartFieldsByFundingSource, setBuyerAccessToken, registerServiceWorker, unregisterServiceWorker } from '../lib';
 import { type FirebaseConfig } from '../api';
 import { DATA_ATTRIBUTES, BUYER_INTENT, FPTI_STATE } from '../constants';
 import { type Payment } from '../payment-flows';
@@ -136,7 +136,6 @@ export function setupButton({
 
             const { win, fundingSource: paymentFundingSource } = payment;
             const { onClick } = paymentProps;
-
             const smartFields = getSmartFieldsByFundingSource(paymentFundingSource);
             
             if (smartFields) {
@@ -164,14 +163,13 @@ export function setupButton({
                 }
             }
         }).catch(err => {
-            
-            getLogger()
-                .info('smart_buttons_payment_error', { err: stringifyError(err) })
-                .track({
-                    [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
-                    [FPTI_KEY.ERROR_CODE]: 'smart_buttons_payment_error',
-                    [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(err)
-                });
+            // we don't think this code path is actually hit but we
+            // are too afraid to remove it right now
+            // if you, brave soul, wish to remove this entire catch statement one day, do the following:
+            // 1. delete this catch statement
+            // 2. throw an error inside initiatePaymentFlow
+            // 3. make sure payPromise.catch(...) still catches the error
+            getLogger().info('smart_buttons_payment_error', { err: stringifyError(err) });
 
             throw err;
         });
@@ -226,7 +224,22 @@ export function setupButton({
             const { onError } = paymentProps;
 
             payPromise.catch(err => {
-                getLogger().warn('click_initiate_payment_reject', { err: stringifyError(err) }).flush();
+                sendMetric({
+                    name: "pp.app.paypal_sdk.buttons.click.error.count",
+                    dimensions: {
+                        fundingSource: paymentFundingSource,
+                        prerender: false
+                    }
+                })
+
+                getLogger()
+                    .warn('click_initiate_payment_reject', { err: stringifyError(err) })
+                    .track({
+                        [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
+                        [FPTI_KEY.ERROR_CODE]: 'smart_buttons_payment_error',
+                        [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(err)
+                    })
+                    .flush();
                 onError(err);
             });
 
@@ -268,7 +281,22 @@ export function setupButton({
             const { onError } = paymentProps;
 
             payPromise.catch(err => {
-                getLogger().error('prerender_initiate_payment_reject', { err: stringifyError(err) }).flush();
+                sendMetric({
+                    name: "pp.app.paypal_sdk.buttons.click.error.count",
+                    dimensions: {
+                        fundingSource: paymentFundingSource,
+                        prerender: true
+                    }
+                })
+
+                getLogger()
+                    .error('prerender_initiate_payment_reject', { err: stringifyError(err) })
+                    .track({
+                        [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
+                        [FPTI_KEY.ERROR_CODE]: 'smart_buttons_prerender_payment_error',
+                        [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(err)
+                    })
+                    .flush();
                 onError(err);
             });
 

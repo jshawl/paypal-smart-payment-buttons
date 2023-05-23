@@ -1,13 +1,13 @@
 /* @flow */
 
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { memoize, getQueryParam, stringifyError } from '@krakenjs/belter/src';
+import { memoize, getQueryParam, stringifyErrorMessage } from '@krakenjs/belter/src';
 import { FPTI_KEY, SDK_QUERY_KEYS, INTENT, CURRENCY, FUNDING } from '@paypal/sdk-constants/src';
 import { getDomain } from '@krakenjs/cross-domain-utils/src';
 
 import { createOrderID, billingTokenToOrderID, subscriptionIdToCartId, createPaymentToken } from '../api';
 import { FPTI_STATE, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_BUTTON_KEY } from '../constants';
-import { getClientsideTimestamp, getLogger, isEmailAddress } from '../lib';
+import { getClientsideTimestamp, getLogger, isEmailAddress, sendMetric } from '../lib';
 import { ENABLE_PAYMENT_API } from '../config';
 import {
   vaultApprovalSessionIdToOrderId,
@@ -177,6 +177,10 @@ type CreateOrderProps = {|
 export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow } : CreateOrderProps) : CreateOrder {
     const data = buildXCreateOrderData({ paymentSource });
     const actions = buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID });
+    // this is purely for analytics purposes. We'd like to know whether
+    // create order was called by a client side integration (actions.order)
+    // or a server-side (all other callbacks only allow server-side)
+    let integrationType = 'server-side';
 
     return memoize(() => {
         const queryOrderID = getQueryParam('orderID');
@@ -200,6 +204,7 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
             } else if (createOrder) {
                 return createOrder(data, actions);
             } else {
+                integrationType = 'client-side'          
                 return actions.order.create({
                     purchase_units: [
                         {
@@ -212,15 +217,60 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
                 });
             }
         }).catch(err => {
-            getLogger().error('create_order_error', { err: stringifyError(err) });
+            sendMetric({
+                name: "pp.app.paypal_sdk.buttons.create_order.error.count",
+                dimensions: {
+                    errorName: 'generic',
+                    flow,
+                    intent,
+                    integrationType
+                }
+            })
+            getLogger()
+                .error('create_order_error', { err: stringifyErrorMessage(err) })
+                .track({
+                    [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
+                    [FPTI_KEY.ERROR_CODE]: 'smart_buttons_create_order_error',
+                    [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(err)
+                });
             throw err;
 
         }).then(orderID => {
             if (!orderID || typeof orderID !== 'string') {
+                sendMetric({
+                    name: "pp.app.paypal_sdk.buttons.create_order.error.count",
+                    dimensions: {
+                        errorName: 'no_order_id',
+                        flow,
+                        intent,
+                        integrationType
+                    }
+                })
+                 getLogger()
+                    .track({
+                        [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
+                        [FPTI_KEY.ERROR_CODE]: 'smart_buttons_create_order_error',
+                        [FPTI_KEY.ERROR_DESC]: "Expected an order id to be passed"
+                    });
                 throw new Error(`Expected an order id to be passed`);
             }
 
             if (orderID.indexOf('PAY-') === 0 || orderID.indexOf('PAYID-') === 0) {
+                sendMetric({
+                    name: "pp.app.paypal_sdk.buttons.create_order.error.count",
+                    dimensions: {
+                        errorName: 'pay_id',
+                        flow,
+                        intent,
+                        integrationType
+                    }
+                })
+                getLogger()
+                    .track({
+                        [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
+                        [FPTI_KEY.ERROR_CODE]: 'smart_buttons_create_order_error',
+                        [FPTI_KEY.ERROR_DESC]: "Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead"
+                    });
                 throw new Error(`Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead`);
             }
 
