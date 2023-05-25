@@ -1,16 +1,15 @@
 /* @flow */
 
-import type { CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FUNDING, FPTI_KEY } from '@paypal/sdk-constants/src';
 import { destroyElement, noop, stringifyError } from '@krakenjs/belter/src';
 import { initiateInstallments } from '@paypal/installments/src/interface';
 
-import type { ThreeDomainSecureFlowType, MenuChoices } from '../types';
-import type { CreateOrder } from '../props';
-import { validatePaymentMethod, type ValidatePaymentMethodResponse, getSupplementalOrderInfo, deleteVault, updateButtonClientConfig, loadFraudnet, confirmOrderAPI, buildPaymentSource, createAccessToken } from '../api';
-import { TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_MENU_OPTION } from '../constants';
+import type { MenuChoices } from '../types';
+import { validatePaymentMethod, getSupplementalOrderInfo, deleteVault, updateButtonClientConfig, loadFraudnet, confirmOrderAPI, buildPaymentSource, createAccessToken } from '../api';
+import { BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_MENU_OPTION } from '../constants';
 import { getLogger } from '../lib';
+import { handleValidatePaymentMethodResponse } from "../lib/3ds"
 import type { ButtonProps } from '../button/props';
 
 import type { PaymentFlow, PaymentFlowInstance, IsEligibleOptions, IsPaymentEligibleOptions, IsInstallmentsEligibleOptions, InitOptions, MenuOptions, Payment } from './types';
@@ -59,57 +58,6 @@ function isVaultCaptureInstallmentsEligible({ props, serviceData } : IsInstallme
     }
 
     return false;
-}
-
-type ThreeDomainSecureProps = {|
-    ThreeDomainSecure : ThreeDomainSecureFlowType,
-    createOrder : CreateOrder,
-    getParent : () => CrossDomainWindowType
-|};
-
-function handleThreeDomainSecure({ ThreeDomainSecure, createOrder, getParent } : ThreeDomainSecureProps) : ZalgoPromise<void> {
-
-    const promise = new ZalgoPromise();
-    const instance = ThreeDomainSecure({
-        createOrder,
-        onSuccess: () => promise.resolve(),
-        onCancel:  () => promise.reject(new Error(`3DS cancelled`)),
-        onError:   (err) => promise.reject(err)
-    });
-
-    return instance.renderTo(getParent(), TARGET_ELEMENT.BODY)
-        .then(() => promise)
-        .finally(instance.close);
-}
-
-type HandleValidateResponse = {|
-    ThreeDomainSecure : ThreeDomainSecureFlowType,
-    status : number,
-    body : ValidatePaymentMethodResponse,
-    createOrder : CreateOrder,
-    getParent : () => CrossDomainWindowType
-|};
-
-function handleValidateResponse({ ThreeDomainSecure, status, body, createOrder, getParent } : HandleValidateResponse) : ZalgoPromise<void> {
-    return ZalgoPromise.try(() => {
-        if (status === 422 && body.links && body.links.some(link => link.rel === '3ds-contingency-resolution')) {
-            return handleThreeDomainSecure({ ThreeDomainSecure, createOrder, getParent });
-        }
-
-        if (status !== 200) {
-
-            const hasDescriptiveErrorCode = Array.isArray(body.details);
-            if (hasDescriptiveErrorCode) {
-                const details = body.details && body.details[0];
-                const { issue = '' } = details || {};
-                if (issue.trim().length !== 0) {
-                    throw new Error(`Validate payment failed with issue: ${ issue }`);
-                }
-            }
-
-            throw new Error(`Validate payment failed with status: ${ status }`);
-        }
-    });
 }
 
 function getClientMetadataID({ props } : {| props : ButtonProps |}) : string {
@@ -197,7 +145,7 @@ function initVaultCapture({ props, components, payment, serviceData, config } : 
             }
 
             const { status, body } = validate;
-            return handleValidateResponse({ ThreeDomainSecure, status, body, createOrder, getParent }).then(() => {
+            return handleValidatePaymentMethodResponse({ ThreeDomainSecure, status, body, createOrder, getParent }).then(() => {
                 return confirmOrderAPI(orderID, { payment_source: buildPaymentSource(paymentMethodID) }, { facilitatorAccessToken: accessToken, partnerAttributionID })
                 .then(() => {
                   return onApprove({}, { restart });
