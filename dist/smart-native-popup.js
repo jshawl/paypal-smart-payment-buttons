@@ -5020,8 +5020,8 @@
             var logger = function(_ref) {
                 var env = _ref.env, sessionID = _ref.sessionID, buttonSessionID = _ref.buttonSessionID, sdkCorrelationID = _ref.sdkCorrelationID, clientID = _ref.clientID, fundingSource = _ref.fundingSource, sdkVersion = _ref.sdkVersion, locale = _ref.locale, buyerCountry = _ref.buyerCountry;
                 var logger = getLogger();
-                !function(_ref2) {
-                    var env = _ref2.env, sessionID = _ref2.sessionID, clientID = _ref2.clientID, sdkCorrelationID = _ref2.sdkCorrelationID, buyerCountry = _ref2.buyerCountry, locale = _ref2.locale, _ref2$sdkVersion = _ref2.sdkVersion, sdkVersion = void 0 === _ref2$sdkVersion ? window.paypal.version : _ref2$sdkVersion;
+                !function(_ref3) {
+                    var env = _ref3.env, sessionID = _ref3.sessionID, clientID = _ref3.clientID, sdkCorrelationID = _ref3.sdkCorrelationID, buyerCountry = _ref3.buyerCountry, locale = _ref3.locale, _ref3$sdkVersion = _ref3.sdkVersion, sdkVersion = void 0 === _ref3$sdkVersion ? window.paypal.version : _ref3$sdkVersion;
                     var logger = getLogger();
                     logger.addPayloadBuilder((function() {
                         return {
@@ -5033,16 +5033,16 @@
                         };
                     }));
                     logger.addTrackingBuilder((function() {
-                        var _ref3;
-                        return (_ref3 = {}).feed_name = "payments_sdk", _ref3.serverside_data_source = "checkout", 
-                        _ref3.client_id = clientID, _ref3.page_session_id = sessionID, _ref3.referer_url = window.location.host, 
-                        _ref3.buyer_cntry = buyerCountry, _ref3.locale = locale.lang + "_" + locale.country, 
-                        _ref3.integration_identifier = clientID, _ref3.sdk_environment = isIos() ? "iOS" : function(ua) {
+                        var _ref4;
+                        return (_ref4 = {}).feed_name = "payments_sdk", _ref4.serverside_data_source = "checkout", 
+                        _ref4.client_id = clientID, _ref4.page_session_id = sessionID, _ref4.referer_url = window.location.host, 
+                        _ref4.buyer_cntry = buyerCountry, _ref4.locale = locale.lang + "_" + locale.country, 
+                        _ref4.integration_identifier = clientID, _ref4.sdk_environment = isIos() ? "iOS" : function(ua) {
                             void 0 === ua && (ua = getUserAgent());
                             return /Android/.test(ua);
-                        }() ? "android" : null, _ref3.sdk_name = "payments_sdk", _ref3.sdk_version = sdkVersion, 
-                        _ref3.user_agent = window.navigator && window.navigator.userAgent, _ref3.context_correlation_id = sdkCorrelationID, 
-                        _ref3.t = Date.now().toString(), _ref3;
+                        }() ? "android" : null, _ref4.sdk_name = "payments_sdk", _ref4.sdk_version = sdkVersion, 
+                        _ref4.user_agent = window.navigator && window.navigator.userAgent, _ref4.context_correlation_id = sdkCorrelationID, 
+                        _ref4.t = Date.now().toString(), _ref4;
                     }));
                     promise_ZalgoPromise.onPossiblyUnhandledException((function(err) {
                         var _logger$track;
@@ -5062,8 +5062,8 @@
                     sdkVersion: sdkVersion,
                     buyerCountry: buyerCountry
                 });
-                !function(_ref) {
-                    var env = _ref.env;
+                !function(_ref2) {
+                    var env = _ref2.env;
                     getLogger().configure({
                         amplitudeApiKey: AMPLITUDE_API_KEY[env]
                     });
@@ -5079,7 +5079,7 @@
                 logger.addTrackingBuilder((function() {
                     var _ref3;
                     return (_ref3 = {}).state_name = "smart_button", _ref3.context_type = "button_session_id", 
-                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.143", 
+                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.144", 
                     _ref3.selected_payment_method = fundingSource, _ref3.user_id = buttonSessionID, 
                     _ref3.time = Date.now().toString(), _ref3;
                 }));

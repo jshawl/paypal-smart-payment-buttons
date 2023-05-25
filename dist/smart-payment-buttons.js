@@ -9966,7 +9966,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.143", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.144", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -10049,11 +10049,11 @@ window.spb = function(modules) {
             var _headers18;
             var orderID = _ref17.orderID, fundingSource = _ref17.fundingSource, integrationArtifact = _ref17.integrationArtifact, userExperienceFlow = _ref17.userExperienceFlow, productFlow = _ref17.productFlow, buttonSessionID = _ref17.buttonSessionID, featureFlags = _ref17.featureFlags;
             featureFlags && featureFlags.isButtonClientConfigCallBlocking ? Object(lib.getLogger)().info("blocking_cco_call", {
-                time: String((new Date).getTime()),
+                time: Object(lib.getClientsideTimestamp)(),
                 buttonSessionID: buttonSessionID,
                 fundingSource: fundingSource
             }) : Object(lib.getLogger)().info("non_blocking_cco_call", {
-                time: String((new Date).getTime()),
+                time: Object(lib.getClientsideTimestamp)(),
                 buttonSessionID: buttonSessionID,
                 fundingSource: fundingSource
             });
@@ -12740,41 +12740,6 @@ window.spb = function(modules) {
                 cardPostalFrame: getExportsByFrameName(constants.FRAME_NAME.CARD_POSTAL_FIELD)
             };
         }
-        function getCardFields(isVaultFlow) {
-            void 0 === isVaultFlow && (isVaultFlow = !1);
-            var card = {};
-            var cardFrame = getExportsByFrameName(constants.FRAME_NAME.CARD_FIELD);
-            if (cardFrame && cardFrame.isFieldValid()) return cardFrame.getFieldValue();
-            var _getCardFrames = getCardFrames(), cardNumberFrame = _getCardFrames.cardNumberFrame, cardCVVFrame = _getCardFrames.cardCVVFrame, cardExpiryFrame = _getCardFrames.cardExpiryFrame, cardNameFrame = _getCardFrames.cardNameFrame, cardPostalFrame = _getCardFrames.cardPostalFrame;
-            if (!cardNumberFrame || !cardNumberFrame.isFieldValid()) throw new Error("INVALID_NUMBER");
-            var cardNumber = cardNumberFrame.getFieldValue();
-            if (!function(cardNumber, cardType, isVaultFlow) {
-                var _fundingEligibility$c;
-                var fundingEligibility = window.xprops.fundingEligibility;
-                var type = VALIDATOR_TO_TYPE_MAP[cardType.type];
-                if (0 === cardNumber.length) return !0;
-                if (null != fundingEligibility && null != (_fundingEligibility$c = fundingEligibility.card) && _fundingEligibility$c.eligible && type && fundingEligibility.card.vendors && !fundingEligibility.card.branded) {
-                    var vendor = fundingEligibility.card.vendors[type];
-                    if (isVaultFlow && null != vendor && vendor.vaultable && null != vendor && vendor.eligible) return !0;
-                    if (!isVaultFlow && null != vendor && vendor.eligible) return !0;
-                }
-                return !1;
-            }(cardNumber, cardNumberFrame.getPotentialCardTypes()[0], isVaultFlow)) throw new Error("INELIGIBLE_CARD_VENDOR");
-            card.number = cardNumber;
-            if (!cardCVVFrame || !cardCVVFrame.isFieldValid()) throw new Error("INVALID_CVV");
-            card.cvv = cardCVVFrame.getFieldValue();
-            if (!cardExpiryFrame || !cardExpiryFrame.isFieldValid()) throw new Error("INVALID_EXPIRY");
-            card.expiry = cardExpiryFrame.getFieldValue();
-            if (cardNameFrame) {
-                var cardNameValue = cardNameFrame.getFieldValue();
-                if (cardNameFrame.isFieldValid()) card.name = cardNameValue; else if (0 !== cardNameValue.length) throw new Error("INVALID_NAME");
-            }
-            if (cardPostalFrame) {
-                var postalCodeValue = cardPostalFrame.getFieldValue();
-                if (cardPostalFrame.isFieldValid()) card.name = postalCodeValue; else if (0 !== postalCodeValue.length) throw new Error("INVALID_POSTAL");
-            }
-            return card;
-        }
         function hasCardFields() {
             var _getCardFrames = getCardFrames();
             return Boolean(_getCardFrames.cardFrame || _getCardFrames.cardNumberFrame && _getCardFrames.cardCVVFrame && _getCardFrames.cardExpiryFrame);
@@ -12816,16 +12781,14 @@ window.spb = function(modules) {
                 var serviceData = _ref4.serviceData;
                 var facilitatorAccessToken = serviceData.facilitatorAccessToken;
                 return {
-                    click: function() {
-                        if (!getCardFields()) return !1;
-                    },
+                    click: function() {},
                     start: function() {
                         return function(_ref) {
                             var facilitatorAccessToken = _ref.facilitatorAccessToken, extraFields = _ref.extraFields;
-                            var cardProps = function(_ref) {
+                            var cardProps = function(_ref2) {
                                 var _fundingEligibility$c, _fundingEligibility$c2;
-                                var facilitatorAccessToken = _ref.facilitatorAccessToken;
-                                if (!_ref.experiments.hostedCardFields) throw new Error("Not feature flagged to use CardFields");
+                                var facilitatorAccessToken = _ref2.facilitatorAccessToken;
+                                if (!_ref2.experiments.hostedCardFields) throw new Error("Not feature flagged to use CardFields");
                                 var xprops = window.xprops;
                                 var fundingEligibility = xprops.fundingEligibility, _xprops$branded = xprops.branded, branded = void 0 === _xprops$branded ? null == (_fundingEligibility$c = null == fundingEligibility || null == (_fundingEligibility$c2 = fundingEligibility.card) ? void 0 : _fundingEligibility$c2.branded) || _fundingEligibility$c : _xprops$branded, parent = xprops.parent, createVaultSetupToken = xprops.createVaultSetupToken, createOrder = xprops.createOrder;
                                 var returnData = {
@@ -12844,7 +12807,7 @@ window.spb = function(modules) {
                                     partnerAttributionID: xprops.partnerAttributionID,
                                     hcfSessionID: xprops.hcfSessionID
                                 };
-                                var baseProps = Object(props_props.getProps)({
+                                var baseProps = Object(src_props.getProps)({
                                     branded: branded
                                 });
                                 if (createVaultSetupToken && createOrder) throw new Error("Cannot pass both createVaultSetupToken and createOrder");
@@ -12857,24 +12820,24 @@ window.spb = function(modules) {
                                     createVaultSetupToken: createVaultSetupToken_getCreateVaultSetupToken({
                                         createVaultSetupToken: xprops.createVaultSetupToken
                                     }),
-                                    onApprove: xprops.onApprove
+                                    onApprove: xprops.onApprove,
+                                    onError: xprops.onError,
+                                    productAction: (_ref = {
+                                        createOrder: xprops.createOrder,
+                                        createVaultSetupToken: xprops.createVaultSetupToken
+                                    }, _ref.createOrder ? constants.PAYMENT_FLOWS.WITH_PURCHASE : _ref.createVaultSetupToken ? constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE : "unknown")
                                 });
+                                var _ref;
                             }({
                                 facilitatorAccessToken: facilitatorAccessToken,
                                 featureFlags: _ref.featureFlags,
                                 experiments: _ref.experiments
                             });
-                            var _ref2 = [ Boolean(cardProps.createOrder), Boolean(cardProps.createVaultSetupToken) ], isPurchaseFlow = _ref2[0], isVaultWithoutPurchaseFlow = _ref2[1];
-                            hcfSessionID = (_ref8 = {
-                                isPurchaseFlow: isPurchaseFlow,
-                                isVaultWithoutPurchaseFlow: isVaultWithoutPurchaseFlow,
-                                hcfSessionID: cardProps.hcfSessionID
-                            }).hcfSessionID, flow = _ref8.isPurchaseFlow ? constants.PAYMENT_FLOWS.WITH_PURCHASE : _ref8.isVaultWithoutPurchaseFlow ? constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE : "", 
-                            Object(lib.getLogger)().track(((_getLogger$track5 = {})[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_fields_submit", 
+                            hcfSessionID = cardProps.hcfSessionID, Object(lib.getLogger)().track(((_getLogger$track5 = {})[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_fields_submit", 
                             _getLogger$track5[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_fields_submit", 
-                            _getLogger$track5[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = flow, _getLogger$track5[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "hosted_session_id", 
+                            _getLogger$track5[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "hosted_session_id", 
                             _getLogger$track5[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = hcfSessionID, _getLogger$track5));
-                            var _ref8, _getLogger$track5, hcfSessionID, flow;
+                            var _getLogger$track5, hcfSessionID;
                             !function() {
                                 var _getCardFrames = getCardFrames(), cardFrame = _getCardFrames.cardFrame, cardNumberFrame = _getCardFrames.cardNumberFrame, cardExpiryFrame = _getCardFrames.cardExpiryFrame, cardCVVFrame = _getCardFrames.cardCVVFrame;
                                 cardFrame && cardFrame.resetGQLErrors();
@@ -12884,122 +12847,163 @@ window.spb = function(modules) {
                             }();
                             return zalgo_promise_src.ZalgoPromise.try((function() {
                                 if (!hasCardFields()) throw new Error("Card fields not available to submit");
-                                var card = getCardFields(isVaultWithoutPurchaseFlow);
-                                return isPurchaseFlow ? function(cardProps, card, extraFields, facilitatorAccessToken) {
-                                    var orderID;
-                                    return cardProps.createOrder().then((function(id) {
-                                        var payment_source = convertCardToPaymentSource(card, extraFields);
-                                        var data = {
-                                            payment_source: {
-                                                card: (paymentSource = payment_source.card, Object.keys(paymentSource).reduce((function(newObj, key) {
-                                                    var transformedKey = reformatBillingKeys(key);
-                                                    if ("billingAddress" === key) {
-                                                        if (paymentSource.billingAddress && 0 !== Object.keys(paymentSource.billingAddress).length) {
-                                                            newObj.billing_address = {};
-                                                            Object.keys(paymentSource.billingAddress).forEach((function(billingKey) {
-                                                                var snakeCaseBillingKey = reformatBillingKeys(billingKey);
-                                                                newObj.billing_address[snakeCaseBillingKey] = paymentSource.billingAddress[billingKey];
-                                                            }));
-                                                        }
-                                                    } else newObj[transformedKey] = paymentSource[key];
-                                                    return newObj;
-                                                }), {}))
-                                            }
-                                        };
-                                        var paymentSource;
-                                        orderID = id;
-                                        return Object(api.confirmOrderAPI)(orderID, data, {
-                                            facilitatorAccessToken: facilitatorAccessToken,
-                                            partnerAttributionID: ""
-                                        });
-                                    })).then((function() {
-                                        return cardProps.onApprove({
-                                            orderID: orderID
-                                        }, {});
-                                    })).then((function() {
-                                        !function(_ref4) {
-                                            var _getLogger$track;
-                                            var orderID = _ref4.orderID;
-                                            Object(lib.getLogger)().track((_getLogger$track = {}, _getLogger$track[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_transaction_success", 
-                                            _getLogger$track[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_success", 
-                                            _getLogger$track.order_id = orderID, _getLogger$track[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = constants.PAYMENT_FLOWS.WITH_PURCHASE, 
-                                            _getLogger$track[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "order_id", _getLogger$track[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = orderID, 
-                                            _getLogger$track)).flush();
-                                        }({
-                                            orderID: orderID
-                                        });
-                                    })).catch((function(error) {
-                                        "string" == typeof error && (error = new Error(error));
-                                        !function(_ref5) {
-                                            var _getLogger$track2;
-                                            var orderID = _ref5.orderID, error = _ref5.error;
-                                            Object(lib.getLogger)().track((_getLogger$track2 = {}, _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_transaction_error", 
-                                            _getLogger$track2[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_error", 
-                                            _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
-                                            _getLogger$track2.order_id = orderID, _getLogger$track2[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = constants.PAYMENT_FLOWS.WITH_PURCHASE, 
-                                            _getLogger$track2[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "order_id", _getLogger$track2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = orderID, 
-                                            _getLogger$track2)).flush();
-                                        }({
-                                            error: error,
-                                            orderID: orderID
-                                        });
-                                        cardProps.onError && cardProps.onError(error);
-                                        throw error;
-                                    }));
-                                }(cardProps, card, extraFields, facilitatorAccessToken) : isVaultWithoutPurchaseFlow ? function(cardProps, card, extraFields) {
-                                    return function(_ref) {
-                                        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource;
-                                        var vaultToken;
-                                        return (0, _ref.createVaultSetupToken)().then((function(vaultSetupToken) {
-                                            if ("string" != typeof vaultSetupToken) throw new TypeError("Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string");
-                                            vaultToken = vaultSetupToken;
-                                            return Object(api_vault.updateVaultSetupToken)({
-                                                vaultSetupToken: vaultSetupToken,
-                                                clientID: clientID,
-                                                paymentSource: paymentSource
+                                var card = function(productAction) {
+                                    var card = {};
+                                    var cardFrame = getExportsByFrameName(constants.FRAME_NAME.CARD_FIELD);
+                                    if (cardFrame && cardFrame.isFieldValid()) return cardFrame.getFieldValue();
+                                    var _getCardFrames = getCardFrames(), cardNumberFrame = _getCardFrames.cardNumberFrame, cardCVVFrame = _getCardFrames.cardCVVFrame, cardExpiryFrame = _getCardFrames.cardExpiryFrame, cardNameFrame = _getCardFrames.cardNameFrame, cardPostalFrame = _getCardFrames.cardPostalFrame;
+                                    if (!cardNumberFrame || !cardNumberFrame.isFieldValid()) throw new Error("INVALID_NUMBER");
+                                    var cardNumber = cardNumberFrame.getFieldValue();
+                                    if (!function(cardNumber, cardType, productAction) {
+                                        var _fundingEligibility$c;
+                                        var fundingEligibility = window.xprops.fundingEligibility;
+                                        var type = VALIDATOR_TO_TYPE_MAP[cardType.type];
+                                        var isVaultFlow = productAction === constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE;
+                                        if (0 === cardNumber.length) return !0;
+                                        if (null != fundingEligibility && null != (_fundingEligibility$c = fundingEligibility.card) && _fundingEligibility$c.eligible && type && fundingEligibility.card.vendors && !fundingEligibility.card.branded) {
+                                            var vendor = fundingEligibility.card.vendors[type];
+                                            if (isVaultFlow && null != vendor && vendor.vaultable && null != vendor && vendor.eligible) return !0;
+                                            if (!isVaultFlow && null != vendor && vendor.eligible) return !0;
+                                        }
+                                        return !1;
+                                    }(cardNumber, cardNumberFrame.getPotentialCardTypes()[0], productAction)) throw new Error("INELIGIBLE_CARD_VENDOR");
+                                    card.number = cardNumber;
+                                    if (!cardCVVFrame || !cardCVVFrame.isFieldValid()) throw new Error("INVALID_CVV");
+                                    card.cvv = cardCVVFrame.getFieldValue();
+                                    if (!cardExpiryFrame || !cardExpiryFrame.isFieldValid()) throw new Error("INVALID_EXPIRY");
+                                    card.expiry = cardExpiryFrame.getFieldValue();
+                                    if (cardNameFrame) {
+                                        var cardNameValue = cardNameFrame.getFieldValue();
+                                        if (cardNameFrame.isFieldValid()) card.name = cardNameValue; else if (0 !== cardNameValue.length) throw new Error("INVALID_NAME");
+                                    }
+                                    if (cardPostalFrame) {
+                                        var postalCodeValue = cardPostalFrame.getFieldValue();
+                                        if (cardPostalFrame.isFieldValid()) card.name = postalCodeValue; else if (0 !== postalCodeValue.length) throw new Error("INVALID_POSTAL");
+                                    }
+                                    return card;
+                                }(cardProps.productAction);
+                                switch (cardProps.productAction) {
+                                  case constants.PAYMENT_FLOWS.WITH_PURCHASE:
+                                    return function(cardProps, card, extraFields, facilitatorAccessToken) {
+                                        var orderID;
+                                        return cardProps.createOrder().then((function(id) {
+                                            var payment_source = convertCardToPaymentSource(card, extraFields);
+                                            var data = {
+                                                payment_source: {
+                                                    card: (paymentSource = payment_source.card, Object.keys(paymentSource).reduce((function(newObj, key) {
+                                                        var transformedKey = reformatBillingKeys(key);
+                                                        if ("billingAddress" === key) {
+                                                            if (paymentSource.billingAddress && 0 !== Object.keys(paymentSource.billingAddress).length) {
+                                                                newObj.billing_address = {};
+                                                                Object.keys(paymentSource.billingAddress).forEach((function(billingKey) {
+                                                                    var snakeCaseBillingKey = reformatBillingKeys(billingKey);
+                                                                    newObj.billing_address[snakeCaseBillingKey] = paymentSource.billingAddress[billingKey];
+                                                                }));
+                                                            }
+                                                        } else newObj[transformedKey] = paymentSource[key];
+                                                        return newObj;
+                                                    }), {}))
+                                                }
+                                            };
+                                            var paymentSource;
+                                            orderID = id;
+                                            return Object(api.confirmOrderAPI)(orderID, data, {
+                                                facilitatorAccessToken: facilitatorAccessToken,
+                                                partnerAttributionID: ""
                                             });
                                         })).then((function() {
-                                            return onApprove({
-                                                vaultSetupToken: vaultToken
-                                            });
+                                            return cardProps.onApprove({
+                                                orderID: orderID
+                                            }, {});
                                         })).then((function() {
-                                            return function(_ref6) {
-                                                var _getLogger$track3;
-                                                var vaultToken = _ref6.vaultToken;
-                                                Object(lib.getLogger)().track((_getLogger$track3 = {}, _getLogger$track3[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_transaction_success", 
-                                                _getLogger$track3[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_success", 
-                                                _getLogger$track3.vault_token = vaultToken, _getLogger$track3[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE, 
-                                                _getLogger$track3[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "vault_setup_token", 
-                                                _getLogger$track3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = vaultToken, _getLogger$track3)).flush();
+                                            !function(_ref4) {
+                                                var _getLogger$track;
+                                                var orderID = _ref4.orderID;
+                                                Object(lib.getLogger)().track((_getLogger$track = {}, _getLogger$track[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_transaction_success", 
+                                                _getLogger$track[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_success", 
+                                                _getLogger$track.order_id = orderID, _getLogger$track[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = constants.PAYMENT_FLOWS.WITH_PURCHASE, 
+                                                _getLogger$track[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "order_id", _getLogger$track[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = orderID, 
+                                                _getLogger$track)).flush();
                                             }({
-                                                vaultToken: vaultToken
+                                                orderID: orderID
                                             });
                                         })).catch((function(error) {
                                             "string" == typeof error && (error = new Error(error));
-                                            !function(_ref7) {
-                                                var _getLogger$track4;
-                                                var vaultToken = _ref7.vaultToken, error = _ref7.error;
-                                                Object(lib.getLogger)().track((_getLogger$track4 = {}, _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_transaction_error", 
-                                                _getLogger$track4[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_error", 
-                                                _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
-                                                _getLogger$track4.vault_token = vaultToken, _getLogger$track4[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE, 
-                                                _getLogger$track4[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "vault_setup_token", 
-                                                _getLogger$track4[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = vaultToken, _getLogger$track4)).flush();
+                                            !function(_ref5) {
+                                                var _getLogger$track2;
+                                                var orderID = _ref5.orderID, error = _ref5.error;
+                                                Object(lib.getLogger)().track((_getLogger$track2 = {}, _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_transaction_error", 
+                                                _getLogger$track2[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_error", 
+                                                _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
+                                                _getLogger$track2.order_id = orderID, _getLogger$track2[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "order_id", 
+                                                _getLogger$track2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = orderID, _getLogger$track2)).flush();
                                             }({
                                                 error: error,
-                                                vaultToken: vaultToken
+                                                orderID: orderID
                                             });
-                                            onError(error);
+                                            cardProps.onError && cardProps.onError(error);
                                             throw error;
                                         }));
-                                    }({
-                                        onApprove: cardProps.onApprove,
-                                        createVaultSetupToken: cardProps.createVaultSetupToken,
-                                        onError: cardProps.onError,
-                                        clientID: cardProps.clientID,
-                                        paymentSource: convertCardToPaymentSource(card, extraFields)
-                                    });
-                                }(cardProps, card, extraFields) : void 0;
+                                    }(cardProps, card, extraFields, facilitatorAccessToken);
+
+                                  case constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE:
+                                    return function(cardProps, card, extraFields) {
+                                        return function(_ref) {
+                                            var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource;
+                                            var vaultToken;
+                                            return (0, _ref.createVaultSetupToken)().then((function(vaultSetupToken) {
+                                                if ("string" != typeof vaultSetupToken) throw new TypeError("Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string");
+                                                vaultToken = vaultSetupToken;
+                                                return Object(api_vault.updateVaultSetupToken)({
+                                                    vaultSetupToken: vaultSetupToken,
+                                                    clientID: clientID,
+                                                    paymentSource: paymentSource
+                                                });
+                                            })).then((function() {
+                                                return onApprove({
+                                                    vaultSetupToken: vaultToken
+                                                });
+                                            })).then((function() {
+                                                return function(_ref6) {
+                                                    var _getLogger$track3;
+                                                    var vaultToken = _ref6.vaultToken;
+                                                    Object(lib.getLogger)().track((_getLogger$track3 = {}, _getLogger$track3[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_transaction_success", 
+                                                    _getLogger$track3[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_success", 
+                                                    _getLogger$track3.vault_token = vaultToken, _getLogger$track3[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "vault_setup_token", 
+                                                    _getLogger$track3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = vaultToken, _getLogger$track3)).flush();
+                                                }({
+                                                    vaultToken: vaultToken
+                                                });
+                                            })).catch((function(error) {
+                                                "string" == typeof error && (error = new Error(error));
+                                                !function(_ref7) {
+                                                    var _getLogger$track4;
+                                                    var vaultToken = _ref7.vaultToken, error = _ref7.error;
+                                                    Object(lib.getLogger)().track((_getLogger$track4 = {}, _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_transaction_error", 
+                                                    _getLogger$track4[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_error", 
+                                                    _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
+                                                    _getLogger$track4.vault_token = vaultToken, _getLogger$track4[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE, 
+                                                    _getLogger$track4[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "vault_setup_token", 
+                                                    _getLogger$track4[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = vaultToken, _getLogger$track4)).flush();
+                                                }({
+                                                    error: error,
+                                                    vaultToken: vaultToken
+                                                });
+                                                onError(error);
+                                                throw error;
+                                            }));
+                                        }({
+                                            onApprove: cardProps.onApprove,
+                                            createVaultSetupToken: cardProps.createVaultSetupToken,
+                                            onError: cardProps.onError,
+                                            clientID: cardProps.clientID,
+                                            paymentSource: convertCardToPaymentSource(card, extraFields)
+                                        });
+                                    }(cardProps, card, extraFields);
+
+                                  default:
+                                    throw new Error("Must pass either createVaultSetupToken or createOrder");
+                                }
                             }));
                         }({
                             facilitatorAccessToken: facilitatorAccessToken,
@@ -13038,15 +13042,15 @@ window.spb = function(modules) {
                 var payment = _ref2.payment;
                 return !(payment.win || !payment.paymentMethodID || window.innerWidth < 250 && payment.fundingSource === sdk_constants_src.FUNDING.PAYPAL);
             },
-            init: function(_ref8) {
-                var props = _ref8.props, components = _ref8.components, payment = _ref8.payment, serviceData = _ref8.serviceData, config = _ref8.config;
+            init: function(_ref5) {
+                var props = _ref5.props, components = _ref5.components, payment = _ref5.payment, serviceData = _ref5.serviceData, config = _ref5.config;
                 var createOrder = props.createOrder, onApprove = props.onApprove, clientAccessToken = props.clientAccessToken, enableThreeDomainSecure = props.enableThreeDomainSecure, partnerAttributionID = props.partnerAttributionID, getParent = props.getParent, userIDToken = props.userIDToken, clientID = props.clientID, env = props.env, merchantID = props.merchantID;
                 var ThreeDomainSecure = components.ThreeDomainSecure, Installments = components.Installments;
                 var fundingSource = payment.fundingSource, paymentMethodID = payment.paymentMethodID, button = payment.button;
                 var facilitatorAccessToken = serviceData.facilitatorAccessToken, buyerCountry = serviceData.buyerCountry;
                 var cspNonce = config.cspNonce;
-                var clientMetadataID = function(_ref7) {
-                    var props = _ref7.props;
+                var clientMetadataID = function(_ref4) {
+                    var props = _ref4.props;
                     return props.clientMetadataID || props.sessionID;
                 }({
                     props: props
@@ -13095,9 +13099,9 @@ window.spb = function(modules) {
                             installmentPlan: installmentPlan
                         }),
                         requireShipping: shippingRequired(orderID)
-                    }).then((function(_ref9) {
-                        var validate = _ref9.validate;
-                        if (_ref9.requireShipping) {
+                    }).then((function(_ref6) {
+                        var validate = _ref6.validate;
+                        if (_ref6.requireShipping) {
                             if (fundingSource !== sdk_constants_src.FUNDING.PAYPAL) {
                                 Object(lib.getLogger)().error("vault_shipping_required");
                                 throw new Error("Shipping address requested for " + fundingSource + " payment");
@@ -13117,13 +13121,13 @@ window.spb = function(modules) {
                                 }).start();
                             }();
                         }
-                        return function(_ref5) {
-                            var ThreeDomainSecure = _ref5.ThreeDomainSecure, status = _ref5.status, body = _ref5.body, createOrder = _ref5.createOrder, getParent = _ref5.getParent;
+                        return function(_ref3) {
+                            var ThreeDomainSecure = _ref3.ThreeDomainSecure, status = _ref3.status, body = _ref3.body, createOrder = _ref3.createOrder, getParent = _ref3.getParent;
                             return zalgo_promise_src.ZalgoPromise.try((function() {
                                 if (422 === status && body.links && body.links.some((function(link) {
                                     return "3ds-contingency-resolution" === link.rel;
-                                }))) return function(_ref4) {
-                                    var ThreeDomainSecure = _ref4.ThreeDomainSecure, createOrder = _ref4.createOrder, getParent = _ref4.getParent;
+                                }))) return function(_ref) {
+                                    var ThreeDomainSecure = _ref.ThreeDomainSecure, createOrder = _ref.createOrder, getParent = _ref.getParent;
                                     var promise = new zalgo_promise_src.ZalgoPromise;
                                     var instance = ThreeDomainSecure({
                                         createOrder: createOrder,
@@ -13147,7 +13151,7 @@ window.spb = function(modules) {
                                 });
                                 if (200 !== status) {
                                     if (Array.isArray(body.details)) {
-                                        var _ref6$issue = (body.details && body.details[0] || {}).issue, issue = void 0 === _ref6$issue ? "" : _ref6$issue;
+                                        var _ref4$issue = (body.details && body.details[0] || {}).issue, issue = void 0 === _ref4$issue ? "" : _ref4$issue;
                                         if (0 !== issue.trim().length) throw new Error("Validate payment failed with issue: " + issue);
                                     }
                                     throw new Error("Validate payment failed with status: " + status);
@@ -13359,8 +13363,8 @@ window.spb = function(modules) {
                     }
                 };
             },
-            setupMenu: function(_ref10) {
-                var props = _ref10.props, payment = _ref10.payment, serviceData = _ref10.serviceData, components = _ref10.components, config = _ref10.config, restart = _ref10.restart;
+            setupMenu: function(_ref7) {
+                var props = _ref7.props, payment = _ref7.payment, serviceData = _ref7.serviceData, components = _ref7.components, config = _ref7.config, restart = _ref7.restart;
                 var clientAccessToken = props.clientAccessToken, createOrder = props.createOrder, enableThreeDomainSecure = props.enableThreeDomainSecure, partnerAttributionID = props.partnerAttributionID, sessionID = props.sessionID, clientMetadataID = props.clientMetadataID, userIDToken = props.userIDToken;
                 var fundingSource = payment.fundingSource, paymentMethodID = payment.paymentMethodID, button = payment.button;
                 var content = serviceData.content, facilitatorAccessToken = serviceData.facilitatorAccessToken, featureFlags = serviceData.featureFlags;
@@ -13377,22 +13381,22 @@ window.spb = function(modules) {
                         });
                     }));
                 };
-                var loadCheckout = function(_ref11) {
+                var loadCheckout = function(_ref8) {
                     return checkout.init({
                         props: props,
                         components: components,
                         serviceData: serviceData,
                         config: config,
-                        payment: _ref11.payment,
+                        payment: _ref8.payment,
                         restart: restart
                     }).start();
                 };
                 if (fundingSource === sdk_constants_src.FUNDING.PAYPAL) return [ {
                     label: content.payWithDifferentMethod,
                     popup: POPUP_OPTIONS,
-                    onSelect: function(_ref12) {
+                    onSelect: function(_ref9) {
                         var _getLogger$info$track2;
-                        var win = _ref12.win;
+                        var win = _ref9.win;
                         Object(lib.getLogger)().info("click_choose_funding").track((_getLogger$info$track2 = {}, 
                         _getLogger$info$track2[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CLICK_CHOOSE_FUNDING, 
                         _getLogger$info$track2[sdk_constants_src.FPTI_KEY.OPTION_SELECTED] = constants.FPTI_MENU_OPTION.CHOOSE_FUNDING, 
@@ -13425,9 +13429,9 @@ window.spb = function(modules) {
                 }, {
                     label: content.payWithDifferentAccount,
                     popup: POPUP_OPTIONS,
-                    onSelect: function(_ref13) {
+                    onSelect: function(_ref10) {
                         var _getLogger$info$track3;
-                        var win = _ref13.win;
+                        var win = _ref10.win;
                         Object(lib.getLogger)().info("click_choose_account").track((_getLogger$info$track3 = {}, 
                         _getLogger$info$track3[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.CLICK_CHOOSE_ACCOUNT, 
                         _getLogger$info$track3[sdk_constants_src.FPTI_KEY.OPTION_SELECTED] = constants.FPTI_MENU_OPTION.CHOOSE_ACCOUNT, 
@@ -13464,9 +13468,9 @@ window.spb = function(modules) {
                 } ];
                 throw new Error("Can not render menu for " + fundingSource);
             },
-            updateFlowClientConfig: function(_ref14) {
-                var orderID = _ref14.orderID, featureFlags = _ref14.featureFlags;
-                var fundingSource = _ref14.payment.fundingSource;
+            updateFlowClientConfig: function(_ref11) {
+                var orderID = _ref11.orderID, featureFlags = _ref11.featureFlags;
+                var fundingSource = _ref11.payment.fundingSource;
                 return Object(api.updateButtonClientConfig)({
                     fundingSource: fundingSource,
                     orderID: orderID,
@@ -15155,7 +15159,7 @@ window.spb = function(modules) {
             var button = payment.button, fundingSource = payment.fundingSource, instrumentType = payment.instrumentType, buyerIntent = payment.buyerIntent;
             var buttonLabel = null == (_props$style = props.style) ? void 0 : _props$style.label;
             return zalgo_promise_src.ZalgoPromise.try((function() {
-                var _getLogger$addPayload, _getLogger$info$track;
+                var _getLogger$addPayload, _getLogger$addPayload2;
                 var merchantID = serviceData.merchantID, fundingEligibility = serviceData.fundingEligibility, buyerCountry = serviceData.buyerCountry, featureFlags = serviceData.featureFlags;
                 var clientID = props.clientID, onClick = props.onClick, createOrder = props.createOrder, env = props.env, vault = props.vault, partnerAttributionID = props.partnerAttributionID, userExperienceFlow = props.userExperienceFlow, buttonSessionID = props.buttonSessionID, intent = props.intent, currency = props.currency, clientAccessToken = props.clientAccessToken, createBillingAgreement = props.createBillingAgreement, createSubscription = props.createSubscription, commit = props.commit, disableFunding = props.disableFunding, disableCard = props.disableCard, userIDToken = props.userIDToken, enableNativeCheckout = props.enableNativeCheckout;
                 !function(personalization) {
@@ -15185,28 +15189,35 @@ window.spb = function(modules) {
                         });
                     }
                 }), click = _init.click, start = _init.start, close = _init.close;
+                Object(lib.sendMetric)({
+                    name: "pp.app.paypal_sdk.buttons.click.count",
+                    dimensions: {
+                        fundingSource: fundingSource,
+                        spbPaymentFlow: name
+                    }
+                });
                 Object(lib.getLogger)().addPayloadBuilder((function() {
                     return {
                         token: null
                     };
-                })).info("button_click").info("button_click_pay_flow_" + name).info("button_click_fundingsource_" + fundingSource).info("button_click_instrument_" + (instrumentType || "default")).addTrackingBuilder((function() {
+                })).addTrackingBuilder((function() {
                     var _ref5;
                     return (_ref5 = {})[sdk_constants_src.FPTI_KEY.CHOSEN_FUNDING] = fundingSource, 
                     _ref5[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref5[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref5[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
                     _ref5[constants.AMPLITUDE_KEY.USER_ID] = buttonSessionID, _ref5[constants.AMPLITUDE_KEY.TIME] = Date.now().toString(), 
                     _ref5;
-                })).track(((_getLogger$addPayload = {})[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
+                })).info("button_click_pay_flow_" + name).info("button_click_fundingsource_" + fundingSource).info("button_click_instrument_" + (instrumentType || "default")).info("cross_site_tracking_" + (Object(src.isCrossSiteTrackingEnabled)("enforce_policy") ? "enabled" : "disabled")).track((_getLogger$addPayload = {}, 
+                _getLogger$addPayload[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
                 _getLogger$addPayload[sdk_constants_src.FPTI_KEY.TRANSITION] = constants.FPTI_TRANSITION.BUTTON_CLICK, 
                 _getLogger$addPayload[sdk_constants_src.FPTI_KEY.EVENT_NAME] = constants.FPTI_TRANSITION.BUTTON_CLICK, 
                 _getLogger$addPayload[sdk_constants_src.FPTI_KEY.CHOSEN_FI_TYPE] = instrumentType, 
                 _getLogger$addPayload[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = name, _getLogger$addPayload[sdk_constants_src.FPTI_KEY.IS_VAULT] = instrumentType ? "1" : "0", 
                 _getLogger$addPayload[constants.FPTI_CUSTOM_KEY.INFO_MSG] = enableNativeCheckout ? "tester" : "", 
-                _getLogger$addPayload));
-                Object(lib.getLogger)().info("cross_site_tracking_" + (Object(src.isCrossSiteTrackingEnabled)("enforce_policy") ? "enabled" : "disabled")).track((_getLogger$info$track = {}, 
-                _getLogger$info$track[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
-                _getLogger$info$track[sdk_constants_src.FPTI_KEY.TRANSITION] = "cross_site_tracking_" + (Object(src.isCrossSiteTrackingEnabled)("enforce_policy") ? "enabled" : "disabled"), 
-                _getLogger$info$track)).flush();
+                _getLogger$addPayload.client_time = Object(lib.getClientsideTimestamp)(), _getLogger$addPayload)).track((_getLogger$addPayload2 = {}, 
+                _getLogger$addPayload2[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
+                _getLogger$addPayload2[sdk_constants_src.FPTI_KEY.TRANSITION] = "cross_site_tracking_" + (Object(src.isCrossSiteTrackingEnabled)("enforce_policy") ? "enabled" : "disabled"), 
+                _getLogger$addPayload2)).flush();
                 var loggingPromise = zalgo_promise_src.ZalgoPromise.try((function() {
                     return window.xprops.sessionState.get("__confirm_" + fundingSource + "_payload__").then((function(confirmPayload) {
                         var fieldsSessionID = confirmPayload ? confirmPayload.payment_source[fundingSource].metadata.fieldsSessionID : "";
@@ -15362,11 +15373,11 @@ window.spb = function(modules) {
                         }));
                         var startPromise = updateClientConfigPromise.then((function() {
                             featureFlags.isButtonClientConfigCallBlocking ? Object(lib.getLogger)().info("blocking_cco_call_resolved", {
-                                time: String((new Date).getTime()),
+                                time: Object(lib.getClientsideTimestamp)(),
                                 fundingSource: fundingSource,
                                 buttonSessionID: buttonSessionID
                             }) : Object(lib.getLogger)().info("non_blocking_cco_call_resolved", {
-                                time: String((new Date).getTime()),
+                                time: Object(lib.getClientsideTimestamp)(),
                                 fundingSource: fundingSource,
                                 buttonSessionID: buttonSessionID
                             });
@@ -15581,11 +15592,11 @@ window.spb = function(modules) {
                             }));
                         })).then((function() {
                             featureFlags.isButtonClientConfigCallBlocking ? Object(lib.getLogger)().info("redirect_to_xorouter_blocking_cco", {
-                                time: String((new Date).getTime()),
+                                time: Object(lib.getClientsideTimestamp)(),
                                 fundingSource: fundingSource,
                                 buttonSessionID: buttonSessionID
                             }) : Object(lib.getLogger)().info("redirect_to_xorouter_non_blocking_cco", {
-                                time: String((new Date).getTime()),
+                                time: Object(lib.getClientsideTimestamp)(),
                                 fundingSource: fundingSource,
                                 buttonSessionID: buttonSessionID
                             });
@@ -15671,13 +15682,9 @@ window.spb = function(modules) {
                         } else win && win.close();
                     }
                 })).catch((function(err) {
-                    var _getLogger$info$track;
                     Object(lib.getLogger)().info("smart_buttons_payment_error", {
                         err: Object(src.stringifyError)(err)
-                    }).track(((_getLogger$info$track = {})[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
-                    _getLogger$info$track[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "smart_buttons_payment_error", 
-                    _getLogger$info$track[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(err), 
-                    _getLogger$info$track));
+                    });
                     throw err;
                 }));
             }
@@ -15743,9 +15750,20 @@ window.spb = function(modules) {
                     });
                     var onError = paymentProps.onError;
                     payPromise.catch((function(err) {
+                        var _getLogger$warn$track;
+                        Object(lib.sendMetric)({
+                            name: "pp.app.paypal_sdk.buttons.click.error.count",
+                            dimensions: {
+                                fundingSource: paymentFundingSource,
+                                prerender: !1
+                            }
+                        });
                         Object(lib.getLogger)().warn("click_initiate_payment_reject", {
                             err: Object(src.stringifyError)(err)
-                        }).flush();
+                        }).track((_getLogger$warn$track = {}, _getLogger$warn$track[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
+                        _getLogger$warn$track[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "smart_buttons_payment_error", 
+                        _getLogger$warn$track[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(err), 
+                        _getLogger$warn$track)).flush();
                         onError(err);
                     }));
                     button.payPromise = payPromise;
@@ -15872,13 +15890,13 @@ window.spb = function(modules) {
                                     props: props
                                 }) : void 0;
                             })).catch((function(err) {
-                                var _getLogger$info$track2;
+                                var _getLogger$info$track;
                                 Object(lib.getLogger)().info("smart_buttons_payment_error", {
                                     err: Object(src.stringifyError)(err)
-                                }).track(((_getLogger$info$track2 = {})[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
-                                _getLogger$info$track2[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "smart_buttons_payment_error", 
-                                _getLogger$info$track2[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(err), 
-                                _getLogger$info$track2));
+                                }).track(((_getLogger$info$track = {})[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
+                                _getLogger$info$track[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "smart_buttons_payment_error", 
+                                _getLogger$info$track[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(err), 
+                                _getLogger$info$track));
                                 throw err;
                             }));
                         }({
@@ -15919,9 +15937,20 @@ window.spb = function(modules) {
                         });
                         var onError = paymentProps.onError;
                         payPromise.catch((function(err) {
+                            var _getLogger$error$trac;
+                            Object(lib.sendMetric)({
+                                name: "pp.app.paypal_sdk.buttons.click.error.count",
+                                dimensions: {
+                                    fundingSource: paymentFundingSource,
+                                    prerender: !0
+                                }
+                            });
                             Object(lib.getLogger)().error("prerender_initiate_payment_reject", {
                                 err: Object(src.stringifyError)(err)
-                            }).flush();
+                            }).track((_getLogger$error$trac = {}, _getLogger$error$trac[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
+                            _getLogger$error$trac[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "smart_buttons_prerender_payment_error", 
+                            _getLogger$error$trac[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(err), 
+                            _getLogger$error$trac)).flush();
                             onError(err);
                         }));
                         button.payPromise = payPromise;
@@ -15961,7 +15990,7 @@ window.spb = function(modules) {
                     var _ref3;
                     return (_ref3 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref3[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.143", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.144", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref3[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref3[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref3[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -16700,8 +16729,14 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "getNavigationTimeOrigin", (function() {
             return util.getNavigationTimeOrigin;
         }));
+        __webpack_require__.d(__webpack_exports__, "getClientsideTimestamp", (function() {
+            return util.getClientsideTimestamp;
+        }));
         __webpack_require__.d(__webpack_exports__, "getLogger", (function() {
             return logger.getLogger;
+        }));
+        __webpack_require__.d(__webpack_exports__, "sendMetric", (function() {
+            return logger.sendMetric;
         }));
         __webpack_require__.d(__webpack_exports__, "enableAmplitude", (function() {
             return logger.enableAmplitude;
@@ -17023,6 +17058,9 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "getLogger", (function() {
             return getLogger;
         }));
+        __webpack_require__.d(__webpack_exports__, "sendMetric", (function() {
+            return sendMetric;
+        }));
         __webpack_require__.d(__webpack_exports__, "enableAmplitude", (function() {
             return enableAmplitude;
         }));
@@ -17042,14 +17080,23 @@ window.spb = function(modules) {
                 });
             }));
         }
-        function enableAmplitude(_ref) {
-            var env = _ref.env;
+        var sendMetric = function(_ref) {
+            var name = _ref.name, dimensions = _ref.dimensions;
+            getLogger().metric({
+                metricNamespace: name,
+                metricEventName: "unused",
+                metricValue: 1,
+                dimensions: dimensions
+            });
+        };
+        function enableAmplitude(_ref2) {
+            var env = _ref2.env;
             getLogger().configure({
                 amplitudeApiKey: _config__WEBPACK_IMPORTED_MODULE_4__.AMPLITUDE_API_KEY[env]
             });
         }
-        function setupLogger(_ref2) {
-            var env = _ref2.env, sessionID = _ref2.sessionID, clientID = _ref2.clientID, sdkCorrelationID = _ref2.sdkCorrelationID, buyerCountry = _ref2.buyerCountry, locale = _ref2.locale, _ref2$sdkVersion = _ref2.sdkVersion, sdkVersion = void 0 === _ref2$sdkVersion ? window.paypal.version : _ref2$sdkVersion;
+        function setupLogger(_ref3) {
+            var env = _ref3.env, sessionID = _ref3.sessionID, clientID = _ref3.clientID, sdkCorrelationID = _ref3.sdkCorrelationID, buyerCountry = _ref3.buyerCountry, locale = _ref3.locale, _ref3$sdkVersion = _ref3.sdkVersion, sdkVersion = void 0 === _ref3$sdkVersion ? window.paypal.version : _ref3$sdkVersion;
             var logger = getLogger();
             logger.addPayloadBuilder((function() {
                 return {
@@ -17061,22 +17108,22 @@ window.spb = function(modules) {
                 };
             }));
             logger.addTrackingBuilder((function() {
-                var _ref3;
-                return (_ref3 = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.FEED] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_FEED.PAYMENTS_SDK, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.DATA_SOURCE] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_DATA_SOURCE.PAYMENTS_SDK, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CLIENT_ID] = clientID, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SESSION_UID] = sessionID, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.REFERER] = window.location.host, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.BUYER_COUNTRY] = buyerCountry, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.LOCALE] = locale.lang + "_" + locale.country, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.INTEGRATION_IDENTIFIER] = clientID, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_ENVIRONMENT] = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.isIos)() ? _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.MOBILE_ENV.IOS : Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.isAndroid)() ? _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.MOBILE_ENV.ANDROID : null, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_NAME] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_SDK_NAME.PAYMENTS_SDK, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_VERSION] = sdkVersion, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.USER_AGENT] = window.navigator && window.navigator.userAgent, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CONTEXT_CORRID] = sdkCorrelationID, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.TIMESTAMP] = Date.now().toString(), 
-                _ref3;
+                var _ref4;
+                return (_ref4 = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.FEED] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_FEED.PAYMENTS_SDK, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.DATA_SOURCE] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_DATA_SOURCE.PAYMENTS_SDK, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CLIENT_ID] = clientID, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SESSION_UID] = sessionID, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.REFERER] = window.location.host, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.BUYER_COUNTRY] = buyerCountry, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.LOCALE] = locale.lang + "_" + locale.country, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.INTEGRATION_IDENTIFIER] = clientID, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_ENVIRONMENT] = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.isIos)() ? _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.MOBILE_ENV.IOS : Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.isAndroid)() ? _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.MOBILE_ENV.ANDROID : null, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_NAME] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_SDK_NAME.PAYMENTS_SDK, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_VERSION] = sdkVersion, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.USER_AGENT] = window.navigator && window.navigator.userAgent, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CONTEXT_CORRID] = sdkCorrelationID, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.TIMESTAMP] = Date.now().toString(), 
+                _ref4;
             }));
             _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_2__.ZalgoPromise.onPossiblyUnhandledException((function(err) {
                 var _logger$track;
@@ -17140,6 +17187,9 @@ window.spb = function(modules) {
         }));
         __webpack_require__.d(__webpack_exports__, "getNavigationTimeOrigin", (function() {
             return getNavigationTimeOrigin;
+        }));
+        __webpack_require__.d(__webpack_exports__, "getClientsideTimestamp", (function() {
+            return getClientsideTimestamp;
         }));
         var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@babel/runtime/helpers/esm/extends.js");
         var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./node_modules/@krakenjs/zalgo-promise/src/index.js");
@@ -17257,6 +17307,13 @@ window.spb = function(modules) {
                 return window.performance.timeOrigin || window.performance.timing.navigationStart || unixSyncPoint - hrSyncPoint;
             }
             throw new Error("window.performance not supported");
+        }
+        function getClientsideTimestamp() {
+            try {
+                return String((new Date).getTime());
+            } catch (_unused) {
+                return "invalid_timestamp";
+            }
         }
     },
     "./src/props/confirmOrder.js": function(module, __webpack_exports__, __webpack_require__) {
@@ -17473,13 +17530,19 @@ window.spb = function(modules) {
                 merchantID: merchantID,
                 partnerAttributionID: partnerAttributionID
             });
+            var integrationType = "server-side";
             return Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
                 var queryOrderID = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.getQueryParam)("orderID");
                 if (queryOrderID) return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.ZalgoPromise.resolve(queryOrderID);
                 if (enableOrdersApprovalSmartWallet && smartWalletOrderID) return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.ZalgoPromise.resolve(smartWalletOrderID);
                 var startTime = Date.now();
                 return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.ZalgoPromise.try((function() {
-                    return "vault_without_purchase" === flow && createVaultSetupToken ? createVaultSetupToken().then(_api_vault__WEBPACK_IMPORTED_MODULE_9__.vaultApprovalSessionIdToOrderId) : createBillingAgreement ? createBillingAgreement().then(_api__WEBPACK_IMPORTED_MODULE_5__.billingTokenToOrderID) : createSubscription ? createSubscription().then(_api__WEBPACK_IMPORTED_MODULE_5__.subscriptionIdToCartId) : createOrder ? createOrder(data, actions) : actions.order.create({
+                    if ("vault_without_purchase" === flow && createVaultSetupToken) return createVaultSetupToken().then(_api_vault__WEBPACK_IMPORTED_MODULE_9__.vaultApprovalSessionIdToOrderId);
+                    if (createBillingAgreement) return createBillingAgreement().then(_api__WEBPACK_IMPORTED_MODULE_5__.billingTokenToOrderID);
+                    if (createSubscription) return createSubscription().then(_api__WEBPACK_IMPORTED_MODULE_5__.subscriptionIdToCartId);
+                    if (createOrder) return createOrder(data, actions);
+                    integrationType = "client-side";
+                    return actions.order.create({
                         purchase_units: [ {
                             amount: {
                                 currency_code: currency,
@@ -17488,14 +17551,59 @@ window.spb = function(modules) {
                         } ]
                     });
                 })).catch((function(err) {
-                    Object(_lib__WEBPACK_IMPORTED_MODULE_7__.getLogger)().error("create_order_error", {
-                        err: Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.stringifyError)(err)
+                    var _getLogger$error$trac;
+                    Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendMetric)({
+                        name: "pp.app.paypal_sdk.buttons.create_order.error.count",
+                        dimensions: {
+                            errorName: "generic",
+                            flow: flow,
+                            intent: intent,
+                            integrationType: integrationType
+                        }
                     });
+                    Object(_lib__WEBPACK_IMPORTED_MODULE_7__.getLogger)().error("create_order_error", {
+                        err: Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.stringifyErrorMessage)(err)
+                    }).track(((_getLogger$error$trac = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.STATE] = _constants__WEBPACK_IMPORTED_MODULE_6__.FPTI_STATE.BUTTON, 
+                    _getLogger$error$trac[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.ERROR_CODE] = "smart_buttons_create_order_error", 
+                    _getLogger$error$trac[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.ERROR_DESC] = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.stringifyErrorMessage)(err), 
+                    _getLogger$error$trac));
                     throw err;
                 })).then((function(orderID) {
                     var _getLogger$addPayload;
-                    if (!orderID || "string" != typeof orderID) throw new Error("Expected an order id to be passed");
-                    if (0 === orderID.indexOf("PAY-") || 0 === orderID.indexOf("PAYID-")) throw new Error("Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead");
+                    if (!orderID || "string" != typeof orderID) {
+                        var _getLogger$track;
+                        Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendMetric)({
+                            name: "pp.app.paypal_sdk.buttons.create_order.error.count",
+                            dimensions: {
+                                errorName: "no_order_id",
+                                flow: flow,
+                                intent: intent,
+                                integrationType: integrationType
+                            }
+                        });
+                        Object(_lib__WEBPACK_IMPORTED_MODULE_7__.getLogger)().track(((_getLogger$track = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.STATE] = _constants__WEBPACK_IMPORTED_MODULE_6__.FPTI_STATE.BUTTON, 
+                        _getLogger$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.ERROR_CODE] = "smart_buttons_create_order_error", 
+                        _getLogger$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.ERROR_DESC] = "Expected an order id to be passed", 
+                        _getLogger$track));
+                        throw new Error("Expected an order id to be passed");
+                    }
+                    if (0 === orderID.indexOf("PAY-") || 0 === orderID.indexOf("PAYID-")) {
+                        var _getLogger$track2;
+                        Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendMetric)({
+                            name: "pp.app.paypal_sdk.buttons.create_order.error.count",
+                            dimensions: {
+                                errorName: "pay_id",
+                                flow: flow,
+                                intent: intent,
+                                integrationType: integrationType
+                            }
+                        });
+                        Object(_lib__WEBPACK_IMPORTED_MODULE_7__.getLogger)().track(((_getLogger$track2 = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.STATE] = _constants__WEBPACK_IMPORTED_MODULE_6__.FPTI_STATE.BUTTON, 
+                        _getLogger$track2[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.ERROR_CODE] = "smart_buttons_create_order_error", 
+                        _getLogger$track2[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.ERROR_DESC] = "Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead", 
+                        _getLogger$track2));
+                        throw new Error("Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead");
+                    }
                     var duration = Date.now() - startTime;
                     Object(_lib__WEBPACK_IMPORTED_MODULE_7__.getLogger)().addPayloadBuilder((function() {
                         return {
@@ -17515,6 +17623,7 @@ window.spb = function(modules) {
                     _getLogger$addPayload[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CONTEXT_ID] = orderID, 
                     _getLogger$addPayload[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.TOKEN] = orderID, 
                     _getLogger$addPayload[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.RESPONSE_DURATION] = duration.toString(), 
+                    _getLogger$addPayload.client_time = Object(_lib__WEBPACK_IMPORTED_MODULE_7__.getClientsideTimestamp)(), 
                     _getLogger$addPayload)).flush();
                     return orderID;
                 }));

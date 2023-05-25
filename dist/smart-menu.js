@@ -389,8 +389,8 @@ window.spb = function(modules) {
         i && (hooks_module_u === hooks_module_r ? (i.__h = [], hooks_module_r.__h = [], 
         i.__.forEach((function(n) {
             n.__N && (n.__ = n.__N), n.__V = hooks_module_c, n.__N = n.i = void 0;
-        }))) : (i.__h.forEach(hooks_module_k), i.__h.forEach(hooks_module_w), i.__h = [])), 
-        hooks_module_u = hooks_module_r;
+        }))) : (i.__h.forEach(hooks_module_k), i.__h.forEach(hooks_module_w), i.__h = [], 
+        hooks_module_t = 0)), hooks_module_u = hooks_module_r;
     }, l.diffed = function(t) {
         hooks_module_v && hooks_module_v(t);
         var o = t.__c;
