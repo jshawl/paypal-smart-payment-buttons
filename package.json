@@ -91,7 +91,7 @@
     "express": "^4.16.3",
     "flow-bin": "0.155.0",
     "flow-typed": "^3.8.0",
-    "happy-dom": "^7.7.0",
+    "happy-dom": "^9.0.0",
     "husky": "^8.0.2",
     "jsdom": "^22.0.0",
     "lint-staged": "^13.0.4",
