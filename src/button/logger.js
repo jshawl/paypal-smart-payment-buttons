@@ -131,15 +131,15 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             native_device = 'android_chrome';
         }
 
-        const renderVersion = getTemplateVersion();
-        const dotSeparatedRenderVersion = renderVersion.split('_').join('.');
+        const serverRenderVersion = getTemplateVersion();
+        const dotSeparatedRenderVersion = serverRenderVersion.split('_').join('.');
 
         if (dotSeparatedRenderVersion !== sdkVersion) {
-          logger.warn('server_render_version_mismatch', {sdkVersion, renderVersion})
+          logger.warn('server_render_version_mismatch', {sdkVersion, serverRenderVersion})
         }
 
         logger.info(`button_render`);
-        logger.info(`button_render_template_version_${ renderVersion }`);
+        logger.info(`button_render_template_version_${ serverRenderVersion }`);
         logger.info(`button_render_client_version_${ getClientVersion() }`);
         logger.info(`button_render_color_${ color }`);
         logger.info(`button_render_shape_${ shape }`);
