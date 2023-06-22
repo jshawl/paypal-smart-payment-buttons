@@ -12,7 +12,8 @@ import {
     isIOSSafari,
     isAndroidChrome,
     prepareLatencyInstrumentationPayload,
-    getNavigationTimeOrigin
+    getNavigationTimeOrigin,
+    sendMetric
 } from '../lib';
 import {
     DATA_ATTRIBUTES, FPTI_TRANSITION, FPTI_BUTTON_TYPE, FPTI_BUTTON_KEY,
@@ -136,6 +137,10 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
 
         if (dotSeparatedRenderVersion !== sdkVersion) {
           logger.warn('server_render_version_mismatch', {sdkVersion, serverRenderVersion})
+          sendMetric({
+            name: 'pp.app.paypal_sdk.buttons.server_render_version_mismatch',
+            dimensions: {sdkVersion, serverRenderVersion}
+          });
         }
 
         logger.info(`button_render`);
