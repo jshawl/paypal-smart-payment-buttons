@@ -139,7 +139,7 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
           logger.warn('server_render_version_mismatch', {sdkVersion, serverRenderVersion})
           sendMetric({
             name: 'pp.app.paypal_sdk.buttons.server_render_version_mismatch',
-            dimensions: {sdkVersion, serverRenderVersion}
+            dimensions: {}
           });
         }
 
