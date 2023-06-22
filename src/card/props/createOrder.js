@@ -2,9 +2,15 @@
 
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 import { memoize } from "@krakenjs/belter/src";
+import { FUNDING } from "@paypal/sdk-constants/src";
 
-export type XCreateOrder = ?() => ZalgoPromise<string>;
+type PaymentSource = $Values<typeof FUNDING>;
 
+export type XCreateOrderDataType = {|
+  paymentSource: PaymentSource,
+|};
+
+export type XCreateOrder = ?(XCreateOrderDataType) => ZalgoPromise<string>;
 export type CreateOrder = () => ZalgoPromise<string>;
 
 type CreateOrderXProps = {|
@@ -20,7 +26,7 @@ export function getCreateOrder({
 
   return memoize(() => {
     return ZalgoPromise.try(() => {
-      return createOrder();
+      return createOrder({paymentSource: FUNDING.CARD});
     }).then((orderID) => {
       if (!orderID || typeof orderID !== "string") {
         throw new Error(`Expected an order id to be passed`);
