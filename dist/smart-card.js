@@ -9576,7 +9576,9 @@ window.smartCard = function(modules) {
     var createVaultSetupToken_getCreateVaultSetupToken = function(_ref) {
         var createVaultSetupToken = _ref.createVaultSetupToken;
         if (createVaultSetupToken) return Object(belter_src.o)((function() {
-            return createVaultSetupToken().then((function(vaultSetupToken) {
+            return createVaultSetupToken({
+                paymentSource: src.g.CARD
+            }).then((function(vaultSetupToken) {
                 if (!vaultSetupToken || "string" != typeof vaultSetupToken) throw new Error("Expected a vault setup token to be returned from createVaultSetupToken");
                 return vaultSetupToken;
             }));
@@ -9586,7 +9588,9 @@ window.smartCard = function(modules) {
         var createOrder = _ref.createOrder;
         if (createOrder) return Object(belter_src.o)((function() {
             return zalgo_promise_src.a.try((function() {
-                return createOrder();
+                return createOrder({
+                    paymentSource: src.g.CARD
+                });
             })).then((function(orderID) {
                 if (!orderID || "string" != typeof orderID) throw new Error("Expected an order id to be passed");
                 if (orderID.includes("PAY-") || orderID.includes("PAYID-")) throw new Error("Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead");
@@ -11248,7 +11252,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.144", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.145", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[src.c.PAYMENTS_SDK] = clientID, 

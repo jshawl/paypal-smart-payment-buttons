@@ -9966,7 +9966,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.144", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.145", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -12747,7 +12747,9 @@ window.spb = function(modules) {
         var createVaultSetupToken_getCreateVaultSetupToken = function(_ref) {
             var createVaultSetupToken = _ref.createVaultSetupToken;
             if (createVaultSetupToken) return Object(src.memoize)((function() {
-                return createVaultSetupToken().then((function(vaultSetupToken) {
+                return createVaultSetupToken({
+                    paymentSource: sdk_constants_src.FUNDING.CARD
+                }).then((function(vaultSetupToken) {
                     if (!vaultSetupToken || "string" != typeof vaultSetupToken) throw new Error("Expected a vault setup token to be returned from createVaultSetupToken");
                     return vaultSetupToken;
                 }));
@@ -12757,7 +12759,9 @@ window.spb = function(modules) {
             var createOrder = _ref.createOrder;
             if (createOrder) return Object(src.memoize)((function() {
                 return zalgo_promise_src.ZalgoPromise.try((function() {
-                    return createOrder();
+                    return createOrder({
+                        paymentSource: sdk_constants_src.FUNDING.CARD
+                    });
                 })).then((function(orderID) {
                     if (!orderID || "string" != typeof orderID) throw new Error("Expected an order id to be passed");
                     if (orderID.includes("PAY-") || orderID.includes("PAYID-")) throw new Error("Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead");
@@ -15990,7 +15994,7 @@ window.spb = function(modules) {
                     var _ref3;
                     return (_ref3 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref3[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.144", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.145", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref3[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref3[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref3[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
