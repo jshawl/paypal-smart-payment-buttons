@@ -10,7 +10,7 @@ import { AMPLITUDE_KEY, FPTI_TRANSITION, BUYER_INTENT, FPTI_CONTEXT_TYPE, FPTI_C
 import { updateButtonClientConfig } from '../api';
 import { getConfirmOrder } from '../props/confirmOrder';
 import { enableVaultSetup } from '../middleware';
-import { Experiments } from '../types';
+import { type Experiments } from '../types';
 
 import { type ButtonProps, type Config, type ServiceData, type Components } from './props';
 import { enableLoadingSpinner, disableLoadingSpinner } from './dom';
