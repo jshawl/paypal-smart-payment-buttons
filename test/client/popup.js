@@ -352,6 +352,101 @@ describe('popup cases', () => {
         });
     });
 
+    it.only('should render a button with createOrder, click the button, open a popup, and render checkout with experimental dimensions', async () => {
+        return await wrapPromise(async ({ expect, avoid }) => {
+
+            const orderID = generateOrderID();
+            const payerID = 'YYYYYYYYYY';
+
+            window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
+                return ZalgoPromise.try(() => {
+                    return orderID;
+                });
+            }));
+
+            window.xprops.onCancel = avoid('onCancel');
+
+            window.xprops.onApprove = mockAsyncProp(expect('onApprove', async (data) => {
+                if (data.orderID !== orderID) {
+                    throw new Error(`Expected orderID to be ${ orderID }, got ${ data.orderID }`);
+                }
+
+                if (data.payerID !== payerID) {
+                    throw new Error(`Expected payerID to be ${ payerID }, got ${ data.payerID }`);
+                }
+            }));
+            const mockWindow = getMockWindowOpen({
+                expectImmediateUrl: false
+            });
+            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ original: CheckoutOriginal, args: [ props ] }) => {
+
+                mockFunction(props, 'onApprove', expect('onApprove', ({ original: onApproveOriginal, args: [ data, actions ] }) => {
+                    return onApproveOriginal({ ...data, payerID }, actions);
+                }));
+
+                const checkoutInstance = CheckoutOriginal(props);
+
+                mockFunction(checkoutInstance, 'renderTo', expect('renderTo', async ({ original: renderToOriginal, args }) => {
+                    const [ win, element, context ] = args;
+
+                    if (!win) {
+                        throw new Error(`Expected window to be passed to renderTo`);
+                    }
+
+                    if (props.win) {
+                        throw new Error(`Expected window to not be passed to props`);
+                    }
+
+
+                    if (!element || typeof element !== 'string') {
+                        throw new Error(`Expected string element to be passed to renderTo`);
+                    }
+
+                    if (context !== 'popup') {
+                        throw new Error(`Expected context to be popup, got ${ context }`);
+                    }
+                    if (props.dimensions.width !== 568) {
+                        throw new Error(`Expected props width to be 568, got ${ props.dimensions.width }`);
+                    }
+                    if (props.dimensions.height !== 750) {
+                        throw new Error(`Expected props height to be 750, got ${ props.dimensions.height }`);
+                    }
+
+                    const opts = mockWindow.getOpts();
+
+                    if (parseInt(opts.width, 10) !== 568) {
+                        throw new Error(`Expected width to be 568, got ${ opts.width }`);
+                    }
+                    if (parseInt(opts.height, 10) !== 750) {
+                        throw new Error(`Expected height to be 750, got ${ opts.height }`);
+                    }
+
+                    return props.createOrder().then(id => {
+                        if (id !== orderID) {
+                            throw new Error(`Expected orderID to be ${ orderID }, got ${ id }`);
+                        }
+
+                        return renderToOriginal(...args);
+                    });
+                }));
+
+                return checkoutInstance;
+            }));
+
+            createButtonHTML();
+
+            await mockSetupButton({
+                experiments: {
+                    popupIncreaseDimensions: true
+                },
+                merchantID: [ 'XYZ12345' ],
+                fundingEligibility: DEFAULT_FUNDING_ELIGIBILITY 
+            });
+
+            await clickButton(FUNDING.PAYPAL);
+        });
+    });
+
     it('should render a button with createOrder, click the button, fail to open a popup with an error, and render checkout', async () => {
         return await wrapPromise(async ({ expect, avoid }) => {
 

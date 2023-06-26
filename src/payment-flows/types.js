@@ -5,7 +5,7 @@ import type { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { COUNTRY, CURRENCY, FUNDING, CARD, WALLET_INSTRUMENT } from '@paypal/sdk-constants/src';
 
 import type { ButtonProps, Components, ServiceData, Config } from '../button/props';
-import type { ProxyWindow, MenuChoices, FeatureFlags } from '../types';
+import type { ProxyWindow, MenuChoices, FeatureFlags, Experiments } from '../types';
 import { BUYER_INTENT } from '../constants';
 
 // export something to force webpack to see this as an ES module
@@ -68,7 +68,8 @@ export type InitOptions = {|
     payment : Payment,
     components : Components,
     config : Config,
-    restart : RestartPayment
+    restart : RestartPayment,
+    experiments? : Experiments
 |};
 
 export type MenuOptions = {|

@@ -128,17 +128,22 @@ function getContext({ win, isClick, merchantRequestedPopupsDisabled } : {| win :
     return CONTEXT.IFRAME;
 }
 
-export const getDimensions = (fundingSource : string) : {| width : number, height : number |} => {
+export const getDimensions = (fundingSource : string, popupIncreaseDimensions : boolean) : {| width : number, height : number |} => {
     if (APM_LIST.indexOf(fundingSource) !== -1) {
         getLogger().info(`popup_dimensions_value_${ fundingSource }`).flush();
         return { width: CHECKOUT_APM_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_APM_POPUP_DIMENSIONS.HEIGHT };
+    } else if (popupIncreaseDimensions) {
+        getLogger().track({
+            [FPTI_KEY.EXPERIMENT_POPUP_INCREASE_DIMENSIONS]: "568x750"
+        });
+        return { width: 568, height: 750 };
     } else {
         getLogger().info(`popup_dimensions_${ fundingSource }`).flush();
         return { width: CHECKOUT_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_POPUP_DIMENSIONS.HEIGHT };
     }
 }
 
-function initCheckout({ props, components, serviceData, payment, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
+function initCheckout({ props, components, serviceData, payment, config, restart: fullRestart, experiments } : InitOptions) : PaymentFlowInstance {
     const { Checkout } = components;
     const { sessionID, buttonSessionID, createOrder, onApprove, onComplete, onCancel,
         onShippingChange, onShippingAddressChange, onShippingOptionsChange, locale, commit, onError, vault, clientAccessToken,
@@ -389,7 +394,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 return onError(err);
             },
 
-            dimensions: getDimensions(fundingSource),
+            dimensions: getDimensions(fundingSource, experiments?.popupIncreaseDimensions ?? false),
 
             fundingSource,
             card,
@@ -435,7 +440,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
         return ZalgoPromise.try(() => {
             if (!merchantRequestedPopupsDisabled && !win && supportsPopups()) {
                 try {
-                    const { width, height } = getDimensions(fundingSource);
+                    const { width, height } = getDimensions(fundingSource, experiments?.popupIncreaseDimensions ?? false);
                     win = openPopup({ width, height });
                 } catch (err) {
                     getLogger().warn('popup_open_error_iframe_fallback', { err: stringifyError(err) });

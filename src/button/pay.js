@@ -10,6 +10,7 @@ import { AMPLITUDE_KEY, FPTI_TRANSITION, BUYER_INTENT, FPTI_CONTEXT_TYPE, FPTI_C
 import { updateButtonClientConfig } from '../api';
 import { getConfirmOrder } from '../props/confirmOrder';
 import { enableVaultSetup } from '../middleware';
+import { Experiments } from '../types';
 
 import { type ButtonProps, type Config, type ServiceData, type Components } from './props';
 import { enableLoadingSpinner, disableLoadingSpinner } from './dom';
@@ -64,10 +65,11 @@ type InitiatePaymentOptions = {|
     props : ButtonProps,
     serviceData : ServiceData,
     config : Config,
-    components : Components
+    components : Components,
+    experiments? : Experiments
 |};
 
-export function initiatePaymentFlow({ payment, serviceData, config, components, props } : InitiatePaymentOptions) : ZalgoPromise<void> {
+export function initiatePaymentFlow({ payment, serviceData, config, components, props, experiments } : InitiatePaymentOptions) : ZalgoPromise<void> {
     const { button, fundingSource, instrumentType, buyerIntent } = payment;
     const buttonLabel = props.style?.label;
 
@@ -82,7 +84,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
             initiatePaymentFlow({ payment: restartPayment, serviceData, config, components, props });
 
         const { name, init, inline, spinner, updateFlowClientConfig } = getPaymentFlow({ props, payment, config, components, serviceData });
-        const { click, start, close } = init({ props, config, serviceData, components, payment, restart });
+        const { click, start, close } = init({ props, config, serviceData, components, payment, restart, experiments });
 
         sendMetric({
             name: 'pp.app.paypal_sdk.buttons.click.count',
