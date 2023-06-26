@@ -134,6 +134,7 @@ export const getDimensions = (fundingSource : string, popupIncreaseDimensions? :
         return { width: CHECKOUT_APM_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_APM_POPUP_DIMENSIONS.HEIGHT };
     } else if (popupIncreaseDimensions) {
         getLogger().track({
+            // $FlowFixMe
             [FPTI_KEY.EXPERIMENT_POPUP_INCREASE_DIMENSIONS]: "568x750"
         });
         return { width: 568, height: 750 };
