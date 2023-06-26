@@ -12,7 +12,8 @@ import {
     isIOSSafari,
     isAndroidChrome,
     prepareLatencyInstrumentationPayload,
-    getNavigationTimeOrigin
+    getNavigationTimeOrigin,
+    sendMetric
 } from '../lib';
 import {
     DATA_ATTRIBUTES, FPTI_TRANSITION, FPTI_BUTTON_TYPE, FPTI_BUTTON_KEY,
@@ -131,8 +132,19 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             native_device = 'android_chrome';
         }
 
+        const serverRenderVersion = getTemplateVersion();
+        const dotSeparatedRenderVersion = serverRenderVersion.split('_').join('.');
+
+        if (dotSeparatedRenderVersion !== sdkVersion) {
+          logger.warn('server_render_version_mismatch', {sdkVersion, serverRenderVersion})
+          sendMetric({
+            name: 'pp.app.paypal_sdk.buttons.server_render_version_mismatch',
+            dimensions: {}
+          });
+        }
+
         logger.info(`button_render`);
-        logger.info(`button_render_template_version_${ getTemplateVersion() }`);
+        logger.info(`button_render_template_version_${ serverRenderVersion }`);
         logger.info(`button_render_client_version_${ getClientVersion() }`);
         logger.info(`button_render_color_${ color }`);
         logger.info(`button_render_shape_${ shape }`);

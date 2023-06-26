@@ -11,6 +11,7 @@ import { setupButtonLogger } from "./logger";
 vi.mock("../lib/logger", () => ({
   getLogger: vi.fn(),
   setupLogger: vi.fn(),
+  sendMetric: vi.fn(),
 }));
 
 const buttonLoggerProps = {
