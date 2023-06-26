@@ -352,7 +352,7 @@ describe('popup cases', () => {
         });
     });
 
-    it.only('should render a button with createOrder, click the button, open a popup, and render checkout with experimental dimensions', async () => {
+    it('should render a button with createOrder, click the button, open a popup, and render checkout with experimental dimensions', async () => {
         return await wrapPromise(async ({ expect, avoid }) => {
 
             const orderID = generateOrderID();
