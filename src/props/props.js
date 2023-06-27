@@ -89,7 +89,8 @@ export type XProps = {|
     allowBillingPayments : boolean,
 
     applePay : XApplePaySessionConfigRequest,
-    paymentRequest: ?PaymentRequest
+    paymentRequest: ?PaymentRequest,
+    disableSetCookie : boolean
 |};
 
 export type Props = {|
@@ -155,7 +156,8 @@ export type Props = {|
     paymentRequest: ?PaymentRequest,
     merchantID : $ReadOnlyArray<string>,
     enableOrdersApprovalSmartWallet : boolean | void,
-    smartWalletOrderID : string | void
+    smartWalletOrderID : string | void,
+    disableSetCookie : boolean
 |};
 
 export function getProps({
@@ -213,7 +215,8 @@ export function getProps({
         applePay,
         userExperienceFlow,
         allowBillingPayments,
-        paymentRequest
+        paymentRequest,
+        disableSetCookie
     } = xprops;
 
     const onInit = getOnInit({ onInit: xprops.onInit });
@@ -291,6 +294,7 @@ export function getProps({
         merchantID,
 
         enableOrdersApprovalSmartWallet,
-        smartWalletOrderID
+        smartWalletOrderID,
+        disableSetCookie
     };
 }

@@ -8,7 +8,7 @@ import { type ProxyWindow } from '@krakenjs/post-robot/src';
 
 import { getNativeEligibility } from '../../api';
 import { getLogger, getStorageID } from '../../lib';
-import { FPTI_STATE, FPTI_TRANSITION, TARGET_ELEMENT, QRCODE_STATE, FPTI_CUSTOM_KEY } from '../../constants';
+import { FPTI_STATE, FPTI_TRANSITION, TARGET_ELEMENT, QRCODE_STATE, FPTI_CUSTOM_KEY, HEADERS } from '../../constants';
 import type { ButtonProps, ServiceData, Config, Components } from '../../button/props';
 import { type OnShippingChangeData } from '../../props/onShippingChange';
 import type { Payment } from '../types';
@@ -26,7 +26,7 @@ type EligibilityOptions = {|
 |};
 
 function getEligibility({ fundingSource, props, serviceData, validatePromise } : EligibilityOptions) : ZalgoPromise<boolean> {
-    const { createOrder, onShippingChange, vault, clientID, currency, buttonSessionID, enableFunding, merchantDomain } = props;
+    const { createOrder, onShippingChange, vault, clientID, currency, buttonSessionID, enableFunding, merchantDomain, disableSetCookie } = props;
     const { buyerCountry, cookies, merchantID } = serviceData;
     const shippingCallbackEnabled = Boolean(onShippingChange);
     const platform = PLATFORM.MOBILE;
@@ -45,7 +45,8 @@ function getEligibility({ fundingSource, props, serviceData, validatePromise } :
                 clientID, buyerCountry, currency, buttonSessionID, cookies, orderID, enableFunding,
                 merchantID:   merchantID[0],
                 domain:       merchantDomain,
-                skipElmo:   true
+                skipElmo:   true,
+                headers: { [ HEADERS.DISABLE_SET_COOKIE ]: String(disableSetCookie) }
             }).then(eligibility => {
                 // ignore isUserAgentEligible and isBrowserMobileAndroid for Venmo Desktop as they don't apply
                 const eligibleReasons = [ 'isUserAgentEligible', 'isBrowserMobileAndroid' ];

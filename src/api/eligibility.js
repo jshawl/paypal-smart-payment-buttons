@@ -114,7 +114,8 @@ type NativeEligibilityOptions = {|
     enableFunding : ?$ReadOnlyArray<$Values<typeof FUNDING>>,
     stickinessID? : ?string,
     domain : string,
-    skipElmo? : boolean
+    skipElmo? : boolean,
+    headers? : { [string] : string }
 |};
 
 export type NativeEligibility = {|
@@ -124,7 +125,7 @@ export type NativeEligibility = {|
     |}
 |};
 
-export function getNativeEligibility({ vault, shippingCallbackEnabled, merchantID, clientID, buyerCountry, currency, buttonSessionID, cookies, orderID, enableFunding, stickinessID, domain, skipElmo = false } : NativeEligibilityOptions) : ZalgoPromise<NativeEligibility> {
+export function getNativeEligibility({ vault, shippingCallbackEnabled, merchantID, clientID, buyerCountry, currency, buttonSessionID, cookies, orderID, enableFunding, stickinessID, domain, headers = {}, skipElmo = false } : NativeEligibilityOptions) : ZalgoPromise<NativeEligibility> {
     const userAgent = getUserAgent();
 
     return callGraphQL({
@@ -177,7 +178,8 @@ export function getNativeEligibility({ vault, shippingCallbackEnabled, merchantI
             vault, shippingCallbackEnabled, merchantID, clientID,
             buyerCountry, currency, userAgent, buttonSessionID,
             cookies, orderID, enableFunding, stickinessID, domain, skipElmo
-        }
+        },
+        headers
     }).then((gqlResult) => {
         if (!gqlResult || !gqlResult.mobileSDKEligibility) {
             throw new Error(`GraphQL GetNativeEligibility returned no mobileSDKEligibility object`);

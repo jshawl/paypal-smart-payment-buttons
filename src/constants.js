@@ -24,7 +24,8 @@ export const HEADERS = {
     PARTNER_ATTRIBUTION_ID: 'paypal-partner-attribution-id',
     CLIENT_METADATA_ID:     'paypal-client-metadata-id',
     PAYPAL_DEBUG_ID:        'paypal-debug-id',
-    PAYPAL_REQUEST_ID:      'paypal-request-id'
+    PAYPAL_REQUEST_ID:      'paypal-request-id',
+    DISABLE_SET_COOKIE:     'disable-set-cookie'
 };
 
 export const DATA_ATTRIBUTES = {

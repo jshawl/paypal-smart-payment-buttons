@@ -10,6 +10,7 @@ import { type NativeEligibility, getNativeEligibility } from '../../api';
 import { enableAmplitude, getStorageState, isIOSSafari, isAndroidChrome, toProxyWindow } from '../../lib';
 import type { ButtonProps, ServiceData } from '../../button/props';
 import type { IsEligibleOptions, IsPaymentEligibleOptions } from '../types';
+import { HEADERS } from '../../constants';
 
 import { NATIVE_CHECKOUT_URI, NATIVE_CHECKOUT_POPUP_URI, NATIVE_CHECKOUT_FALLBACK_URI, SUPPORTED_FUNDING } from './config';
 
@@ -82,7 +83,7 @@ let nativeEligibilityResults;
 
 export function prefetchNativeEligibility({ props, serviceData } : PrefetchNativeEligibilityOptions) : ZalgoPromise<void> {
     const { clientID, onShippingChange, currency, platform, env,
-        vault, buttonSessionID, enableFunding, merchantDomain } = props;
+        vault, buttonSessionID, enableFunding, merchantDomain, disableSetCookie } = props;
     const { merchantID, buyerCountry, cookies, eligibility: { venmoWebEnabled } } = serviceData;
 
     const shippingCallbackEnabled = venmoWebEnabled ? false : Boolean(onShippingChange);
@@ -92,7 +93,8 @@ export function prefetchNativeEligibility({ props, serviceData } : PrefetchNativ
         stickinessID: null,
         skipElmo:     true,
         merchantID:   merchantID[0],
-        domain:       merchantDomain
+        domain:       merchantDomain,
+        headers: { [ HEADERS.DISABLE_SET_COOKIE ]: String(disableSetCookie) }
     }).then(nativeEligibility => {
         nativeEligibilityResults = nativeEligibility;
  

@@ -8,7 +8,7 @@ import type { ProxyWindow } from '@krakenjs/post-robot/src';
 
 import { getNativeEligibility, onLsatUpgradeCalled } from '../../api';
 import { getLogger, isAndroidChrome, unresolvedPromise, getStorageState, toProxyWindow, postRobotOnceProxy, onCloseProxyWindow } from '../../lib';
-import { FPTI_STATE, FPTI_TRANSITION, FPTI_CUSTOM_KEY } from '../../constants';
+import { FPTI_STATE, FPTI_TRANSITION, FPTI_CUSTOM_KEY, HEADERS } from '../../constants';
 import type { ButtonProps, ServiceData, Config, Components } from '../../button/props';
 import { type OnShippingChangeData } from '../../props/onShippingChange';
 import type { Payment } from '../types';
@@ -96,7 +96,7 @@ type EligibilityOptions = {|
     appDetect : AppDetect
 |};
 function getEligibility({ fundingSource, props, serviceData, sfvc, validatePromise, stickinessID, appDetect } : EligibilityOptions) : ZalgoPromise<boolean> {
-    const { createOrder, onShippingChange, vault, platform, clientID, currency, buttonSessionID, enableFunding, merchantDomain } = props;
+    const { createOrder, onShippingChange, vault, platform, clientID, currency, buttonSessionID, enableFunding, merchantDomain, disableSetCookie } = props;
     const { buyerCountry, cookies, merchantID } = serviceData;
     const shippingCallbackEnabled = Boolean(onShippingChange);
 
@@ -121,7 +121,8 @@ function getEligibility({ fundingSource, props, serviceData, sfvc, validatePromi
             return getNativeEligibility({ vault, platform, shippingCallbackEnabled,
                 clientID, buyerCountry, currency, buttonSessionID, cookies, orderID, enableFunding, stickinessID,
                 merchantID:   merchantID[0],
-                domain:       merchantDomain
+                domain:       merchantDomain,
+                headers: { [ HEADERS.DISABLE_SET_COOKIE ]: String(disableSetCookie) }
             }).then(eligibility => {
                 const ineligibilityReason = eligibility && eligibility[fundingSource]?.ineligibilityReason ? eligibility[fundingSource].ineligibilityReason : '';
 
