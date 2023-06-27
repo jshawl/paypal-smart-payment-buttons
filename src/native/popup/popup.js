@@ -32,6 +32,13 @@ export function setupNativePopup({ parentDomain, env, sessionID, buttonSessionID
     clientID, fundingSource, locale, buyerCountry } : NativePopupOptions) : NativePopup {
 
     const sdkVersion = getSDKVersion();
+
+    const initQueryString = window.location.search.slice(1);
+    const { venmoWebEnabled = false, venmoWebUrl } = parseQuery(initQueryString);
+    if (venmoWebEnabled && venmoWebUrl) {
+        return window.location.replace(venmoWebUrl + window.location.search);
+    }
+
     const logger = setupNativeLogger({ env, sessionID, buttonSessionID, sdkCorrelationID,
         clientID, fundingSource, sdkVersion, locale, buyerCountry });
 

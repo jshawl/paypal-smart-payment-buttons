@@ -4,7 +4,7 @@ import { COUNTRY, FUNDING, CARD, INTENT, type FundingEligibilityType } from '@pa
 import type { InstallmentsFlowType } from '@paypal/installments/src/types';
 
 import type { ContentType, ProxyWindow, Wallet, CheckoutFlowType, CardFormFlowType,
-    ThreeDomainSecureFlowType, MenuFlowType, PersonalizationType, QRCodeType, PaymentFieldsFlowType, InlinePaymentFieldsEligibility, Experiments, FeatureFlags } from '../types';
+    ThreeDomainSecureFlowType, MenuFlowType, PersonalizationType, QRCodeType, VenmoWebType, PaymentFieldsFlowType, InlinePaymentFieldsEligibility, Experiments, FeatureFlags } from '../types';
 import { type FirebaseConfig } from '../api';
 import { getNonce } from '../lib';
 import { getProps, type XProps, type Props } from '../props/props';
@@ -178,12 +178,13 @@ export type Components = {|
     Menu : MenuFlowType,
     Installments : InstallmentsFlowType,
     QRCode : QRCodeType,
-    PaymentFields : PaymentFieldsFlowType
+    PaymentFields : PaymentFieldsFlowType,
+    Venmo : VenmoWebType,
 |};
 
 export function getComponents() : Components {
-    const { Checkout, CardForm, ThreeDomainSecure, Menu, Installments, QRCode, PaymentFields } = paypal;
-    return { Checkout, CardForm, ThreeDomainSecure, Menu, Installments, QRCode, PaymentFields };
+    const { Checkout, CardForm, ThreeDomainSecure, Menu, Installments, QRCode, PaymentFields, Venmo } = paypal;
+    return { Checkout, CardForm, ThreeDomainSecure, Menu, Installments, QRCode, PaymentFields, Venmo };
 }
 
 export type Config = {|
@@ -214,7 +215,8 @@ export type ServiceData = {|
     content : ContentType,
     eligibility : {|
         cardForm : boolean,
-        paymentFields : InlinePaymentFieldsEligibility
+        paymentFields : InlinePaymentFieldsEligibility,
+        venmoWebEnabled: boolean,
     |},
     cookies : string,
     personalization : PersonalizationType,
@@ -233,7 +235,8 @@ type ServiceDataOptions = {|
     eligibility : {|
         cardFields : boolean,
         inlinePaymentFields : InlinePaymentFieldsEligibility,
-        isServiceWorkerEligible : boolean
+        isServiceWorkerEligible : boolean,
+        venmoEnableOnShippingChange: boolean,
     |},
     cookies : string,
     personalization : PersonalizationType,
@@ -269,7 +272,8 @@ export function getServiceData({
             paymentFields: eligibility.inlinePaymentFields || {
                 inlineEligibleAPMs : [],
                 isInlineEnabled : false
-            }
+            },
+            venmoWebEnabled: eligibility.venmoEnableOnShippingChange,
         },
         cookies,
         personalization,

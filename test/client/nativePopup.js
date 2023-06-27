@@ -372,7 +372,7 @@ describe('Native popup cases', () => {
 
                     window.location.hash = `onCancel`;
 
-                    return ZalgoPromise.delay(50).then(expect('detectOnApprove', () => {
+                    return ZalgoPromise.delay(50).then(expect('detectOnCancel', () => {
                         if (!onCancelCalled) {
                             throw new Error(`Expected onCancel to be called`);
                         }
@@ -466,7 +466,7 @@ describe('Native popup cases', () => {
                         throw new Error(`Expected app switch to be detected`);
                     }
 
-                    return ZalgoPromise.delay(50).then(expect('detectOnApprove', () => {
+                    return ZalgoPromise.delay(50).then(expect('detectOnFallback', () => {
                         if (!fallbackCalled) {
                             throw new Error(`Expected fallback to be called`);
                         }
@@ -563,7 +563,7 @@ describe('Native popup cases', () => {
                     const errorMessage = 'foobarbaz';
                     window.location.hash = `onError?message=${ errorMessage }`;
 
-                    return ZalgoPromise.delay(50).then(expect('detectOnApprove', () => {
+                    return ZalgoPromise.delay(50).then(expect('detectOnError', () => {
                         if (!onErrorCalled) {
                             throw new Error(`Expected onError to be called`);
                         }
@@ -665,7 +665,7 @@ describe('Native popup cases', () => {
 
                     window.location.hash = `close`;
 
-                    return ZalgoPromise.delay(50).then(expect('detectOnApprove', () => {
+                    return ZalgoPromise.delay(50).then(expect('detectOnComplete', () => {
                         if (!onCompleteCalled) {
                             throw new Error(`Expected onComplete to be called`);
                         }
@@ -760,7 +760,7 @@ describe('Native popup cases', () => {
                     }
                     window.location.hash = `zerk`;
 
-                    return ZalgoPromise.delay(50).then(expect('detectOnApprove', () => {
+                    return ZalgoPromise.delay(50).then(expect('detectOnError', () => {
                         if (!onErrorCalled) {
                             throw new Error(`Expected onError to be called`);
                         }
@@ -848,7 +848,7 @@ describe('Native popup cases', () => {
                 
                                     window.location.hash = `close`;
                 
-                                    return ZalgoPromise.delay(50).then(expect('detectOnApprove', () => {
+                                    return ZalgoPromise.delay(50).then(expect('detectOnComplete', () => {
                                         if (!onCompleteCalled) {
                                             throw new Error(`Expected onComplete to be called`);
                                         }
@@ -967,7 +967,7 @@ describe('Native popup cases', () => {
                 
                                     window.location.hash = `close`;
                 
-                                    return ZalgoPromise.delay(50).then(expect('detectOnApprove', () => {
+                                    return ZalgoPromise.delay(50).then(expect('detectOnComplete', () => {
                                         if (!onCompleteCalled) {
                                             throw new Error(`Expected onComplete to be called`);
                                         }

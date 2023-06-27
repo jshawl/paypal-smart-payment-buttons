@@ -83,8 +83,9 @@ let nativeEligibilityResults;
 export function prefetchNativeEligibility({ props, serviceData } : PrefetchNativeEligibilityOptions) : ZalgoPromise<void> {
     const { clientID, onShippingChange, currency, platform, env,
         vault, buttonSessionID, enableFunding, merchantDomain } = props;
-    const { merchantID, buyerCountry, cookies } = serviceData;
-    const shippingCallbackEnabled = Boolean(onShippingChange);
+    const { merchantID, buyerCountry, cookies, eligibility: { venmoWebEnabled } } = serviceData;
+
+    const shippingCallbackEnabled = venmoWebEnabled ? false : Boolean(onShippingChange);
 
     return getNativeEligibility({
         vault, platform, shippingCallbackEnabled, clientID, buyerCountry, currency, buttonSessionID, cookies, enableFunding,
@@ -133,10 +134,31 @@ export function canUseNativeQRCode({ fundingSource, win } : {| fundingSource : ?
     return true;
 }
 
+export function canUseVenmoWeb({ fundingSource, win, serviceData } : {| fundingSource : ?$Values<typeof FUNDING>, win? : ?(ProxyWindow | CrossDomainWindowType), serviceData : ServiceData |}) : boolean {
+    const { eligibility: { venmoWebEnabled } } = serviceData;
+
+    if (!venmoWebEnabled) {
+        return false;
+    }
+
+    if (fundingSource && fundingSource !== FUNDING.VENMO) {
+        return false;
+    }
+
+    if (win) {
+        return false;
+    }
+
+    return true;
+}
+
+
+// eslint-disable-next-line complexity
 export function isNativeEligible({ props, config, serviceData } : IsEligibleOptions) : boolean {
     const { fundingSource, onShippingChange, createBillingAgreement, createSubscription, env, platform } = props;
     const { firebase: firebaseConfig } = config;
-    const { cookies, merchantID, fundingEligibility } = serviceData;
+    const { cookies, merchantID, fundingEligibility, eligibility: { venmoWebEnabled } } = serviceData;
+
     const isVenmoEligible = fundingEligibility?.venmo?.eligible;
     const isVenmoButton = fundingSource === FUNDING.VENMO;
     const isLocalOrStageEnv = env === ENV.LOCAL || env === ENV.STAGE;
@@ -170,7 +192,7 @@ export function isNativeEligible({ props, config, serviceData } : IsEligibleOpti
         return false;
     }
 
-    if (onShippingChange) {
+    if (!venmoWebEnabled && onShippingChange) {
         return false;
     }
 
@@ -194,7 +216,6 @@ export function isNativeEligible({ props, config, serviceData } : IsEligibleOpti
 }
 
 export function isNativePaymentEligible({ props, payment } : IsPaymentEligibleOptions) : boolean {
-
     const { platform } = props;
     const { fundingSource, win } = payment;
 

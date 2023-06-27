@@ -34,6 +34,7 @@ export type SetupButtonOptions = {|
         cardFields : boolean,
         inlinePaymentFields: InlinePaymentFieldsEligibility,
         isServiceWorkerEligible : boolean,
+        venmoEnableOnShippingChange: boolean,
     |}>,
     correlationID? : string,
     cookies : string,

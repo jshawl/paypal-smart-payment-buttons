@@ -166,6 +166,47 @@ export type QRCodeProps = {|
 |};
 export type QRCodeType = ZoidComponent<QRCodeProps>;
 
+export type VenmoWebProps = {|
+    window? : ?(ProxyWindow | CrossDomainWindowType),
+    sessionID : string,
+    buttonSessionID : string,
+    stickinessID : string,
+    clientAccessToken? : ?string,
+    createAuthCode? : () => ZalgoPromise<?string>,
+    getConnectURL? : ?({| payerID : string |}) => ZalgoPromise<string>,
+    createOrder : () => ZalgoPromise<string>,
+    onApprove : ({| accelerated? : boolean, payerID : string, paymentID : ?string, billingToken : ?string, subscriptionID : ?string, authCode : ?string |}) => ZalgoPromise<void> | void,
+    onComplete : () => ZalgoPromise<void> | void,
+    onAuth : ({| accessToken : string |}) => ZalgoPromise<void> | void,
+    onSmartWalletEligible? : onSmartWalletEligible,
+    onCancel : () => ZalgoPromise<void> | void,
+    onShippingChange : ?(data : OnShippingChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
+    onShippingAddressChange : ?(data : OnShippingAddressChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
+    onShippingOptionsChange : ?(data : OnShippingOptionsChangeData, {| resolve : () => ZalgoPromise<void>, reject : (string) => ZalgoPromise<void> |}) => ZalgoPromise<void> | void,
+    onError : (mixed) => ZalgoPromise<void> | void,
+    onClose : () => ZalgoPromise<void> | void,
+    fundingSource : FundingType,
+    card : ?$Values<typeof CARD>,
+    buyerCountry : $Values<typeof COUNTRY>,
+    locale : LocaleType,
+    commit : boolean,
+    cspNonce : ?string,
+    venmoPayloadID? : ?string,
+    clientMetadataID : ?string,
+    enableFunding : ?$ReadOnlyArray<FundingType>,
+    standaloneFundingSource : ?FundingType,
+    branded : boolean | null,
+    restart : () => ZalgoPromise<void>,
+    dimensions : {|
+        width : number,
+        height : number
+    |},
+    parentDomain: string,
+    venmoWebEnabled: boolean | null,
+    venmoWebUrl: string,
+|};
+export type VenmoWebType = ZoidComponent<VenmoWebProps>;
+
 export type ContentType = {|
     instantlyPayWith : string,
     poweredBy : string,

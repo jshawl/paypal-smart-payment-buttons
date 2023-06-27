@@ -55,3 +55,11 @@ export const NATIVE_CHECKOUT_FALLBACK_URI : FundingConfig = {
     [ FUNDING.PAYPAL ]: '/smart/checkout/fallback',
     [ FUNDING.VENMO ]:  '/smart/checkout/fallback'
 };
+
+export const VENMO_WEB_URL : EnvConfig = {
+    [ ENV.TEST ]:       'https://account.qa.venmo.com/go/web',
+    [ ENV.LOCAL ]:      'https://account.qa.venmo.com/go/web/paypal',
+    [ ENV.STAGE ]:      getDomain().includes('cibns') ? 'https://account.dev.venmo.com/go/web/paypal' : 'https://account.qa.venmo.com/go/web',
+    [ ENV.SANDBOX ]:    'https://account.qa.venmo.com/go/web/paypal',
+    [ ENV.PRODUCTION ]: 'https://account.venmo.com/go/web/paypal'
+};

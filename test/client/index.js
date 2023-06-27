@@ -33,6 +33,7 @@ import './props-utils';
 import './onShippingAddressChange';
 import './onShippingOptionsChange';
 import './payment-fields';
+import './venmo';
 
 beforeEach(() => {
     setupMocks();

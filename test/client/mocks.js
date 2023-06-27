@@ -143,6 +143,55 @@ export function setupMocks() {
                 }
             };
         },
+        Venmo: (props) => {
+            props.onAuth = once(props.onAuth);
+
+            return {
+                renderTo: () => {
+                    props.onAuth({ accessToken: MOCK_BUYER_ACCESS_TOKEN });
+
+                    return ZalgoPromise.try(() => {
+                        if (props.window) {
+                            return ProxyWindow.toProxyWindow(props.window, {
+                                send: () => {
+                                    throw new Error(`Can not send post message for proxy window in test`);
+                                }
+                            }).awaitWindow().then(win => {
+                                if (!isSameDomain(win)) {
+                                    // $FlowFixMe
+                                    throw new Error(`Expected window passed to renderTo to be on same domain - expected ${ getDomain(window) } but got ${ getDomain(win) }`);
+                                }
+                            });
+                        }
+                    }).then(() => {
+                        return props.createOrder();
+                    }).then(orderID => {
+                        return ZalgoPromise.delay(50).then(() => {
+                            return props.onApprove({
+                                orderID,
+                                payerID: 'AAABBBCCC'
+                            }).catch(err => {
+                                return props.onError(err);
+                            });
+                        });
+                    });
+                },
+                close: () => {
+                    if (props.window) {
+                        props.window.close();
+                    }
+
+                    return ZalgoPromise.delay(50).then(() => {
+                        if (props.onClose) {
+                            return props.onClose();
+                        }
+                    });
+                },
+                onError: (err) => {
+                    throw err;
+                }
+            };
+        },
         QRCode: (props) => {
             return {
                 renderTo: () => {

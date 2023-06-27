@@ -150,7 +150,7 @@ function getNativeUrlQueryParams({ props, serviceData, config, fundingSource, se
         domain:         merchantDomain,
         rtdbInstanceID: firebase.databaseURL,
         buyerCountry,
-        sdkVersion
+        sdkVersion,
     };
 
     if (queryParams.channel === CHANNEL.DESKTOP) {

@@ -4,7 +4,7 @@
 import { uniqueID, memoize, stringifyError,
     stringifyErrorMessage, cleanup, noop } from '@krakenjs/belter/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { FPTI_KEY } from '@paypal/sdk-constants/src';
+import { FPTI_KEY, FUNDING } from '@paypal/sdk-constants/src';
 import { type CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 import type { ProxyWindow } from '@krakenjs/post-robot/src';
 
@@ -16,18 +16,27 @@ import { checkout } from '../checkout';
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, InitOptions } from '../types';
 
 import { isNativeEligible, isNativePaymentEligible, prefetchNativeEligibility, canUsePopupAppSwitch,
-    canUseNativeQRCode, setNativeOptOut, getDefaultNativeFallbackOptions, type NativeFallbackOptions } from './eligibility';
+    canUseNativeQRCode, canUseVenmoWeb, setNativeOptOut, getDefaultNativeFallbackOptions, type NativeFallbackOptions } from './eligibility';
 import { initNativeQRCode } from './qrcode';
 import { initNativePopup } from './popup';
+import { initVenmoWeb, setupVenmoWeb } from './venmo';
 
 let clean;
+let fallback;
 
-function setupNative({ props, serviceData } : SetupOptions) : ZalgoPromise<void> {
+function setupNative({ components, props, serviceData } : SetupOptions) : ZalgoPromise<void> {
+    const { fundingSource } = props;
+    const { eligibility: { venmoWebEnabled } } = serviceData;
+
+    if (fundingSource === FUNDING.VENMO && venmoWebEnabled) {
+        setupVenmoWeb({ components });
+    }
     return prefetchNativeEligibility({ props, serviceData }).then(noop);
 }
 
 function initNative({ props, components, config, payment, serviceData, restart } : InitOptions) : PaymentFlowInstance {
     const { onApprove, onCancel, onError, buttonSessionID, onShippingChange } = props;
+    const { eligibility: { venmoWebEnabled } } = serviceData;
     const { fundingSource, win } = payment;
     const { firebase: firebaseConfig } = config;
 
@@ -58,7 +67,13 @@ function initNative({ props, components, config, payment, serviceData, restart }
             const actualFallbackWin = winClosedOrNotPassed ? null : fallbackWin;
 
             const checkoutPayment = { ...payment, win: actualFallbackWin, isClick: false };
-            const instance = checkout.init({ props, components, payment: checkoutPayment, config, serviceData, restart });
+            
+            let instance;
+            if (fundingSource === FUNDING.VENMO && venmoWebEnabled) {
+                instance = initVenmoWeb({ props, components, payment: checkoutPayment, config, serviceData, fallback });
+            } else {
+                instance = checkout.init({ props, components, payment: checkoutPayment, config, serviceData, restart });
+            }
 
             return ZalgoPromise.all([
                 destroy(),
@@ -178,18 +193,28 @@ function initNative({ props, components, config, payment, serviceData, restart }
         }).then(noop);
     };
 
-    const fallback = (opts? : {| win? : CrossDomainWindowType | ProxyWindow, fallbackOptions? : NativeFallbackOptions |}) => {
+    fallback = (opts? : {| win? : CrossDomainWindowType | ProxyWindow, fallbackOptions? : NativeFallbackOptions |}) => {
         const { win: fallbackWin, fallbackOptions = getDefaultNativeFallbackOptions() } = opts || {};
         
         return ZalgoPromise.try(() => {
 
             const result = setNativeOptOut(fallbackOptions);
             const { fallback_reason } = fallbackOptions;
+            const venmoFallback = fundingSource === FUNDING.VENMO && venmoWebEnabled;
+            let fallbackTransitionLog;
+
+            if (result) {
+                fallbackTransitionLog = FPTI_TRANSITION.NATIVE_OPT_OUT;
+            } else if (venmoFallback) {
+                fallbackTransitionLog = FPTI_TRANSITION.NATIVE_FALLBACK_VENMO;
+            } else {
+                fallbackTransitionLog = FPTI_TRANSITION.NATIVE_FALLBACK;
+            }
 
             getLogger().info(`native_message_onfallback`)
                 .track({
                     [FPTI_KEY.TRANSITION]:               FPTI_TRANSITION.NATIVE_ON_FALLBACK,
-                    [FPTI_CUSTOM_KEY.TRANSITION_TYPE]:   result ? FPTI_TRANSITION.NATIVE_OPT_OUT :  FPTI_TRANSITION.NATIVE_FALLBACK,
+                    [FPTI_CUSTOM_KEY.TRANSITION_TYPE]:   fallbackTransitionLog,
                     [FPTI_CUSTOM_KEY.TRANSITION_REASON]: fallback_reason || ''
                 }).flush();
 
@@ -200,7 +225,12 @@ function initNative({ props, components, config, payment, serviceData, restart }
     const sessionUID = uniqueID();
     let initFlow;
 
-    if (canUsePopupAppSwitch({ fundingSource, win })) {
+    if (canUseVenmoWeb({ fundingSource, win, serviceData }) && Boolean(onShippingChange)) {
+        getLogger().info(`venmo_web`).track({
+            [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.NATIVE_VENMO_WEB,
+        }).flush();
+        initFlow = initVenmoWeb;
+    } else if (canUsePopupAppSwitch({ fundingSource, win })) {
         initFlow = initNativePopup;
     } else if (canUseNativeQRCode({ fundingSource, win })) {
         initFlow = initNativeQRCode;
