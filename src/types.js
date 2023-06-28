@@ -121,7 +121,9 @@ export type CardFormProps = {|
 export type CardFormFlowType = ZoidComponent<CardFormProps>;
 
 type ThreeDomainSecureProps = {|
-    createOrder : () => ZalgoPromise<string>,
+    createOrder? : () => ZalgoPromise<string> | void,
+    vaultToken ? : string | null,
+    action ? : string | null,
     onSuccess : () => ZalgoPromise<void> | void,
     onCancel : () => ZalgoPromise<void> | void,
     onError : (mixed) => ZalgoPromise<void> | void

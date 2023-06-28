@@ -1,5 +1,5 @@
+/* eslint-disable compat/compat */
 /* @flow */
-
 import type { CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
@@ -11,13 +11,14 @@ import { TARGET_ELEMENT } from '../constants';
 type CreateOrder = () => ZalgoPromise<string>;
 type ThreeDomainSecureProps = {|
     ThreeDomainSecure : ThreeDomainSecureFlowType,
-    createOrder : CreateOrder,
-    getParent : () => CrossDomainWindowType
+    createOrder : CreateOrder|void,
+    getParent : () => CrossDomainWindowType,
+    vaultToken? : string|null ,
+    action ? : string | null,
 |};
-
 type ThreeDomainSecureContingencyProps = {|
     ThreeDomainSecure : ThreeDomainSecureFlowType,
-    createOrder : CreateOrder,
+    createOrder? : CreateOrder,
     getParent : () => CrossDomainWindowType,
     status : string,
     links : $ReadOnlyArray < {|
@@ -27,26 +28,47 @@ type ThreeDomainSecureContingencyProps = {|
     |}>
 |};
 
-function handleThreeDomainSecureRedirect({ ThreeDomainSecure, createOrder, getParent }: ThreeDomainSecureProps): ZalgoPromise<void> {
+function handleThreeDomainSecureRedirect({ ThreeDomainSecure, vaultToken, createOrder, action, getParent }: ThreeDomainSecureProps): ZalgoPromise<void> {
     const promise = new ZalgoPromise();
     const instance = ThreeDomainSecure({
+        vaultToken,
         createOrder,
-        onSuccess: () => promise.resolve(),
-        onCancel: () => promise.reject(new Error(`3DS cancelled`)),
-        onError: (err) => promise.reject(err)
+        action,
+        onSuccess: (data) => {
+          return promise.resolve(data)
+        },
+        onCancel: () => {
+          return promise.reject(new Error(`3DS cancelled`))
+        },
+        onError: (err) => {
+          return promise.reject(err)
+        }
     });
 
     return instance.renderTo(getParent(), TARGET_ELEMENT.BODY)
-        .then(() => promise)
+    .then(() => promise)
         .finally(instance.close);
 }
-
+const getThreeDSParams = (links) => {
+    const helioslink = links.find(link => link.href.includes("helios"));
+    // $FlowIssue, eslint-disable-next-line compat/compat
+    const linkUrl = new URL(helioslink?.href);
+    const vaultToken = linkUrl.searchParams.get("token");
+    const action = linkUrl.searchParams.get("action");
+    return { vaultToken, action };
+}
 
 export function handleThreeDomainSecureContingency({ status, links, ThreeDomainSecure, createOrder, getParent }: ThreeDomainSecureContingencyProps): ZalgoPromise<void> | void {
+    const isWithPurchase = (link) => link.rel === "payer-action" && link.href && link.href.includes("flow=3ds");
+    const isWithoutPurchase = (link) => (link.rel === "approve" && link.href.includes("helios"));
+
     return ZalgoPromise.try(() => {
-        if (status === "PAYER_ACTION_REQUIRED" && links.some(link => link.rel === "payer-action" && link.href && link.href.includes("flow=3ds"))) {
-            return handleThreeDomainSecureRedirect({ ThreeDomainSecure, createOrder, getParent });
-        }
+        if (status === "PAYER_ACTION_REQUIRED" && links.some(link => isWithPurchase(link) || isWithoutPurchase(link)))
+        {
+            const {vaultToken, action } = getThreeDSParams(links);
+
+        return handleThreeDomainSecureRedirect({ ThreeDomainSecure, createOrder, vaultToken, getParent, action});
+        } 
     });
 }
 
@@ -79,3 +101,4 @@ export function handleValidatePaymentMethodResponse({ ThreeDomainSecure, status,
         }
     });
 }
+/* eslint-enable compat/compat */

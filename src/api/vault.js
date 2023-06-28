@@ -122,7 +122,10 @@ export const updateVaultSetupToken = ({
           paymentSource: $paymentSource
         ) {
           id,
-          status
+          status,
+          links {
+            rel, href
+          }
         }
       }`,
     variables: {
@@ -135,6 +138,7 @@ export const updateVaultSetupToken = ({
 export function vaultApprovalSessionIdToOrderId(
   approvalSessionId: string
 ): ZalgoPromise<string> {
+
   return callSmartAPI({
     authenticated: false,
     method: "post",
@@ -142,5 +146,6 @@ export function vaultApprovalSessionIdToOrderId(
     url: `${SMART_API_URI.VAULT}/${approvalSessionId}/ectoken`,
   }).then(({ data }) => {
     return data.token;
-  });
+  })
+
 }

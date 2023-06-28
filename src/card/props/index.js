@@ -8,7 +8,7 @@ import {
   type FundingEligibilityType,
 } from "@paypal/sdk-constants/src";
 
-import type { ProxyWindow, FeatureFlags } from "../../types";
+import type { ProxyWindow, FeatureFlags, ThreeDomainSecureFlowType } from "../../types";
 import { PAYMENT_FLOWS } from "../../constants";
 import {
   getProps,
@@ -140,6 +140,14 @@ type GetCardPropsOptions = {|
   },
 |};
 
+export type Components = {|
+ThreeDomainSecure : ThreeDomainSecureFlowType
+|}
+
+export function getComponents() : Components {
+  const { ThreeDomainSecure } = paypal;
+  return { ThreeDomainSecure };
+}
 const determineProductAction = ({
   createOrder,
   createVaultSetupToken,

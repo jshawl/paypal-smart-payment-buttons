@@ -7,17 +7,22 @@ import { confirmOrderAPI } from "../../api";
 import { PAYMENT_FLOWS } from "../../constants";
 import { hcfTransactionSuccess, hcfTransactionError } from "../logger";
 import { SUBMIT_ERRORS } from "../constants";
+import { handleThreeDomainSecureContingency } from "../../lib/3ds";
 
 import { savePaymentSource } from "./vault-without-purchase";
 import { resetGQLErrors } from "./gql";
 
 import { hasCardFields, submitCardFields } from ".";
 
+const mockThreeDomainSecure = {};
 vi.mock("../props", () => {
   return {
     getCardProps: vi.fn(() => ({})),
+    getComponents: vi.fn(() => ({ ThreeDomainSecure: mockThreeDomainSecure })),
   };
 });
+
+vi.mock("../../lib/3ds");
 
 vi.mock("./hasCardFields", () => {
   return {
@@ -46,6 +51,10 @@ vi.mock("./gql", () => ({
 
 vi.mock("./vault-without-purchase", () => ({
   savePaymentSource: vi.fn(),
+}));
+
+vi.mock("../../lib/3ds", () => ({
+  handleThreeDomainSecureContingency: vi.fn(),
 }));
 
 vi.mock("../../lib");
@@ -84,9 +93,12 @@ describe("submitCardFields", () => {
     const onApprove = vi.fn();
 
     const mockGetCardPropsReturn = {
-      clientID: "client-id",
       onApprove,
       createVaultSetupToken,
+      onError: vi.fn(),
+      getParent: vi.fn(),
+      ThreeDomainSecure: {},
+      clientID: "client-id",
     };
     // $FlowIssue
     getCardProps.mockReturnValue({
@@ -211,7 +223,8 @@ describe("submitCardFields", () => {
   });
 
   test("should catch any errors from createOrder", async () => {
-    const error = new Error("create order failure test");
+    const expectedError = "create order failure test";
+    const error = new Error(expectedError);
 
     const mockGetCardPropsReturn = {
       createOrder: vi.fn().mockRejectedValue(error),
@@ -222,7 +235,7 @@ describe("submitCardFields", () => {
     // $FlowIssue
     getCardProps.mockReturnValue(mockGetCardPropsReturn);
     await expect(submitCardFields(defaultOptions)).rejects.toThrow(
-      "create order failure test"
+      expectedError
     );
     expect(mockGetCardPropsReturn.createOrder).toHaveBeenCalled();
     // $FlowIssue
@@ -232,5 +245,58 @@ describe("submitCardFields", () => {
     expect(hcfTransactionSuccess).not.toHaveBeenCalled();
     expect(mockGetCardPropsReturn.onError).toHaveBeenCalledWith(error);
     expect.assertions(5);
+  });
+
+  describe("handlePurchaseFlow()", () => {
+    test("should handle 3DS contingency for vault with purchase", async () => {
+      const mockOrderId = "12345";
+      const mock3dsResponse = { liability_shift: "some-value" };
+      // $FlowIssue
+      handleThreeDomainSecureContingency.mockResolvedValue(
+        // eslint-disable-next-line compat/compat, promise/no-native, no-restricted-globals
+        Promise.resolve(mock3dsResponse)
+      );
+      const inputOpts = {
+        facilitatorAccessToken: "test-access-token",
+        extraFields: {},
+        featureFlags: {},
+        experiments: {
+          hostedCardFields: true,
+        },
+      };
+      const mockCardProps = {
+        // eslint-disable-next-line compat/compat, promise/no-native, no-restricted-globals
+        createOrder: vi.fn(() => Promise.resolve(mockOrderId)),
+        // eslint-disable-next-line compat/compat, promise/no-native, no-restricted-globals
+        onApprove: vi.fn(() => Promise.resolve()),
+        // eslint-disable-next-line no-empty-function
+        getParent: () => {},
+        productAction: PAYMENT_FLOWS.WITH_PURCHASE,
+      };
+      // $FlowIssue
+      getCardProps.mockReturnValue(mockCardProps);
+      const mockConfirmOrderReturn = {
+        status: "A_STATUS",
+        links: [{}],
+      };
+      // $FlowIssue
+      confirmOrderAPI.mockResolvedValue(mockConfirmOrderReturn);
+      await submitCardFields(inputOpts);
+
+      expect(handleThreeDomainSecureContingency).toHaveBeenCalledWith({
+        status: mockConfirmOrderReturn.status,
+        links: mockConfirmOrderReturn.links,
+        ThreeDomainSecure: mockThreeDomainSecure,
+        createOrder: mockCardProps.createOrder,
+        getParent: mockCardProps.getParent,
+      });
+      expect(mockCardProps.onApprove).toBeCalledWith(
+        {
+          liabilityShift: mock3dsResponse.liability_shift,
+          orderID: mockOrderId,
+        },
+        {}
+      );
+    });
   });
 });

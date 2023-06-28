@@ -91,7 +91,11 @@ describe("savePaymentSource", () => {
   test("should handle failure from merchant-supplied onApprove", async () => {
     const onApproveError = new Error("error with on approve");
     const rejectOnApprove = vi.fn().mockRejectedValue(onApproveError);
-
+    const updateVaultSetupTokenResult = {
+      updateVaultSetupToken: { status: "SOME_VALID_STATUS", links: {} },
+    };
+    // $FlowIssue
+    updateVaultSetupToken.mockResolvedValue(updateVaultSetupTokenResult);
     expect.assertions(4);
     await expect(
       savePaymentSource({
@@ -108,6 +112,12 @@ describe("savePaymentSource", () => {
   });
 
   test("should handle successful vault without purchase", async () => {
+    const updateVaultSetupTokenResult = {
+      updateVaultSetupToken: { status: "SOME_VALID_STATUS", links: {} },
+    };
+    // $FlowIssue
+    updateVaultSetupToken.mockResolvedValue(updateVaultSetupTokenResult);
+
     await savePaymentSource(defaultOptions);
 
     expect.assertions(4);

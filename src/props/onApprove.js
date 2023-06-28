@@ -633,5 +633,5 @@ export function getOnApprove({ intent, createBillingAgreement, createSubscriptio
     throw new Error(`Unsupported intent: ${ intent }`);
 }
 
-export type SaveActionOnApproveData = {| vaultSetupToken: string |};
+export type SaveActionOnApproveData = {| vaultSetupToken: string, liabilityShift?: string |};
 export type SaveActionOnApprove = (SaveActionOnApproveData) => ZalgoPromise<void>;

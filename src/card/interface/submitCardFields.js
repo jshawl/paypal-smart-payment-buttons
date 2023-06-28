@@ -2,13 +2,14 @@
 
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { getCardProps, type PurchaseFlowCardProps, type VaultWithoutPurchaseFlowCardProps } from "../props"
+import { getCardProps, getComponents, type PurchaseFlowCardProps, type VaultWithoutPurchaseFlowCardProps } from "../props"
 import { confirmOrderAPI } from "../../api"
 import { hcfTransactionError, hcfTransactionSuccess, hcfFieldsSubmit } from "../logger"
 import type { FeatureFlags } from "../../types"
 import type { BillingAddress, Card, ExtraFields } from '../types'
 import {convertCardToPaymentSource, reformatPaymentSource} from '../lib'
 import { SUBMIT_ERRORS } from "../constants"
+import { handleThreeDomainSecureContingency } from "../../lib/3ds"
 import { PAYMENT_FLOWS } from "../../constants";
 
 import { resetGQLErrors } from "./gql";
@@ -27,17 +28,18 @@ type SubmitCardFieldsOptions = {|
   |},
 |};
 
-function handleVaultWithoutPurchaseFlow(
-  cardProps: VaultWithoutPurchaseFlowCardProps,
-  card: Card,
-  extraFields?: ExtraFields
-): ZalgoPromise<void> {
+function handleVaultWithoutPurchaseFlow(cardProps: VaultWithoutPurchaseFlowCardProps, card: Card, extraFields?: ExtraFields): ZalgoPromise<void> {
+  const { ThreeDomainSecure } = getComponents();
+  const { getParent, createVaultSetupToken, onError,clientID, onApprove } = cardProps;
+
   return savePaymentSource({
-    onApprove: cardProps.onApprove,
+    onApprove,
   // $FlowFixMe need to rethink how to pass down these props
-    createVaultSetupToken: cardProps.createVaultSetupToken,
-    onError: cardProps.onError,
-    clientID: cardProps.clientID,
+    createVaultSetupToken,
+    onError,
+    getParent,
+    ThreeDomainSecure,
+    clientID,
     paymentSource: convertCardToPaymentSource(card, extraFields),
   });
 }
@@ -49,6 +51,8 @@ function handlePurchaseFlow(
   facilitatorAccessToken: string
 ): ZalgoPromise<void> {
   let orderID;
+  const { ThreeDomainSecure } = getComponents();
+  const { createOrder, getParent } = cardProps;
 
   return cardProps
   // $FlowFixMe need to rethink how to pass down these props
@@ -66,11 +70,16 @@ function handlePurchaseFlow(
       return confirmOrderAPI(orderID, data, {
         facilitatorAccessToken,
         partnerAttributionID: "",
-      });
+      })
     })
-    .then(() => {
+    .then((res) => {
       // $FlowFixMe
-      return cardProps.onApprove({ orderID }, {});
+      const { status, links } = res;
+      return handleThreeDomainSecureContingency({status, links, ThreeDomainSecure, createOrder, getParent });
+    })
+    .then((threeDsResponse) => {
+      // $FlowFixMe
+      return cardProps.onApprove({ orderID, liabilityShift: threeDsResponse?.liability_shift }, {});
     })
     .then(() => {
       hcfTransactionSuccess({ orderID });

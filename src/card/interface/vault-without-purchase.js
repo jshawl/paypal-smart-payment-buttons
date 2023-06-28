@@ -1,7 +1,9 @@
 /* @flow */
 
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import type { CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 
+import type { ThreeDomainSecureFlowType } from '../../types';
 import {
   updateVaultSetupToken,
   type PaymentSourceInput,
@@ -16,6 +18,7 @@ import type {
   SaveActionOnApprove,
 } from "../../props";
 import { SUBMIT_ERRORS } from "../constants";
+import { handleThreeDomainSecureContingency } from "../../lib/3ds";
 
 type VaultPaymenSourceOptions = {|
   createVaultSetupToken: CreateVaultSetupToken,
@@ -23,6 +26,8 @@ type VaultPaymenSourceOptions = {|
   onError: XOnError,
   clientID: string,
   paymentSource: PaymentSourceInput,
+  getParent : () => CrossDomainWindowType,
+  ThreeDomainSecure : ThreeDomainSecureFlowType,
 |};
 
 export const savePaymentSource = ({
@@ -31,6 +36,8 @@ export const savePaymentSource = ({
   onError,
   clientID,
   paymentSource,
+  getParent,
+  ThreeDomainSecure,
 }: VaultPaymenSourceOptions): ZalgoPromise<void> => {
   let vaultToken;
   return createVaultSetupToken()
@@ -45,7 +52,16 @@ export const savePaymentSource = ({
         paymentSource,
       });
     })
-    .then(() => onApprove({ vaultSetupToken: vaultToken }))
+    .then((res) => {
+      // $FlowFixMe
+      const { status, links } = res?.updateVaultSetupToken || {};
+
+      return handleThreeDomainSecureContingency({ status, links,
+        getParent,
+        ThreeDomainSecure,
+    })
+    })
+    .then((threeDsResponse) => onApprove({ vaultSetupToken: vaultToken, liabilityShift: threeDsResponse?.liability_shift }))
     .then(() => vaultWithoutPurchaseSuccess({ vaultToken }))
     .catch((error) => {
       if (typeof error === "string") {
