@@ -214,7 +214,8 @@ export const FPTI_CUSTOM_KEY = {
     TRANSITION_REASON:          ('transition_reason' : 'transition_reason'),
     SHIPPING_CALLBACK_PASSED:   ('shipping_callback_passed' : 'shipping_callback_passed'),
     SHIPPING_CALLBACK_INVOKED:  ('shipping_callback_invoked' : 'shipping_callback_invoked'),
-    DESKTOP_EXIT_SURVEY_REASON: ('desktop_exit_survey_reason' : 'desktop_exit_survey_reason')
+    DESKTOP_EXIT_SURVEY_REASON: ('desktop_exit_survey_reason' : 'desktop_exit_survey_reason'),
+    ORDER_CREATED_BY: ('order_created_by' : 'order_created_by')
 };
 
 export const FPTI_BUTTON_KEY = {
@@ -295,4 +296,10 @@ export const SERVICE_WORKER = {
 export const PAYMENT_FLOWS = {
     WITH_PURCHASE: 'with_purchase',
     VAULT_WITHOUT_PURCHASE: `vault_without_purchase`
+}
+
+export const ORDER_CREATED_BY = {
+    HONEY: ('honey': 'honey'),
+    UNKNOWN_EVENT: ('unknown_event': 'unknown_event'),
+    BUTTON_CLICK: ('button_click': 'button_click'),
 }

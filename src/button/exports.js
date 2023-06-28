@@ -4,7 +4,7 @@
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { querySelectorAll } from '@krakenjs/belter/src';
 
-import { DATA_ATTRIBUTES } from '../constants';
+import { DATA_ATTRIBUTES, FPTI_CUSTOM_KEY, ORDER_CREATED_BY } from '../constants';
 import { upgradeFacilitatorAccessToken, getGuestEnabledStatus } from '../api';
 import { getLogger, getBuyerAccessToken } from '../lib';
 
@@ -39,7 +39,12 @@ export function setupExports({ props, isEnabled, facilitatorAccessToken, funding
         paymentSession:          () => {
             return {
                 getAvailableFundingSources: () => fundingSources,
-                createOrder:                () => {
+                createOrder:                (data) => {
+                    const { eventSource = ORDER_CREATED_BY.UNKNOWN_EVENT } = data || {}
+
+                    getLogger().addTrackingBuilder(() => ({
+                        [FPTI_CUSTOM_KEY.ORDER_CREATED_BY]: eventSource
+                    }))
 
                     if (!isEnabled()) {
                         throw new Error('Error occurred. Button not enabled.');

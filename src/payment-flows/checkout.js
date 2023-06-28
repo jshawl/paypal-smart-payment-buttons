@@ -9,7 +9,7 @@ import type { ProxyWindow, ConnectOptions } from '../types';
 import { type CreateBillingAgreement, type CreateSubscription } from '../props';
 import { exchangeAccessTokenForAuthCode, getConnectURL, updateButtonClientConfig, getSmartWallet, loadFraudnet  } from '../api';
 import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_STATE } from '../constants';
-import { unresolvedPromise, getLogger, setBuyerAccessToken } from '../lib';
+import { unresolvedPromise, getLogger, setBuyerAccessToken, sendMetric } from '../lib';
 import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
 import { enableLoadingSpinner, getButtons } from "../button/dom";
@@ -438,11 +438,17 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     const { width, height } = getDimensions(fundingSource);
                     win = openPopup({ width, height });
                 } catch (err) {
-                    getLogger().warn('popup_open_error_iframe_fallback', { err: stringifyError(err) });
-
                     if (err instanceof PopupOpenError) {
+                        getLogger().warn('popup_open_error_iframe_fallback', { err: stringifyError(err) });
                         context = CONTEXT.IFRAME;
                     } else {
+                        getLogger().warn('popup_open_error_blocked', { err: stringifyError(err) });
+                        sendMetric({
+                            name: "pp.app.paypal_sdk.buttons.click.error.count",
+                            dimensions: {
+                                errorName: 'checkout_blocked',
+                            }
+                        }).flush()
                         throw err;
                     }
                 }
@@ -457,6 +463,12 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 return onClick ? onClick({ fundingSource }) : true;
             }).then(valid => {
                 if (win && !valid) {
+                    sendMetric({
+                        name: "pp.app.paypal_sdk.buttons.click.error.count",
+                        dimensions: {
+                            errorName: 'invalid_funding_click',
+                        }
+                    }).flush()
                     win.close();
                 }
             });

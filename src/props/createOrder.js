@@ -195,9 +195,9 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
         const startTime = Date.now();
 
         return ZalgoPromise.try(() => {
-          if (flow === "vault_without_purchase" && createVaultSetupToken) {
-            return createVaultSetupToken().then(vaultApprovalSessionIdToOrderId);
-          } else if (createBillingAgreement) {
+            if (flow === "vault_without_purchase" && createVaultSetupToken) {
+                return createVaultSetupToken().then(vaultApprovalSessionIdToOrderId);
+            } else if (createBillingAgreement) {
                 return createBillingAgreement().then(billingTokenToOrderID);
             } else if (createSubscription) {
                 return createSubscription().then(subscriptionIdToCartId);
@@ -275,6 +275,15 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
             }
 
             const duration = Date.now() - startTime;
+
+            sendMetric({
+                name: "pp.app.paypal_sdk.buttons.create_order.count",
+                dimensions: {
+                    flow,
+                    intent,
+                    integrationType
+                }
+            })            
 
             getLogger()
                 .addPayloadBuilder(() => {

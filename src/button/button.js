@@ -7,7 +7,7 @@ import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import type { ContentType, Wallet, PersonalizationType, Experiments, FeatureFlags, InlinePaymentFieldsEligibility } from '../types';
 import { sendMetric, getLogger, getSmartFieldsByFundingSource, setBuyerAccessToken, registerServiceWorker, unregisterServiceWorker } from '../lib';
 import { type FirebaseConfig } from '../api';
-import { DATA_ATTRIBUTES, BUYER_INTENT, FPTI_STATE } from '../constants';
+import { DATA_ATTRIBUTES, BUYER_INTENT, FPTI_STATE, FPTI_CUSTOM_KEY, ORDER_CREATED_BY } from '../constants';
 import { type Payment } from '../payment-flows';
 
 import { getButtonProps, getConfig, getComponents, getServiceData, type ButtonProps } from './props';
@@ -211,6 +211,11 @@ export function setupButton({
             event.preventDefault();
             event.stopPropagation();
 
+            
+            getLogger().addTrackingBuilder(() => ({
+                [FPTI_CUSTOM_KEY.ORDER_CREATED_BY]: ORDER_CREATED_BY.BUTTON_CLICK
+            }))
+
             if (eligibility.isServiceWorkerEligible) {
                 getLogger().info(`SERVICE_WORKER_ELIGIBLE`);
                 registerServiceWorker({ dumbledoreCurrentReleaseHash, dumbledoreServiceWorker});
@@ -228,6 +233,7 @@ export function setupButton({
                 sendMetric({
                     name: "pp.app.paypal_sdk.buttons.click.error.count",
                     dimensions: {
+                        errorName: 'payment_flow_error',
                         fundingSource: paymentFundingSource,
                         prerender: false
                     }
