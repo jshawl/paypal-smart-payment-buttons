@@ -263,10 +263,13 @@ window.smartCard = function(modules) {
     __webpack_require__.d(__webpack_exports__, "k", (function() {
         return ORDER_API_ERROR;
     }));
+    __webpack_require__.d(__webpack_exports__, "r", (function() {
+        return TARGET_ELEMENT;
+    }));
     __webpack_require__.d(__webpack_exports__, "j", (function() {
         return INTEGRATION_ARTIFACT;
     }));
-    __webpack_require__.d(__webpack_exports__, "r", (function() {
+    __webpack_require__.d(__webpack_exports__, "s", (function() {
         return USER_EXPERIENCE_FLOW;
     }));
     __webpack_require__.d(__webpack_exports__, "n", (function() {
@@ -314,7 +317,8 @@ window.smartCard = function(modules) {
         PARTNER_ATTRIBUTION_ID: "paypal-partner-attribution-id",
         CLIENT_METADATA_ID: "paypal-client-metadata-id",
         PAYPAL_DEBUG_ID: "paypal-debug-id",
-        PAYPAL_REQUEST_ID: "paypal-request-id"
+        PAYPAL_REQUEST_ID: "paypal-request-id",
+        DISABLE_SET_COOKIE: "disable-set-cookie"
     };
     var DATA_ATTRIBUTES = {
         FUNDING_SOURCE: "data-funding-source",
@@ -343,6 +347,9 @@ window.smartCard = function(modules) {
         PAYER_ACTION_REQUIRED: "PAYER_ACTION_REQUIRED",
         DUPLICATE_INVOICE_ID: "DUPLICATE_INVOICE_ID",
         INVALID_RESOURCE_ID: "INVALID_RESOURCE_ID"
+    };
+    var TARGET_ELEMENT = {
+        BODY: "body"
     };
     var INTEGRATION_ARTIFACT = {
         PAYPAL_JS_SDK: "PAYPAL_JS_SDK"
@@ -435,6 +442,8 @@ window.smartCard = function(modules) {
         NATIVE_POPUP_OPENER_DETECT_CLOSE: "native_popup_opener_detect_close",
         NATIVE_OPT_OUT: "native_opt_out",
         NATIVE_FALLBACK: "native_fallback",
+        NATIVE_FALLBACK_VENMO: "native_fallback_venmo",
+        NATIVE_VENMO_WEB: "native_venmo_web",
         QR_LOAD: "qr_load",
         QR_SHOWN: "qr_shown",
         QR_CLOSING: "qr_closing",
@@ -457,7 +466,8 @@ window.smartCard = function(modules) {
         TRANSITION_REASON: "transition_reason",
         SHIPPING_CALLBACK_PASSED: "shipping_callback_passed",
         SHIPPING_CALLBACK_INVOKED: "shipping_callback_invoked",
-        DESKTOP_EXIT_SURVEY_REASON: "desktop_exit_survey_reason"
+        DESKTOP_EXIT_SURVEY_REASON: "desktop_exit_survey_reason",
+        ORDER_CREATED_BY: "order_created_by"
     };
     var FPTI_BUTTON_KEY = {
         BUTTON_LAYOUT: "button_layout",
@@ -3453,7 +3463,7 @@ window.smartCard = function(modules) {
     }
     var sendMetric = function(_ref) {
         var name = _ref.name, dimensions = _ref.dimensions;
-        getLogger().metric({
+        return getLogger().metric({
             metricNamespace: name,
             metricEventName: "unused",
             metricValue: 1,
@@ -3858,7 +3868,7 @@ window.smartCard = function(modules) {
         var clientID = _ref2.clientID, vaultSetupToken = _ref2.vaultSetupToken, paymentSource = _ref2.paymentSource;
         return Object(_api__WEBPACK_IMPORTED_MODULE_2__.a)({
             name: "UpdateVaultSetupToken",
-            query: "\n      mutation UpdateVaultSetupToken(\n        $clientID: String!\n        $vaultSetupToken: String!\n        $paymentSource: PaymentSource\n      ) {\n        updateVaultSetupToken(\n          clientId: $clientID\n          vaultSetupToken: $vaultSetupToken\n          paymentSource: $paymentSource\n        ) {\n          id,\n          status\n        }\n      }",
+            query: "\n      mutation UpdateVaultSetupToken(\n        $clientID: String!\n        $vaultSetupToken: String!\n        $paymentSource: PaymentSource\n      ) {\n        updateVaultSetupToken(\n          clientId: $clientID\n          vaultSetupToken: $vaultSetupToken\n          paymentSource: $paymentSource\n        ) {\n          id,\n          status,\n          links {\n            rel, href\n          }\n        }\n      }",
             variables: {
                 clientID: clientID,
                 vaultSetupToken: vaultSetupToken,
@@ -4055,7 +4065,7 @@ window.smartCard = function(modules) {
         var xprops = window.xprops;
         var uid = xprops.uid, env = xprops.env, _xprops$vault = xprops.vault, vault = void 0 !== _xprops$vault && _xprops$vault, commit = xprops.commit, locale = xprops.locale, platform = xprops.platform, sessionID = xprops.sessionID, clientID = xprops.clientID, partnerAttributionID = xprops.partnerAttributionID, merchantRequestedPopupsDisabled = xprops.merchantRequestedPopupsDisabled, clientMetadataID = xprops.clientMetadataID, sdkCorrelationID = xprops.sdkCorrelationID, getParentDomain = xprops.getParentDomain, clientAccessToken = xprops.clientAccessToken, getPopupBridge = xprops.getPopupBridge, getPrerenderDetails = xprops.getPrerenderDetails, getPageUrl = xprops.getPageUrl, enableThreeDomainSecure = xprops.enableThreeDomainSecure, enableVaultInstallments = xprops.enableVaultInstallments, _xprops$enableNativeC = xprops.enableNativeCheckout, enableNativeCheckout = void 0 !== _xprops$enableNativeC && _xprops$enableNativeC, rememberFunding = xprops.remember, stageHost = xprops.stageHost, apiStageHost = xprops.apiStageHost, getParent = xprops.getParent, fundingSource = xprops.fundingSource, currency = xprops.currency, connect = xprops.connect, intent = xprops.intent, merchantID = xprops.merchantID, amount = xprops.amount, userIDToken = xprops.userIDToken, enableFunding = xprops.enableFunding, disableFunding = xprops.disableFunding, disableCard = xprops.disableCard, disableAutocomplete = xprops.disableAutocomplete, wallet = xprops.wallet, _xprops$paymentMethod = xprops.paymentMethodToken, paymentMethodToken = void 0 === _xprops$paymentMethod ? xprops.paymentMethodNonce : _xprops$paymentMethod, _xprops$getQueriedEli = xprops.getQueriedEligibleFunding, getQueriedEligibleFunding = void 0 === _xprops$getQueriedEli ? function() {
             return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.a.resolve([]);
-        } : _xprops$getQueriedEli, storageID = xprops.storageID, applePay = xprops.applePay, userExperienceFlow = xprops.userExperienceFlow, allowBillingPayments = xprops.allowBillingPayments, paymentRequest = xprops.paymentRequest;
+        } : _xprops$getQueriedEli, storageID = xprops.storageID, applePay = xprops.applePay, userExperienceFlow = xprops.userExperienceFlow, allowBillingPayments = xprops.allowBillingPayments, paymentRequest = xprops.paymentRequest, disableSetCookie = xprops.disableSetCookie;
         var onInit = Object(_onInit__WEBPACK_IMPORTED_MODULE_3__.a)({
             onInit: xprops.onInit
         });
@@ -4118,7 +4128,8 @@ window.smartCard = function(modules) {
             paymentRequest: paymentRequest,
             merchantID: merchantID,
             enableOrdersApprovalSmartWallet: enableOrdersApprovalSmartWallet,
-            smartWalletOrderID: smartWalletOrderID
+            smartWalletOrderID: smartWalletOrderID,
+            disableSetCookie: disableSetCookie
         };
     }
 }, function(module, __webpack_exports__, __webpack_require__) {
@@ -9598,6 +9609,11 @@ window.smartCard = function(modules) {
             }));
         }));
     }
+    function getComponents() {
+        return {
+            ThreeDomainSecure: paypal.ThreeDomainSecure
+        };
+    }
     function getCardProps(_ref2) {
         var _fundingEligibility$c, _fundingEligibility$c2;
         var facilitatorAccessToken = _ref2.facilitatorAccessToken;
@@ -9643,9 +9659,59 @@ window.smartCard = function(modules) {
         var _ref;
     }
     var api = __webpack_require__(8);
+    function handleThreeDomainSecureContingency(_ref2) {
+        var status = _ref2.status, links = _ref2.links, ThreeDomainSecure = _ref2.ThreeDomainSecure, createOrder = _ref2.createOrder, getParent = _ref2.getParent;
+        return zalgo_promise_src.a.try((function() {
+            if ("PAYER_ACTION_REQUIRED" === status && links.some((function(link) {
+                return function(link) {
+                    return "payer-action" === link.rel && link.href && link.href.includes("flow=3ds");
+                }(link) || function(link) {
+                    return "approve" === link.rel && link.href.includes("helios");
+                }(link);
+            }))) {
+                var _getThreeDSParams = function(links) {
+                    var helioslink = links.find((function(link) {
+                        return link.href.includes("helios");
+                    }));
+                    var linkUrl = new URL(null == helioslink ? void 0 : helioslink.href);
+                    return {
+                        vaultToken: linkUrl.searchParams.get("token"),
+                        action: linkUrl.searchParams.get("action")
+                    };
+                }(links);
+                return function(_ref) {
+                    var ThreeDomainSecure = _ref.ThreeDomainSecure, vaultToken = _ref.vaultToken, createOrder = _ref.createOrder, action = _ref.action, getParent = _ref.getParent;
+                    var promise = new zalgo_promise_src.a;
+                    var instance = ThreeDomainSecure({
+                        vaultToken: vaultToken,
+                        createOrder: createOrder,
+                        action: action,
+                        onSuccess: function(data) {
+                            return promise.resolve(data);
+                        },
+                        onCancel: function() {
+                            return promise.reject(new Error("3DS cancelled"));
+                        },
+                        onError: function(err) {
+                            return promise.reject(err);
+                        }
+                    });
+                    return instance.renderTo(getParent(), constants.r.BODY).then((function() {
+                        return promise;
+                    })).finally(instance.close);
+                }({
+                    ThreeDomainSecure: ThreeDomainSecure,
+                    createOrder: createOrder,
+                    vaultToken: _getThreeDSParams.vaultToken,
+                    getParent: getParent,
+                    action: _getThreeDSParams.action
+                });
+            }
+        }));
+    }
     var vault = __webpack_require__(23);
     var vault_without_purchase_savePaymentSource = function(_ref) {
-        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource;
+        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, getParent = _ref.getParent, ThreeDomainSecure = _ref.ThreeDomainSecure;
         var vaultToken;
         return (0, _ref.createVaultSetupToken)().then((function(vaultSetupToken) {
             if ("string" != typeof vaultSetupToken) throw new TypeError("Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string");
@@ -9655,9 +9721,18 @@ window.smartCard = function(modules) {
                 clientID: clientID,
                 paymentSource: paymentSource
             });
-        })).then((function() {
+        })).then((function(res) {
+            var _ref2 = (null == res ? void 0 : res.updateVaultSetupToken) || {};
+            return handleThreeDomainSecureContingency({
+                status: _ref2.status,
+                links: _ref2.links,
+                getParent: getParent,
+                ThreeDomainSecure: ThreeDomainSecure
+            });
+        })).then((function(threeDsResponse) {
             return onApprove({
-                vaultSetupToken: vaultToken
+                vaultSetupToken: vaultToken,
+                liabilityShift: null == threeDsResponse ? void 0 : threeDsResponse.liability_shift
             });
         })).then((function() {
             return function(_ref6) {
@@ -9707,6 +9782,8 @@ window.smartCard = function(modules) {
               case constants.l.WITH_PURCHASE:
                 return function(cardProps, card, extraFields, facilitatorAccessToken) {
                     var orderID;
+                    var ThreeDomainSecure = getComponents().ThreeDomainSecure;
+                    var createOrder = cardProps.createOrder, getParent = cardProps.getParent;
                     return cardProps.createOrder().then((function(id) {
                         var payment_source = convertCardToPaymentSource(card, extraFields);
                         var data = {
@@ -9732,9 +9809,18 @@ window.smartCard = function(modules) {
                             facilitatorAccessToken: facilitatorAccessToken,
                             partnerAttributionID: ""
                         });
-                    })).then((function() {
+                    })).then((function(res) {
+                        return handleThreeDomainSecureContingency({
+                            status: res.status,
+                            links: res.links,
+                            ThreeDomainSecure: ThreeDomainSecure,
+                            createOrder: createOrder,
+                            getParent: getParent
+                        });
+                    })).then((function(threeDsResponse) {
                         return cardProps.onApprove({
-                            orderID: orderID
+                            orderID: orderID,
+                            liabilityShift: null == threeDsResponse ? void 0 : threeDsResponse.liability_shift
                         }, {});
                     })).then((function() {
                         !function(_ref4) {
@@ -9767,10 +9853,13 @@ window.smartCard = function(modules) {
 
               case constants.l.VAULT_WITHOUT_PURCHASE:
                 return function(cardProps, card, extraFields) {
+                    var _getComponents = getComponents();
                     return vault_without_purchase_savePaymentSource({
                         onApprove: cardProps.onApprove,
                         createVaultSetupToken: cardProps.createVaultSetupToken,
                         onError: cardProps.onError,
+                        getParent: cardProps.getParent,
+                        ThreeDomainSecure: _getComponents.ThreeDomainSecure,
                         clientID: cardProps.clientID,
                         paymentSource: convertCardToPaymentSource(card, extraFields)
                     });
@@ -11252,7 +11341,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.145", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.146", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[src.c.PAYMENTS_SDK] = clientID, 

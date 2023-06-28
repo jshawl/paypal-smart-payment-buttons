@@ -5016,7 +5016,10 @@
         }
         function setupNativePopup(_ref) {
             var _logger$info$track;
-            var parentDomain = _ref.parentDomain, env = _ref.env, buttonSessionID = _ref.buttonSessionID, fundingSource = _ref.fundingSource, locale = _ref.locale, buyerCountry = _ref.buyerCountry;
+            var parentDomain = _ref.parentDomain, env = _ref.env, sessionID = _ref.sessionID, buttonSessionID = _ref.buttonSessionID, sdkCorrelationID = _ref.sdkCorrelationID, clientID = _ref.clientID, fundingSource = _ref.fundingSource, locale = _ref.locale, buyerCountry = _ref.buyerCountry;
+            var sdkVersion = getPayPal().version;
+            var _parseQuery = parseQuery(window.location.search.slice(1)), _parseQuery$venmoWebE = _parseQuery.venmoWebEnabled, venmoWebUrl = _parseQuery.venmoWebUrl;
+            if (void 0 !== _parseQuery$venmoWebE && _parseQuery$venmoWebE && venmoWebUrl) return window.location.replace(venmoWebUrl + window.location.search);
             var logger = function(_ref) {
                 var env = _ref.env, sessionID = _ref.sessionID, buttonSessionID = _ref.buttonSessionID, sdkCorrelationID = _ref.sdkCorrelationID, clientID = _ref.clientID, fundingSource = _ref.fundingSource, sdkVersion = _ref.sdkVersion, locale = _ref.locale, buyerCountry = _ref.buyerCountry;
                 var logger = getLogger();
@@ -5079,7 +5082,7 @@
                 logger.addTrackingBuilder((function() {
                     var _ref3;
                     return (_ref3 = {}).state_name = "smart_button", _ref3.context_type = "button_session_id", 
-                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.145", 
+                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.146", 
                     _ref3.selected_payment_method = fundingSource, _ref3.user_id = buttonSessionID, 
                     _ref3.time = Date.now().toString(), _ref3;
                 }));
@@ -5116,12 +5119,12 @@
                 return logger;
             }({
                 env: env,
-                sessionID: _ref.sessionID,
+                sessionID: sessionID,
                 buttonSessionID: buttonSessionID,
-                sdkCorrelationID: _ref.sdkCorrelationID,
-                clientID: _ref.clientID,
+                sdkCorrelationID: sdkCorrelationID,
+                clientID: clientID,
                 fundingSource: fundingSource,
-                sdkVersion: getPayPal().version,
+                sdkVersion: sdkVersion,
                 locale: locale,
                 buyerCountry: buyerCountry
             });
@@ -5315,11 +5318,11 @@
                         break;
 
                       case "onApprove":
-                        var _parseQuery = parseQuery(queryString);
+                        var _parseQuery2 = parseQuery(queryString);
                         sendToParent("onApprove", {
-                            payerID: _parseQuery.payerID,
-                            paymentID: _parseQuery.paymentID,
-                            billingToken: _parseQuery.billingToken
+                            payerID: _parseQuery2.payerID,
+                            paymentID: _parseQuery2.paymentID,
+                            billingToken: _parseQuery2.billingToken
                         }).finally(closeWindow);
                         break;
 
@@ -5328,18 +5331,18 @@
                         break;
 
                       case "fallback":
-                        var _parseQuery2 = parseQuery(queryString);
+                        var _parseQuery3 = parseQuery(queryString);
                         sendToParent("onFallback", {
-                            type: _parseQuery2.type,
-                            skip_native_duration: _parseQuery2.skip_native_duration,
-                            fallback_reason: _parseQuery2.fallback_reason
+                            type: _parseQuery3.type,
+                            skip_native_duration: _parseQuery3.skip_native_duration,
+                            fallback_reason: _parseQuery3.fallback_reason
                         });
                         break;
 
                       case "onError":
-                        var _parseQuery3 = parseQuery(queryString);
+                        var _parseQuery4 = parseQuery(queryString);
                         sendToParent("onError", {
-                            message: _parseQuery3.message
+                            message: _parseQuery4.message
                         }).finally(closeWindow);
                         break;
 
