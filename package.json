@@ -68,7 +68,7 @@
     "@paypal/checkout-components": "^5.0.256",
     "@paypal/common-components": "^1.0.35",
     "@paypal/installments": "^1.0.0",
-    "@paypal/sdk-client": "^4.0.156",
+    "@paypal/sdk-client": "^4.0.175",
     "@paypal/sdk-constants": "^1.0.128",
     "@paypal/sdk-logos": "^2.1.0",
     "@paypal/sdk-release": "^5.0.138",

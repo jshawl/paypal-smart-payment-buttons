@@ -24,9 +24,15 @@ import type { LocaleType } from "../types";
 import { LOGGER_URL, AMPLITUDE_API_KEY } from "../config";
 
 export function getLogger(): LoggerType {
+  const disableSetCookieQuery = "disableSetCookie=true";
+  
+  const loggerUrl = window && typeof window.xprops === "object" && window.xprops.disableSetCookie
+  ? `${LOGGER_URL}?${disableSetCookieQuery}`
+  : LOGGER_URL;
+  
   return inlineMemoize(getLogger, () =>
     Logger({
-      url: LOGGER_URL,
+      url: loggerUrl,
       enableSendBeacon: true,
     })
   );
