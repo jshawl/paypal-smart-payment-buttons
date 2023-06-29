@@ -37,17 +37,21 @@ let smartWalletPromise;
 let smartWalletErrored = false;
 
 function setupWalletCapture({ props, config, serviceData } : SetupOptions) {
-    const { env, clientID, currency, amount, userIDToken, paymentMethodToken, allowBillingPayments, branded } = props;
+    const { env, clientID, currency, amount, userIDToken, paymentMethodToken, allowBillingPayments, branded, disableSetCookie } = props;
     const { cspNonce } = config;
     const { merchantID, wallet } = serviceData;
 
     const clientMetadataID = getClientMetadataID({ props });
+    let queryStringParams = {};
 
     if (!wallet) {
         throw new Error(`No wallet found`);
     }
 
-    smartWalletPromise = loadFraudnet({ env, clientMetadataID, cspNonce }).catch(noop).then(() => {
+    if (disableSetCookie) {
+        queryStringParams = { disableSetCookie: "true" };
+    }
+    smartWalletPromise = loadFraudnet({ env, clientMetadataID, cspNonce, queryStringParams }).catch(noop).then(() => {
         return userIDToken
             ? getSmartWallet({ clientID, merchantID, currency, amount, clientMetadataID, userIDToken, paymentMethodToken, allowBillingPayments, branded })
             : wallet;

@@ -21,7 +21,8 @@ type FraudnetOptions = {|
     env : $Values<typeof ENV>,
     clientMetadataID : string,
     cspNonce? : ?string,
-    timeout? : number
+    timeout? : number,
+    queryStringParams? : {[string]: string | boolean}
 |};
 
 type FraudnetConfig = {|
@@ -34,7 +35,7 @@ type FraudnetConfig = {|
 
 type LoadFraudnet = (FraudnetOptions) => ZalgoPromise<void>;
 
-export const loadFraudnet : Memoized<LoadFraudnet> = memoize(({ env, clientMetadataID, cspNonce, timeout = 1000 }) => {
+export const loadFraudnet : Memoized<LoadFraudnet> = memoize(({ env, clientMetadataID, cspNonce, timeout = 1000, queryStringParams = {} }) => {
     return new ZalgoPromise(resolve => {
         if (__TEST__) {
             return resolve();
@@ -59,8 +60,11 @@ export const loadFraudnet : Memoized<LoadFraudnet> = memoize(({ env, clientMetad
         configScript.textContent = JSON.stringify(config);
 
         const fraudnetScript = document.createElement('script');
+        const queryString = Object.keys(queryStringParams).map(key => `${key}=${encodeURIComponent(String(queryStringParams[key]))}`).join('&');
+        const fraudnetUrl = queryString.length ? `${FRAUDNET_URL[env]}?${queryString}` : FRAUDNET_URL[env];
+
         fraudnetScript.setAttribute('nonce', cspNonce || '');
-        fraudnetScript.setAttribute('src', FRAUDNET_URL[env]);
+        fraudnetScript.setAttribute('src', fraudnetUrl);
         fraudnetScript.addEventListener('error', () => resolve());
 
         window.fnCallback = resolve;

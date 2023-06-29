@@ -67,7 +67,7 @@ function getClientMetadataID({ props } : {| props : ButtonProps |}) : string {
 
 function initVaultCapture({ props, components, payment, serviceData, config } : InitOptions) : PaymentFlowInstance {
     const { createOrder, onApprove, clientAccessToken,
-        enableThreeDomainSecure, partnerAttributionID, getParent, userIDToken, clientID, env, merchantID } = props;
+        enableThreeDomainSecure, partnerAttributionID, getParent, userIDToken, clientID, env, merchantID, disableSetCookie } = props;
     const { ThreeDomainSecure, Installments } = components;
     const { fundingSource, paymentMethodID, button } = payment;
     const { facilitatorAccessToken, buyerCountry } = serviceData;
@@ -156,7 +156,8 @@ function initVaultCapture({ props, components, payment, serviceData, config } : 
 
     const start = () => {
         return createOrder().then(orderID => {
-            return loadFraudnet({ env, clientMetadataID, cspNonce }).catch(noop).then(() => {
+            const queryStringParams = disableSetCookie ? { disableSetCookie } : {};
+            return loadFraudnet({ env, clientMetadataID, cspNonce, queryStringParams }).catch(noop).then(() => {
                 const installmentsEligible = isVaultCaptureInstallmentsEligible({ props, serviceData });
 
                 getLogger()

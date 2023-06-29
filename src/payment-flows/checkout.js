@@ -145,7 +145,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
         createBillingAgreement, createSubscription, onClick, amount,
         clientID, connect, clientMetadataID: cmid, onAuth, userIDToken, env,
         currency, enableFunding, stickinessID,
-        standaloneFundingSource, branded, paymentMethodToken, allowBillingPayments, merchantRequestedPopupsDisabled } = props;
+        standaloneFundingSource, branded, paymentMethodToken, allowBillingPayments, merchantRequestedPopupsDisabled, disableSetCookie } = props;
     let { button, win, fundingSource, card, isClick, buyerAccessToken = serviceData.buyerAccessToken,
         venmoPayloadID, buyerIntent, checkoutRestart } = payment;
     const { buyerCountry, sdkMeta, merchantID } = serviceData;
@@ -180,8 +180,8 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                         return buyerAccessToken;
                     } else if (clientID && userIDToken && fundingSkipLogin) {
                         const clientMetadataID = cmid || sessionID;
-
-                        return loadFraudnet({ env, clientMetadataID, cspNonce }).catch(noop).then(() => {
+                        const queryStringParams = disableSetCookie ? { disableSetCookie } : {};
+                        return loadFraudnet({ env, clientMetadataID, cspNonce, queryStringParams }).catch(noop).then(() => {
                             return getSmartWallet({ clientID, merchantID, currency, amount, clientMetadataID, userIDToken, paymentMethodToken, allowBillingPayments, branded });
                         }).then(wallet => {
                             // $FlowFixMe
