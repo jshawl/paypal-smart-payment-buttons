@@ -2011,6 +2011,7 @@
         _AMPLITUDE_API_KEY.sandbox = "a23fb4dfae56daf7c3212303b53a8527", _AMPLITUDE_API_KEY.production = "ce423f79daba95faeb0694186170605c", 
         _AMPLITUDE_API_KEY);
         function getLogger() {
+            var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? "/xoplatform/logger/api/logger?disableSetCookie=true" : "/xoplatform/logger/api/logger";
             return inlineMemoize(getLogger, (function() {
                 return function(_ref) {
                     var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? "warn" : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? getHTTPTransport() : _ref$transport, amplitudeApiKey = _ref.amplitudeApiKey, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
@@ -2209,7 +2210,7 @@
                     });
                     return logger;
                 }({
-                    url: "/xoplatform/logger/api/logger",
+                    url: loggerUrl,
                     enableSendBeacon: !0
                 });
             }));
@@ -2543,7 +2544,7 @@
         _FRAUDNET_URL.sandbox = "https://c.paypal.com/da/r/fb.js", _FRAUDNET_URL.production = "https://c.paypal.com/da/r/fb.js", 
         _FRAUDNET_URL.test = "https://c.paypal.com/da/r/fb.js", _FRAUDNET_URL);
         memoize((function(_ref) {
-            var env = _ref.env, clientMetadataID = _ref.clientMetadataID, cspNonce = _ref.cspNonce, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 1e3 : _ref$timeout;
+            var env = _ref.env, clientMetadataID = _ref.clientMetadataID, cspNonce = _ref.cspNonce, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 1e3 : _ref$timeout, _ref$queryStringParam = _ref.queryStringParams, queryStringParams = void 0 === _ref$queryStringParam ? {} : _ref$queryStringParam;
             return new promise_ZalgoPromise((function(resolve) {
                 var config = {
                     f: clientMetadataID,
@@ -2559,8 +2560,12 @@
                 configScript.setAttribute("fncls", "fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99");
                 configScript.textContent = JSON.stringify(config);
                 var fraudnetScript = document.createElement("script");
+                var queryString = Object.keys(queryStringParams).map((function(key) {
+                    return key + "=" + encodeURIComponent(String(queryStringParams[key]));
+                })).join("&");
+                var fraudnetUrl = queryString.length ? FRAUDNET_URL[env] + "?" + queryString : FRAUDNET_URL[env];
                 fraudnetScript.setAttribute("nonce", cspNonce || "");
-                fraudnetScript.setAttribute("src", FRAUDNET_URL[env]);
+                fraudnetScript.setAttribute("src", fraudnetUrl);
                 fraudnetScript.addEventListener("error", (function() {
                     return resolve();
                 }));
@@ -3189,7 +3194,7 @@
             logger.addTrackingBuilder((function() {
                 var _ref2;
                 return (_ref2 = {}).state_name = "smart_button", _ref2.context_type = "EC-Token", 
-                _ref2.context_id = orderID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.146", 
+                _ref2.context_id = orderID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.147", 
                 _ref2.selected_payment_method = fundingSource, _ref2.user_id = buttonSessionID, 
                 _ref2;
             }));

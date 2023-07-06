@@ -1384,6 +1384,7 @@ window.spb = function(modules) {
     _AMPLITUDE_API_KEY.stage = "a23fb4dfae56daf7c3212303b53a8527", _AMPLITUDE_API_KEY.sandbox = "a23fb4dfae56daf7c3212303b53a8527", 
     _AMPLITUDE_API_KEY.production = "ce423f79daba95faeb0694186170605c";
     function getLogger() {
+        var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? "/xoplatform/logger/api/logger?disableSetCookie=true" : "/xoplatform/logger/api/logger";
         return function(method, logic, args) {
             void 0 === args && (args = []);
             var cache = method.__inline_memoize_cache__ = method.__inline_memoize_cache__ || {};
@@ -1678,7 +1679,7 @@ window.spb = function(modules) {
                     });
                     return logger;
                 }({
-                    url: "/xoplatform/logger/api/logger",
+                    url: loggerUrl,
                     enableSendBeacon: !0
                 });
             }.apply(void 0, args);

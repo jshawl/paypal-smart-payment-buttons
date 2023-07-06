@@ -4972,9 +4972,10 @@
         _AMPLITUDE_API_KEY.sandbox = "a23fb4dfae56daf7c3212303b53a8527", _AMPLITUDE_API_KEY.production = "ce423f79daba95faeb0694186170605c", 
         _AMPLITUDE_API_KEY);
         function getLogger() {
+            var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? "/xoplatform/logger/api/logger?disableSetCookie=true" : "/xoplatform/logger/api/logger";
             return inlineMemoize(getLogger, (function() {
                 return Logger({
-                    url: "/xoplatform/logger/api/logger",
+                    url: loggerUrl,
                     enableSendBeacon: !0
                 });
             }));
@@ -5082,7 +5083,7 @@
                 logger.addTrackingBuilder((function() {
                     var _ref3;
                     return (_ref3 = {}).state_name = "smart_button", _ref3.context_type = "button_session_id", 
-                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.146", 
+                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.147", 
                     _ref3.selected_payment_method = fundingSource, _ref3.user_id = buttonSessionID, 
                     _ref3.time = Date.now().toString(), _ref3;
                 }));

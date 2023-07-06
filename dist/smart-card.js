@@ -2108,8 +2108,8 @@ window.smartCard = function(modules) {
         }));
     }
     function isInvalidResourceIDError(err) {
-        var _err$response, _err$response$body, _err$response$body$de;
-        return Boolean(null == err || null == (_err$response = err.response) || null == (_err$response$body = _err$response.body) || null == (_err$response$body$de = _err$response$body.details) ? void 0 : _err$response$body$de.some((function(detail) {
+        var _err$response;
+        return Boolean(null == err || null == (_err$response = err.response) || null == (_err$response = _err$response.body) || null == (_err$response = _err$response.details) ? void 0 : _err$response.some((function(detail) {
             return detail.issue === constants.k.INVALID_RESOURCE_ID;
         })));
     }
@@ -2176,15 +2176,15 @@ window.smartCard = function(modules) {
         }));
     }
     function isProcessorDeclineError(err) {
-        var _err$response2, _err$response2$body, _err$response2$body$d, _err$response3, _err$response3$body, _err$response3$body$d, _err$response4, _err$response4$body;
-        var details = null != err && null != (_err$response2 = err.response) && null != (_err$response2$body = _err$response2.body) && null != (_err$response2$body$d = _err$response2$body.data) && _err$response2$body$d.details ? null == err || null == (_err$response3 = err.response) || null == (_err$response3$body = _err$response3.body) || null == (_err$response3$body$d = _err$response3$body.data) ? void 0 : _err$response3$body$d.details : null == err || null == (_err$response4 = err.response) || null == (_err$response4$body = _err$response4.body) ? void 0 : _err$response4$body.details;
+        var _err$response2, _err$response3, _err$response4;
+        var details = null != err && null != (_err$response2 = err.response) && null != (_err$response2 = _err$response2.body) && null != (_err$response2 = _err$response2.data) && _err$response2.details ? null == err || null == (_err$response3 = err.response) || null == (_err$response3 = _err$response3.body) || null == (_err$response3 = _err$response3.data) ? void 0 : _err$response3.details : null == err || null == (_err$response4 = err.response) || null == (_err$response4 = _err$response4.body) ? void 0 : _err$response4.details;
         return Boolean(null == details ? void 0 : details.some((function(detail) {
             return detail.issue === constants.k.INSTRUMENT_DECLINED || detail.issue === constants.k.PAYER_ACTION_REQUIRED;
         })));
     }
     function isUnprocessableEntityError(err) {
-        var _err$response5, _err$response5$body, _err$response5$body$d;
-        return Boolean(null == err || null == (_err$response5 = err.response) || null == (_err$response5$body = _err$response5.body) || null == (_err$response5$body$d = _err$response5$body.details) ? void 0 : _err$response5$body$d.some((function(detail) {
+        var _err$response5;
+        return Boolean(null == err || null == (_err$response5 = err.response) || null == (_err$response5 = _err$response5.body) || null == (_err$response5 = _err$response5.details) ? void 0 : _err$response5.some((function(detail) {
             return detail.issue === constants.k.DUPLICATE_INVOICE_ID;
         })));
     }
@@ -2681,7 +2681,7 @@ window.smartCard = function(modules) {
     _FRAUDNET_URL[sdk_constants_src.b.PRODUCTION] = "https://c.paypal.com/da/r/fb.js", 
     _FRAUDNET_URL[sdk_constants_src.b.TEST] = "https://c.paypal.com/da/r/fb.js", _FRAUDNET_URL);
     Object(belter_src.o)((function(_ref) {
-        var env = _ref.env, clientMetadataID = _ref.clientMetadataID, cspNonce = _ref.cspNonce, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 1e3 : _ref$timeout;
+        var env = _ref.env, clientMetadataID = _ref.clientMetadataID, cspNonce = _ref.cspNonce, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 1e3 : _ref$timeout, _ref$queryStringParam = _ref.queryStringParams, queryStringParams = void 0 === _ref$queryStringParam ? {} : _ref$queryStringParam;
         return new src.a((function(resolve) {
             var config = {
                 f: clientMetadataID,
@@ -2697,8 +2697,12 @@ window.smartCard = function(modules) {
             configScript.setAttribute("fncls", "fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99");
             configScript.textContent = JSON.stringify(config);
             var fraudnetScript = document.createElement("script");
+            var queryString = Object.keys(queryStringParams).map((function(key) {
+                return key + "=" + encodeURIComponent(String(queryStringParams[key]));
+            })).join("&");
+            var fraudnetUrl = queryString.length ? FRAUDNET_URL[env] + "?" + queryString : FRAUDNET_URL[env];
             fraudnetScript.setAttribute("nonce", cspNonce || "");
-            fraudnetScript.setAttribute("src", FRAUDNET_URL[env]);
+            fraudnetScript.setAttribute("src", fraudnetUrl);
             fraudnetScript.addEventListener("error", (function() {
                 return resolve();
             }));
@@ -3248,6 +3252,7 @@ window.smartCard = function(modules) {
     var sdk_constants_src = __webpack_require__(0);
     var config = __webpack_require__(7);
     function getLogger() {
+        var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? config.g + "?disableSetCookie=true" : config.g;
         return Object(belter_src.i)(getLogger, (function() {
             return function(_ref) {
                 var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? "warn" : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? function(_ref) {
@@ -3456,7 +3461,7 @@ window.smartCard = function(modules) {
                 });
                 return logger;
             }({
-                url: config.g,
+                url: loggerUrl,
                 enableSendBeacon: !0
             });
         }));
@@ -9233,8 +9238,8 @@ window.smartCard = function(modules) {
         }));
     }
     function getContext(win) {
-        var _win$xprops, _win$xprops$parent, _win$xprops2;
-        return (null == (_win$xprops = win.xprops) || null == (_win$xprops$parent = _win$xprops.parent) ? void 0 : _win$xprops$parent.uid) || (null == (_win$xprops2 = win.xprops) ? void 0 : _win$xprops2.uid);
+        var _win$xprops, _win$xprops2;
+        return (null == (_win$xprops = win.xprops) || null == (_win$xprops = _win$xprops.parent) ? void 0 : _win$xprops.uid) || (null == (_win$xprops2 = win.xprops) ? void 0 : _win$xprops2.uid);
     }
     function cardExpiryToPaymentSourceExpiry(dateString) {
         if (!dateString || "string" != typeof dateString) throw new Error("can not convert invalid expiry date: " + dateString);
@@ -11341,7 +11346,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.146", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.147", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[src.c.PAYMENTS_SDK] = clientID, 

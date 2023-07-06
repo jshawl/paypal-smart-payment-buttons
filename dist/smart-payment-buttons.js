@@ -9598,8 +9598,8 @@ window.spb = function(modules) {
             }));
         }
         function isInvalidResourceIDError(err) {
-            var _err$response, _err$response$body, _err$response$body$de;
-            return Boolean(null == err || null == (_err$response = err.response) || null == (_err$response$body = _err$response.body) || null == (_err$response$body$de = _err$response$body.details) ? void 0 : _err$response$body$de.some((function(detail) {
+            var _err$response;
+            return Boolean(null == err || null == (_err$response = err.response) || null == (_err$response = _err$response.body) || null == (_err$response = _err$response.details) ? void 0 : _err$response.some((function(detail) {
                 return detail.issue === constants.ORDER_API_ERROR.INVALID_RESOURCE_ID;
             })));
         }
@@ -9668,15 +9668,15 @@ window.spb = function(modules) {
             }));
         }
         function isProcessorDeclineError(err) {
-            var _err$response2, _err$response2$body, _err$response2$body$d, _err$response3, _err$response3$body, _err$response3$body$d, _err$response4, _err$response4$body;
-            var details = null != err && null != (_err$response2 = err.response) && null != (_err$response2$body = _err$response2.body) && null != (_err$response2$body$d = _err$response2$body.data) && _err$response2$body$d.details ? null == err || null == (_err$response3 = err.response) || null == (_err$response3$body = _err$response3.body) || null == (_err$response3$body$d = _err$response3$body.data) ? void 0 : _err$response3$body$d.details : null == err || null == (_err$response4 = err.response) || null == (_err$response4$body = _err$response4.body) ? void 0 : _err$response4$body.details;
+            var _err$response2, _err$response3, _err$response4;
+            var details = null != err && null != (_err$response2 = err.response) && null != (_err$response2 = _err$response2.body) && null != (_err$response2 = _err$response2.data) && _err$response2.details ? null == err || null == (_err$response3 = err.response) || null == (_err$response3 = _err$response3.body) || null == (_err$response3 = _err$response3.data) ? void 0 : _err$response3.details : null == err || null == (_err$response4 = err.response) || null == (_err$response4 = _err$response4.body) ? void 0 : _err$response4.details;
             return Boolean(null == details ? void 0 : details.some((function(detail) {
                 return detail.issue === constants.ORDER_API_ERROR.INSTRUMENT_DECLINED || detail.issue === constants.ORDER_API_ERROR.PAYER_ACTION_REQUIRED;
             })));
         }
         function isUnprocessableEntityError(err) {
-            var _err$response5, _err$response5$body, _err$response5$body$d;
-            return Boolean(null == err || null == (_err$response5 = err.response) || null == (_err$response5$body = _err$response5.body) || null == (_err$response5$body$d = _err$response5$body.details) ? void 0 : _err$response5$body$d.some((function(detail) {
+            var _err$response5;
+            return Boolean(null == err || null == (_err$response5 = err.response) || null == (_err$response5 = _err$response5.body) || null == (_err$response5 = _err$response5.details) ? void 0 : _err$response5.some((function(detail) {
                 return detail.issue === constants.ORDER_API_ERROR.DUPLICATE_INVOICE_ID;
             })));
         }
@@ -9966,7 +9966,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.146", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.147", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -10085,9 +10085,9 @@ window.spb = function(modules) {
                 headers: (_headers19 = {}, _headers19[constants.HEADERS.ACCESS_TOKEN] = buyerAccessToken, 
                 _headers19[constants.HEADERS.CLIENT_CONTEXT] = orderID, _headers19)
             }).then((function(_ref19) {
-                var _approvePayment$buyer, _approvePayment$buyer2;
+                var _approvePayment$buyer;
                 var approvePayment = _ref19.approvePayment;
-                Object(lib.setBuyerAccessToken)(null == approvePayment || null == (_approvePayment$buyer = approvePayment.buyer) || null == (_approvePayment$buyer2 = _approvePayment$buyer.auth) ? void 0 : _approvePayment$buyer2.accessToken);
+                Object(lib.setBuyerAccessToken)(null == approvePayment || null == (_approvePayment$buyer = approvePayment.buyer) || null == (_approvePayment$buyer = _approvePayment$buyer.auth) ? void 0 : _approvePayment$buyer.accessToken);
                 return {
                     payerID: approvePayment.buyer.userId
                 };
@@ -10730,7 +10730,7 @@ window.spb = function(modules) {
         var FRAUDNET_FNCLS = "fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99";
         var FRAUDNET_APP_NAME = "SMART_PAYMENT_BUTTONS";
         var loadFraudnet = Object(belter_src.memoize)((function(_ref) {
-            var env = _ref.env, clientMetadataID = _ref.clientMetadataID, cspNonce = _ref.cspNonce, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 1e3 : _ref$timeout;
+            var env = _ref.env, clientMetadataID = _ref.clientMetadataID, cspNonce = _ref.cspNonce, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 1e3 : _ref$timeout, _ref$queryStringParam = _ref.queryStringParams, queryStringParams = void 0 === _ref$queryStringParam ? {} : _ref$queryStringParam;
             return new src.ZalgoPromise((function(resolve) {
                 var config = {
                     f: clientMetadataID,
@@ -10746,8 +10746,12 @@ window.spb = function(modules) {
                 configScript.setAttribute("fncls", FRAUDNET_FNCLS);
                 configScript.textContent = JSON.stringify(config);
                 var fraudnetScript = document.createElement("script");
+                var queryString = Object.keys(queryStringParams).map((function(key) {
+                    return key + "=" + encodeURIComponent(String(queryStringParams[key]));
+                })).join("&");
+                var fraudnetUrl = queryString.length ? FRAUDNET_URL[env] + "?" + queryString : FRAUDNET_URL[env];
                 fraudnetScript.setAttribute("nonce", cspNonce || "");
-                fraudnetScript.setAttribute("src", FRAUDNET_URL[env]);
+                fraudnetScript.setAttribute("src", fraudnetUrl);
                 fraudnetScript.addEventListener("error", (function() {
                     return resolve();
                 }));
@@ -11406,7 +11410,7 @@ window.spb = function(modules) {
                                     currentShippingContact = shippingContact;
                                     shippingMethod && (currentShippingMethod = shippingMethod);
                                     return Object(api.getDetailedOrderInfo)(orderID, locale.country).then((function(updatedOrder) {
-                                        var _currentShippingMetho7, _updatedOrder$checkou3, _updatedOrder$checkou4, _currentShippingMetho8, _currentShippingMetho9;
+                                        var _currentShippingMetho7, _updatedOrder$checkou3, _currentShippingMetho8, _currentShippingMetho9;
                                         var _updatedOrder$checkou = updatedOrder.checkoutSession.cart, _updatedOrder$checkou2 = _updatedOrder$checkou.amounts, updatedTaxValue = _updatedOrder$checkou2.tax.currencyValue, updatedSubtotalValue = _updatedOrder$checkou2.subtotal.currencyValue, updatedTotalValue = _updatedOrder$checkou2.total.currencyValue;
                                         currentShippingAmount = (null == (_currentShippingMetho7 = currentShippingMethod) ? void 0 : _currentShippingMetho7.amount) || currentShippingAmount || "0.00";
                                         currentTaxAmount = "0.00" === updatedTaxValue ? currentTaxAmount : updatedTaxValue;
@@ -11414,7 +11418,7 @@ window.spb = function(modules) {
                                         currentTotalAmount = updatedTotalValue;
                                         var update = {
                                             newTotal: {
-                                                label: merchantName = (null == updatedOrder || null == (_updatedOrder$checkou3 = updatedOrder.checkoutSession) || null == (_updatedOrder$checkou4 = _updatedOrder$checkou3.merchant) ? void 0 : _updatedOrder$checkou4.name) || "Total",
+                                                label: merchantName = (null == updatedOrder || null == (_updatedOrder$checkou3 = updatedOrder.checkoutSession) || null == (_updatedOrder$checkou3 = _updatedOrder$checkou3.merchant) ? void 0 : _updatedOrder$checkou3.name) || "Total",
                                                 amount: updatedTotalValue
                                             },
                                             newLineItems: [],
@@ -11945,7 +11949,7 @@ window.spb = function(modules) {
             init: function initCheckout(_ref5) {
                 var props = _ref5.props, components = _ref5.components, serviceData = _ref5.serviceData, payment = _ref5.payment, config = _ref5.config, fullRestart = _ref5.restart;
                 var Checkout = components.Checkout;
-                var sessionID = props.sessionID, buttonSessionID = props.buttonSessionID, _createOrder = props.createOrder, _onApprove = props.onApprove, _onComplete = props.onComplete, _onCancel = props.onCancel, onShippingChange = props.onShippingChange, onShippingAddressChange = props.onShippingAddressChange, onShippingOptionsChange = props.onShippingOptionsChange, locale = props.locale, commit = props.commit, _onError = props.onError, vault = props.vault, clientAccessToken = props.clientAccessToken, createBillingAgreement = props.createBillingAgreement, createSubscription = props.createSubscription, onClick = props.onClick, amount = props.amount, clientID = props.clientID, connect = props.connect, cmid = props.clientMetadataID, _onAuth = props.onAuth, userIDToken = props.userIDToken, env = props.env, currency = props.currency, enableFunding = props.enableFunding, stickinessID = props.stickinessID, standaloneFundingSource = props.standaloneFundingSource, branded = props.branded, paymentMethodToken = props.paymentMethodToken, allowBillingPayments = props.allowBillingPayments, merchantRequestedPopupsDisabled = props.merchantRequestedPopupsDisabled;
+                var sessionID = props.sessionID, buttonSessionID = props.buttonSessionID, _createOrder = props.createOrder, _onApprove = props.onApprove, _onComplete = props.onComplete, _onCancel = props.onCancel, onShippingChange = props.onShippingChange, onShippingAddressChange = props.onShippingAddressChange, onShippingOptionsChange = props.onShippingOptionsChange, locale = props.locale, commit = props.commit, _onError = props.onError, vault = props.vault, clientAccessToken = props.clientAccessToken, createBillingAgreement = props.createBillingAgreement, createSubscription = props.createSubscription, onClick = props.onClick, amount = props.amount, clientID = props.clientID, connect = props.connect, cmid = props.clientMetadataID, _onAuth = props.onAuth, userIDToken = props.userIDToken, env = props.env, currency = props.currency, enableFunding = props.enableFunding, stickinessID = props.stickinessID, standaloneFundingSource = props.standaloneFundingSource, branded = props.branded, paymentMethodToken = props.paymentMethodToken, allowBillingPayments = props.allowBillingPayments, merchantRequestedPopupsDisabled = props.merchantRequestedPopupsDisabled, disableSetCookie = props.disableSetCookie;
                 var button = payment.button, win = payment.win, fundingSource = payment.fundingSource, card = payment.card, _payment$buyerAccessT = payment.buyerAccessToken, buyerAccessToken = void 0 === _payment$buyerAccessT ? serviceData.buyerAccessToken : _payment$buyerAccessT, venmoPayloadID = payment.venmoPayloadID, buyerIntent = payment.buyerIntent, checkoutRestart = payment.checkoutRestart;
                 var buyerCountry = serviceData.buyerCountry, sdkMeta = serviceData.sdkMeta, merchantID = serviceData.merchantID;
                 var cspNonce = config.cspNonce;
@@ -12002,10 +12006,14 @@ window.spb = function(modules) {
                                 if (buyerAccessToken) return buyerAccessToken;
                                 if (clientID && userIDToken && fundingSkipLogin) {
                                     var clientMetadataID = cmid || sessionID;
+                                    var queryStringParams = disableSetCookie ? {
+                                        disableSetCookie: disableSetCookie
+                                    } : {};
                                     return Object(api.loadFraudnet)({
                                         env: env,
                                         clientMetadataID: clientMetadataID,
-                                        cspNonce: cspNonce
+                                        cspNonce: cspNonce,
+                                        queryStringParams: queryStringParams
                                     }).catch(src.noop).then((function() {
                                         return Object(api.getSmartWallet)({
                                             clientID: clientID,
@@ -13150,7 +13158,7 @@ window.spb = function(modules) {
             },
             init: function(_ref5) {
                 var props = _ref5.props, components = _ref5.components, payment = _ref5.payment, serviceData = _ref5.serviceData, config = _ref5.config;
-                var createOrder = props.createOrder, onApprove = props.onApprove, clientAccessToken = props.clientAccessToken, enableThreeDomainSecure = props.enableThreeDomainSecure, partnerAttributionID = props.partnerAttributionID, getParent = props.getParent, userIDToken = props.userIDToken, clientID = props.clientID, env = props.env, merchantID = props.merchantID;
+                var createOrder = props.createOrder, onApprove = props.onApprove, clientAccessToken = props.clientAccessToken, enableThreeDomainSecure = props.enableThreeDomainSecure, partnerAttributionID = props.partnerAttributionID, getParent = props.getParent, userIDToken = props.userIDToken, clientID = props.clientID, env = props.env, merchantID = props.merchantID, disableSetCookie = props.disableSetCookie;
                 var ThreeDomainSecure = components.ThreeDomainSecure, Installments = components.Installments;
                 var fundingSource = payment.fundingSource, paymentMethodID = payment.paymentMethodID, button = payment.button;
                 var facilitatorAccessToken = serviceData.facilitatorAccessToken, buyerCountry = serviceData.buyerCountry;
@@ -13268,10 +13276,14 @@ window.spb = function(modules) {
                 return {
                     start: function() {
                         return createOrder().then((function(orderID) {
+                            var queryStringParams = disableSetCookie ? {
+                                disableSetCookie: disableSetCookie
+                            } : {};
                             return Object(api.loadFraudnet)({
                                 env: env,
                                 clientMetadataID: clientMetadataID,
-                                cspNonce: cspNonce
+                                cspNonce: cspNonce,
+                                queryStringParams: queryStringParams
                             }).catch(src.noop).then((function() {
                                 var _getLogger$info$track;
                                 var installmentsEligible = (fundingEligibility = (_ref3 = {
@@ -13590,7 +13602,7 @@ window.spb = function(modules) {
             name: "wallet_capture",
             setup: function(_ref3) {
                 var props = _ref3.props, serviceData = _ref3.serviceData;
-                var env = props.env, clientID = props.clientID, currency = props.currency, amount = props.amount, userIDToken = props.userIDToken, paymentMethodToken = props.paymentMethodToken, allowBillingPayments = props.allowBillingPayments, branded = props.branded;
+                var env = props.env, clientID = props.clientID, currency = props.currency, amount = props.amount, userIDToken = props.userIDToken, paymentMethodToken = props.paymentMethodToken, allowBillingPayments = props.allowBillingPayments, branded = props.branded, disableSetCookie = props.disableSetCookie;
                 var cspNonce = _ref3.config.cspNonce;
                 var merchantID = serviceData.merchantID, wallet = serviceData.wallet;
                 var clientMetadataID = function(_ref2) {
@@ -13599,11 +13611,16 @@ window.spb = function(modules) {
                 }({
                     props: props
                 });
+                var queryStringParams = {};
                 if (!wallet) throw new Error("No wallet found");
+                disableSetCookie && (queryStringParams = {
+                    disableSetCookie: "true"
+                });
                 (smartWalletPromise = Object(api.loadFraudnet)({
                     env: env,
                     clientMetadataID: clientMetadataID,
-                    cspNonce: cspNonce
+                    cspNonce: cspNonce,
+                    queryStringParams: queryStringParams
                 }).catch(src.noop).then((function() {
                     return userIDToken ? Object(api.getSmartWallet)({
                         clientID: clientID,
@@ -14085,9 +14102,9 @@ window.spb = function(modules) {
                         headers: (_headers = {}, _headers[constants.HEADERS.DISABLE_SET_COOKIE] = String(disableSetCookie), 
                         _headers)
                     }).then((function(eligibility) {
-                        var _eligibility$fundingS, _eligibility$fundingS2;
+                        var _eligibility$fundingS;
                         var eligibleReasons = [ "isUserAgentEligible", "isBrowserMobileAndroid" ];
-                        var ineligibleReasons = eligibility && (null == (_eligibility$fundingS = eligibility[fundingSource]) || null == (_eligibility$fundingS2 = _eligibility$fundingS.ineligibilityReason) ? void 0 : _eligibility$fundingS2.split(","));
+                        var ineligibleReasons = eligibility && (null == (_eligibility$fundingS = eligibility[fundingSource]) || null == (_eligibility$fundingS = _eligibility$fundingS.ineligibilityReason) ? void 0 : _eligibility$fundingS.split(","));
                         var eligible = null == ineligibleReasons ? void 0 : ineligibleReasons.every((function(reason) {
                             return !reason || -1 !== (null == eligibleReasons ? void 0 : eligibleReasons.indexOf(reason));
                         }));
@@ -15741,10 +15758,10 @@ window.spb = function(modules) {
                                 var env = _ref3.env, merchantID = _ref3.merchantID, currency = _ref3.currency, intent = _ref3.intent, vault = _ref3.vault, buttonLabel = _ref3.buttonLabel, featureFlags = _ref3.featureFlags;
                                 var logger = Object(lib_logger.getLogger)();
                                 return Object(api.getSupplementalOrderInfo)(orderID).then((function(order) {
-                                    var _cart$supplementary, _cart$supplementary$i, _cart$supplementary2, _cart$supplementary2$;
+                                    var _cart$supplementary, _cart$supplementary2;
                                     var cart = order.checkoutSession.cart;
                                     var cartIntent = "sale" === cart.intent.toLowerCase() ? sdk_constants_src.INTENT.CAPTURE : cart.intent.toLowerCase();
-                                    var initiationIntent = "authorization" === (null == (_cart$supplementary = cart.supplementary) || null == (_cart$supplementary$i = _cart$supplementary.initiationIntent) ? void 0 : _cart$supplementary$i.toLowerCase()) ? sdk_constants_src.INTENT.AUTHORIZE : null == (_cart$supplementary2 = cart.supplementary) || null == (_cart$supplementary2$ = _cart$supplementary2.initiationIntent) ? void 0 : _cart$supplementary2$.toLowerCase();
+                                    var initiationIntent = "authorization" === (null == (_cart$supplementary = cart.supplementary) || null == (_cart$supplementary = _cart$supplementary.initiationIntent) ? void 0 : _cart$supplementary.toLowerCase()) ? sdk_constants_src.INTENT.AUTHORIZE : null == (_cart$supplementary2 = cart.supplementary) || null == (_cart$supplementary2 = _cart$supplementary2.initiationIntent) ? void 0 : _cart$supplementary2.toLowerCase();
                                     var cartCurrency = cart.amounts && cart.amounts.total.currencyCode;
                                     var cartAmount = cart.amounts && cart.amounts.total.currencyValue;
                                     var cartBillingType = cart.billingType;
@@ -16349,7 +16366,7 @@ window.spb = function(modules) {
                     var _ref3;
                     return (_ref3 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref3[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.146", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref3[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.147", _ref3[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref3[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref3[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref3[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -16431,9 +16448,9 @@ window.spb = function(modules) {
                     _tracking[constants.FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_PASSED] = onShippingChange ? "1" : "0", 
                     _tracking);
                     var fiID = function() {
-                        var _wallet$paypal, _wallet$paypal$instru, _wallet$paypal2, _wallet$paypal2$instr;
+                        var _wallet$paypal, _wallet$paypal2;
                         var FI_ID;
-                        null != wallet && null != (_wallet$paypal = wallet.paypal) && null != (_wallet$paypal$instru = _wallet$paypal.instruments[0]) && _wallet$paypal$instru.secondaryInstruments && wallet.paypal.instruments[0].instrumentID ? FI_ID = wallet.paypal.instruments[0].instrumentID + "," + wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID : null != wallet && null != (_wallet$paypal2 = wallet.paypal) && null != (_wallet$paypal2$instr = _wallet$paypal2.instruments[0]) && _wallet$paypal2$instr.instrumentID && (FI_ID = "" + wallet.paypal.instruments[0].instrumentID);
+                        null != wallet && null != (_wallet$paypal = wallet.paypal) && null != (_wallet$paypal = _wallet$paypal.instruments[0]) && _wallet$paypal.secondaryInstruments && wallet.paypal.instruments[0].instrumentID ? FI_ID = wallet.paypal.instruments[0].instrumentID + "," + wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID : null != wallet && null != (_wallet$paypal2 = wallet.paypal) && null != (_wallet$paypal2 = _wallet$paypal2.instruments[0]) && _wallet$paypal2.instrumentID && (FI_ID = "" + wallet.paypal.instruments[0].instrumentID);
                         return FI_ID;
                     }();
                     fiID && (tracking["" + sdk_constants_src.FPTI_KEY.FI_ID] = fiID);
@@ -17460,9 +17477,10 @@ window.spb = function(modules) {
         var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("./node_modules/@paypal/sdk-constants/src/index.js");
         var _config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__("./src/config.js");
         function getLogger() {
+            var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? _config__WEBPACK_IMPORTED_MODULE_4__.LOGGER_URL + "?disableSetCookie=true" : _config__WEBPACK_IMPORTED_MODULE_4__.LOGGER_URL;
             return Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.inlineMemoize)(getLogger, (function() {
                 return Object(_krakenjs_beaver_logger_src__WEBPACK_IMPORTED_MODULE_0__.Logger)({
-                    url: _config__WEBPACK_IMPORTED_MODULE_4__.LOGGER_URL,
+                    url: loggerUrl,
                     enableSendBeacon: !0
                 });
             }));
@@ -19111,12 +19129,12 @@ window.spb = function(modules) {
                     return actions;
                 },
                 updateShippingOptions: function(_ref3) {
-                    var _selectedShippingOpti, _selectedShippingOpti2, _data$amount3;
+                    var _selectedShippingOpti, _data$amount3;
                     var options = _ref3.options;
                     var selectedShippingOption = options.filter((function(option) {
                         return !0 === option.selected;
                     }));
-                    var selectedShippingOptionAmount = selectedShippingOption && selectedShippingOption.length > 0 ? null == (_selectedShippingOpti = selectedShippingOption[0]) || null == (_selectedShippingOpti2 = _selectedShippingOpti.amount) ? void 0 : _selectedShippingOpti2.value : "0.00";
+                    var selectedShippingOptionAmount = selectedShippingOption && selectedShippingOption.length > 0 ? null == (_selectedShippingOpti = selectedShippingOption[0]) || null == (_selectedShippingOpti = _selectedShippingOpti.amount) ? void 0 : _selectedShippingOpti.value : "0.00";
                     breakdown = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.buildBreakdown)({
                         breakdown: breakdown,
                         updatedAmounts: {
@@ -19173,9 +19191,9 @@ window.spb = function(modules) {
                 },
                 patch: function() {
                     return Object(_api__WEBPACK_IMPORTED_MODULE_5__.getShippingOrderInfo)(orderID).then((function(sessionData) {
-                        var _sessionData$checkout, _sessionData$checkout2;
+                        var _sessionData$checkout;
                         var queries;
-                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout = sessionData.checkoutSession) || null == (_sessionData$checkout2 = _sessionData$checkout.cart) ? void 0 : _sessionData$checkout2.shippingMethods) || [];
+                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout = sessionData.checkoutSession) || null == (_sessionData$checkout = _sessionData$checkout.cart) ? void 0 : _sessionData$checkout.shippingMethods) || [];
                         queries = Boolean(shippingMethods.length > 0) ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
                             queries: patchQueries
                         }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
@@ -19192,8 +19210,8 @@ window.spb = function(modules) {
                 },
                 query: function() {
                     return Object(_api__WEBPACK_IMPORTED_MODULE_5__.getShippingOrderInfo)(orderID).then((function(sessionData) {
-                        var _sessionData$checkout3, _sessionData$checkout4;
-                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout3 = sessionData.checkoutSession) || null == (_sessionData$checkout4 = _sessionData$checkout3.cart) ? void 0 : _sessionData$checkout4.shippingMethods) || [];
+                        var _sessionData$checkout2;
+                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout2 = sessionData.checkoutSession) || null == (_sessionData$checkout2 = _sessionData$checkout2.cart) ? void 0 : _sessionData$checkout2.shippingMethods) || [];
                         return Boolean(shippingMethods.length > 0) ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
                             queries: patchQueries
                         }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
@@ -19448,9 +19466,9 @@ window.spb = function(modules) {
                 },
                 patch: function() {
                     return Object(_api__WEBPACK_IMPORTED_MODULE_5__.getShippingOrderInfo)(orderID).then((function(sessionData) {
-                        var _sessionData$checkout, _sessionData$checkout2;
+                        var _sessionData$checkout;
                         var queries;
-                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout = sessionData.checkoutSession) || null == (_sessionData$checkout2 = _sessionData$checkout.cart) ? void 0 : _sessionData$checkout2.shippingMethods) || [];
+                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout = sessionData.checkoutSession) || null == (_sessionData$checkout = _sessionData$checkout.cart) ? void 0 : _sessionData$checkout.shippingMethods) || [];
                         queries = Boolean(shippingMethods.length > 0) ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
                             queries: patchQueries
                         }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
@@ -19467,8 +19485,8 @@ window.spb = function(modules) {
                 },
                 query: function() {
                     return Object(_api__WEBPACK_IMPORTED_MODULE_5__.getShippingOrderInfo)(orderID).then((function(sessionData) {
-                        var _sessionData$checkout3, _sessionData$checkout4;
-                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout3 = sessionData.checkoutSession) || null == (_sessionData$checkout4 = _sessionData$checkout3.cart) ? void 0 : _sessionData$checkout4.shippingMethods) || [];
+                        var _sessionData$checkout2;
+                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout2 = sessionData.checkoutSession) || null == (_sessionData$checkout2 = _sessionData$checkout2.cart) ? void 0 : _sessionData$checkout2.shippingMethods) || [];
                         return Boolean(shippingMethods.length > 0) ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
                             queries: patchQueries
                         }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
