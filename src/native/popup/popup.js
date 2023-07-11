@@ -33,14 +33,20 @@ export function setupNativePopup({ parentDomain, env, sessionID, buttonSessionID
 
     const sdkVersion = getSDKVersion();
 
+    const logger = setupNativeLogger({ env, sessionID, buttonSessionID, sdkCorrelationID,
+        clientID, fundingSource, sdkVersion, locale, buyerCountry });
+
     const initQueryString = window.location.search.slice(1);
     const { venmoWebEnabled = false, venmoWebUrl } = parseQuery(initQueryString);
     if (venmoWebEnabled && venmoWebUrl) {
+        logger.info('native_venmo_web_redirect', {
+            buttonSessionID,
+        }).track({
+            [FPTI_KEY.TRANSITION]:      FPTI_TRANSITION.NATIVE_VENMO_WEB_REDIRECT,
+        }).flush();
+        
         return window.location.replace(venmoWebUrl + window.location.search);
     }
-
-    const logger = setupNativeLogger({ env, sessionID, buttonSessionID, sdkCorrelationID,
-        clientID, fundingSource, sdkVersion, locale, buyerCountry });
 
     logger.info('native_popup_init', {
         buttonSessionID,

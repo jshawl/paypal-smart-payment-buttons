@@ -283,29 +283,19 @@ export function initVenmoWeb({ props, components, serviceData, payment, config, 
                 }
             }
 
-            const validatePromise = ZalgoPromise.try(() => {
+            return ZalgoPromise.try(() => {
                 return onClick ? onClick({ fundingSource }) : true;
             }).then(valid => {
-                if (!valid) {
+                if (win && !valid) {
                     getLogger().info(`native_onclick_invalid`).track({
                         [FPTI_KEY.STATE]:       FPTI_STATE.BUTTON,
                         [FPTI_KEY.TRANSITION]:  FPTI_TRANSITION.NATIVE_ON_CLICK_INVALID
                     }).flush();
-                }
 
-                return valid;
-            });
-
-            return validatePromise.then(valid => {
-                if (win && !valid) {
                     win.close();
                 }
 
-                if (valid) {
-                    return createOrder();
-                }
-
-                return unresolvedPromise();
+                return valid;
             });
         });
     };

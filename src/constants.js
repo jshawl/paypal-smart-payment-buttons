@@ -177,6 +177,7 @@ export const FPTI_TRANSITION = {
     NATIVE_FALLBACK:                        ('native_fallback' : 'native_fallback'),
     NATIVE_FALLBACK_VENMO:                  ('native_fallback_venmo' : 'native_fallback_venmo'),
     NATIVE_VENMO_WEB:                       ('native_venmo_web' : 'native_venmo_web'),
+    NATIVE_VENMO_WEB_REDIRECT:              ('native_venmo_web_redirect' : 'native_venmo_web_redirect'),
     
     QR_LOAD:                                ('qr_load' : 'qr_load'),
     QR_SHOWN:                               ('qr_shown' : 'qr_shown'),
