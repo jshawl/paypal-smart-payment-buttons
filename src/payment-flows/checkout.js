@@ -9,7 +9,7 @@ import type { ProxyWindow, ConnectOptions } from '../types';
 import { type CreateBillingAgreement, type CreateSubscription } from '../props';
 import { exchangeAccessTokenForAuthCode, getConnectURL, updateButtonClientConfig, getSmartWallet, loadFraudnet  } from '../api';
 import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_STATE } from '../constants';
-import { unresolvedPromise, getLogger, setBuyerAccessToken, sendMetric } from '../lib';
+import { unresolvedPromise, getLogger, sendMetric, setBuyerAccessToken } from '../lib';
 import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
 import { enableLoadingSpinner, getButtons } from "../button/dom";
@@ -19,6 +19,11 @@ import type { PaymentFlow, PaymentFlowInstance, SetupOptions, InitOptions } from
 export const CHECKOUT_POPUP_DIMENSIONS = {
     WIDTH:  500,
     HEIGHT: 590
+};
+
+export const EXPERIMENTAL_POPUP_DIMENSIONS = {
+    WIDTH: 568,
+    HEIGHT: 750
 };
 
 export const CHECKOUT_APM_POPUP_DIMENSIONS = {
@@ -128,17 +133,44 @@ function getContext({ win, isClick, merchantRequestedPopupsDisabled } : {| win :
     return CONTEXT.IFRAME;
 }
 
-export const getDimensions = (fundingSource : string) : {| width : number, height : number |} => {
+export const getDimensions = (fundingSource : string, popupIncreaseDimensions? : boolean) : {| width : number, height : number |} => {
     if (APM_LIST.indexOf(fundingSource) !== -1) {
-        getLogger().info(`popup_dimensions_value_${ fundingSource }`).flush();
+        getLogger().info(`popup_dimensions_value_${ fundingSource }`);
+        sendMetric({
+            name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
+            dimensions: {
+                spbPaymentFlow: "checkout",
+                fundingSource,
+                dimensionType: 'apm',
+            }
+        })
         return { width: CHECKOUT_APM_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_APM_POPUP_DIMENSIONS.HEIGHT };
+    } else if (popupIncreaseDimensions) {
+        getLogger().info(`popup_dimensions_value_${ fundingSource }`);
+        sendMetric({
+            name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
+            dimensions: {
+                spbPaymentFlow: "checkout",
+                fundingSource,
+                dimensionType: 'experiment_default',
+            }
+        })
+        return { width: EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH, height: EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT };
     } else {
-        getLogger().info(`popup_dimensions_${ fundingSource }`).flush();
+        getLogger().info(`popup_dimensions_${ fundingSource }`);
+        sendMetric({
+            name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
+            dimensions: {
+                spbPaymentFlow: "checkout",
+                fundingSource,
+                dimensionType: 'default',
+            }
+        })
         return { width: CHECKOUT_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_POPUP_DIMENSIONS.HEIGHT };
     }
 }
 
-function initCheckout({ props, components, serviceData, payment, config, restart: fullRestart } : InitOptions) : PaymentFlowInstance {
+function initCheckout({ props, components, serviceData, payment, config, restart: fullRestart, experiments } : InitOptions) : PaymentFlowInstance {
     const { Checkout } = components;
     const { sessionID, buttonSessionID, createOrder, onApprove, onComplete, onCancel,
         onShippingChange, onShippingAddressChange, onShippingOptionsChange, locale, commit, onError, vault, clientAccessToken,
@@ -389,7 +421,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 return onError(err);
             },
 
-            dimensions: getDimensions(fundingSource),
+            dimensions: getDimensions(fundingSource, experiments?.popupIncreaseDimensions ?? false),
 
             fundingSource,
             card,
@@ -435,7 +467,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
         return ZalgoPromise.try(() => {
             if (!merchantRequestedPopupsDisabled && !win && supportsPopups()) {
                 try {
-                    const { width, height } = getDimensions(fundingSource);
+                    const { width, height } = getDimensions(fundingSource, experiments?.popupIncreaseDimensions ?? false);
                     win = openPopup({ width, height });
                 } catch (err) {
                     if (err instanceof PopupOpenError) {

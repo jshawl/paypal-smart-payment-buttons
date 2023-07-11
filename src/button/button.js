@@ -155,7 +155,7 @@ export function setupButton({
             if (isEnabled()) {
                 paymentProcessing = true;
 
-                return initiatePaymentFlow({ payment, config, serviceData, components, props: paymentProps }).finally(() => {
+                return initiatePaymentFlow({ payment, config, serviceData, components, props: paymentProps, experiments }).finally(() => {
                     paymentProcessing = false;
                 });
             } else  {
@@ -183,7 +183,7 @@ export function setupButton({
             }
 
             if (isEnabled()) {
-                return initiateMenuFlow({ payment, config, serviceData, components, props });
+                return initiateMenuFlow({ payment, config, serviceData, components, props, experiments });
             }
         }).catch(err => {
             getLogger()

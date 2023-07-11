@@ -31,6 +31,7 @@ export type FeatureFlags = $Shape<{|
 export type Experiments = $Shape<{|
     useShippingChangeCallbackMutation?: boolean;
     payPalWalletVaultWithoutPurchase?: boolean;
+    popupIncreaseDimensions?: boolean;
 |}>
 
 export type ProxyWindow = _ProxyWindow;

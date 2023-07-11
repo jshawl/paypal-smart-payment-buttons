@@ -8,10 +8,10 @@ import type { MenuChoices, Wallet, WalletInstrument } from '../types';
 import { getSupplementalOrderInfo, oneClickApproveOrder, getSmartWallet, loadFraudnet, updateButtonClientConfig } from '../api';
 import { BUYER_INTENT, FPTI_TRANSITION, FPTI_MENU_OPTION, FPTI_STATE } from '../constants';
 import { type ButtonProps } from '../button/props';
-import { getBuyerAccessToken, getLogger } from '../lib';
+import { getBuyerAccessToken, getLogger, sendMetric } from '../lib';
 
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, IsEligibleOptions, IsPaymentEligibleOptions, InitOptions, MenuOptions, Payment } from './types';
-import { checkout, CHECKOUT_POPUP_DIMENSIONS } from './checkout';
+import { checkout, CHECKOUT_POPUP_DIMENSIONS, EXPERIMENTAL_POPUP_DIMENSIONS } from './checkout';
 
 function isWalletCaptureEligible({ props, serviceData } : IsEligibleOptions) : boolean {
     const { wallet } = serviceData;
@@ -238,12 +238,14 @@ function initWalletCapture({ props, components, payment, serviceData, config, re
     };
 }
 
-const POPUP_OPTIONS = {
-    width:  CHECKOUT_POPUP_DIMENSIONS.WIDTH,
-    height: CHECKOUT_POPUP_DIMENSIONS.HEIGHT
-};
 
-function setupWalletMenu({ props, payment, serviceData, components, config, restart } : MenuOptions) : MenuChoices {
+
+function setupWalletMenu({ props, payment, serviceData, components, config, restart, experiments } : MenuOptions) : MenuChoices {
+    const dimensions = experiments?.popupIncreaseDimensions ? EXPERIMENTAL_POPUP_DIMENSIONS : CHECKOUT_POPUP_DIMENSIONS;
+    const POPUP_OPTIONS = {
+        width:  dimensions.WIDTH,
+        height: dimensions.HEIGHT
+    };
     const { createOrder, enableOrdersApprovalSmartWallet } = props;
     const { fundingSource, instrumentID } = payment;
     const { wallet, content, featureFlags } = serviceData;
@@ -261,6 +263,16 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
     if (!instrument) {
         throw new Error(`Can not render wallet menu without instrument`);
     }
+
+    getLogger().info(`popup_dimensions_value_wallet_capture`);
+    sendMetric({
+        name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
+        dimensions: {
+            spbPaymentFlow: "wallet_capture",
+            fundingSource,
+            dimensionType: experiments?.popupIncreaseDimensions ? 'experiment_default' : 'default',
+        }
+    });
 
     const updateMenuClientConfig = () => {
         return ZalgoPromise.try(() => {

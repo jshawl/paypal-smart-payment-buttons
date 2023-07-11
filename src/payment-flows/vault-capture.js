@@ -8,12 +8,12 @@ import { initiateInstallments } from '@paypal/installments/src/interface';
 import type { MenuChoices } from '../types';
 import { validatePaymentMethod, getSupplementalOrderInfo, deleteVault, updateButtonClientConfig, loadFraudnet, confirmOrderAPI, buildPaymentSource, createAccessToken } from '../api';
 import { BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_MENU_OPTION } from '../constants';
-import { getLogger } from '../lib';
+import { getLogger, sendMetric } from '../lib';
 import { handleValidatePaymentMethodResponse } from "../lib/3ds"
 import type { ButtonProps } from '../button/props';
 
 import type { PaymentFlow, PaymentFlowInstance, IsEligibleOptions, IsPaymentEligibleOptions, IsInstallmentsEligibleOptions, InitOptions, MenuOptions, Payment } from './types';
-import { checkout, CHECKOUT_POPUP_DIMENSIONS } from './checkout';
+import { checkout, CHECKOUT_POPUP_DIMENSIONS, EXPERIMENTAL_POPUP_DIMENSIONS } from './checkout';
 
 const VAULT_MIN_WIDTH = 250;
 
@@ -187,12 +187,13 @@ function initVaultCapture({ props, components, payment, serviceData, config } : 
     };
 }
 
-const POPUP_OPTIONS = {
-    width:  CHECKOUT_POPUP_DIMENSIONS.WIDTH,
-    height: CHECKOUT_POPUP_DIMENSIONS.HEIGHT
-};
+function setupVaultMenu({ props, payment, serviceData, components, config, restart, experiments } : MenuOptions) : MenuChoices {
+    const dimensions = experiments?.popupIncreaseDimensions ? EXPERIMENTAL_POPUP_DIMENSIONS : CHECKOUT_POPUP_DIMENSIONS;
+    const POPUP_OPTIONS = {
+        width:  dimensions.WIDTH,
+        height: dimensions.HEIGHT
+    };
 
-function setupVaultMenu({ props, payment, serviceData, components, config, restart } : MenuOptions) : MenuChoices {
     const { clientAccessToken, createOrder, enableThreeDomainSecure, partnerAttributionID, sessionID, clientMetadataID, userIDToken } = props;
     const { fundingSource, paymentMethodID, button } = payment;
     const { content, facilitatorAccessToken, featureFlags } = serviceData;
@@ -200,6 +201,16 @@ function setupVaultMenu({ props, payment, serviceData, components, config, resta
     if (!clientAccessToken || !paymentMethodID) {
         throw new Error(`Client access token and payment method id required`);
     }
+
+    getLogger().info(`popup_dimensions_value_vault_capture`);
+    sendMetric({
+        name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
+        dimensions: {
+            spbPaymentFlow: "vault_capture",
+            fundingSource,
+            dimensionType: experiments?.popupIncreaseDimensions ? 'experiment_default' : 'default',
+        }
+    });
 
     const updateMenuClientConfig = () => {
         return ZalgoPromise.try(() => {

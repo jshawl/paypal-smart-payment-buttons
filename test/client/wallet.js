@@ -6,6 +6,7 @@ import { FUNDING, INTENT, WALLET_INSTRUMENT } from '@paypal/sdk-constants/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import { getBuyerAccessToken } from '../../src/lib/session';
+import { EXPERIMENTAL_POPUP_DIMENSIONS } from '../../src/payment-flows/checkout';
 
 import { mockSetupButton, mockAsyncProp, createButtonHTML, clickButton, getGraphQLApiMock,
     generateOrderID, clickMenu, mockMenu, getMockWindowOpen, MOCK_BUYER_ACCESS_TOKEN, DEFAULT_FUNDING_ELIGIBILITY } from './mocks';
@@ -1098,6 +1099,14 @@ describe('wallet cases', () => {
                             throw new Error(`Expected popup option to be passed`);
                         }
 
+                        if(choice.popup.height !== EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT){
+                            throw new Error(`Expected popup height to be ${EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT} but got ${choice.popup.height}`);
+                        }
+
+                        if(choice.popup.width !== EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH){
+                            throw new Error(`Expected popup width to be ${EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH} but got ${choice.popup.WIDTH}`);
+                        }
+
                         choice.onSelect({ win });
                     }),
                     hide: expect('hide', mockAsyncProp()),
@@ -1109,7 +1118,10 @@ describe('wallet cases', () => {
             await mockSetupButton({
                 content,
                 merchantID:       [ uniqueID() ],
-                wallet
+                wallet,
+                experiments: {
+                    popupIncreaseDimensions: true
+                }
             });
 
             await clickMenu(FUNDING.PAYPAL);

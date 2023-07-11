@@ -10,6 +10,7 @@ import { AMPLITUDE_KEY, FPTI_TRANSITION, BUYER_INTENT, FPTI_CONTEXT_TYPE, FPTI_C
 import { updateButtonClientConfig } from '../api';
 import { getConfirmOrder } from '../props/confirmOrder';
 import { enableVaultSetup } from '../middleware';
+import { type Experiments } from '../types';
 
 import { type ButtonProps, type Config, type ServiceData, type Components } from './props';
 import { enableLoadingSpinner, disableLoadingSpinner } from './dom';
@@ -64,10 +65,11 @@ type InitiatePaymentOptions = {|
     props : ButtonProps,
     serviceData : ServiceData,
     config : Config,
-    components : Components
+    components : Components,
+    experiments? : Experiments
 |};
 
-export function initiatePaymentFlow({ payment, serviceData, config, components, props } : InitiatePaymentOptions) : ZalgoPromise<void> {
+export function initiatePaymentFlow({ payment, serviceData, config, components, props, experiments } : InitiatePaymentOptions) : ZalgoPromise<void> {
     const { button, fundingSource, instrumentType, buyerIntent } = payment;
     const buttonLabel = props.style?.label;
 
@@ -82,7 +84,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
             initiatePaymentFlow({ payment: restartPayment, serviceData, config, components, props });
 
         const { name, init, inline, spinner, updateFlowClientConfig } = getPaymentFlow({ props, payment, config, components, serviceData });
-        const { click, start, close } = init({ props, config, serviceData, components, payment, restart });
+        const { click, start, close } = init({ props, config, serviceData, components, payment, restart, experiments });
 
         sendMetric({
             name: 'pp.app.paypal_sdk.buttons.click.count',
@@ -252,10 +254,11 @@ type InitiateMenuOptions = {|
     props : ButtonProps,
     serviceData : ServiceData,
     config : Config,
-    components : Components
+    components : Components,
+    experiments? : Experiments
 |};
 
-export function initiateMenuFlow({ payment, serviceData, config, components, props } : InitiateMenuOptions) : ZalgoPromise<void> {
+export function initiateMenuFlow({ payment, serviceData, config, components, props, experiments } : InitiateMenuOptions) : ZalgoPromise<void> {
     return ZalgoPromise.try(() => {
         const { fundingSource, button } = payment;
 
@@ -275,7 +278,7 @@ export function initiateMenuFlow({ payment, serviceData, config, components, pro
         const restart = ({ payment: restartPayment }) =>
             initiatePaymentFlow({ payment: restartPayment, serviceData, config, components, props });
 
-        const choices = setupMenu({ props, payment, serviceData, components, config, restart }).map(choice => {
+        const choices = setupMenu({ props, payment, serviceData, components, config, restart, experiments }).map(choice => {
             return {
                 ...choice,
                 onSelect: (...args) => {
