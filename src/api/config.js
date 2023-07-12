@@ -14,12 +14,13 @@ export type ApplepayConfigResponse = {|
 type GetApplepayConfigPayload = {|
     buyerCountry: string, 
     clientId: string, 
-    merchantId: $ReadOnlyArray<string>
+    merchantId: $ReadOnlyArray<string>,
+    headers? : { [string] : string }
 |}
 
 export type GetApplepayConfig = (payload: GetApplepayConfigPayload) => ZalgoPromise<ApplepayConfigResponse>;
 
-export const getApplepayConfig : GetApplepayConfig = ({ buyerCountry, clientId, merchantId }: GetApplepayConfigPayload) => {
+export const getApplepayConfig : GetApplepayConfig = ({ buyerCountry, clientId, merchantId, headers = {} }: GetApplepayConfigPayload) => {
 
     return callGraphQL({
         name:  'GetApplepayConfig',
@@ -39,7 +40,8 @@ export const getApplepayConfig : GetApplepayConfig = ({ buyerCountry, clientId, 
             }
           }
         `,
-        variables: { buyerCountry, clientId, merchantId }
+        variables: { buyerCountry, clientId, merchantId },
+        headers
     });
     
 };

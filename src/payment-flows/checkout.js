@@ -8,8 +8,8 @@ import { getParent, getTop, type CrossDomainWindowType } from '@krakenjs/cross-d
 import type { ProxyWindow, ConnectOptions } from '../types';
 import { type CreateBillingAgreement, type CreateSubscription } from '../props';
 import { exchangeAccessTokenForAuthCode, getConnectURL, updateButtonClientConfig, getSmartWallet, loadFraudnet  } from '../api';
-import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_STATE } from '../constants';
-import { unresolvedPromise, getLogger, sendMetric, setBuyerAccessToken } from '../lib';
+import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_STATE, HEADERS } from '../constants';
+import { unresolvedPromise, getLogger, setBuyerAccessToken, sendMetric } from '../lib';
 import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
 import { enableLoadingSpinner, getButtons } from "../button/dom";
@@ -214,7 +214,8 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                         const clientMetadataID = cmid || sessionID;
                         const queryStringParams = disableSetCookie ? { disableSetCookie } : {};
                         return loadFraudnet({ env, clientMetadataID, cspNonce, queryStringParams }).catch(noop).then(() => {
-                            return getSmartWallet({ clientID, merchantID, currency, amount, clientMetadataID, userIDToken, paymentMethodToken, allowBillingPayments, branded });
+                            const headers = { [ HEADERS.DISABLE_SET_COOKIE ]: String(disableSetCookie) }
+                            return getSmartWallet({ clientID, merchantID, currency, amount, clientMetadataID, userIDToken, paymentMethodToken, allowBillingPayments, branded, headers });
                         }).then(wallet => {
                             // $FlowFixMe
                             const walletInstruments = wallet[fundingSkipLogin] && wallet[fundingSkipLogin].instruments;

@@ -167,6 +167,7 @@ describe("initApplePay - no shipping", () => {
           requiredShippingContactFields: ["name", "phone", "email"],
         },
       },
+      disableSetCookie: true,
     };
 
     const payment = {
@@ -192,6 +193,7 @@ describe("initApplePay - no shipping", () => {
       buyerCountry: setupOptions.props.locale.country,
       clientId: setupOptions.props.clientID,
       merchantId: setupOptions.props.merchantID,
+      headers: { "disable-set-cookie": "true" },
     });
 
     const {

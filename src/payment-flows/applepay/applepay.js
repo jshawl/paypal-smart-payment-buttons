@@ -7,7 +7,7 @@ import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import {  getApplepayConfig, getDetailedOrderInfo, approveApplePayPayment, getApplePayMerchantSession } from '../../api';
 import { getLogger, promiseNoop, unresolvedPromise } from '../../lib';
-import { FPTI_CUSTOM_KEY, FPTI_STATE, FPTI_TRANSITION } from '../../constants';
+import { FPTI_CUSTOM_KEY, FPTI_STATE, FPTI_TRANSITION, HEADERS } from '../../constants';
 import type { ApplePayLineItem, ApplePayPaymentMethod, ApplePayPaymentContact, ApplePayShippingMethod, ApplePayShippingMethodUpdate, ApplePayShippingContactUpdate, PaymentFlow, PaymentFlowInstance, IsEligibleOptions, IsPaymentEligibleOptions, InitOptions, SetupOptions, ApplepaySessionMerchantConfig } from '../types';
 
 import { isJSON, validateShippingContact, isZeroAmount, getApplePayShippingMethods, getShippingContactFromAddress } from './utils';
@@ -25,7 +25,8 @@ function setupApplePay({ props } : SetupOptions) : ZalgoPromise<void> {
     return getApplepayConfig({
         buyerCountry: props.locale.country, 
         clientId: props.clientID, 
-        merchantId: props.merchantID
+        merchantId: props.merchantID,
+        headers: { [ HEADERS.DISABLE_SET_COOKIE ]: String(props.disableSetCookie) }
     })
     .then(data => {
         config = data.applepayConfig;

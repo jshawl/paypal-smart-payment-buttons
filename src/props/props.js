@@ -90,7 +90,7 @@ export type XProps = {|
 
     applePay : XApplePaySessionConfigRequest,
     paymentRequest: ?PaymentRequest,
-    disableSetCookie : boolean
+    disableSetCookie? : boolean
 |};
 
 export type Props = {|
@@ -216,7 +216,7 @@ export function getProps({
         userExperienceFlow,
         allowBillingPayments,
         paymentRequest,
-        disableSetCookie
+        disableSetCookie = false
     } = xprops;
 
     const onInit = getOnInit({ onInit: xprops.onInit });

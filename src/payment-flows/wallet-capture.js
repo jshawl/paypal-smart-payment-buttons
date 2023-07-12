@@ -6,7 +6,7 @@ import { FUNDING, WALLET_INSTRUMENT, FPTI_KEY } from '@paypal/sdk-constants/src'
 
 import type { MenuChoices, Wallet, WalletInstrument } from '../types';
 import { getSupplementalOrderInfo, oneClickApproveOrder, getSmartWallet, loadFraudnet, updateButtonClientConfig } from '../api';
-import { BUYER_INTENT, FPTI_TRANSITION, FPTI_MENU_OPTION, FPTI_STATE } from '../constants';
+import { BUYER_INTENT, FPTI_TRANSITION, FPTI_MENU_OPTION, FPTI_STATE, HEADERS } from '../constants';
 import { type ButtonProps } from '../button/props';
 import { getBuyerAccessToken, getLogger, sendMetric } from '../lib';
 
@@ -42,18 +42,16 @@ function setupWalletCapture({ props, config, serviceData } : SetupOptions) {
     const { merchantID, wallet } = serviceData;
 
     const clientMetadataID = getClientMetadataID({ props });
-    let queryStringParams = {};
+    const queryStringParams = disableSetCookie ? { disableSetCookie } : {};
+    const headers = disableSetCookie ? { [ HEADERS.DISABLE_SET_COOKIE ]: String(disableSetCookie) } : {};
 
     if (!wallet) {
         throw new Error(`No wallet found`);
     }
 
-    if (disableSetCookie) {
-        queryStringParams = { disableSetCookie: "true" };
-    }
     smartWalletPromise = loadFraudnet({ env, clientMetadataID, cspNonce, queryStringParams }).catch(noop).then(() => {
         return userIDToken
-            ? getSmartWallet({ clientID, merchantID, currency, amount, clientMetadataID, userIDToken, paymentMethodToken, allowBillingPayments, branded })
+            ? getSmartWallet({ clientID, merchantID, currency, amount, clientMetadataID, userIDToken, paymentMethodToken, allowBillingPayments, branded, headers})
             : wallet;
     });
 

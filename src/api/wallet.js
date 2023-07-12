@@ -19,14 +19,18 @@ type GetSmartWalletOptions = {|
     vetted? : boolean,
     paymentMethodToken? : ?string,
     branded? : ?boolean,
-    allowBillingPayments? : ?boolean
+    allowBillingPayments? : ?boolean,
+    headers? : { [string] : string } 
 |};
 
 const DEFAULT_AMOUNT = '0.00';
 
 type GetSmartWallet = (GetSmartWalletOptions) => ZalgoPromise<Wallet>;
 
-export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, currency, amount = DEFAULT_AMOUNT, clientMetadataID, userIDToken, vetted = true, paymentMethodToken, branded, allowBillingPayments = true }) => {
+export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, currency, amount = DEFAULT_AMOUNT, clientMetadataID, userIDToken, vetted = true, paymentMethodToken, branded, allowBillingPayments = true, headers={} }) => {
+    if (clientMetadataID) {
+        headers[HEADERS.CLIENT_METADATA_ID] = String(clientMetadataID)
+    }
     return callGraphQL({
         name:  'GetSmartWallet',
         query: `
@@ -101,9 +105,7 @@ export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, 
             }
         `,
         variables: { clientID, merchantID, currency, amount, userIDToken, vetted, paymentMethodToken, branded, allowBillingPayments },
-        headers:   {
-            [HEADERS.CLIENT_METADATA_ID]: clientMetadataID
-        }
+        headers
     }).then(({ smartWallet }) => {
         return smartWallet;
     });

@@ -220,6 +220,7 @@ describe("initApplePay", () => {
           },
         },
       },
+      disableSetCookie: true,
     };
 
     const payment = {
@@ -245,6 +246,7 @@ describe("initApplePay", () => {
       buyerCountry: setupOptions.props.locale.country,
       clientId: setupOptions.props.clientID,
       merchantId: setupOptions.props.merchantID,
+      headers: { "disable-set-cookie": "true" },
     });
 
     const {

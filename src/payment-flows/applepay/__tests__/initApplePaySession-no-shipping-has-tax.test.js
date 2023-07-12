@@ -176,6 +176,7 @@ describe("initApplePay - no shipping but has tax", () => {
           requiredShippingContactFields: ["name", "phone", "email"],
         },
       },
+      disableSetCookie: true,
     };
 
     const payment = {
@@ -206,6 +207,7 @@ describe("initApplePay - no shipping but has tax", () => {
       buyerCountry: setupOptions.props.locale.country,
       clientId: setupOptions.props.clientID,
       merchantId: setupOptions.props.merchantID,
+      headers: { "disable-set-cookie": "true" },
     });
 
     // $FlowFixMe

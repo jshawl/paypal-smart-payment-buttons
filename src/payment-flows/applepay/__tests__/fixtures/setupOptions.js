@@ -46,6 +46,7 @@ export default {
       menuPlacement: "below",
     },
     buttonSessionID: "uid_83e2df4351_mtk6mdm6nti",
+    disableSetCookie: true
   },
   config: {
     sdkVersion: "5.0.317",
