@@ -5016,11 +5016,8 @@
             });
         }
         function setupNativePopup(_ref) {
-            var _logger$info$track;
-            var parentDomain = _ref.parentDomain, env = _ref.env, sessionID = _ref.sessionID, buttonSessionID = _ref.buttonSessionID, sdkCorrelationID = _ref.sdkCorrelationID, clientID = _ref.clientID, fundingSource = _ref.fundingSource, locale = _ref.locale, buyerCountry = _ref.buyerCountry;
-            var sdkVersion = getPayPal().version;
-            var _parseQuery = parseQuery(window.location.search.slice(1)), _parseQuery$venmoWebE = _parseQuery.venmoWebEnabled, venmoWebUrl = _parseQuery.venmoWebUrl;
-            if (void 0 !== _parseQuery$venmoWebE && _parseQuery$venmoWebE && venmoWebUrl) return window.location.replace(venmoWebUrl + window.location.search);
+            var _logger$info$track2;
+            var parentDomain = _ref.parentDomain, env = _ref.env, buttonSessionID = _ref.buttonSessionID, fundingSource = _ref.fundingSource, locale = _ref.locale, buyerCountry = _ref.buyerCountry;
             var logger = function(_ref) {
                 var env = _ref.env, sessionID = _ref.sessionID, buttonSessionID = _ref.buttonSessionID, sdkCorrelationID = _ref.sdkCorrelationID, clientID = _ref.clientID, fundingSource = _ref.fundingSource, sdkVersion = _ref.sdkVersion, locale = _ref.locale, buyerCountry = _ref.buyerCountry;
                 var logger = getLogger();
@@ -5083,7 +5080,7 @@
                 logger.addTrackingBuilder((function() {
                     var _ref3;
                     return (_ref3 = {}).state_name = "smart_button", _ref3.context_type = "button_session_id", 
-                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.147", 
+                    _ref3.context_id = buttonSessionID, _ref3.button_session_id = buttonSessionID, _ref3.button_version = "5.0.148", 
                     _ref3.selected_payment_method = fundingSource, _ref3.user_id = buttonSessionID, 
                     _ref3.time = Date.now().toString(), _ref3;
                 }));
@@ -5120,20 +5117,29 @@
                 return logger;
             }({
                 env: env,
-                sessionID: sessionID,
+                sessionID: _ref.sessionID,
                 buttonSessionID: buttonSessionID,
-                sdkCorrelationID: sdkCorrelationID,
-                clientID: clientID,
+                sdkCorrelationID: _ref.sdkCorrelationID,
+                clientID: _ref.clientID,
                 fundingSource: fundingSource,
-                sdkVersion: sdkVersion,
+                sdkVersion: getPayPal().version,
                 locale: locale,
                 buyerCountry: buyerCountry
             });
+            var _parseQuery = parseQuery(window.location.search.slice(1)), _parseQuery$venmoWebE = _parseQuery.venmoWebEnabled, venmoWebUrl = _parseQuery.venmoWebUrl;
+            if (void 0 !== _parseQuery$venmoWebE && _parseQuery$venmoWebE && venmoWebUrl) {
+                var _logger$info$track;
+                logger.info("native_venmo_web_redirect", {
+                    buttonSessionID: buttonSessionID
+                }).track((_logger$info$track = {}, _logger$info$track.transition_name = "native_venmo_web_redirect", 
+                _logger$info$track)).flush();
+                return window.location.replace(venmoWebUrl + window.location.search);
+            }
             logger.info("native_popup_init", {
                 buttonSessionID: buttonSessionID,
                 href: base64encode(window.location.href)
-            }).track((_logger$info$track = {}, _logger$info$track.transition_name = "native_popup_init", 
-            _logger$info$track.info_msg = base64encode(window.location.href), _logger$info$track)).flush();
+            }).track((_logger$info$track2 = {}, _logger$info$track2.transition_name = "native_popup_init", 
+            _logger$info$track2.info_msg = base64encode(window.location.href), _logger$info$track2)).flush();
             var appInstalledPromise = function(_ref2) {
                 var fundingSource = _ref2.fundingSource, env = _ref2.env;
                 if (Object(belter.isIos)()) return promise_ZalgoPromise.resolve(null);
@@ -5157,10 +5163,10 @@
                 fundingSource: fundingSource,
                 env: env
             }).catch((function(err) {
-                var _logger$info$track2;
-                logger.info("native_popup_android_app_installed_error").track((_logger$info$track2 = {}, 
-                _logger$info$track2.transition_name = "native_popup_android_app_installed_error", 
-                _logger$info$track2.int_error_desc = "Error: " + stringifyErrorMessage(err), _logger$info$track2)).flush();
+                var _logger$info$track3;
+                logger.info("native_popup_android_app_installed_error").track((_logger$info$track3 = {}, 
+                _logger$info$track3.transition_name = "native_popup_android_app_installed_error", 
+                _logger$info$track3.int_error_desc = "Error: " + stringifyErrorMessage(err), _logger$info$track3)).flush();
                 return promise_ZalgoPromise.resolve(null);
             }));
             var sfvc = isSFVC();
@@ -5182,29 +5188,29 @@
             }();
             var logMessage = sfvc ? "sfvc" : sfvcOrSafari ? "sfvcOrSafari" : "browser";
             if (isIOSSafari()) {
-                var _logger$info$track3;
+                var _logger$info$track4;
                 var height = window.innerHeight;
                 var scale = Math.round(window.screen.width / window.innerWidth * 100) / 100;
                 var computedHeight = Math.round(height * scale);
                 var log = "native_popup_init_" + logMessage;
-                logger.info(log).track((_logger$info$track3 = {}, _logger$info$track3.transition_name = log, 
-                _logger$info$track3.info_msg = "computed height: " + computedHeight + ", height: " + window.outerHeight + ", width: " + window.outerWidth + ", innerHeight: " + height + ", scale: " + scale, 
-                _logger$info$track3)).flush();
+                logger.info(log).track((_logger$info$track4 = {}, _logger$info$track4.transition_name = log, 
+                _logger$info$track4.info_msg = "computed height: " + computedHeight + ", height: " + window.outerHeight + ", width: " + window.outerWidth + ", innerHeight: " + height + ", scale: " + scale, 
+                _logger$info$track4)).flush();
             }
             window.addEventListener("beforeunload", (function() {
-                var _logger$info$track4;
-                logger.info("native_popup_beforeunload").track((_logger$info$track4 = {}, _logger$info$track4.transition_name = "native_popup_beforeunload", 
-                _logger$info$track4)).flush();
-            }));
-            window.addEventListener("unload", (function() {
                 var _logger$info$track5;
-                logger.info("native_popup_unload").track((_logger$info$track5 = {}, _logger$info$track5.transition_name = "native_popup_unload", 
+                logger.info("native_popup_beforeunload").track((_logger$info$track5 = {}, _logger$info$track5.transition_name = "native_popup_beforeunload", 
                 _logger$info$track5)).flush();
             }));
-            window.addEventListener("pagehide", (function() {
+            window.addEventListener("unload", (function() {
                 var _logger$info$track6;
-                logger.info("native_popup_pagehide").track((_logger$info$track6 = {}, _logger$info$track6.transition_name = "native_popup_pagehide", 
+                logger.info("native_popup_unload").track((_logger$info$track6 = {}, _logger$info$track6.transition_name = "native_popup_unload", 
                 _logger$info$track6)).flush();
+            }));
+            window.addEventListener("pagehide", (function() {
+                var _logger$info$track7;
+                logger.info("native_popup_pagehide").track((_logger$info$track7 = {}, _logger$info$track7.transition_name = "native_popup_pagehide", 
+                _logger$info$track7)).flush();
             }));
             var replaceHash = function(hash) {
                 return window.location.replace("#" + hash.replace(/^#/, ""));
@@ -5220,10 +5226,10 @@
             if (!opener) {
                 var _logger$info$info$tra;
                 if (isIOSSafari()) {
-                    var _logger$info$track7;
+                    var _logger$info$track8;
                     var _log = "popup_no_opener_hash_" + getRawHash() + "_" + logMessage;
-                    logger.info(_log).track((_logger$info$track7 = {}, _logger$info$track7.transition_name = _log, 
-                    _logger$info$track7)).flush();
+                    logger.info(_log).track((_logger$info$track8 = {}, _logger$info$track8.transition_name = _log, 
+                    _logger$info$track8)).flush();
                 }
                 logger.info("native_popup_no_opener", {
                     buttonSessionID: buttonSessionID,
@@ -5241,10 +5247,10 @@
                 !function check() {
                     if (isWindowClosed(win)) {
                         timeout && clearTimeout(timeout);
-                        logger.info("native_popup_opener_detect_close").track((_logger$info$track8 = {}, 
-                        _logger$info$track8.transition_name = "native_popup_opener_detect_close", _logger$info$track8)).flush().then(closeWindow);
+                        logger.info("native_popup_opener_detect_close").track((_logger$info$track9 = {}, 
+                        _logger$info$track9.transition_name = "native_popup_opener_detect_close", _logger$info$track9)).flush().then(closeWindow);
                     } else {
-                        var _logger$info$track8;
+                        var _logger$info$track9;
                         if (maxtime <= 0) clearTimeout(timeout); else {
                             maxtime -= delay;
                             timeout = setTimeout(check, delay);
