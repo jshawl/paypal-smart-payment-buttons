@@ -1,6 +1,6 @@
 /* @flow */
 
-// eslint-disable-next-line import/no-default-export 
+// eslint-disable-next-line import/no-default-export
 export default {
   props: {
     uid: "zoid-paypal-buttons-uid_466f6975c6_mtk6mdm6nte",
@@ -31,7 +31,7 @@ export default {
     enableThreeDomainSecure: false,
     enableNativeCheckout: false,
     stageHost: "localhost.paypal.com:8443",
-    apiStageHost: "msmaster.qa.paypal.com",
+    apiStageHost: "sandbox.paypal.com",
     standaloneFundingSource: "applepay",
     branded: true,
     stickinessID: "uid_da1ad28a5d_mji6ntg6mtq",
