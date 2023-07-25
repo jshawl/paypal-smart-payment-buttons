@@ -6,8 +6,8 @@ import { FPTI_KEY, ENV, FUNDING, COUNTRY } from '@paypal/sdk-constants/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import type { LocaleType } from '../../types';
-import { enableAmplitude, getLogger, setupLogger } from '../../lib';
-import { FPTI_TRANSITION, FPTI_STATE, FPTI_CONTEXT_TYPE, AMPLITUDE_KEY } from '../../constants';
+import { getLogger, setupLogger } from '../../lib';
+import { FPTI_TRANSITION, FPTI_STATE, FPTI_CONTEXT_TYPE } from '../../constants';
 
 type NativeLoggerOptions = {|
     env : $Values<typeof ENV>,
@@ -25,13 +25,10 @@ export function setupNativeLogger({ env, sessionID, buttonSessionID, sdkCorrelat
     const logger = getLogger();
 
     setupLogger({ env, sessionID, clientID, sdkCorrelationID, locale, sdkVersion, buyerCountry });
-    enableAmplitude({ env });
 
     logger.addPayloadBuilder(() => {
         return {
             buttonSessionID,
-            [AMPLITUDE_KEY.USER_ID]: buttonSessionID,
-            [AMPLITUDE_KEY.TIME]:    Date.now().toString()
         };
     });
 
@@ -43,8 +40,6 @@ export function setupNativeLogger({ env, sessionID, buttonSessionID, sdkCorrelat
             [FPTI_KEY.BUTTON_SESSION_UID]:           buttonSessionID,
             [FPTI_KEY.BUTTON_VERSION]:               __SMART_BUTTONS__.__MINOR_VERSION__,
             [FPTI_KEY.CHOSEN_FUNDING]:               fundingSource,
-            [AMPLITUDE_KEY.USER_ID]:                 buttonSessionID,
-            [AMPLITUDE_KEY.TIME]:                    Date.now().toString()
         };
     });
 

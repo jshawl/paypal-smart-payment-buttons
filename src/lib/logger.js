@@ -21,7 +21,7 @@ import {
 } from "@paypal/sdk-constants/src";
 
 import type { LocaleType } from "../types";
-import { LOGGER_URL, AMPLITUDE_API_KEY } from "../config";
+import { LOGGER_URL } from "../config";
 
 export function getLogger(): LoggerType {
   const disableSetCookieQuery = "disableSetCookie=true";
@@ -54,13 +54,6 @@ export const sendMetric = ({
     // $FlowFixMe beaver-logger types need to be updated
     dimensions,
   })
-
-
-export function enableAmplitude({ env }: {| env: $Values<typeof ENV> |}) {
-  getLogger().configure({
-    amplitudeApiKey: AMPLITUDE_API_KEY[env],
-  });
-}
 
 type MobileEnvironment = $Values<typeof MOBILE_ENV>;
 

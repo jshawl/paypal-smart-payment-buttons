@@ -87,7 +87,6 @@ export type CheckoutProps = {|
     clientMetadataID : ?string,
     enableFunding : ?$ReadOnlyArray<FundingType>,
     standaloneFundingSource : ?FundingType,
-    amplitude? : boolean,
     branded : boolean | null,
     restart : () => ZalgoPromise<void>,
     dimensions : {|

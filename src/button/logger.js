@@ -17,7 +17,7 @@ import {
 } from '../lib';
 import {
     DATA_ATTRIBUTES, FPTI_TRANSITION, FPTI_BUTTON_TYPE, FPTI_BUTTON_KEY,
-    FPTI_STATE, FPTI_CONTEXT_TYPE, AMPLITUDE_KEY, FPTI_CUSTOM_KEY
+    FPTI_STATE, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY
 } from '../constants';
 import type { GetQueriedEligibleFunding, OnShippingChange } from '../props';
 
@@ -74,8 +74,6 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
         return {
             buttonSessionID,
             buttonCorrelationID,
-            [AMPLITUDE_KEY.TIME]:    Date.now().toString(),
-            [AMPLITUDE_KEY.USER_ID]: buttonSessionID
         };
     });
 

@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from "vitest";
 import { isAndroid, isIos } from "@krakenjs/belter";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { getLogger, setupLogger, enableAmplitude } from "./logger";
+import { getLogger, setupLogger } from "./logger";
 
 vi.mock("@krakenjs/belter", async () => {
   const actual = await vi.importActual("@krakenjs/belter");
@@ -29,10 +29,6 @@ const loggerProps = {
 };
 
 describe("setupLogger", () => {
-  it("can enable amplitude", () => {
-    expect(() => enableAmplitude({ env: "test" })).not.toThrowError();
-  });
-
   it("supports sdk mobile environments", () => {
     // $FlowFixMe
     isIos.mockImplementation(() => true);

@@ -256,11 +256,6 @@ export const FRAME_NAME = {
     CARD_POSTAL_FIELD: 'card-postal-field'
 };
 
-export const AMPLITUDE_KEY = {
-    TIME:    'time',
-    USER_ID: 'user_id'
-};
-
 export const VENMO_BLUE : string = '#3D93CE';
 
 export const QRCODE_STATE = {

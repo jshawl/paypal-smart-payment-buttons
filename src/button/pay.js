@@ -6,7 +6,7 @@ import { FPTI_KEY } from '@paypal/sdk-constants/src';
 
 import { applepay, checkout, cardField, cardForm, paymentFields, native, vaultCapture, walletCapture, popupBridge, type Payment, type PaymentFlow } from '../payment-flows';
 import { getClientsideTimestamp, getLogger, sendBeacon, sendMetric } from '../lib';
-import { AMPLITUDE_KEY, FPTI_TRANSITION, BUYER_INTENT, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY, FPTI_STATE } from '../constants';
+import { FPTI_TRANSITION, BUYER_INTENT, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY, FPTI_STATE } from '../constants';
 import { updateButtonClientConfig } from '../api';
 import { getConfirmOrder } from '../props/confirmOrder';
 import { enableVaultSetup } from '../middleware';
@@ -103,8 +103,6 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
                     [FPTI_KEY.CONTEXT_TYPE]:       FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID,
                     [FPTI_KEY.CONTEXT_ID]:         buttonSessionID,
                     [FPTI_KEY.BUTTON_SESSION_UID]: buttonSessionID,
-                    [AMPLITUDE_KEY.USER_ID]:       buttonSessionID,
-                    [AMPLITUDE_KEY.TIME]:          Date.now().toString()
                 };
             })
             .info(`button_click_pay_flow_${ name }`)

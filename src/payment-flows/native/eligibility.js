@@ -6,43 +6,13 @@ import { supportsPopups, isIos, isAndroid } from '@krakenjs/belter/src';
 import type { CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 import type { ProxyWindow } from '@krakenjs/post-robot/src';
 
-import { type NativeEligibility, getNativeEligibility } from '../../api';
-import { enableAmplitude, getStorageState, isIOSSafari, isAndroidChrome, toProxyWindow } from '../../lib';
+import { getNativeEligibility } from '../../api';
+import { getStorageState, isIOSSafari, isAndroidChrome, toProxyWindow } from '../../lib';
 import type { ButtonProps, ServiceData } from '../../button/props';
 import type { IsEligibleOptions, IsPaymentEligibleOptions } from '../types';
 import { HEADERS } from '../../constants';
 
-import { NATIVE_CHECKOUT_URI, NATIVE_CHECKOUT_POPUP_URI, NATIVE_CHECKOUT_FALLBACK_URI, SUPPORTED_FUNDING } from './config';
-
-export function isTestGroup(nativeEligibility : NativeEligibility, fundingSource : $Values<typeof FUNDING>) : boolean {
-    const fundingEligibility = nativeEligibility[fundingSource];
-
-    if (fundingEligibility && fundingEligibility.eligibility) {
-        return true;
-    }
-
-    return false;
-}
-
-export function isControlGroup(nativeEligibility : NativeEligibility, fundingSource : $Values<typeof FUNDING>) : boolean {
-    const fundingEligibility = nativeEligibility[fundingSource];
-
-    if (fundingEligibility && !fundingEligibility.eligibility && fundingEligibility.ineligibilityReason === 'experimentation_ineligibility') {
-        return true;
-    }
-
-    return false;
-}
-
-export function isAnyTestOrControlGroup({ nativeEligibility } : {| nativeEligibility : NativeEligibility |}) : boolean {
-    for (const fundingSource of SUPPORTED_FUNDING) {
-        if (isTestGroup(nativeEligibility, fundingSource) || isControlGroup(nativeEligibility, fundingSource)) {
-            return true;
-        }
-    }
-
-    return false;
-}
+import { NATIVE_CHECKOUT_URI, NATIVE_CHECKOUT_POPUP_URI, NATIVE_CHECKOUT_FALLBACK_URI } from './config';
 
 export function isNativeOptedIn({ props } : {| props : ButtonProps |}) : boolean {
     const { enableNativeCheckout } = props;
@@ -82,7 +52,7 @@ type PrefetchNativeEligibilityOptions = {|
 let nativeEligibilityResults;
 
 export function prefetchNativeEligibility({ props, serviceData } : PrefetchNativeEligibilityOptions) : ZalgoPromise<void> {
-    const { clientID, onShippingChange, currency, platform, env,
+    const { clientID, onShippingChange, currency, platform,
         vault, buttonSessionID, enableFunding, merchantDomain, disableSetCookie } = props;
     const { merchantID, buyerCountry, cookies, eligibility: { venmoWebEnabled } } = serviceData;
 
@@ -97,10 +67,6 @@ export function prefetchNativeEligibility({ props, serviceData } : PrefetchNativ
         headers: { [ HEADERS.DISABLE_SET_COOKIE ]: String(disableSetCookie) }
     }).then(nativeEligibility => {
         nativeEligibilityResults = nativeEligibility;
- 
-        if (isAnyTestOrControlGroup({ nativeEligibility })) {
-            enableAmplitude({ env });
-        }
     });
 }
 

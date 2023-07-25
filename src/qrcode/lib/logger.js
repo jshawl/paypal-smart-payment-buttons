@@ -5,8 +5,8 @@ import { isIEIntranet, getPageRenderTime } from '@krakenjs/belter/src';
 import { FPTI_KEY, FUNDING } from '@paypal/sdk-constants/src';
 import { type LoggerType, getHTTPTransport } from '@krakenjs/beaver-logger/src';
 
-import {  FPTI_TRANSITION, FPTI_STATE, AMPLITUDE_KEY, FPTI_CONTEXT_TYPE } from '../../constants';
-import { enableAmplitude, getLogger, setupLogger, getSDKVersion } from '../../lib';
+import {  FPTI_TRANSITION, FPTI_STATE, FPTI_CONTEXT_TYPE } from '../../constants';
+import { getLogger, setupLogger, getSDKVersion } from '../../lib';
 
 export function setupNativeQRLogger() : LoggerType {
     const { env, sessionID, buttonSessionID, sdkCorrelationID, clientID, fundingSource = FUNDING.VENMO, locale, getParent, orderID } = window.xprops;
@@ -21,12 +21,10 @@ export function setupNativeQRLogger() : LoggerType {
     });
 
     setupLogger({ env, sessionID, clientID, sdkCorrelationID, locale, sdkVersion, buyerCountry });
-    enableAmplitude({ env });
 
     logger.addPayloadBuilder(() => {
         return {
             buttonSessionID,
-            [AMPLITUDE_KEY.USER_ID]: buttonSessionID
         };
     });
 
@@ -38,7 +36,6 @@ export function setupNativeQRLogger() : LoggerType {
             [FPTI_KEY.BUTTON_SESSION_UID]:           buttonSessionID,
             [FPTI_KEY.BUTTON_VERSION]:               __SMART_BUTTONS__.__MINOR_VERSION__,
             [FPTI_KEY.CHOSEN_FUNDING]:               fundingSource,
-            [AMPLITUDE_KEY.USER_ID]:                 buttonSessionID
         };
     });
 
