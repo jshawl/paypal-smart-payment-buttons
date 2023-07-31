@@ -32,6 +32,7 @@ export type Experiments = $Shape<{|
     useShippingChangeCallbackMutation?: boolean;
     payPalWalletVaultWithoutPurchase?: boolean;
     popupIncreaseDimensions?: boolean;
+    btSdkOrdersV2Migration?: boolean;
 |}>
 
 export type ProxyWindow = _ProxyWindow;

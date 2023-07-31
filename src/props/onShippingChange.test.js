@@ -47,6 +47,31 @@ describe("onShippingChange", () => {
       });
     });
 
+    test("should invoke onShippingChange with a paymentID aliased to orderID", () => {
+      const merchantOnShippingChange = vi.fn();
+      const fn = getOnShippingChange(
+        {
+          clientID,
+          experiments: {
+            btSdkOrdersV2Migration: true,
+          },
+          featureFlags,
+          onShippingChange: merchantOnShippingChange,
+          partnerAttributionID,
+        },
+        { facilitatorAccessToken, createOrder }
+      );
+
+      if (fn) {
+        fn({ orderID: "EC-abc123" }, invocationActions);
+      }
+
+      expect(merchantOnShippingChange).toHaveBeenCalledWith(
+        expect.objectContaining({ orderID: "EC-abc123", paymentID: "abc123" }),
+        expect.anything()
+      );
+    });
+
     test("should call patchOrder", async () => {
       // $FlowFixMe
       mockPatchOrder.mockImplementation(() => ZalgoPromise.resolve({}));

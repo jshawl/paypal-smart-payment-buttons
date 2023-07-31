@@ -155,6 +155,12 @@ export function getOnShippingChange({ onShippingChange, partnerAttributionID, fe
                         [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_INVOKED]: '1'
                     }).flush();
 
+                if(experiments.btSdkOrdersV2Migration && !data.paymentID){
+                    // The Braintree SDK prefixes the orderID with "EC-" to support
+                    // backwards compatibility. Before invoking onShippingChange,
+                    // we need to remove that prefix.
+                    data.paymentID = data.orderID?.replace("EC-","");
+                }
                 return onShippingChange(buildXOnShippingChangeData(data), buildXShippingChangeActions({ orderID, facilitatorAccessToken, buyerAccessToken, actions, partnerAttributionID, forceRestAPI, clientID, experiments }));
             });
         };

@@ -346,6 +346,7 @@ type GetOnApproveOrderOptions = {|
     paymentSource : $Values<typeof FUNDING> | null,
     featureFlags: FeatureFlags,
     beforeOnApprove: () => void;
+    experiments: Experiments
 |};
 
 function getDefaultOnApproveOrder(intent : $Values<typeof INTENT>) : XOnApproveOrder {
@@ -360,7 +361,7 @@ function getDefaultOnApproveOrder(intent : $Values<typeof INTENT>) : XOnApproveO
     };
 }
 
-export function getOnApproveOrder({ intent, onApprove = getDefaultOnApproveOrder(intent), partnerAttributionID, onError, clientAccessToken, vault, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags, beforeOnApprove } : GetOnApproveOrderOptions) : OnApprove {
+export function getOnApproveOrder({ intent, onApprove = getDefaultOnApproveOrder(intent), partnerAttributionID, onError, clientAccessToken, vault, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags, experiments, beforeOnApprove } : GetOnApproveOrderOptions) : OnApprove {
     if (!onApprove) {
         throw new Error(`Expected onApprove`);
     }
@@ -393,7 +394,12 @@ export function getOnApproveOrder({ intent, onApprove = getDefaultOnApproveOrder
             return getSupplementalOrderInfo(orderID).then(supplementalData => {
                 billingToken = billingToken || (supplementalData && supplementalData.checkoutSession && supplementalData.checkoutSession.cart && supplementalData.checkoutSession.cart.billingToken);
                 paymentID = paymentID || (supplementalData && supplementalData.checkoutSession && supplementalData.checkoutSession.cart && supplementalData.checkoutSession.cart.paymentId);
-
+                if(experiments.btSdkOrdersV2Migration && !paymentID){
+                    // The Braintree SDK prefixes the orderID with "EC-" to support
+                    // backwards compatibility. Before invoking onApprove, we need
+                    // to remove that prefix.
+                    paymentID = orderID.replace(/EC-/, '');
+                }
                 const data = { orderID, payerID, paymentID, billingToken, facilitatorAccessToken, authCode, paymentSource };
                 const actions = buildXApproveOrderActions({ orderID, paymentID, payerID, intent, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError });
 
@@ -642,7 +648,7 @@ export function getOnApprove({ intent, createBillingAgreement, createSubscriptio
     }
 
     if (intent === INTENT.CAPTURE || intent === INTENT.AUTHORIZE || intent === INTENT.ORDER) {
-        return getOnApproveOrder({ intent, onApprove, partnerAttributionID, onError, clientAccessToken, vault, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags, beforeOnApprove });
+        return getOnApproveOrder({ intent, onApprove, partnerAttributionID, onError, clientAccessToken, vault, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags, experiments, beforeOnApprove });
     }
 
     if (intent === INTENT.TOKENIZE) {
