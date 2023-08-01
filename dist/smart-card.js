@@ -506,6 +506,70 @@ window.smartCard = function(modules) {
     };
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
+    __webpack_require__.d(__webpack_exports__, "l", (function() {
+        return util.f;
+    }));
+    __webpack_require__.d(__webpack_exports__, "h", (function() {
+        return util.e;
+    }));
+    __webpack_require__.d(__webpack_exports__, "a", (function() {
+        return util.a;
+    }));
+    __webpack_require__.d(__webpack_exports__, "f", (function() {
+        return util.c;
+    }));
+    __webpack_require__.d(__webpack_exports__, "b", (function() {
+        return util.b;
+    }));
+    __webpack_require__.d(__webpack_exports__, "c", (function() {
+        return logger.a;
+    }));
+    __webpack_require__.d(__webpack_exports__, "i", (function() {
+        return logger.b;
+    }));
+    __webpack_require__.d(__webpack_exports__, "k", (function() {
+        return logger.c;
+    }));
+    __webpack_require__.d(__webpack_exports__, "e", (function() {
+        return getStorageID;
+    }));
+    __webpack_require__.d(__webpack_exports__, "g", (function() {
+        return isStorageStateFresh;
+    }));
+    __webpack_require__.d(__webpack_exports__, "j", (function() {
+        return setBuyerAccessToken;
+    }));
+    __webpack_require__.d(__webpack_exports__, "d", (function() {
+        return getPostRobot;
+    }));
+    var util = __webpack_require__(16);
+    var logger = __webpack_require__(13);
+    __webpack_require__(1);
+    __webpack_require__(10);
+    var belter_src = __webpack_require__(3);
+    function getSDKStorage() {
+        return Object(belter_src.f)({
+            name: "paypal",
+            lifetime: 36e5
+        });
+    }
+    function getStorageID() {
+        return getSDKStorage().getID();
+    }
+    function isStorageStateFresh() {
+        return getSDKStorage().isStateFresh();
+    }
+    function setBuyerAccessToken(token) {}
+    function getPostRobot() {
+        var paypal = function() {
+            if (!window.paypal) throw new Error("paypal not found");
+            return window.paypal;
+        }();
+        if (!paypal.postRobot) throw new Error("paypal.postRobot not found");
+        return paypal.postRobot;
+    }
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
     __webpack_require__.d(__webpack_exports__, "g", (function() {
         return getUserAgent;
     }));
@@ -1339,70 +1403,6 @@ window.smartCard = function(modules) {
     }
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    __webpack_require__.d(__webpack_exports__, "l", (function() {
-        return util.f;
-    }));
-    __webpack_require__.d(__webpack_exports__, "h", (function() {
-        return util.e;
-    }));
-    __webpack_require__.d(__webpack_exports__, "a", (function() {
-        return util.a;
-    }));
-    __webpack_require__.d(__webpack_exports__, "f", (function() {
-        return util.c;
-    }));
-    __webpack_require__.d(__webpack_exports__, "b", (function() {
-        return util.b;
-    }));
-    __webpack_require__.d(__webpack_exports__, "c", (function() {
-        return logger.a;
-    }));
-    __webpack_require__.d(__webpack_exports__, "i", (function() {
-        return logger.b;
-    }));
-    __webpack_require__.d(__webpack_exports__, "k", (function() {
-        return logger.c;
-    }));
-    __webpack_require__.d(__webpack_exports__, "e", (function() {
-        return getStorageID;
-    }));
-    __webpack_require__.d(__webpack_exports__, "g", (function() {
-        return isStorageStateFresh;
-    }));
-    __webpack_require__.d(__webpack_exports__, "j", (function() {
-        return setBuyerAccessToken;
-    }));
-    __webpack_require__.d(__webpack_exports__, "d", (function() {
-        return getPostRobot;
-    }));
-    var util = __webpack_require__(16);
-    var logger = __webpack_require__(13);
-    __webpack_require__(1);
-    __webpack_require__(10);
-    var belter_src = __webpack_require__(2);
-    function getSDKStorage() {
-        return Object(belter_src.f)({
-            name: "paypal",
-            lifetime: 36e5
-        });
-    }
-    function getStorageID() {
-        return getSDKStorage().getID();
-    }
-    function isStorageStateFresh() {
-        return getSDKStorage().isStateFresh();
-    }
-    function setBuyerAccessToken(token) {}
-    function getPostRobot() {
-        var paypal = function() {
-            if (!window.paypal) throw new Error("paypal not found");
-            return window.paypal;
-        }();
-        if (!paypal.postRobot) throw new Error("paypal.postRobot not found");
-        return paypal.postRobot;
-    }
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
     __webpack_require__.d(__webpack_exports__, "a", (function() {
         return promise_ZalgoPromise;
     }));
@@ -1751,10 +1751,10 @@ window.smartCard = function(modules) {
     var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
     var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
     __webpack_require__(4);
-    var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(2);
+    var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
     var _config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
     var _constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(1);
-    var _lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(3);
+    var _lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(2);
     function callRestAPI(_ref) {
         var _extends2;
         var accessToken = _ref.accessToken, method = _ref.method, url = _ref.url, data = _ref.data, headers = _ref.headers, eventName = _ref.eventName;
@@ -1837,7 +1837,7 @@ window.smartCard = function(modules) {
     function callGraphQL(_ref5) {
         var name = _ref5.name, query = _ref5.query, _ref5$variables = _ref5.variables, variables = void 0 === _ref5$variables ? {} : _ref5$variables, _ref5$headers = _ref5.headers, headers = void 0 === _ref5$headers ? {} : _ref5$headers, _ref5$returnErrorObje = _ref5.returnErrorObject, returnErrorObject = void 0 !== _ref5$returnErrorObje && _ref5$returnErrorObje;
         return Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_3__.t)({
-            url: _config__WEBPACK_IMPORTED_MODULE_4__.f + "?" + name,
+            url: _config__WEBPACK_IMPORTED_MODULE_4__.e + "?" + name,
             method: "POST",
             json: {
                 query: query,
@@ -1859,7 +1859,7 @@ window.smartCard = function(modules) {
             }
             if (200 !== status) {
                 Object(_lib__WEBPACK_IMPORTED_MODULE_6__.c)().warn("graphql_" + name + "_status_" + status + "_error");
-                throw new Error(_config__WEBPACK_IMPORTED_MODULE_4__.f + " returned status " + status + "\n\n" + JSON.stringify(body));
+                throw new Error(_config__WEBPACK_IMPORTED_MODULE_4__.e + " returned status " + status + "\n\n" + JSON.stringify(body));
             }
             return body.data;
         }));
@@ -1873,44 +1873,41 @@ window.smartCard = function(modules) {
     }
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    __webpack_require__.d(__webpack_exports__, "g", (function() {
+    __webpack_require__.d(__webpack_exports__, "f", (function() {
         return LOGGER_URL;
     }));
-    __webpack_require__.d(__webpack_exports__, "b", (function() {
+    __webpack_require__.d(__webpack_exports__, "a", (function() {
         return AUTH_API_URL;
     }));
-    __webpack_require__.d(__webpack_exports__, "h", (function() {
+    __webpack_require__.d(__webpack_exports__, "g", (function() {
         return ORDERS_API_URL;
     }));
-    __webpack_require__.d(__webpack_exports__, "i", (function() {
+    __webpack_require__.d(__webpack_exports__, "h", (function() {
         return PAYMENTS_API_URL;
     }));
-    __webpack_require__.d(__webpack_exports__, "c", (function() {
+    __webpack_require__.d(__webpack_exports__, "b", (function() {
         return CREATE_SUBSCRIPTIONS_API_URL;
     }));
-    __webpack_require__.d(__webpack_exports__, "k", (function() {
+    __webpack_require__.d(__webpack_exports__, "j", (function() {
         return VALIDATE_PAYMENT_METHOD_API;
     }));
-    __webpack_require__.d(__webpack_exports__, "l", (function() {
+    __webpack_require__.d(__webpack_exports__, "k", (function() {
         return VAULT_SETUP_TOKENS_API_URL;
     }));
-    __webpack_require__.d(__webpack_exports__, "j", (function() {
+    __webpack_require__.d(__webpack_exports__, "i", (function() {
         return SMART_API_URI;
     }));
-    __webpack_require__.d(__webpack_exports__, "f", (function() {
+    __webpack_require__.d(__webpack_exports__, "e", (function() {
         return GRAPHQL_URI;
     }));
-    __webpack_require__.d(__webpack_exports__, "a", (function() {
-        return AMPLITUDE_API_KEY;
-    }));
-    __webpack_require__.d(__webpack_exports__, "e", (function() {
+    __webpack_require__.d(__webpack_exports__, "d", (function() {
         return FIREBASE_SCRIPTS;
     }));
-    __webpack_require__.d(__webpack_exports__, "d", (function() {
+    __webpack_require__.d(__webpack_exports__, "c", (function() {
         return ENABLE_PAYMENT_API;
     }));
     var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
-    var _FUNDING_SKIP_LOGIN, _AMPLITUDE_API_KEY;
+    var _FUNDING_SKIP_LOGIN;
     var LOGGER_URL = "/xoplatform/logger/api/logger";
     var AUTH_API_URL = "/v1/oauth2/token";
     var ORDERS_API_URL = "/v2/checkout/orders";
@@ -1930,12 +1927,6 @@ window.smartCard = function(modules) {
     (_FUNDING_SKIP_LOGIN = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL, 
     _FUNDING_SKIP_LOGIN[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYLATER] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL, 
     _FUNDING_SKIP_LOGIN[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.CREDIT] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL;
-    var AMPLITUDE_API_KEY = ((_AMPLITUDE_API_KEY = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.b.TEST] = "a23fb4dfae56daf7c3212303b53a8527", 
-    _AMPLITUDE_API_KEY[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.b.LOCAL] = "a23fb4dfae56daf7c3212303b53a8527", 
-    _AMPLITUDE_API_KEY[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.b.STAGE] = "a23fb4dfae56daf7c3212303b53a8527", 
-    _AMPLITUDE_API_KEY[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.b.SANDBOX] = "a23fb4dfae56daf7c3212303b53a8527", 
-    _AMPLITUDE_API_KEY[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.b.PRODUCTION] = "ce423f79daba95faeb0694186170605c", 
-    _AMPLITUDE_API_KEY);
     var FIREBASE_SCRIPTS = {
         APP: "https://www.paypalobjects.com/checkout/js/lib/firebase-app.js",
         AUTH: "https://www.paypalobjects.com/checkout/js/lib/firebase-auth.js",
@@ -2014,10 +2005,10 @@ window.smartCard = function(modules) {
         return getSubscription;
     }));
     var src = __webpack_require__(4);
-    var belter_src = __webpack_require__(2);
+    var belter_src = __webpack_require__(3);
     var sdk_constants_src = __webpack_require__(0);
     var src_config = __webpack_require__(7);
-    var lib = __webpack_require__(3);
+    var lib = __webpack_require__(2);
     var constants = __webpack_require__(1);
     var api = __webpack_require__(6);
     function createAccessToken(clientID, _temp) {
@@ -2031,7 +2022,7 @@ window.smartCard = function(modules) {
             targetSubject && (data.target_subject = targetSubject);
             return Object(belter_src.t)({
                 method: "post",
-                url: src_config.b,
+                url: src_config.a,
                 headers: {
                     Authorization: "Basic " + basicAuth
                 },
@@ -2093,7 +2084,7 @@ window.smartCard = function(modules) {
         return Object(api.b)({
             accessToken: facilitatorAccessToken,
             method: "post",
-            url: "" + src_config.h,
+            url: "" + src_config.g,
             eventName: "v2_checkout_orders_create",
             data: order,
             headers: (_headers = {}, _headers[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
@@ -2125,7 +2116,7 @@ window.smartCard = function(modules) {
             var _headers2;
             return Object(api.b)({
                 accessToken: facilitatorAccessToken,
-                url: src_config.h + "/" + orderID,
+                url: src_config.g + "/" + orderID,
                 eventName: "v2_checkout_orders_get",
                 headers: (_headers2 = {}, _headers2[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                 _headers2[constants.i.PREFER] = constants.m.REPRESENTATION, _headers2)
@@ -2144,7 +2135,7 @@ window.smartCard = function(modules) {
                 });
                 return Object(api.c)({
                     accessToken: buyerAccessToken,
-                    url: src_config.j.ORDER + "/" + orderID,
+                    url: src_config.i.ORDER + "/" + orderID,
                     eventName: "order_get",
                     headers: (_headers3 = {}, _headers3[constants.i.CLIENT_CONTEXT] = orderID, _headers3)
                 }).then((function(res) {
@@ -2169,7 +2160,7 @@ window.smartCard = function(modules) {
         }
         return Object(api.c)({
             accessToken: buyerAccessToken,
-            url: src_config.j.ORDER + "/" + orderID,
+            url: src_config.i.ORDER + "/" + orderID,
             eventName: "order_get",
             headers: (_headers4 = {}, _headers4[constants.i.CLIENT_CONTEXT] = orderID, _headers4)
         }).then((function(_ref3) {
@@ -2202,7 +2193,7 @@ window.smartCard = function(modules) {
                 accessToken: facilitatorAccessToken,
                 method: "post",
                 eventName: "v2_checkout_orders_capture",
-                url: src_config.h + "/" + orderID + "/capture",
+                url: src_config.g + "/" + orderID + "/capture",
                 headers: (_headers5 = {}, _headers5[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                 _headers5[constants.i.PREFER] = constants.m.REPRESENTATION, _headers5[constants.i.PAYPAL_REQUEST_ID] = orderID, 
                 _headers5)
@@ -2224,7 +2215,7 @@ window.smartCard = function(modules) {
                     accessToken: buyerAccessToken,
                     method: "post",
                     eventName: "order_capture",
-                    url: src_config.j.ORDER + "/" + orderID + "/capture",
+                    url: src_config.i.ORDER + "/" + orderID + "/capture",
                     json: {
                         data: {
                             facilitatorAccessToken: facilitatorAccessToken
@@ -2255,7 +2246,7 @@ window.smartCard = function(modules) {
             accessToken: buyerAccessToken,
             method: "post",
             eventName: "order_capture",
-            url: src_config.j.ORDER + "/" + orderID + "/capture",
+            url: src_config.i.ORDER + "/" + orderID + "/capture",
             json: {
                 data: {
                     facilitatorAccessToken: facilitatorAccessToken
@@ -2279,7 +2270,7 @@ window.smartCard = function(modules) {
                 accessToken: facilitatorAccessToken,
                 method: "post",
                 eventName: "v2_checkout_orders_authorize",
-                url: src_config.h + "/" + orderID + "/authorize",
+                url: src_config.g + "/" + orderID + "/authorize",
                 headers: (_headers8 = {}, _headers8[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                 _headers8[constants.i.PREFER] = constants.m.REPRESENTATION, _headers8)
             }).catch((function(err) {
@@ -2300,7 +2291,7 @@ window.smartCard = function(modules) {
                     accessToken: buyerAccessToken,
                     method: "post",
                     eventName: "order_authorize",
-                    url: src_config.j.ORDER + "/" + orderID + "/authorize",
+                    url: src_config.i.ORDER + "/" + orderID + "/authorize",
                     json: {
                         data: {
                             facilitatorAccessToken: facilitatorAccessToken
@@ -2332,7 +2323,7 @@ window.smartCard = function(modules) {
             accessToken: buyerAccessToken,
             method: "post",
             eventName: "order_authorize",
-            url: src_config.j.ORDER + "/" + orderID + "/authorize",
+            url: src_config.i.ORDER + "/" + orderID + "/authorize",
             json: {
                 data: {
                     facilitatorAccessToken: facilitatorAccessToken
@@ -2356,7 +2347,7 @@ window.smartCard = function(modules) {
                 accessToken: facilitatorAccessToken,
                 method: "PATCH",
                 eventName: "v2_checkout_orders_patch",
-                url: src_config.h + "/" + orderID,
+                url: src_config.g + "/" + orderID,
                 data: data,
                 headers: (_headers11 = {}, _headers11[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                 _headers11[constants.i.PREFER] = constants.m.REPRESENTATION, _headers11)
@@ -2384,7 +2375,7 @@ window.smartCard = function(modules) {
                     accessToken: buyerAccessToken,
                     method: "post",
                     eventName: "order_patch",
-                    url: src_config.j.ORDER + "/" + orderID + "/patch",
+                    url: src_config.i.ORDER + "/" + orderID + "/patch",
                     json: {
                         data: requestData
                     },
@@ -2421,7 +2412,7 @@ window.smartCard = function(modules) {
             accessToken: buyerAccessToken,
             method: "post",
             eventName: "order_patch",
-            url: src_config.j.ORDER + "/" + orderID + "/patch",
+            url: src_config.i.ORDER + "/" + orderID + "/patch",
             json: {
                 data: requestData
             },
@@ -2449,7 +2440,7 @@ window.smartCard = function(modules) {
             accessToken: facilitatorAccessToken,
             method: "post",
             eventName: "order_confirm_payment_source",
-            url: src_config.h + "/" + orderID + "/confirm-payment-source",
+            url: src_config.g + "/" + orderID + "/confirm-payment-source",
             data: data,
             headers: (_headers14 = {}, _headers14[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
             _headers14[constants.i.PREFER] = constants.m.REPRESENTATION, _headers14)
@@ -2460,7 +2451,7 @@ window.smartCard = function(modules) {
             authenticated: !1,
             method: "post",
             eventName: "payment_ectoken",
-            url: src_config.j.PAYMENT + "/" + billingToken + "/ectoken"
+            url: src_config.i.PAYMENT + "/" + billingToken + "/ectoken"
         }).then((function(_ref13) {
             return _ref13.data.token;
         }));
@@ -2470,7 +2461,7 @@ window.smartCard = function(modules) {
             authenticated: !1,
             method: "post",
             eventName: "billagmt_subscriptions_cartid",
-            url: src_config.j.SUBSCRIPTION + "/" + subscriptionID + "/cartid"
+            url: src_config.i.SUBSCRIPTION + "/" + subscriptionID + "/cartid"
         }).then((function(_ref14) {
             return _ref14.data.token;
         }));
@@ -2506,7 +2497,7 @@ window.smartCard = function(modules) {
                 accessToken: facilitatorAccessToken,
                 method: "post",
                 eventName: "v1_payments_payment_create",
-                url: "" + src_config.i,
+                url: "" + src_config.h,
                 data: payment,
                 headers: (_headers = {}, _headers[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                 _headers)
@@ -2536,7 +2527,7 @@ window.smartCard = function(modules) {
         return Object(api.b)({
             accessToken: facilitatorAccessToken,
             eventName: "v1_payments_payment_get",
-            url: src_config.i + "/" + paymentID,
+            url: src_config.h + "/" + paymentID,
             headers: (_headers2 = {}, _headers2[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
             _headers2)
         });
@@ -2548,7 +2539,7 @@ window.smartCard = function(modules) {
             accessToken: facilitatorAccessToken,
             method: "post",
             eventName: "v1_payments_payment_execute",
-            url: src_config.i + "/" + paymentID + "/execute",
+            url: src_config.h + "/" + paymentID + "/execute",
             headers: (_headers3 = {}, _headers3[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
             _headers3),
             data: {
@@ -2566,7 +2557,7 @@ window.smartCard = function(modules) {
             accessToken: facilitatorAccessToken,
             method: "patch",
             eventName: "v1_payments_payment_patch",
-            url: src_config.i + "/" + paymentID,
+            url: src_config.h + "/" + paymentID,
             data: patchData,
             headers: (_headers4 = {}, _headers4[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
             _headers4)
@@ -2579,7 +2570,7 @@ window.smartCard = function(modules) {
         };
         return Object(belter_src.t)({
             method: "post",
-            url: src_config.c,
+            url: src_config.b,
             headers: headers,
             json: subscriptionPayload
         }).then((function(_ref) {
@@ -2613,7 +2604,7 @@ window.smartCard = function(modules) {
         };
         return Object(belter_src.t)({
             method: "post",
-            url: src_config.c + "/" + subscriptionID + "/revise",
+            url: src_config.b + "/" + subscriptionID + "/revise",
             headers: headers,
             json: subscriptionPayload
         }).then((function(_ref3) {
@@ -2647,7 +2638,7 @@ window.smartCard = function(modules) {
             accessToken: buyerAccessToken,
             method: "post",
             eventName: "billagmt_subscriptions_activate",
-            url: src_config.j.SUBSCRIPTION + "/" + subscriptionID + "/activate"
+            url: src_config.i.SUBSCRIPTION + "/" + subscriptionID + "/activate"
         }).then((function(_ref6) {
             return _ref6.data;
         }));
@@ -2657,7 +2648,7 @@ window.smartCard = function(modules) {
         return Object(api.c)({
             accessToken: buyerAccessToken,
             eventName: "billagmt_subscriptions_get",
-            url: src_config.j.SUBSCRIPTION + "/" + subscriptionID
+            url: src_config.i.SUBSCRIPTION + "/" + subscriptionID
         }).then((function(_ref8) {
             return _ref8.data;
         }));
@@ -2665,8 +2656,8 @@ window.smartCard = function(modules) {
     var util = __webpack_require__(16);
     Object(belter_src.o)((function(config) {
         return src.a.try((function() {
-            if (!window.firebase || !window.firebase.auth || !window.firebase.database) return Object(util.d)(src_config.e.APP).then((function() {
-                return src.a.all([ Object(util.d)(src_config.e.AUTH), Object(util.d)(src_config.e.DATABASE) ]);
+            if (!window.firebase || !window.firebase.auth || !window.firebase.database) return Object(util.d)(src_config.d.APP).then((function() {
+                return src.a.all([ Object(util.d)(src_config.d.AUTH), Object(util.d)(src_config.d.DATABASE) ]);
             }));
         })).then((function() {
             var firebase = window.firebase;
@@ -2755,7 +2746,7 @@ window.smartCard = function(modules) {
     __webpack_require__(0);
     __webpack_require__(8);
     __webpack_require__(1);
-    __webpack_require__(3);
+    __webpack_require__(2);
     var ON_SHIPPING_CHANGE_PATHS = {
         AMOUNT: "/purchase_units/@reference_id=='default'/amount",
         OPTIONS: "/purchase_units/@reference_id=='default'/shipping/options"
@@ -3226,25 +3217,9 @@ window.smartCard = function(modules) {
     }));
     var esm_extends = __webpack_require__(5);
     var src = __webpack_require__(4);
-    var belter_src = __webpack_require__(2);
+    var belter_src = __webpack_require__(3);
     var AUTO_FLUSH_LEVEL = [ "warn", "error" ];
     var LOG_LEVEL_PRIORITY = [ "error", "warn", "info", "debug" ];
-    var sendBeacon = function(_ref2) {
-        var _ref2$win = _ref2.win, win = void 0 === _ref2$win ? window : _ref2$win, url = _ref2.url, data = _ref2.data, _ref2$useBlob = _ref2.useBlob, useBlob = void 0 === _ref2$useBlob || _ref2$useBlob;
-        try {
-            var json = JSON.stringify(data);
-            if (!win.navigator.sendBeacon) throw new Error("No sendBeacon available");
-            if (useBlob) {
-                var blob = new Blob([ json ], {
-                    type: "application/json"
-                });
-                return win.navigator.sendBeacon(url, blob);
-            }
-            return win.navigator.sendBeacon(url, json);
-        } catch (e) {
-            return !1;
-        }
-    };
     var extendIfDefined = function(target, source) {
         for (var key in source) source.hasOwnProperty(key) && (target[key] = source[key]);
     };
@@ -3252,7 +3227,7 @@ window.smartCard = function(modules) {
     var sdk_constants_src = __webpack_require__(0);
     var config = __webpack_require__(7);
     function getLogger() {
-        var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? config.g + "?disableSetCookie=true" : config.g;
+        var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? config.f + "?disableSetCookie=true" : config.f;
         return Object(belter_src.i)(getLogger, (function() {
             return function(_ref) {
                 var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? "warn" : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? function(_ref) {
@@ -3268,14 +3243,22 @@ window.smartCard = function(modules) {
                         })({
                             headers: headers,
                             enableSendBeacon: enableSendBeacon
-                        }) && (beaconResult = function(url) {
-                            return "https://api2.amplitude.com/2/httpapi" === url;
-                        }(url) ? sendBeacon({
-                            win: win,
-                            url: url,
-                            data: json,
-                            useBlob: !1
-                        }) : sendBeacon({
+                        }) && (beaconResult = function(_ref2) {
+                            var _ref2$win = _ref2.win, win = void 0 === _ref2$win ? window : _ref2$win, url = _ref2.url, data = _ref2.data, _ref2$useBlob = _ref2.useBlob, useBlob = void 0 === _ref2$useBlob || _ref2$useBlob;
+                            try {
+                                var json = JSON.stringify(data);
+                                if (!win.navigator.sendBeacon) throw new Error("No sendBeacon available");
+                                if (useBlob) {
+                                    var blob = new Blob([ json ], {
+                                        type: "application/json"
+                                    });
+                                    return win.navigator.sendBeacon(url, blob);
+                                }
+                                return win.navigator.sendBeacon(url, json);
+                            } catch (e) {
+                                return !1;
+                            }
+                        }({
                             win: win,
                             url: url,
                             data: json,
@@ -3289,7 +3272,7 @@ window.smartCard = function(modules) {
                             json: json
                         });
                     })).then(belter_src.p);
-                } : _ref$transport, amplitudeApiKey = _ref.amplitudeApiKey, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
+                } : _ref$transport, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
                 var events = [];
                 var tracking = [];
                 var metrics = [];
@@ -3328,21 +3311,6 @@ window.smartCard = function(modules) {
                                 },
                                 enableSendBeacon: enableSendBeacon
                             }).catch(belter_src.p));
-                            amplitudeApiKey && transport({
-                                method: "POST",
-                                url: "https://api2.amplitude.com/2/httpapi",
-                                headers: {},
-                                json: {
-                                    api_key: amplitudeApiKey,
-                                    events: tracking.map((function(payload) {
-                                        return Object(esm_extends.a)({
-                                            event_type: payload.transition_name || "event",
-                                            event_properties: payload
-                                        }, payload);
-                                    }))
-                                },
-                                enableSendBeacon: enableSendBeacon
-                            }).catch(belter_src.p);
                             events = [];
                             tracking = [];
                             metrics = [];
@@ -3439,7 +3407,6 @@ window.smartCard = function(modules) {
                         opts.prefix && (prefix = opts.prefix);
                         opts.logLevel && (logLevel = opts.logLevel);
                         opts.transport && (transport = opts.transport);
-                        opts.amplitudeApiKey && (amplitudeApiKey = opts.amplitudeApiKey);
                         opts.flushInterval && (flushInterval = opts.flushInterval);
                         opts.enableSendBeacon && (enableSendBeacon = opts.enableSendBeacon);
                         return logger;
@@ -3475,8 +3442,8 @@ window.smartCard = function(modules) {
             dimensions: dimensions
         });
     };
-    function setupLogger(_ref3) {
-        var env = _ref3.env, sessionID = _ref3.sessionID, clientID = _ref3.clientID, sdkCorrelationID = _ref3.sdkCorrelationID, buyerCountry = _ref3.buyerCountry, locale = _ref3.locale, _ref3$sdkVersion = _ref3.sdkVersion, sdkVersion = void 0 === _ref3$sdkVersion ? window.paypal.version : _ref3$sdkVersion;
+    function setupLogger(_ref2) {
+        var env = _ref2.env, sessionID = _ref2.sessionID, clientID = _ref2.clientID, sdkCorrelationID = _ref2.sdkCorrelationID, buyerCountry = _ref2.buyerCountry, locale = _ref2.locale, _ref2$sdkVersion = _ref2.sdkVersion, sdkVersion = void 0 === _ref2$sdkVersion ? window.paypal.version : _ref2$sdkVersion;
         var logger = getLogger();
         logger.addPayloadBuilder((function() {
             return {
@@ -3488,16 +3455,16 @@ window.smartCard = function(modules) {
             };
         }));
         logger.addTrackingBuilder((function() {
-            var _ref4;
-            return (_ref4 = {})[sdk_constants_src.e.FEED] = sdk_constants_src.d.PAYMENTS_SDK, 
-            _ref4[sdk_constants_src.e.DATA_SOURCE] = sdk_constants_src.c.PAYMENTS_SDK, _ref4[sdk_constants_src.e.CLIENT_ID] = clientID, 
-            _ref4[sdk_constants_src.e.SESSION_UID] = sessionID, _ref4[sdk_constants_src.e.REFERER] = window.location.host, 
-            _ref4[sdk_constants_src.e.BUYER_COUNTRY] = buyerCountry, _ref4[sdk_constants_src.e.LOCALE] = locale.lang + "_" + locale.country, 
-            _ref4[sdk_constants_src.e.INTEGRATION_IDENTIFIER] = clientID, _ref4[sdk_constants_src.e.SDK_ENVIRONMENT] = Object(belter_src.m)() ? sdk_constants_src.i.IOS : Object(belter_src.j)() ? sdk_constants_src.i.ANDROID : null, 
-            _ref4[sdk_constants_src.e.SDK_NAME] = sdk_constants_src.f.PAYMENTS_SDK, _ref4[sdk_constants_src.e.SDK_VERSION] = sdkVersion, 
-            _ref4[sdk_constants_src.e.USER_AGENT] = window.navigator && window.navigator.userAgent, 
-            _ref4[sdk_constants_src.e.CONTEXT_CORRID] = sdkCorrelationID, _ref4[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
-            _ref4;
+            var _ref3;
+            return (_ref3 = {})[sdk_constants_src.e.FEED] = sdk_constants_src.d.PAYMENTS_SDK, 
+            _ref3[sdk_constants_src.e.DATA_SOURCE] = sdk_constants_src.c.PAYMENTS_SDK, _ref3[sdk_constants_src.e.CLIENT_ID] = clientID, 
+            _ref3[sdk_constants_src.e.SESSION_UID] = sessionID, _ref3[sdk_constants_src.e.REFERER] = window.location.host, 
+            _ref3[sdk_constants_src.e.BUYER_COUNTRY] = buyerCountry, _ref3[sdk_constants_src.e.LOCALE] = locale.lang + "_" + locale.country, 
+            _ref3[sdk_constants_src.e.INTEGRATION_IDENTIFIER] = clientID, _ref3[sdk_constants_src.e.SDK_ENVIRONMENT] = Object(belter_src.m)() ? sdk_constants_src.i.IOS : Object(belter_src.j)() ? sdk_constants_src.i.ANDROID : null, 
+            _ref3[sdk_constants_src.e.SDK_NAME] = sdk_constants_src.f.PAYMENTS_SDK, _ref3[sdk_constants_src.e.SDK_VERSION] = sdkVersion, 
+            _ref3[sdk_constants_src.e.USER_AGENT] = window.navigator && window.navigator.userAgent, 
+            _ref3[sdk_constants_src.e.CONTEXT_CORRID] = sdkCorrelationID, _ref3[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
+            _ref3;
         }));
         src.a.onPossiblyUnhandledException((function(err) {
             var _logger$track;
@@ -3548,7 +3515,7 @@ window.smartCard = function(modules) {
     }));
     __webpack_require__(5);
     var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
-    var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+    var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
     __webpack_require__(0);
     __webpack_require__(10);
     __webpack_require__(1);
@@ -3817,7 +3784,7 @@ window.smartCard = function(modules) {
     }));
     var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
     __webpack_require__(0);
-    var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
+    var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
     function getOnClick(_ref2) {
         var onClick = _ref2.onClick;
         if (onClick) return Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.o)((function(_ref3) {
@@ -3848,7 +3815,7 @@ window.smartCard = function(modules) {
         return getOnError;
     }));
     var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
-    var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+    var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
     function getOnError(_ref) {
         var onError = _ref.onError;
         var onErrorHandler = onError ? Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.b)(onError) : _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.p;
@@ -3886,7 +3853,7 @@ window.smartCard = function(modules) {
             authenticated: !1,
             method: "post",
             eventName: "vault_ectoken",
-            url: _config__WEBPACK_IMPORTED_MODULE_1__.j.VAULT + "/" + approvalSessionId + "/ectoken"
+            url: _config__WEBPACK_IMPORTED_MODULE_1__.i.VAULT + "/" + approvalSessionId + "/ectoken"
         }).then((function(_ref3) {
             return _ref3.data.token;
         }));
@@ -4061,7 +4028,7 @@ window.smartCard = function(modules) {
     }));
     __webpack_require__(0);
     var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
-    var _lib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
+    var _lib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
     var _onInit__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(20);
     var _onClick__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(21);
     var _onError__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(22);
@@ -4141,22 +4108,22 @@ window.smartCard = function(modules) {
     "use strict";
     __webpack_require__(5);
     __webpack_require__(4);
-    __webpack_require__(2);
+    __webpack_require__(3);
     __webpack_require__(0);
     __webpack_require__(10);
     __webpack_require__(8);
     __webpack_require__(1);
-    __webpack_require__(3);
+    __webpack_require__(2);
     __webpack_require__(7);
     __webpack_require__(23);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(4);
-    __webpack_require__(2);
+    __webpack_require__(3);
     __webpack_require__(0);
     __webpack_require__(8);
     __webpack_require__(1);
-    __webpack_require__(3);
+    __webpack_require__(2);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(0);
@@ -4164,35 +4131,36 @@ window.smartCard = function(modules) {
     "use strict";
     __webpack_require__(0);
     __webpack_require__(8);
-    __webpack_require__(3);
+    __webpack_require__(2);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    __webpack_require__(2);
+    __webpack_require__(3);
     __webpack_require__(4);
     __webpack_require__(0);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
+    __webpack_require__(5);
     __webpack_require__(4);
-    __webpack_require__(2);
+    __webpack_require__(3);
     __webpack_require__(0);
     __webpack_require__(8);
     __webpack_require__(1);
-    __webpack_require__(3);
+    __webpack_require__(2);
     __webpack_require__(7);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(4);
-    __webpack_require__(2);
-    __webpack_require__(0);
     __webpack_require__(3);
+    __webpack_require__(0);
+    __webpack_require__(2);
     __webpack_require__(1);
     __webpack_require__(8);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    __webpack_require__(2);
+    __webpack_require__(3);
     __webpack_require__(4);
     __webpack_require__(0);
-    __webpack_require__(3);
+    __webpack_require__(2);
     __webpack_require__(1);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
@@ -4203,7 +4171,7 @@ window.smartCard = function(modules) {
     __webpack_require__(0);
     __webpack_require__(8);
     __webpack_require__(1);
-    __webpack_require__(3);
+    __webpack_require__(2);
     __webpack_require__(9);
     __webpack_require__(11);
 }, function(module, __webpack_exports__, __webpack_require__) {
@@ -4215,7 +4183,7 @@ window.smartCard = function(modules) {
     __webpack_require__(0);
     __webpack_require__(8);
     __webpack_require__(1);
-    __webpack_require__(3);
+    __webpack_require__(2);
     __webpack_require__(9);
     __webpack_require__(11);
 }, function(module, __webpack_exports__, __webpack_require__) {
@@ -4231,9 +4199,9 @@ window.smartCard = function(modules) {
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(4);
-    __webpack_require__(2);
-    __webpack_require__(8);
     __webpack_require__(3);
+    __webpack_require__(8);
+    __webpack_require__(2);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(4);
@@ -8913,7 +8881,7 @@ window.smartCard = function(modules) {
     function hooks_module_B(n, t) {
         return "function" == typeof t ? t(n) : t;
     }
-    var lib = __webpack_require__(3);
+    var lib = __webpack_require__(2);
     var dist = __webpack_require__(12);
     var dist_default = __webpack_require__.n(dist);
     var constants = __webpack_require__(1);
@@ -9586,7 +9554,7 @@ window.smartCard = function(modules) {
     }
     var zalgo_promise_src = __webpack_require__(4);
     var src_props = __webpack_require__(49);
-    var belter_src = __webpack_require__(2);
+    var belter_src = __webpack_require__(3);
     var createVaultSetupToken_getCreateVaultSetupToken = function(_ref) {
         var createVaultSetupToken = _ref.createVaultSetupToken;
         if (createVaultSetupToken) return Object(belter_src.o)((function() {
@@ -11344,7 +11312,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.148", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.149", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[src.c.PAYMENTS_SDK] = clientID, 

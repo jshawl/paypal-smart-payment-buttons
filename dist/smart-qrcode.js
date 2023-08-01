@@ -1945,22 +1945,6 @@
         }
         var AUTO_FLUSH_LEVEL = [ "warn", "error" ];
         var LOG_LEVEL_PRIORITY = [ "error", "warn", "info", "debug" ];
-        var sendBeacon = function(_ref2) {
-            var _ref2$win = _ref2.win, win = void 0 === _ref2$win ? window : _ref2$win, url = _ref2.url, data = _ref2.data, _ref2$useBlob = _ref2.useBlob, useBlob = void 0 === _ref2$useBlob || _ref2$useBlob;
-            try {
-                var json = JSON.stringify(data);
-                if (!win.navigator.sendBeacon) throw new Error("No sendBeacon available");
-                if (useBlob) {
-                    var blob = new Blob([ json ], {
-                        type: "application/json"
-                    });
-                    return win.navigator.sendBeacon(url, blob);
-                }
-                return win.navigator.sendBeacon(url, json);
-            } catch (e) {
-                return !1;
-            }
-        };
         var extendIfDefined = function(target, source) {
             for (var key in source) source.hasOwnProperty(key) && (target[key] = source[key]);
         };
@@ -1978,14 +1962,22 @@
                     })({
                         headers: headers,
                         enableSendBeacon: enableSendBeacon
-                    }) && (beaconResult = function(url) {
-                        return "https://api2.amplitude.com/2/httpapi" === url;
-                    }(url) ? sendBeacon({
-                        win: win,
-                        url: url,
-                        data: json,
-                        useBlob: !1
-                    }) : sendBeacon({
+                    }) && (beaconResult = function(_ref2) {
+                        var _ref2$win = _ref2.win, win = void 0 === _ref2$win ? window : _ref2$win, url = _ref2.url, data = _ref2.data, _ref2$useBlob = _ref2.useBlob, useBlob = void 0 === _ref2$useBlob || _ref2$useBlob;
+                        try {
+                            var json = JSON.stringify(data);
+                            if (!win.navigator.sendBeacon) throw new Error("No sendBeacon available");
+                            if (useBlob) {
+                                var blob = new Blob([ json ], {
+                                    type: "application/json"
+                                });
+                                return win.navigator.sendBeacon(url, blob);
+                            }
+                            return win.navigator.sendBeacon(url, json);
+                        } catch (e) {
+                            return !1;
+                        }
+                    }({
                         win: win,
                         url: url,
                         data: json,
@@ -2001,18 +1993,14 @@
                 })).then(src_util_noop);
             };
         }
-        var _FUNDING_SKIP_LOGIN, _AMPLITUDE_API_KEY;
+        var _FUNDING_SKIP_LOGIN;
         (_FUNDING_SKIP_LOGIN = {}).paypal = "paypal", _FUNDING_SKIP_LOGIN.paylater = "paypal", 
         _FUNDING_SKIP_LOGIN.credit = "paypal";
-        var AMPLITUDE_API_KEY = ((_AMPLITUDE_API_KEY = {}).test = "a23fb4dfae56daf7c3212303b53a8527", 
-        _AMPLITUDE_API_KEY.local = "a23fb4dfae56daf7c3212303b53a8527", _AMPLITUDE_API_KEY.stage = "a23fb4dfae56daf7c3212303b53a8527", 
-        _AMPLITUDE_API_KEY.sandbox = "a23fb4dfae56daf7c3212303b53a8527", _AMPLITUDE_API_KEY.production = "ce423f79daba95faeb0694186170605c", 
-        _AMPLITUDE_API_KEY);
         function getLogger() {
             var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? "/xoplatform/logger/api/logger?disableSetCookie=true" : "/xoplatform/logger/api/logger";
             return inlineMemoize(getLogger, (function() {
                 return function(_ref) {
-                    var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? "warn" : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? getHTTPTransport() : _ref$transport, amplitudeApiKey = _ref.amplitudeApiKey, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
+                    var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? "warn" : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? getHTTPTransport() : _ref$transport, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
                     var events = [];
                     var tracking = [];
                     var metrics = [];
@@ -2051,21 +2039,6 @@
                                     },
                                     enableSendBeacon: enableSendBeacon
                                 }).catch(src_util_noop));
-                                amplitudeApiKey && transport({
-                                    method: "POST",
-                                    url: "https://api2.amplitude.com/2/httpapi",
-                                    headers: {},
-                                    json: {
-                                        api_key: amplitudeApiKey,
-                                        events: tracking.map((function(payload) {
-                                            return _extends({
-                                                event_type: payload.transition_name || "event",
-                                                event_properties: payload
-                                            }, payload);
-                                        }))
-                                    },
-                                    enableSendBeacon: enableSendBeacon
-                                }).catch(src_util_noop);
                                 events = [];
                                 tracking = [];
                                 metrics = [];
@@ -2186,7 +2159,6 @@
                             opts.prefix && (prefix = opts.prefix);
                             opts.logLevel && (logLevel = opts.logLevel);
                             opts.transport && (transport = opts.transport);
-                            opts.amplitudeApiKey && (amplitudeApiKey = opts.amplitudeApiKey);
                             opts.flushInterval && (flushInterval = opts.flushInterval);
                             opts.enableSendBeacon && (enableSendBeacon = opts.enableSendBeacon);
                             return logger;
@@ -3127,8 +3099,8 @@
             logger.configure({
                 transport: parent && getHTTPTransport(parent)
             });
-            !function(_ref3) {
-                var env = _ref3.env, sessionID = _ref3.sessionID, clientID = _ref3.clientID, sdkCorrelationID = _ref3.sdkCorrelationID, buyerCountry = _ref3.buyerCountry, locale = _ref3.locale, _ref3$sdkVersion = _ref3.sdkVersion, sdkVersion = void 0 === _ref3$sdkVersion ? window.paypal.version : _ref3$sdkVersion;
+            !function(_ref2) {
+                var env = _ref2.env, sessionID = _ref2.sessionID, clientID = _ref2.clientID, sdkCorrelationID = _ref2.sdkCorrelationID, buyerCountry = _ref2.buyerCountry, locale = _ref2.locale, _ref2$sdkVersion = _ref2.sdkVersion, sdkVersion = void 0 === _ref2$sdkVersion ? window.paypal.version : _ref2$sdkVersion;
                 var logger = getLogger();
                 logger.addPayloadBuilder((function() {
                     return {
@@ -3140,19 +3112,19 @@
                     };
                 }));
                 logger.addTrackingBuilder((function() {
-                    var _ref4;
-                    return (_ref4 = {}).feed_name = "payments_sdk", _ref4.serverside_data_source = "checkout", 
-                    _ref4.client_id = clientID, _ref4.page_session_id = sessionID, _ref4.referer_url = window.location.host, 
-                    _ref4.buyer_cntry = buyerCountry, _ref4.locale = locale.lang + "_" + locale.country, 
-                    _ref4.integration_identifier = clientID, _ref4.sdk_environment = function(ua) {
+                    var _ref3;
+                    return (_ref3 = {}).feed_name = "payments_sdk", _ref3.serverside_data_source = "checkout", 
+                    _ref3.client_id = clientID, _ref3.page_session_id = sessionID, _ref3.referer_url = window.location.host, 
+                    _ref3.buyer_cntry = buyerCountry, _ref3.locale = locale.lang + "_" + locale.country, 
+                    _ref3.integration_identifier = clientID, _ref3.sdk_environment = function(ua) {
                         void 0 === ua && (ua = getUserAgent());
                         return /iPhone|iPod|iPad/.test(ua);
                     }() ? "iOS" : function(ua) {
                         void 0 === ua && (ua = getUserAgent());
                         return /Android/.test(ua);
-                    }() ? "android" : null, _ref4.sdk_name = "payments_sdk", _ref4.sdk_version = sdkVersion, 
-                    _ref4.user_agent = window.navigator && window.navigator.userAgent, _ref4.context_correlation_id = sdkCorrelationID, 
-                    _ref4.t = Date.now().toString(), _ref4;
+                    }() ? "android" : null, _ref3.sdk_name = "payments_sdk", _ref3.sdk_version = sdkVersion, 
+                    _ref3.user_agent = window.navigator && window.navigator.userAgent, _ref3.context_correlation_id = sdkCorrelationID, 
+                    _ref3.t = Date.now().toString(), _ref3;
                 }));
                 promise_ZalgoPromise.onPossiblyUnhandledException((function(err) {
                     var _logger$track;
@@ -3174,26 +3146,16 @@
                 sdkVersion: sdkVersion,
                 buyerCountry: buyerCountry
             });
-            !function(_ref2) {
-                var env = _ref2.env;
-                getLogger().configure({
-                    amplitudeApiKey: AMPLITUDE_API_KEY[env]
-                });
-            }({
-                env: env
-            });
             logger.addPayloadBuilder((function() {
-                var _ref;
-                return (_ref = {
+                return {
                     buttonSessionID: buttonSessionID
-                }).user_id = buttonSessionID, _ref;
+                };
             }));
             logger.addTrackingBuilder((function() {
-                var _ref2;
-                return (_ref2 = {}).state_name = "smart_button", _ref2.context_type = "EC-Token", 
-                _ref2.context_id = orderID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.148", 
-                _ref2.selected_payment_method = fundingSource, _ref2.user_id = buttonSessionID, 
-                _ref2;
+                var _ref;
+                return (_ref = {}).state_name = "smart_button", _ref.context_type = "EC-Token", 
+                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.149", 
+                _ref.selected_payment_method = fundingSource, _ref;
             }));
             (function() {
                 if (window.document.documentMode) try {
@@ -3217,9 +3179,9 @@
                         return timing.connectEnd && timing.domInteractive ? timing.domInteractive - timing.connectEnd : void 0;
                     }
                 }))
-            }).then((function(_ref3) {
+            }).then((function(_ref2) {
                 var _logger$track;
-                var pageRenderTime = _ref3.pageRenderTime;
+                var pageRenderTime = _ref2.pageRenderTime;
                 logger.track(((_logger$track = {}).transition_name = "qr_load", _logger$track.merchant_selected_funding_source = fundingSource, 
                 _logger$track.page_load_time = pageRenderTime ? pageRenderTime.toString() : "", 
                 _logger$track));
