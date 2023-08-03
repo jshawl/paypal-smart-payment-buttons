@@ -112,7 +112,7 @@ const setupPopup = async (options: SetupPopupOptions, callback) => {
         await clickButton(options.fundingSource);
     });
 }
-describe.only('popup cases', () => {
+describe('popup cases', () => {
 
     it('should render a button with createOrder, click the button, fail to open a popup, and render checkout', async () => {
         const windowOpen = window.open;
