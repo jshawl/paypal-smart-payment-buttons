@@ -9,7 +9,7 @@ import {
 } from "@paypal/sdk-constants/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { getLogger, setupLogger } from "../lib";
+import { sendMetric, getLogger, setupLogger } from "../lib";
 import type { LocaleType } from "../types";
 import { FPTI_STATE, PAYMENT_FLOWS } from "../constants";
 
@@ -97,6 +97,14 @@ export function setupCardLogger({
 export const hcfTransactionSuccess = ({
   orderID
 }: {|orderID: string|}) => {
+
+  sendMetric({
+    name: "pp.app.paypal_sdk.card_fields.submit.success.count",
+    dimensions: {
+      cardFieldsFlow: PAYMENT_FLOWS.WITH_PURCHASE,
+    }
+  })
+
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_transaction_success",
     [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_success",
@@ -114,10 +122,18 @@ export const hcfTransactionError = ({
   // should be Error but other apis are constraining this type
   error: mixed
 |}) => {
+
+  sendMetric({
+    name: "pp.app.paypal_sdk.card_fields.submit.error.count",
+    dimensions: {
+      cardFieldsFlow: PAYMENT_FLOWS.WITH_PURCHASE,
+    }
+  })
   getLogger().track({
     [FPTI_KEY.ERROR_CODE]: "hcf_transaction_error",
     [FPTI_KEY.EVENT_NAME]: "hcf_transaction_error",
     [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(error),
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.WITH_PURCHASE,
     [FPTI_HCF_KEYS.HCF_ORDER_ID]: orderID,
     [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HCF_ORDER_ID,
     [FPTI_KEY.CONTEXT_ID]: orderID
@@ -127,10 +143,19 @@ export const hcfTransactionError = ({
 export const vaultWithoutPurchaseSuccess = ({
   vaultToken,
 }: {|vaultToken: string|}) => {
+
+  sendMetric({
+    name: "pp.app.paypal_sdk.card_fields.submit.success.count",
+    dimensions: {
+      cardFieldsFlow: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+    }
+  })
+
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_transaction_success",
     [FPTI_KEY.EVENT_NAME]:  "hcf_transaction_success",
     [FPTI_HCF_KEYS.VAULT_TOKEN]: vaultToken,
+    [FPTI_KEY.PAYMENT_FLOW]: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
     [FPTI_KEY.CONTEXT_TYPE]: `vault_setup_token`,
     [FPTI_KEY.CONTEXT_ID]: vaultToken
   }).flush();
@@ -143,6 +168,13 @@ export const vaultWithoutPurchaseFailure = ({
   // should be Error but other apis are constraining this type
   error: mixed
 |}) => {
+
+  sendMetric({
+    name: "pp.app.paypal_sdk.card_fields.submit.error.count",
+    dimensions: {
+      cardFieldsFlow: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+    }
+  })
   getLogger().track({
     [FPTI_KEY.ERROR_CODE]: "hcf_transaction_error",
     [FPTI_KEY.EVENT_NAME]: "hcf_transaction_error",
@@ -154,15 +186,36 @@ export const vaultWithoutPurchaseFailure = ({
   }).flush();
 }
 
+// $FlowFixMe
+export const threeDsAuthStatus = ({
+  authStatus, // $FlowFixMe
+}): {|
+  authStatus: string
+  |} => {
+  getLogger().addTrackingBuilder(() => ({
+    [FPTI_HCF_KEYS.THREEDS_AUTH_STATUS]: authStatus,
+  }))
+  }
+
 export const hcfFieldsSubmit = ({
+  cardFlowType,
   hcfSessionID
 }: {|
+  cardFlowType: string,
   hcfSessionID: string
 |}) => {
+
+  sendMetric({
+    name: "pp.app.paypal_sdk.card_fields.submit.count",
+    dimensions: {
+      cardFieldsFlow: cardFlowType,
+    }
+  })
   getLogger().track({
     [FPTI_KEY.TRANSITION]:  "hcf_fields_submit",
     [FPTI_KEY.EVENT_NAME]:  "hcf_fields_submit",
     [FPTI_KEY.CONTEXT_TYPE]: FPTI_HCF_KEYS.HOSTED_SESSION_ID,
+    [FPTI_KEY.PAYMENT_FLOW]: cardFlowType,
     [FPTI_KEY.CONTEXT_ID]: hcfSessionID
   })
 }

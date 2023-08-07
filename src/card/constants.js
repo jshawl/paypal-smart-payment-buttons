@@ -326,5 +326,6 @@ export const FPTI_HCF_KEYS = {
   HCF_VERSION: ("hcf_version": "hcf_version"),
   SDK_CORRELATION_ID: ("sdk_correlation_id": "sdk_correlation_id"),
   VAULT_TOKEN: ("vault_token": "vault_token"),
-  HCF_ORDER_ID: ('order_id' : 'order_id'),
+  HCF_ORDER_ID: ("order_id" : "order_id"),
+  THREEDS_AUTH_STATUS: ("3ds_auth_status" : "3ds_auth_status")
 }

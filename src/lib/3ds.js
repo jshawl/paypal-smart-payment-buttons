@@ -6,7 +6,7 @@ import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { type ValidatePaymentMethodResponse } from '../api';
 import type { ThreeDomainSecureFlowType } from '../types';
 import { TARGET_ELEMENT } from '../constants';
-
+import { threeDsAuthStatus } from '../card/logger'
 
 type CreateOrder = () => ZalgoPromise<string>;
 type ThreeDomainSecureProps = {|
@@ -35,12 +35,15 @@ function handleThreeDomainSecureRedirect({ ThreeDomainSecure, vaultToken, create
         createOrder,
         action,
         onSuccess: (data) => {
+            threeDsAuthStatus({authStatus: "success"})
           return promise.resolve(data)
         },
         onCancel: () => {
+            threeDsAuthStatus({ authStatus: "cancelled" })
           return promise.reject(new Error(`3DS cancelled`))
         },
         onError: (err) => {
+            threeDsAuthStatus({ authStatus: "failure" })
           return promise.reject(err)
         }
     });

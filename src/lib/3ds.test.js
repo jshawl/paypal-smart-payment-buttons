@@ -3,9 +3,13 @@
 import { describe, test, expect, beforeEach, vi } from "vitest";
 
 import { TARGET_ELEMENT } from "../constants";
+import { threeDsAuthStatus } from "../card/logger";
 
 import { handleThreeDomainSecureContingency } from "./3ds";
 
+vi.mock("../card/logger", () => ({
+  threeDsAuthStatus: vi.fn(),
+}));
 describe("3ds.js", () => {
   beforeEach(() => undefined);
 
@@ -36,6 +40,7 @@ describe("3ds.js", () => {
           // Need to invoke the `onSuccess` provided to the ThreeDomainSecure object to
           // resolve the ZalgoPromise, so just sneakily invoke it here for the test here
           await onSuccess();
+          expect(threeDsAuthStatus).toBeCalledWith({ authStatus: "success" });
           return mockRenderTo(param1, param2);
         }),
         close: mockClose,

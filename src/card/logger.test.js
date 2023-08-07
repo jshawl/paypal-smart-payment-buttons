@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { COUNTRY } from "@paypal/sdk-constants/src";
 import { uniqueID } from "@krakenjs/belter/src";
 
-import { getLogger } from "../lib/logger";
+import { getLogger, sendMetric } from "../lib/logger";
 
 import {
   hcfTransactionError,
@@ -16,6 +16,7 @@ import {
 
 vi.mock("../lib/logger", () => ({
   getLogger: vi.fn(),
+  sendMetric: vi.fn(),
   setupLogger: vi.fn(),
 }));
 
@@ -90,6 +91,12 @@ describe("card logger", () => {
         ext_error_desc: "testing hcf transaction error",
       })
     );
+    expect(sendMetric).toBeCalledWith({
+      name: "pp.app.paypal_sdk.card_fields.submit.error.count",
+      dimensions: {
+        cardFieldsFlow: "with_purchase",
+      },
+    });
   });
 
   it("should call logger.track with hcfTransactionSuccess ", async () => {
@@ -101,6 +108,12 @@ describe("card logger", () => {
         order_id: "ABCD123",
       })
     );
+    expect(sendMetric).toBeCalledWith({
+      name: "pp.app.paypal_sdk.card_fields.submit.success.count",
+      dimensions: {
+        cardFieldsFlow: "with_purchase",
+      },
+    });
   });
 
   it("should call logger.track with vaultWithoutPurchaseSuccess ", async () => {
@@ -112,6 +125,12 @@ describe("card logger", () => {
         vault_token: "ABCD123efgh",
       })
     );
+    expect(sendMetric).toBeCalledWith({
+      name: "pp.app.paypal_sdk.card_fields.submit.success.count",
+      dimensions: {
+        cardFieldsFlow: "vault_without_purchase",
+      },
+    });
   });
 
   it("should call logger.track with vaultWithoutPurchaseFailure ", async () => {
@@ -123,5 +142,11 @@ describe("card logger", () => {
         ext_error_desc: "testing vault without purchase error",
       })
     );
+    expect(sendMetric).toBeCalledWith({
+      name: "pp.app.paypal_sdk.card_fields.submit.error.count",
+      dimensions: {
+        cardFieldsFlow: "vault_without_purchase",
+      },
+    });
   });
 });

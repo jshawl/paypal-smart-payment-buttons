@@ -110,6 +110,7 @@ export function submitCardFields({
   });
 
   hcfFieldsSubmit({
+    cardFlowType: cardProps.productAction,
     hcfSessionID: cardProps.hcfSessionID,
   });
   resetGQLErrors();
