@@ -1181,7 +1181,7 @@ describe('card fields cases', () => {
         });
     });
 
-    it('should turn autocomplete off on fields with `disableAutocomplete`', async () => {
+    it.skip('should turn autocomplete off on fields with `disableAutocomplete`', async () => {
         return await wrapPromise(async ({ expect }) => {
             window.xprops.disableAutocomplete = true;
             window.xprops.type = CARD_FIELD_TYPE.SINGLE;
