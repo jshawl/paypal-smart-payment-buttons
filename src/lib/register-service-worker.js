@@ -38,7 +38,6 @@ const requestSwLogs = () => {
 };
 
 const startBroadCastChannel = () => {
-    // eslint-disable-next-line compat/compat
     broadcastChannel = new BroadcastChannel(LOGS_CHANNEL_NAME);
 };
 
@@ -120,8 +119,12 @@ const executeServiceWorker = (releaseHash: string, serviceWorker: string) => {
 }
 
 export function registerServiceWorker({ dumbledoreCurrentReleaseHash, dumbledoreServiceWorker }: RegisterServiceWorkerParams) {
-    if ('serviceWorker' in navigator === false) {
-        getLogger().info(`${ LOG_PREFIX }NOT_SUPPORTED`);
+    // Browser eligibility criteria for SW registration
+    if ('serviceWorker' in navigator === false || 'BroadcastChannel' in window === false) {
+        getLogger().info(`${ LOG_PREFIX }NOT_SUPPORTED`, {
+          serviceWorker: Boolean('serviceWorker' in navigator),
+          BroadcastChannel: Boolean('BroadcastChannel' in window),
+        });
         return;
     }
     if (!dumbledoreCurrentReleaseHash) {
