@@ -10,6 +10,7 @@
 // This link also includes instructions on opting out of this behavior.
 
 import { stringifyError } from '@krakenjs/belter/src';
+import { FPTI_KEY } from "@paypal/sdk-constants/src";
 
 import { SERVICE_WORKER, CLASS } from '../constants';
 
@@ -124,9 +125,14 @@ export function registerServiceWorker({ dumbledoreCurrentReleaseHash, dumbledore
         getLogger().info(`${ LOG_PREFIX }NOT_SUPPORTED`, {
           serviceWorker: Boolean('serviceWorker' in navigator),
           BroadcastChannel: Boolean('BroadcastChannel' in window),
+        }).track({
+            [FPTI_KEY.EVENT_NAME]: `${ LOG_PREFIX }NOT_ELIGIBILE`,
         });
         return;
     }
+    getLogger().track({
+        [FPTI_KEY.EVENT_NAME]: `${ LOG_PREFIX }ELIGIBILE`,
+    });
     if (!dumbledoreCurrentReleaseHash) {
         getLogger().error(`${ LOG_PREFIX }RELEASE_HASH_NOT_PROVIDED`, { releaseHash: dumbledoreCurrentReleaseHash });
         return;

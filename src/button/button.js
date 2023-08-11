@@ -217,10 +217,12 @@ export function setupButton({
             }))
 
             if (eligibility.isServiceWorkerEligible) {
-                getLogger().info(`SERVICE_WORKER_ELIGIBLE`);
+                getLogger().info('SERVICE_WORKER_ELMO_TREATMENT');
                 registerServiceWorker({ dumbledoreCurrentReleaseHash, dumbledoreServiceWorker});
             } else {
-                getLogger().info(`SERVICE_WORKER_NOT_ELIGIBLE`);
+                getLogger().info('SERVICE_WORKER_ELMO_CONTROL').track({
+                    [FPTI_KEY.EVENT_NAME]: 'SERVICE_WORKER_NOT_ELIGIBLE',
+                });
                 unregisterServiceWorker();
             }
 
