@@ -15,9 +15,9 @@ import { checkout, CHECKOUT_POPUP_DIMENSIONS, EXPERIMENTAL_POPUP_DIMENSIONS } fr
 
 function isWalletCaptureEligible({ props, serviceData } : IsEligibleOptions) : boolean {
     const { wallet } = serviceData;
-    const { onShippingChange, onShippingAddressChange, onShippingOptionsChange } = props;
+    const { onShippingChange, onShippingAddressChange, onShippingOptionsChange, userIDToken } = props;
 
-    if (!wallet) {
+    if (!userIDToken || !wallet) {
         return false;
     }
 

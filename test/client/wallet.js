@@ -1276,6 +1276,9 @@ describe('wallet cases', () => {
         return await wrapPromise(async ({ expect }) => {
             const orderID = generateOrderID();
             const instrumentID = uniqueID();
+            const userIDToken = uniqueID();
+
+            window.xprops.userIDToken = userIDToken;
 
             window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
                 return orderID;
@@ -1299,6 +1302,22 @@ describe('wallet cases', () => {
                     ]
                 }
             };
+
+            const gqlMock = getGraphQLApiMock({
+                extraHandler: ({ data }) => {
+                    if (data.query.includes('query GetSmartWallet')) {
+                        if (data.variables.userIDToken !== userIDToken) {
+                            throw new Error(`Expected correct userIdToken`);
+                        }
+
+                        return {
+                            data: {
+                                smartWallet: wallet
+                            }
+                        };
+                    }
+                }
+            }).expectCalls();
 
             getMockWindowOpen({ expectImmediateUrl: false });
             const win = window.open();
@@ -1373,6 +1392,7 @@ describe('wallet cases', () => {
             });
 
             await clickMenu(FUNDING.PAYPAL);
+            gqlMock.done();
         });
     });
 
@@ -1380,6 +1400,9 @@ describe('wallet cases', () => {
         return await wrapPromise(async ({ expect }) => {
             const orderID = generateOrderID();
             const instrumentID = uniqueID();
+            const userIDToken = uniqueID();
+
+            window.xprops.userIDToken = userIDToken;
 
             window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
                 return orderID;
@@ -1403,6 +1426,22 @@ describe('wallet cases', () => {
                     ]
                 }
             };
+
+            const gqlMock = getGraphQLApiMock({
+                extraHandler: ({ data }) => {
+                    if (data.query.includes('query GetSmartWallet')) {
+                        if (data.variables.userIDToken !== userIDToken) {
+                            throw new Error(`Expected correct userIdToken`);
+                        }
+
+                        return {
+                            data: {
+                                smartWallet: wallet
+                            }
+                        };
+                    }
+                }
+            }).expectCalls();
 
             getMockWindowOpen({ expectImmediateUrl: false });
             const win = window.open();
@@ -1481,6 +1520,7 @@ describe('wallet cases', () => {
             });
 
             await clickMenu(FUNDING.PAYPAL);
+            gqlMock.done();
         });
     });
 
