@@ -150,6 +150,8 @@ window.smartCard = function(modules) {
         ERROR_CODE: "ext_error_code",
         ERROR_DESC: "ext_error_desc",
         PAGE_LOAD_TIME: "page_load_time",
+        EXPERIMENT_EXPERIENCE: "experimentation_experience",
+        EXPERIMENT_TREATMENT: "experimentation_treatment",
         EXPERIMENT_NAME: "pxp_exp_id",
         TREATMENT_NAME: "pxp_trtmnt_id",
         TRANSITION_TIME: "transition_time",
@@ -568,6 +570,7 @@ window.smartCard = function(modules) {
         if (!paypal.postRobot) throw new Error("paypal.postRobot not found");
         return paypal.postRobot;
     }
+    __webpack_require__(0);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.d(__webpack_exports__, "g", (function() {
@@ -1783,7 +1786,7 @@ window.smartCard = function(modules) {
                     _getLogger$track[_constants__WEBPACK_IMPORTED_MODULE_5__.e.INFO_MSG] = "URL: " + url, 
                     _getLogger$track));
                 }
-                eventName && Object(_lib__WEBPACK_IMPORTED_MODULE_6__.c)().warn("rest_api_" + eventName + "_error");
+                eventName && Object(_lib__WEBPACK_IMPORTED_MODULE_6__.c)().warn("rest_api_" + eventName + "_status_" + status + "_error");
                 throw error;
             }
             return body;
@@ -8557,18 +8560,17 @@ window.smartCard = function(modules) {
         x.__r = 0;
     }
     function P(n, l, u, t, i, o, r, f, e, a, v) {
-        var p, y, _, b, g, m, w, x, P, S, H = 0, I = t && t.__k || preact_module_s, T = I.length, j = T, z = l.length;
+        var p, y, _, b, m, w, x, P, S, H = 0, I = t && t.__k || preact_module_s, T = I.length, j = T, z = l.length;
         for (u.__k = [], p = 0; p < z; p++) null != (b = u.__k[p] = null == (b = l[p]) || "boolean" == typeof b || "function" == typeof b ? null : "string" == typeof b || "number" == typeof b || "bigint" == typeof b ? preact_module_d(null, b, null, null, b) : h(b) ? preact_module_d(k, {
             children: b
-        }, null, null, null) : b.__b > 0 ? preact_module_d(b.type, b.props, b.key, b.ref ? b.ref : null, b.__v) : b) && (b.__ = u, 
-        b.__b = u.__b + 1, -1 === (x = A(b, I, w = p + H, j)) ? _ = c : (_ = I[x] || c, 
-        I[x] = void 0, j--), L(n, b, _, i, o, r, f, e, a, v), g = b.__e, (y = b.ref) && _.ref != y && (_.ref && O(_.ref, null, b), 
-        v.push(y, b.__c || g, b)), null != g && (null == m && (m = g), S = !(P = _ === c || null === _.__v) && x === w, 
-        P ? -1 == x && H-- : x !== w && (x === w + 1 ? (H++, S = !0) : x > w ? j > z - w ? (H += x - w, 
-        S = !0) : H-- : H = x < w && x == w - 1 ? x - w : 0), w = p + H, S = S || x == p && !P, 
-        "function" != typeof b.type || x === w && _.__k !== b.__k ? "function" == typeof b.type || S ? void 0 !== b.__d ? (e = b.__d, 
-        b.__d = void 0) : e = g.nextSibling : e = $(n, g, e) : e = C(b, e, n), "function" == typeof u.type && (u.__d = e)));
-        for (u.__e = m, p = T; p--; ) null != I[p] && ("function" == typeof u.type && null != I[p].__e && I[p].__e == u.__d && (u.__d = I[p].__e.nextSibling), 
+        }, null, null, null) : b.__b > 0 ? preact_module_d(b.type, b.props, b.key, b.ref ? b.ref : null, b.__v) : b) ? (b.__ = u, 
+        b.__b = u.__b + 1, -1 === (P = A(b, I, x = p + H, j)) ? _ = c : (_ = I[P] || c, 
+        I[P] = void 0, j--), L(n, b, _, i, o, r, f, e, a, v), m = b.__e, (y = b.ref) && _.ref != y && (_.ref && O(_.ref, null, b), 
+        v.push(y, b.__c || m, b)), null != m && (null == w && (w = m), (S = _ === c || null === _.__v) ? -1 == P && H-- : P !== x && (P === x + 1 ? H++ : P > x ? j > z - x ? H += P - x : H-- : H = P < x && P == x - 1 ? P - x : 0), 
+        x = p + H, "function" != typeof b.type || P === x && _.__k !== b.__k ? "function" == typeof b.type || P === x && !S ? void 0 !== b.__d ? (e = b.__d, 
+        b.__d = void 0) : e = m.nextSibling : e = $(n, m, e) : e = C(b, e, n), "function" == typeof u.type && (u.__d = e))) : (_ = I[p]) && null == _.key && _.__e && (_.__e == e && (e = g(_)), 
+        q(_, _, !1));
+        for (u.__e = w, p = T; p--; ) null != I[p] && ("function" == typeof u.type && null != I[p].__e && I[p].__e == u.__d && (u.__d = I[p].__e.nextSibling), 
         q(I[p], I[p]));
     }
     function C(n, l, u) {
@@ -8622,46 +8624,44 @@ window.smartCard = function(modules) {
         var a, p, y, d, _, g, m, w, x, C, S, $, A, H, I, T = u.type;
         if (void 0 !== u.constructor) return null;
         null != t.__h && (c = t.__h, e = u.__e = t.__e, u.__h = null, r = [ e ]), (a = l.__b) && a(u);
-        try {
-            n: if ("function" == typeof T) {
-                if (w = u.props, x = (a = T.contextType) && i[a.__c], C = a ? x ? x.props.value : a.__ : i, 
-                t.__c ? m = (p = u.__c = t.__c).__ = p.__E : ("prototype" in T && T.prototype.render ? u.__c = p = new T(w, C) : (u.__c = p = new b(w, C), 
-                p.constructor = T, p.render = B), x && x.sub(p), p.props = w, p.state || (p.state = {}), 
-                p.context = C, p.__n = i, y = p.__d = !0, p.__h = [], p._sb = []), null == p.__s && (p.__s = p.state), 
-                null != T.getDerivedStateFromProps && (p.__s == p.state && (p.__s = v({}, p.__s)), 
-                v(p.__s, T.getDerivedStateFromProps(w, p.__s))), d = p.props, _ = p.state, p.__v = u, 
-                y) null == T.getDerivedStateFromProps && null != p.componentWillMount && p.componentWillMount(), 
-                null != p.componentDidMount && p.__h.push(p.componentDidMount); else {
-                    if (null == T.getDerivedStateFromProps && w !== d && null != p.componentWillReceiveProps && p.componentWillReceiveProps(w, C), 
-                    !p.__e && (null != p.shouldComponentUpdate && !1 === p.shouldComponentUpdate(w, p.__s, C) || u.__v === t.__v)) {
-                        for (u.__v !== t.__v && (p.props = w, p.state = p.__s, p.__d = !1), u.__e = t.__e, 
-                        u.__k = t.__k, u.__k.forEach((function(n) {
-                            n && (n.__ = u);
-                        })), S = 0; S < p._sb.length; S++) p.__h.push(p._sb[S]);
-                        p._sb = [], p.__h.length && f.push(p);
-                        break n;
-                    }
-                    null != p.componentWillUpdate && p.componentWillUpdate(w, p.__s, C), null != p.componentDidUpdate && p.__h.push((function() {
-                        p.componentDidUpdate(d, _, g);
-                    }));
+        n: if ("function" == typeof T) try {
+            if (w = u.props, x = (a = T.contextType) && i[a.__c], C = a ? x ? x.props.value : a.__ : i, 
+            t.__c ? m = (p = u.__c = t.__c).__ = p.__E : ("prototype" in T && T.prototype.render ? u.__c = p = new T(w, C) : (u.__c = p = new b(w, C), 
+            p.constructor = T, p.render = B), x && x.sub(p), p.props = w, p.state || (p.state = {}), 
+            p.context = C, p.__n = i, y = p.__d = !0, p.__h = [], p._sb = []), null == p.__s && (p.__s = p.state), 
+            null != T.getDerivedStateFromProps && (p.__s == p.state && (p.__s = v({}, p.__s)), 
+            v(p.__s, T.getDerivedStateFromProps(w, p.__s))), d = p.props, _ = p.state, p.__v = u, 
+            y) null == T.getDerivedStateFromProps && null != p.componentWillMount && p.componentWillMount(), 
+            null != p.componentDidMount && p.__h.push(p.componentDidMount); else {
+                if (null == T.getDerivedStateFromProps && w !== d && null != p.componentWillReceiveProps && p.componentWillReceiveProps(w, C), 
+                !p.__e && (null != p.shouldComponentUpdate && !1 === p.shouldComponentUpdate(w, p.__s, C) || u.__v === t.__v)) {
+                    for (u.__v !== t.__v && (p.props = w, p.state = p.__s, p.__d = !1), u.__e = t.__e, 
+                    u.__k = t.__k, u.__k.forEach((function(n) {
+                        n && (n.__ = u);
+                    })), S = 0; S < p._sb.length; S++) p.__h.push(p._sb[S]);
+                    p._sb = [], p.__h.length && f.push(p);
+                    break n;
                 }
-                if (p.context = C, p.props = w, p.__P = n, p.__e = !1, $ = l.__r, A = 0, "prototype" in T && T.prototype.render) {
-                    for (p.state = p.__s, p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), 
-                    H = 0; H < p._sb.length; H++) p.__h.push(p._sb[H]);
-                    p._sb = [];
-                } else do {
-                    p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), p.state = p.__s;
-                } while (p.__d && ++A < 25);
-                p.state = p.__s, null != p.getChildContext && (i = v(v({}, i), p.getChildContext())), 
-                y || null == p.getSnapshotBeforeUpdate || (g = p.getSnapshotBeforeUpdate(d, _)), 
-                P(n, h(I = null != a && a.type === k && null == a.key ? a.props.children : a) ? I : [ I ], u, t, i, o, r, f, e, c, s), 
-                p.base = u.__e, u.__h = null, p.__h.length && f.push(p), m && (p.__E = p.__ = null);
-            } else null == r && u.__v === t.__v ? (u.__k = t.__k, u.__e = t.__e) : u.__e = N(t.__e, u, t, i, o, r, f, c, s);
-            (a = l.diffed) && a(u);
+                null != p.componentWillUpdate && p.componentWillUpdate(w, p.__s, C), null != p.componentDidUpdate && p.__h.push((function() {
+                    p.componentDidUpdate(d, _, g);
+                }));
+            }
+            if (p.context = C, p.props = w, p.__P = n, p.__e = !1, $ = l.__r, A = 0, "prototype" in T && T.prototype.render) {
+                for (p.state = p.__s, p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), 
+                H = 0; H < p._sb.length; H++) p.__h.push(p._sb[H]);
+                p._sb = [];
+            } else do {
+                p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), p.state = p.__s;
+            } while (p.__d && ++A < 25);
+            p.state = p.__s, null != p.getChildContext && (i = v(v({}, i), p.getChildContext())), 
+            y || null == p.getSnapshotBeforeUpdate || (g = p.getSnapshotBeforeUpdate(d, _)), 
+            P(n, h(I = null != a && a.type === k && null == a.key ? a.props.children : a) ? I : [ I ], u, t, i, o, r, f, e, c, s), 
+            p.base = u.__e, u.__h = null, p.__h.length && f.push(p), m && (p.__E = p.__ = null);
         } catch (n) {
             u.__v = null, (c || null != r) && (u.__e = e, u.__h = !!c, r[r.indexOf(e)] = null), 
             l.__e(n, u, t);
-        }
+        } else null == r && u.__v === t.__v ? (u.__k = t.__k, u.__e = t.__e) : u.__e = N(t.__e, u, t, i, o, r, f, c, s);
+        (a = l.diffed) && a(u);
     }
     function M(n, u, t) {
         for (var i = 0; i < t.length; i++) O(t[i], t[++i], t[++i]);
@@ -9630,6 +9630,13 @@ window.smartCard = function(modules) {
         var _ref;
     }
     var api = __webpack_require__(8);
+    var logger_threeDsAuthStatus = function(_ref8) {
+        var authStatus = _ref8.authStatus;
+        Object(lib.c)().addTrackingBuilder((function() {
+            var _ref9;
+            return (_ref9 = {})["3ds_auth_status"] = authStatus, _ref9;
+        }));
+    };
     function handleThreeDomainSecureContingency(_ref2) {
         var status = _ref2.status, links = _ref2.links, ThreeDomainSecure = _ref2.ThreeDomainSecure, createOrder = _ref2.createOrder, getParent = _ref2.getParent;
         return zalgo_promise_src.a.try((function() {
@@ -9658,12 +9665,21 @@ window.smartCard = function(modules) {
                         createOrder: createOrder,
                         action: action,
                         onSuccess: function(data) {
+                            logger_threeDsAuthStatus({
+                                authStatus: "success"
+                            });
                             return promise.resolve(data);
                         },
                         onCancel: function() {
+                            logger_threeDsAuthStatus({
+                                authStatus: "cancelled"
+                            });
                             return promise.reject(new Error("3DS cancelled"));
                         },
                         onError: function(err) {
+                            logger_threeDsAuthStatus({
+                                authStatus: "failure"
+                            });
                             return promise.reject(err);
                         }
                     });
@@ -9709,10 +9725,16 @@ window.smartCard = function(modules) {
             return function(_ref6) {
                 var _getLogger$track3;
                 var vaultToken = _ref6.vaultToken;
+                Object(lib.i)({
+                    name: "pp.app.paypal_sdk.card_fields.submit.success.count",
+                    dimensions: {
+                        cardFieldsFlow: constants.l.VAULT_WITHOUT_PURCHASE
+                    }
+                });
                 Object(lib.c)().track((_getLogger$track3 = {}, _getLogger$track3[src.e.TRANSITION] = "hcf_transaction_success", 
                 _getLogger$track3[src.e.EVENT_NAME] = "hcf_transaction_success", _getLogger$track3.vault_token = vaultToken, 
-                _getLogger$track3[src.e.CONTEXT_TYPE] = "vault_setup_token", _getLogger$track3[src.e.CONTEXT_ID] = vaultToken, 
-                _getLogger$track3)).flush();
+                _getLogger$track3[src.e.PAYMENT_FLOW] = constants.l.VAULT_WITHOUT_PURCHASE, _getLogger$track3[src.e.CONTEXT_TYPE] = "vault_setup_token", 
+                _getLogger$track3[src.e.CONTEXT_ID] = vaultToken, _getLogger$track3)).flush();
             }({
                 vaultToken: vaultToken
             });
@@ -9721,6 +9743,12 @@ window.smartCard = function(modules) {
             !function(_ref7) {
                 var _getLogger$track4;
                 var vaultToken = _ref7.vaultToken, error = _ref7.error;
+                Object(lib.i)({
+                    name: "pp.app.paypal_sdk.card_fields.submit.error.count",
+                    dimensions: {
+                        cardFieldsFlow: constants.l.VAULT_WITHOUT_PURCHASE
+                    }
+                });
                 Object(lib.c)().track((_getLogger$track4 = {}, _getLogger$track4[src.e.ERROR_CODE] = "hcf_transaction_error", 
                 _getLogger$track4[src.e.EVENT_NAME] = "hcf_transaction_error", _getLogger$track4[src.e.ERROR_DESC] = Object(belter_src.w)(error), 
                 _getLogger$track4.vault_token = vaultToken, _getLogger$track4[src.e.PAYMENT_FLOW] = constants.l.VAULT_WITHOUT_PURCHASE, 
@@ -9741,10 +9769,23 @@ window.smartCard = function(modules) {
             featureFlags: _ref.featureFlags,
             experiments: _ref.experiments
         });
-        hcfSessionID = cardProps.hcfSessionID, Object(lib.c)().track(((_getLogger$track5 = {})[src.e.TRANSITION] = "hcf_fields_submit", 
-        _getLogger$track5[src.e.EVENT_NAME] = "hcf_fields_submit", _getLogger$track5[src.e.CONTEXT_TYPE] = "hosted_session_id", 
-        _getLogger$track5[src.e.CONTEXT_ID] = hcfSessionID, _getLogger$track5));
-        var _getLogger$track5, hcfSessionID;
+        !function(_ref10) {
+            var _getLogger$track5;
+            var cardFlowType = _ref10.cardFlowType, hcfSessionID = _ref10.hcfSessionID;
+            Object(lib.i)({
+                name: "pp.app.paypal_sdk.card_fields.submit.count",
+                dimensions: {
+                    cardFieldsFlow: cardFlowType
+                }
+            });
+            Object(lib.c)().track(((_getLogger$track5 = {})[src.e.TRANSITION] = "hcf_fields_submit", 
+            _getLogger$track5[src.e.EVENT_NAME] = "hcf_fields_submit", _getLogger$track5[src.e.CONTEXT_TYPE] = "hosted_session_id", 
+            _getLogger$track5[src.e.PAYMENT_FLOW] = cardFlowType, _getLogger$track5[src.e.CONTEXT_ID] = hcfSessionID, 
+            _getLogger$track5));
+        }({
+            cardFlowType: cardProps.productAction,
+            hcfSessionID: cardProps.hcfSessionID
+        });
         gql_resetGQLErrors();
         return zalgo_promise_src.a.try((function() {
             if (!hasCardFields()) throw new Error("Card fields not available to submit");
@@ -9797,6 +9838,12 @@ window.smartCard = function(modules) {
                         !function(_ref4) {
                             var _getLogger$track;
                             var orderID = _ref4.orderID;
+                            Object(lib.i)({
+                                name: "pp.app.paypal_sdk.card_fields.submit.success.count",
+                                dimensions: {
+                                    cardFieldsFlow: constants.l.WITH_PURCHASE
+                                }
+                            });
                             Object(lib.c)().track((_getLogger$track = {}, _getLogger$track[src.e.TRANSITION] = "hcf_transaction_success", 
                             _getLogger$track[src.e.EVENT_NAME] = "hcf_transaction_success", _getLogger$track.order_id = orderID, 
                             _getLogger$track[src.e.PAYMENT_FLOW] = constants.l.WITH_PURCHASE, _getLogger$track[src.e.CONTEXT_TYPE] = "order_id", 
@@ -9809,10 +9856,17 @@ window.smartCard = function(modules) {
                         !function(_ref5) {
                             var _getLogger$track2;
                             var orderID = _ref5.orderID, error = _ref5.error;
+                            Object(lib.i)({
+                                name: "pp.app.paypal_sdk.card_fields.submit.error.count",
+                                dimensions: {
+                                    cardFieldsFlow: constants.l.WITH_PURCHASE
+                                }
+                            });
                             Object(lib.c)().track((_getLogger$track2 = {}, _getLogger$track2[src.e.ERROR_CODE] = "hcf_transaction_error", 
                             _getLogger$track2[src.e.EVENT_NAME] = "hcf_transaction_error", _getLogger$track2[src.e.ERROR_DESC] = Object(belter_src.w)(error), 
-                            _getLogger$track2.order_id = orderID, _getLogger$track2[src.e.CONTEXT_TYPE] = "order_id", 
-                            _getLogger$track2[src.e.CONTEXT_ID] = orderID, _getLogger$track2)).flush();
+                            _getLogger$track2[src.e.PAYMENT_FLOW] = constants.l.WITH_PURCHASE, _getLogger$track2.order_id = orderID, 
+                            _getLogger$track2[src.e.CONTEXT_TYPE] = "order_id", _getLogger$track2[src.e.CONTEXT_ID] = orderID, 
+                            _getLogger$track2)).flush();
                         }({
                             error: error,
                             orderID: orderID
@@ -11312,7 +11366,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.149", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.150", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[src.c.PAYMENTS_SDK] = clientID, 

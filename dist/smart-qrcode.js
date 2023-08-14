@@ -658,18 +658,17 @@
             x.__r = 0;
         }
         function P(n, l, u, t, i, o, r, f, e, a, v) {
-            var p, y, _, b, g, m, w, x, P, S, H = 0, I = t && t.__k || s, T = I.length, j = T, z = l.length;
+            var p, y, _, b, m, w, x, P, S, H = 0, I = t && t.__k || s, T = I.length, j = T, z = l.length;
             for (u.__k = [], p = 0; p < z; p++) null != (b = u.__k[p] = null == (b = l[p]) || "boolean" == typeof b || "function" == typeof b ? null : "string" == typeof b || "number" == typeof b || "bigint" == typeof b ? d(null, b, null, null, b) : h(b) ? d(k, {
                 children: b
-            }, null, null, null) : b.__b > 0 ? d(b.type, b.props, b.key, b.ref ? b.ref : null, b.__v) : b) && (b.__ = u, 
-            b.__b = u.__b + 1, -1 === (x = A(b, I, w = p + H, j)) ? _ = c : (_ = I[x] || c, 
-            I[x] = void 0, j--), L(n, b, _, i, o, r, f, e, a, v), g = b.__e, (y = b.ref) && _.ref != y && (_.ref && O(_.ref, null, b), 
-            v.push(y, b.__c || g, b)), null != g && (null == m && (m = g), S = !(P = _ === c || null === _.__v) && x === w, 
-            P ? -1 == x && H-- : x !== w && (x === w + 1 ? (H++, S = !0) : x > w ? j > z - w ? (H += x - w, 
-            S = !0) : H-- : H = x < w && x == w - 1 ? x - w : 0), w = p + H, S = S || x == p && !P, 
-            "function" != typeof b.type || x === w && _.__k !== b.__k ? "function" == typeof b.type || S ? void 0 !== b.__d ? (e = b.__d, 
-            b.__d = void 0) : e = g.nextSibling : e = $(n, g, e) : e = C(b, e, n), "function" == typeof u.type && (u.__d = e)));
-            for (u.__e = m, p = T; p--; ) null != I[p] && ("function" == typeof u.type && null != I[p].__e && I[p].__e == u.__d && (u.__d = I[p].__e.nextSibling), 
+            }, null, null, null) : b.__b > 0 ? d(b.type, b.props, b.key, b.ref ? b.ref : null, b.__v) : b) ? (b.__ = u, 
+            b.__b = u.__b + 1, -1 === (P = A(b, I, x = p + H, j)) ? _ = c : (_ = I[P] || c, 
+            I[P] = void 0, j--), L(n, b, _, i, o, r, f, e, a, v), m = b.__e, (y = b.ref) && _.ref != y && (_.ref && O(_.ref, null, b), 
+            v.push(y, b.__c || m, b)), null != m && (null == w && (w = m), (S = _ === c || null === _.__v) ? -1 == P && H-- : P !== x && (P === x + 1 ? H++ : P > x ? j > z - x ? H += P - x : H-- : H = P < x && P == x - 1 ? P - x : 0), 
+            x = p + H, "function" != typeof b.type || P === x && _.__k !== b.__k ? "function" == typeof b.type || P === x && !S ? void 0 !== b.__d ? (e = b.__d, 
+            b.__d = void 0) : e = m.nextSibling : e = $(n, m, e) : e = C(b, e, n), "function" == typeof u.type && (u.__d = e))) : (_ = I[p]) && null == _.key && _.__e && (_.__e == e && (e = g(_)), 
+            q(_, _, !1));
+            for (u.__e = w, p = T; p--; ) null != I[p] && ("function" == typeof u.type && null != I[p].__e && I[p].__e == u.__d && (u.__d = I[p].__e.nextSibling), 
             q(I[p], I[p]));
         }
         function C(n, l, u) {
@@ -723,46 +722,44 @@
             var a, p, y, d, _, g, m, w, x, C, S, $, A, H, I, T = u.type;
             if (void 0 !== u.constructor) return null;
             null != t.__h && (c = t.__h, e = u.__e = t.__e, u.__h = null, r = [ e ]), (a = l.__b) && a(u);
-            try {
-                n: if ("function" == typeof T) {
-                    if (w = u.props, x = (a = T.contextType) && i[a.__c], C = a ? x ? x.props.value : a.__ : i, 
-                    t.__c ? m = (p = u.__c = t.__c).__ = p.__E : ("prototype" in T && T.prototype.render ? u.__c = p = new T(w, C) : (u.__c = p = new b(w, C), 
-                    p.constructor = T, p.render = B), x && x.sub(p), p.props = w, p.state || (p.state = {}), 
-                    p.context = C, p.__n = i, y = p.__d = !0, p.__h = [], p._sb = []), null == p.__s && (p.__s = p.state), 
-                    null != T.getDerivedStateFromProps && (p.__s == p.state && (p.__s = v({}, p.__s)), 
-                    v(p.__s, T.getDerivedStateFromProps(w, p.__s))), d = p.props, _ = p.state, p.__v = u, 
-                    y) null == T.getDerivedStateFromProps && null != p.componentWillMount && p.componentWillMount(), 
-                    null != p.componentDidMount && p.__h.push(p.componentDidMount); else {
-                        if (null == T.getDerivedStateFromProps && w !== d && null != p.componentWillReceiveProps && p.componentWillReceiveProps(w, C), 
-                        !p.__e && (null != p.shouldComponentUpdate && !1 === p.shouldComponentUpdate(w, p.__s, C) || u.__v === t.__v)) {
-                            for (u.__v !== t.__v && (p.props = w, p.state = p.__s, p.__d = !1), u.__e = t.__e, 
-                            u.__k = t.__k, u.__k.forEach((function(n) {
-                                n && (n.__ = u);
-                            })), S = 0; S < p._sb.length; S++) p.__h.push(p._sb[S]);
-                            p._sb = [], p.__h.length && f.push(p);
-                            break n;
-                        }
-                        null != p.componentWillUpdate && p.componentWillUpdate(w, p.__s, C), null != p.componentDidUpdate && p.__h.push((function() {
-                            p.componentDidUpdate(d, _, g);
-                        }));
+            n: if ("function" == typeof T) try {
+                if (w = u.props, x = (a = T.contextType) && i[a.__c], C = a ? x ? x.props.value : a.__ : i, 
+                t.__c ? m = (p = u.__c = t.__c).__ = p.__E : ("prototype" in T && T.prototype.render ? u.__c = p = new T(w, C) : (u.__c = p = new b(w, C), 
+                p.constructor = T, p.render = B), x && x.sub(p), p.props = w, p.state || (p.state = {}), 
+                p.context = C, p.__n = i, y = p.__d = !0, p.__h = [], p._sb = []), null == p.__s && (p.__s = p.state), 
+                null != T.getDerivedStateFromProps && (p.__s == p.state && (p.__s = v({}, p.__s)), 
+                v(p.__s, T.getDerivedStateFromProps(w, p.__s))), d = p.props, _ = p.state, p.__v = u, 
+                y) null == T.getDerivedStateFromProps && null != p.componentWillMount && p.componentWillMount(), 
+                null != p.componentDidMount && p.__h.push(p.componentDidMount); else {
+                    if (null == T.getDerivedStateFromProps && w !== d && null != p.componentWillReceiveProps && p.componentWillReceiveProps(w, C), 
+                    !p.__e && (null != p.shouldComponentUpdate && !1 === p.shouldComponentUpdate(w, p.__s, C) || u.__v === t.__v)) {
+                        for (u.__v !== t.__v && (p.props = w, p.state = p.__s, p.__d = !1), u.__e = t.__e, 
+                        u.__k = t.__k, u.__k.forEach((function(n) {
+                            n && (n.__ = u);
+                        })), S = 0; S < p._sb.length; S++) p.__h.push(p._sb[S]);
+                        p._sb = [], p.__h.length && f.push(p);
+                        break n;
                     }
-                    if (p.context = C, p.props = w, p.__P = n, p.__e = !1, $ = l.__r, A = 0, "prototype" in T && T.prototype.render) {
-                        for (p.state = p.__s, p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), 
-                        H = 0; H < p._sb.length; H++) p.__h.push(p._sb[H]);
-                        p._sb = [];
-                    } else do {
-                        p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), p.state = p.__s;
-                    } while (p.__d && ++A < 25);
-                    p.state = p.__s, null != p.getChildContext && (i = v(v({}, i), p.getChildContext())), 
-                    y || null == p.getSnapshotBeforeUpdate || (g = p.getSnapshotBeforeUpdate(d, _)), 
-                    P(n, h(I = null != a && a.type === k && null == a.key ? a.props.children : a) ? I : [ I ], u, t, i, o, r, f, e, c, s), 
-                    p.base = u.__e, u.__h = null, p.__h.length && f.push(p), m && (p.__E = p.__ = null);
-                } else null == r && u.__v === t.__v ? (u.__k = t.__k, u.__e = t.__e) : u.__e = N(t.__e, u, t, i, o, r, f, c, s);
-                (a = l.diffed) && a(u);
+                    null != p.componentWillUpdate && p.componentWillUpdate(w, p.__s, C), null != p.componentDidUpdate && p.__h.push((function() {
+                        p.componentDidUpdate(d, _, g);
+                    }));
+                }
+                if (p.context = C, p.props = w, p.__P = n, p.__e = !1, $ = l.__r, A = 0, "prototype" in T && T.prototype.render) {
+                    for (p.state = p.__s, p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), 
+                    H = 0; H < p._sb.length; H++) p.__h.push(p._sb[H]);
+                    p._sb = [];
+                } else do {
+                    p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), p.state = p.__s;
+                } while (p.__d && ++A < 25);
+                p.state = p.__s, null != p.getChildContext && (i = v(v({}, i), p.getChildContext())), 
+                y || null == p.getSnapshotBeforeUpdate || (g = p.getSnapshotBeforeUpdate(d, _)), 
+                P(n, h(I = null != a && a.type === k && null == a.key ? a.props.children : a) ? I : [ I ], u, t, i, o, r, f, e, c, s), 
+                p.base = u.__e, u.__h = null, p.__h.length && f.push(p), m && (p.__E = p.__ = null);
             } catch (n) {
                 u.__v = null, (c || null != r) && (u.__e = e, u.__h = !!c, r[r.indexOf(e)] = null), 
                 l.__e(n, u, t);
-            }
+            } else null == r && u.__v === t.__v ? (u.__k = t.__k, u.__e = t.__e) : u.__e = N(t.__e, u, t, i, o, r, f, c, s);
+            (a = l.diffed) && a(u);
         }
         function M(n, u, t) {
             for (var i = 0; i < t.length; i++) O(t[i], t[++i], t[++i]);
@@ -3154,7 +3151,7 @@
             logger.addTrackingBuilder((function() {
                 var _ref;
                 return (_ref = {}).state_name = "smart_button", _ref.context_type = "EC-Token", 
-                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.149", 
+                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.150", 
                 _ref.selected_payment_method = fundingSource, _ref;
             }));
             (function() {

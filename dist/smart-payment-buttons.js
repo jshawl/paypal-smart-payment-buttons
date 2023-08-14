@@ -5308,7 +5308,7 @@ window.spb = function(modules) {
             if (isPlainObject(item)) {
                 var _result = {};
                 var _loop3 = function(key) {
-                    if (!item.hasOwnProperty(key)) return "continue";
+                    if (!item.hasOwnProperty(key)) return 1;
                     defineLazyProp(_result, key, (function() {
                         var itemKey = fullKey ? fullKey + "." + key : "" + key;
                         var child = replacer(item[key], key, itemKey);
@@ -8359,6 +8359,8 @@ window.spb = function(modules) {
             ERROR_CODE: "ext_error_code",
             ERROR_DESC: "ext_error_desc",
             PAGE_LOAD_TIME: "page_load_time",
+            EXPERIMENT_EXPERIENCE: "experimentation_experience",
+            EXPERIMENT_TREATMENT: "experimentation_treatment",
             EXPERIMENT_NAME: "pxp_exp_id",
             TREATMENT_NAME: "pxp_trtmnt_id",
             TRANSITION_TIME: "transition_time",
@@ -9149,7 +9151,7 @@ window.spb = function(modules) {
                         _getLogger$track[_constants__WEBPACK_IMPORTED_MODULE_5__.FPTI_CUSTOM_KEY.INFO_MSG] = "URL: " + url, 
                         _getLogger$track));
                     }
-                    eventName && Object(_lib__WEBPACK_IMPORTED_MODULE_6__.getLogger)().warn("rest_api_" + eventName + "_error");
+                    eventName && Object(_lib__WEBPACK_IMPORTED_MODULE_6__.getLogger)().warn("rest_api_" + eventName + "_status_" + status + "_error");
                     throw error;
                 }
                 return body;
@@ -9939,7 +9941,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.149", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.150", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -12827,6 +12829,13 @@ window.spb = function(modules) {
                 ThreeDomainSecure: paypal.ThreeDomainSecure
             };
         }
+        var logger_threeDsAuthStatus = function(_ref8) {
+            var authStatus = _ref8.authStatus;
+            Object(lib.getLogger)().addTrackingBuilder((function() {
+                var _ref9;
+                return (_ref9 = {})["3ds_auth_status"] = authStatus, _ref9;
+            }));
+        };
         function handleThreeDomainSecureRedirect(_ref) {
             var ThreeDomainSecure = _ref.ThreeDomainSecure, vaultToken = _ref.vaultToken, createOrder = _ref.createOrder, action = _ref.action, getParent = _ref.getParent;
             var promise = new zalgo_promise_src.ZalgoPromise;
@@ -12835,12 +12844,21 @@ window.spb = function(modules) {
                 createOrder: createOrder,
                 action: action,
                 onSuccess: function(data) {
+                    logger_threeDsAuthStatus({
+                        authStatus: "success"
+                    });
                     return promise.resolve(data);
                 },
                 onCancel: function() {
+                    logger_threeDsAuthStatus({
+                        authStatus: "cancelled"
+                    });
                     return promise.reject(new Error("3DS cancelled"));
                 },
                 onError: function(err) {
+                    logger_threeDsAuthStatus({
+                        authStatus: "failure"
+                    });
                     return promise.reject(err);
                 }
             });
@@ -12946,11 +12964,24 @@ window.spb = function(modules) {
                                 featureFlags: _ref.featureFlags,
                                 experiments: _ref.experiments
                             });
-                            hcfSessionID = cardProps.hcfSessionID, Object(lib.getLogger)().track(((_getLogger$track5 = {})[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_fields_submit", 
-                            _getLogger$track5[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_fields_submit", 
-                            _getLogger$track5[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "hosted_session_id", 
-                            _getLogger$track5[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = hcfSessionID, _getLogger$track5));
-                            var _getLogger$track5, hcfSessionID;
+                            !function(_ref10) {
+                                var _getLogger$track5;
+                                var cardFlowType = _ref10.cardFlowType, hcfSessionID = _ref10.hcfSessionID;
+                                Object(lib.sendMetric)({
+                                    name: "pp.app.paypal_sdk.card_fields.submit.count",
+                                    dimensions: {
+                                        cardFieldsFlow: cardFlowType
+                                    }
+                                });
+                                Object(lib.getLogger)().track(((_getLogger$track5 = {})[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_fields_submit", 
+                                _getLogger$track5[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_fields_submit", 
+                                _getLogger$track5[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "hosted_session_id", 
+                                _getLogger$track5[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = cardFlowType, _getLogger$track5[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = hcfSessionID, 
+                                _getLogger$track5));
+                            }({
+                                cardFlowType: cardProps.productAction,
+                                hcfSessionID: cardProps.hcfSessionID
+                            });
                             !function() {
                                 var _getCardFrames = getCardFrames(), cardFrame = _getCardFrames.cardFrame, cardNumberFrame = _getCardFrames.cardNumberFrame, cardExpiryFrame = _getCardFrames.cardExpiryFrame, cardCVVFrame = _getCardFrames.cardCVVFrame;
                                 cardFrame && cardFrame.resetGQLErrors();
@@ -13043,6 +13074,12 @@ window.spb = function(modules) {
                                             !function(_ref4) {
                                                 var _getLogger$track;
                                                 var orderID = _ref4.orderID;
+                                                Object(lib.sendMetric)({
+                                                    name: "pp.app.paypal_sdk.card_fields.submit.success.count",
+                                                    dimensions: {
+                                                        cardFieldsFlow: constants.PAYMENT_FLOWS.WITH_PURCHASE
+                                                    }
+                                                });
                                                 Object(lib.getLogger)().track((_getLogger$track = {}, _getLogger$track[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_transaction_success", 
                                                 _getLogger$track[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_success", 
                                                 _getLogger$track.order_id = orderID, _getLogger$track[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = constants.PAYMENT_FLOWS.WITH_PURCHASE, 
@@ -13056,9 +13093,16 @@ window.spb = function(modules) {
                                             !function(_ref5) {
                                                 var _getLogger$track2;
                                                 var orderID = _ref5.orderID, error = _ref5.error;
+                                                Object(lib.sendMetric)({
+                                                    name: "pp.app.paypal_sdk.card_fields.submit.error.count",
+                                                    dimensions: {
+                                                        cardFieldsFlow: constants.PAYMENT_FLOWS.WITH_PURCHASE
+                                                    }
+                                                });
                                                 Object(lib.getLogger)().track((_getLogger$track2 = {}, _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_transaction_error", 
                                                 _getLogger$track2[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_error", 
                                                 _getLogger$track2[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
+                                                _getLogger$track2[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = constants.PAYMENT_FLOWS.WITH_PURCHASE, 
                                                 _getLogger$track2.order_id = orderID, _getLogger$track2[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "order_id", 
                                                 _getLogger$track2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = orderID, _getLogger$track2)).flush();
                                             }({
@@ -13101,9 +13145,16 @@ window.spb = function(modules) {
                                                 return function(_ref6) {
                                                     var _getLogger$track3;
                                                     var vaultToken = _ref6.vaultToken;
+                                                    Object(lib.sendMetric)({
+                                                        name: "pp.app.paypal_sdk.card_fields.submit.success.count",
+                                                        dimensions: {
+                                                            cardFieldsFlow: constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+                                                        }
+                                                    });
                                                     Object(lib.getLogger)().track((_getLogger$track3 = {}, _getLogger$track3[sdk_constants_src.FPTI_KEY.TRANSITION] = "hcf_transaction_success", 
                                                     _getLogger$track3[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_success", 
-                                                    _getLogger$track3.vault_token = vaultToken, _getLogger$track3[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "vault_setup_token", 
+                                                    _getLogger$track3.vault_token = vaultToken, _getLogger$track3[sdk_constants_src.FPTI_KEY.PAYMENT_FLOW] = constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE, 
+                                                    _getLogger$track3[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = "vault_setup_token", 
                                                     _getLogger$track3[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = vaultToken, _getLogger$track3)).flush();
                                                 }({
                                                     vaultToken: vaultToken
@@ -13113,6 +13164,12 @@ window.spb = function(modules) {
                                                 !function(_ref7) {
                                                     var _getLogger$track4;
                                                     var vaultToken = _ref7.vaultToken, error = _ref7.error;
+                                                    Object(lib.sendMetric)({
+                                                        name: "pp.app.paypal_sdk.card_fields.submit.error.count",
+                                                        dimensions: {
+                                                            cardFieldsFlow: constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
+                                                        }
+                                                    });
                                                     Object(lib.getLogger)().track((_getLogger$track4 = {}, _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_CODE] = "hcf_transaction_error", 
                                                     _getLogger$track4[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "hcf_transaction_error", 
                                                     _getLogger$track4[sdk_constants_src.FPTI_KEY.ERROR_DESC] = Object(src.stringifyErrorMessage)(error), 
@@ -13673,7 +13730,7 @@ window.spb = function(modules) {
             },
             isEligible: function(_ref) {
                 var props = _ref.props;
-                return !!_ref.serviceData.wallet && !(props.onShippingChange || props.onShippingAddressChange || props.onShippingOptionsChange);
+                return !(!props.userIDToken || !_ref.serviceData.wallet || props.onShippingChange || props.onShippingAddressChange || props.onShippingOptionsChange);
             },
             isPaymentEligible: function(_ref5) {
                 var payment = _ref5.payment;
@@ -16124,13 +16181,15 @@ window.spb = function(modules) {
                         _ref4;
                     }));
                     if (eligibility.isServiceWorkerEligible) {
-                        Object(lib.getLogger)().info("SERVICE_WORKER_ELIGIBLE");
+                        Object(lib.getLogger)().info("SERVICE_WORKER_ELMO_TREATMENT");
                         Object(lib.registerServiceWorker)({
                             dumbledoreCurrentReleaseHash: dumbledoreCurrentReleaseHash,
                             dumbledoreServiceWorker: dumbledoreServiceWorker
                         });
                     } else {
-                        Object(lib.getLogger)().info("SERVICE_WORKER_NOT_ELIGIBLE");
+                        var _getLogger$info$track2;
+                        Object(lib.getLogger)().info("SERVICE_WORKER_ELMO_CONTROL").track(((_getLogger$info$track2 = {})[sdk_constants_src.FPTI_KEY.EVENT_NAME] = "SERVICE_WORKER_NOT_ELIGIBLE", 
+                        _getLogger$info$track2));
                         Object(lib.unregisterServiceWorker)();
                     }
                     var paymentProps = getButtonProps({
@@ -16389,7 +16448,7 @@ window.spb = function(modules) {
                     var _ref2;
                     return (_ref2 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref2[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.149", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.150", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref2[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref2[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref2[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -17385,6 +17444,7 @@ window.spb = function(modules) {
                 }
             };
         }
+        var sdk_constants_src = __webpack_require__("./node_modules/@paypal/sdk-constants/src/index.js");
         var SERVICE_WORKER_URL = constants.SERVICE_WORKER.SERVICE_WORKER_URL, SW_SCOPE = constants.SERVICE_WORKER.SW_SCOPE, GET_SW_LOGS_EVENT_NAME = constants.SERVICE_WORKER.GET_SW_LOGS_EVENT_NAME, LOGS_CHANNEL_NAME = constants.SERVICE_WORKER.LOGS_CHANNEL_NAME, GET_SW_LOGS_RESPONSE_EVENT_NAME = constants.SERVICE_WORKER.GET_SW_LOGS_RESPONSE_EVENT_NAME;
         var LOG_PREFIX = "SERVICE_WORKER_";
         var broadcastChannel = {};
@@ -17402,53 +17462,65 @@ window.spb = function(modules) {
             return new URL(SERVICE_WORKER_URL + "/" + serviceWorker + "?releaseHash=" + clearedHash).toString();
         }
         function registerServiceWorker(_ref) {
+            var _getLogger$track;
             var dumbledoreCurrentReleaseHash = _ref.dumbledoreCurrentReleaseHash, dumbledoreServiceWorker = _ref.dumbledoreServiceWorker;
-            if ("serviceWorker" in navigator != 0) if (dumbledoreCurrentReleaseHash) if (dumbledoreServiceWorker) try {
-                !function() {
-                    var paypalButtons = document.getElementsByClassName(constants.CLASS.BUTTON);
-                    for (var i = 0; i < paypalButtons.length; i++) paypalButtons[i].addEventListener("click", requestSwLogs);
-                }();
-                (broadcastChannel = new BroadcastChannel(LOGS_CHANNEL_NAME)).addEventListener("message", (function(event) {
-                    var _event$data = event.data, _event$data$payload = _event$data.payload, payload = void 0 === _event$data$payload ? [] : _event$data$payload;
-                    payload && _event$data.eventName === GET_SW_LOGS_RESPONSE_EVENT_NAME && Object(logger.getLogger)().info(LOG_PREFIX + "LOGS", {
-                        logs: JSON.stringify(payload)
-                    });
-                }));
-                !function(releaseHash, serviceWorker) {
-                    var swUrl = getSanitizedUrl(releaseHash, serviceWorker);
-                    Object(logger.getLogger)().info(LOG_PREFIX + "REGISTER_START", {
-                        url: swUrl
-                    });
-                    swUrl ? function(swUrl) {
-                        var _navigator$serviceWor;
-                        null == (_navigator$serviceWor = navigator.serviceWorker) || _navigator$serviceWor.register(swUrl, {
-                            scope: SW_SCOPE
-                        }).then((function(registration) {
-                            Object(logger.getLogger)().info(LOG_PREFIX + "REGISTERED");
-                            registration.addEventListener("updatefound", (function() {
-                                var installingWorker = registration.installing;
-                                installingWorker && installingWorker.addEventListener("statechange", (function() {
-                                    "activated" === installingWorker.state && requestSwLogs();
-                                    Object(logger.getLogger)().info(LOG_PREFIX + "REGISTERING: " + installingWorker.state);
+            if ("serviceWorker" in navigator != 0 && "BroadcastChannel" in window != 0) {
+                Object(logger.getLogger)().track(((_getLogger$track = {})[sdk_constants_src.FPTI_KEY.EVENT_NAME] = LOG_PREFIX + "ELIGIBILE", 
+                _getLogger$track));
+                if (dumbledoreCurrentReleaseHash) if (dumbledoreServiceWorker) try {
+                    !function() {
+                        var paypalButtons = document.getElementsByClassName(constants.CLASS.BUTTON);
+                        for (var i = 0; i < paypalButtons.length; i++) paypalButtons[i].addEventListener("click", requestSwLogs);
+                    }();
+                    (broadcastChannel = new BroadcastChannel(LOGS_CHANNEL_NAME)).addEventListener("message", (function(event) {
+                        var _event$data = event.data, _event$data$payload = _event$data.payload, payload = void 0 === _event$data$payload ? [] : _event$data$payload;
+                        payload && _event$data.eventName === GET_SW_LOGS_RESPONSE_EVENT_NAME && Object(logger.getLogger)().info(LOG_PREFIX + "LOGS", {
+                            logs: JSON.stringify(payload)
+                        });
+                    }));
+                    !function(releaseHash, serviceWorker) {
+                        var swUrl = getSanitizedUrl(releaseHash, serviceWorker);
+                        Object(logger.getLogger)().info(LOG_PREFIX + "REGISTER_START", {
+                            url: swUrl
+                        });
+                        swUrl ? function(swUrl) {
+                            var _navigator$serviceWor;
+                            null == (_navigator$serviceWor = navigator.serviceWorker) || _navigator$serviceWor.register(swUrl, {
+                                scope: SW_SCOPE
+                            }).then((function(registration) {
+                                Object(logger.getLogger)().info(LOG_PREFIX + "REGISTERED");
+                                registration.addEventListener("updatefound", (function() {
+                                    var installingWorker = registration.installing;
+                                    installingWorker && installingWorker.addEventListener("statechange", (function() {
+                                        "activated" === installingWorker.state && requestSwLogs();
+                                        Object(logger.getLogger)().info(LOG_PREFIX + "REGISTERING: " + installingWorker.state);
+                                    }));
                                 }));
+                            })).catch((function(err) {
+                                Object(logger.getLogger)().error(LOG_PREFIX + "ERROR_REGISTERING", {
+                                    err: Object(belter_src.stringifyError)(err)
+                                });
+                                register_service_worker_unRegisterButtonHandlers();
                             }));
-                        })).catch((function(err) {
-                            Object(logger.getLogger)().error(LOG_PREFIX + "ERROR_REGISTERING", {
-                                err: Object(belter_src.stringifyError)(err)
-                            });
-                            register_service_worker_unRegisterButtonHandlers();
-                        }));
-                    }(swUrl) : Object(logger.getLogger)().error(LOG_PREFIX + "ERROR_DURING_SWURL_GENERATION");
-                }(dumbledoreCurrentReleaseHash, dumbledoreServiceWorker);
-            } catch (err) {
-                Object(logger.getLogger)().error(LOG_PREFIX + "ERROR_DURING_INITIALIZATION", {
-                    err: Object(belter_src.stringifyError)(err)
+                        }(swUrl) : Object(logger.getLogger)().error(LOG_PREFIX + "ERROR_DURING_SWURL_GENERATION");
+                    }(dumbledoreCurrentReleaseHash, dumbledoreServiceWorker);
+                } catch (err) {
+                    Object(logger.getLogger)().error(LOG_PREFIX + "ERROR_DURING_INITIALIZATION", {
+                        err: Object(belter_src.stringifyError)(err)
+                    });
+                } else Object(logger.getLogger)().error(LOG_PREFIX + "SERVICE_WORKER_URL_NOT_PROVIDED", {
+                    serviceWorker: dumbledoreServiceWorker
+                }); else Object(logger.getLogger)().error(LOG_PREFIX + "RELEASE_HASH_NOT_PROVIDED", {
+                    releaseHash: dumbledoreCurrentReleaseHash
                 });
-            } else Object(logger.getLogger)().error(LOG_PREFIX + "SERVICE_WORKER_URL_NOT_PROVIDED", {
-                serviceWorker: dumbledoreServiceWorker
-            }); else Object(logger.getLogger)().error(LOG_PREFIX + "RELEASE_HASH_NOT_PROVIDED", {
-                releaseHash: dumbledoreCurrentReleaseHash
-            }); else Object(logger.getLogger)().info(LOG_PREFIX + "NOT_SUPPORTED");
+            } else {
+                var _getLogger$info$track;
+                Object(logger.getLogger)().info(LOG_PREFIX + "NOT_SUPPORTED", {
+                    serviceWorker: Boolean("serviceWorker" in navigator),
+                    BroadcastChannel: Boolean("BroadcastChannel" in window)
+                }).track(((_getLogger$info$track = {})[sdk_constants_src.FPTI_KEY.EVENT_NAME] = LOG_PREFIX + "NOT_ELIGIBILE", 
+                _getLogger$info$track));
+            }
         }
         function unregisterServiceWorker() {
             if ("serviceWorker" in navigator) {
