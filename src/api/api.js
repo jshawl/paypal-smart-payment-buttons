@@ -51,7 +51,7 @@ export function callRestAPI<D, T>({ accessToken, method, url, data, headers, eve
             }
 
             if (eventName) {
-                getLogger().warn(`rest_api_${ eventName }_error`);
+                getLogger().warn(`rest_api_${ eventName }_status_${ status }_error`);
             }
             throw error;
         }
