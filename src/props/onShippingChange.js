@@ -160,6 +160,16 @@ export function getOnShippingChange({ onShippingChange, partnerAttributionID, fe
                     // backwards compatibility. Before invoking onShippingChange,
                     // we need to remove that prefix.
                     data.paymentID = data.orderID?.replace("EC-","");
+
+                    // The Braintree SDK expects a paymentId (not paymentID) when
+                    // invoking updatePayment().
+                    // See: https://github.com/braintree/braintree-web/blob/831be9d4f7bea387cae98f22c8f215854c994b75/src/paypal-checkout/paypal-checkout.js#L589-L593
+                    // The paymentId property (lowercase "d") is passed into
+                    // onShippingChange from an internal @paypal/sdk-client consumer.
+                    // The following line's type error is explicity ignored in order
+                    // to prevent confusion about which property to use in the future.
+                    // $FlowExpectedError
+                    data.paymentId = data.paymentID;
                 }
                 return onShippingChange(buildXOnShippingChangeData(data), buildXShippingChangeActions({ orderID, facilitatorAccessToken, buyerAccessToken, actions, partnerAttributionID, forceRestAPI, clientID, experiments }));
             });
