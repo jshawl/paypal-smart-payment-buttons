@@ -9,7 +9,7 @@ import {
 } from "@paypal/sdk-constants/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { sendMetric, getLogger, setupLogger } from "../lib";
+import { sendCountMetric, getLogger, setupLogger } from "../lib";
 import type { LocaleType } from "../types";
 import { FPTI_STATE, PAYMENT_FLOWS } from "../constants";
 
@@ -98,7 +98,7 @@ export const hcfTransactionSuccess = ({
   orderID
 }: {|orderID: string|}) => {
 
-  sendMetric({
+  sendCountMetric({
     name: "pp.app.paypal_sdk.card_fields.submit.success.count",
     dimensions: {
       cardFieldsFlow: PAYMENT_FLOWS.WITH_PURCHASE,
@@ -123,7 +123,7 @@ export const hcfTransactionError = ({
   error: mixed
 |}) => {
 
-  sendMetric({
+  sendCountMetric({
     name: "pp.app.paypal_sdk.card_fields.submit.error.count",
     dimensions: {
       cardFieldsFlow: PAYMENT_FLOWS.WITH_PURCHASE,
@@ -144,7 +144,7 @@ export const vaultWithoutPurchaseSuccess = ({
   vaultToken,
 }: {|vaultToken: string|}) => {
 
-  sendMetric({
+  sendCountMetric({
     name: "pp.app.paypal_sdk.card_fields.submit.success.count",
     dimensions: {
       cardFieldsFlow: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
@@ -169,7 +169,7 @@ export const vaultWithoutPurchaseFailure = ({
   error: mixed
 |}) => {
 
-  sendMetric({
+  sendCountMetric({
     name: "pp.app.paypal_sdk.card_fields.submit.error.count",
     dimensions: {
       cardFieldsFlow: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
@@ -205,7 +205,7 @@ export const hcfFieldsSubmit = ({
   hcfSessionID: string
 |}) => {
 
-  sendMetric({
+  sendCountMetric({
     name: "pp.app.paypal_sdk.card_fields.submit.count",
     dimensions: {
       cardFieldsFlow: cardFlowType,

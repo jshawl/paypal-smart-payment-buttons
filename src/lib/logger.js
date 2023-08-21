@@ -38,22 +38,47 @@ export function getLogger(): LoggerType {
   );
 }
 
-export const sendMetric = ({
-  name,
+export const sendCountMetric = ({
   dimensions,
+  event = 'unused',
+  name,
+  value = 1,
 }: {|
+  event?: string,
   name: string,
+  value?: number,
   dimensions: {
     [string]: mixed
   },
-  // $FlowFixMe beaver-logger types need to be updated
+  // $FlowIssue return type
 |}) => getLogger().metric({
-    metricNamespace: name,
-    metricEventName: 'unused',
-    metricValue: 1,
-    // $FlowFixMe beaver-logger types need to be updated
     dimensions,
+    metricEventName: event,
+    metricNamespace: name,
+    metricValue: value,
+    metricType: "counter"
   })
+
+  export const sendGaugeMetric = ({
+    dimensions,
+    event = 'unused',
+    name,
+    value,
+  }: {|
+    event?: string,
+    name: string,
+    value: number,
+    dimensions: {
+      [string]: mixed
+    },
+  // $FlowIssue return type
+  |}) => getLogger().metric({
+      dimensions,
+      metricEventName: event,
+      metricNamespace: name,
+      metricValue: value,
+      metricType: "gauge"
+    })
 
 type MobileEnvironment = $Values<typeof MOBILE_ENV>;
 
@@ -120,6 +145,14 @@ export function setupLogger({
 
     logger.error("unhandled_error", {
       err: stringifyError(err),
+    });
+
+    sendCountMetric({
+      event: 'error',
+      name: 'pp.app.paypal_sdk.buttons.unhandled_exception.count',
+      dimensions: {
+        errorType: "payments_sdk_error"
+      }
     });
 
     // eslint-disable-next-line promise/no-promise-in-callback

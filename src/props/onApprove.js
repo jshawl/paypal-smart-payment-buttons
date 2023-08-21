@@ -9,7 +9,7 @@ import { type OrderResponse, type PaymentResponse, getOrder, captureOrder, autho
     getSubscription, activateSubscription, type SubscriptionResponse, getPayment, executePayment, patchPayment,
     getSupplementalOrderInfo, isProcessorDeclineError, isUnprocessableEntityError } from '../api';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_STATE } from '../constants';
-import { unresolvedPromise, getLogger, sendMetric } from '../lib';
+import { unresolvedPromise, getLogger, sendCountMetric } from '../lib';
 import { ENABLE_PAYMENT_API } from '../config';
 import type {FeatureFlags, Experiments} from '../types'
 
@@ -627,7 +627,7 @@ type GetOnApproveOptions = {|
 
 export function getOnApprove({ intent, createBillingAgreement, createSubscription, onApprove, partnerAttributionID, onError, clientAccessToken, vault, clientID, facilitatorAccessToken, branded, createOrder, paymentSource, featureFlags, createVaultSetupToken, flow, experiments } : GetOnApproveOptions) : OnApprove {
     const beforeOnApprove = () => {
-        sendMetric({
+        sendCountMetric({
             name: "pp.app.paypal_sdk.buttons.click.success.count",
             dimensions: {
                 spbPaymentFlow: flow,

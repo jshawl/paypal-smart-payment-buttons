@@ -118,6 +118,7 @@ export function createExperiment(name : string, { sample, sticky = true } : Crea
         },
 
         logCheckpoint({ treatment, checkpoint, payload, throttle }) {
+            // $FlowIssue payload type mismatch
             logger.info(`${ treatment }_${ checkpoint }`, { ...payload, throttle: throttle.toString() });
             logger.flush();
         },

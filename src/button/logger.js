@@ -13,7 +13,7 @@ import {
     isAndroidChrome,
     prepareLatencyInstrumentationPayload,
     getNavigationTimeOrigin,
-    sendMetric
+    sendCountMetric
 } from '../lib';
 import {
     DATA_ATTRIBUTES, FPTI_TRANSITION, FPTI_BUTTON_TYPE, FPTI_BUTTON_KEY,
@@ -123,11 +123,11 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
 
         const { layout, color, shape, label, tagline = true } = style;
 
-        let native_device = 'non_native';
+        let nativeDevice = 'non_native';
         if (isIOSSafari()) {
-            native_device = 'ios_safari';
+            nativeDevice = 'ios_safari';
         } else if (isAndroidChrome()) {
-            native_device = 'android_chrome';
+            nativeDevice = 'android_chrome';
         }
 
         const serverRenderVersion = getTemplateVersion();
@@ -135,27 +135,27 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
 
         if (dotSeparatedRenderVersion !== sdkVersion) {
           logger.warn('server_render_version_mismatch', {sdkVersion, serverRenderVersion})
-          sendMetric({
+          sendCountMetric({
             name: 'pp.app.paypal_sdk.buttons.server_render_version_mismatch',
             dimensions: {}
           });
         }
 
-        logger.info(`button_render`);
-        logger.info(`button_render_template_version_${ serverRenderVersion }`);
-        logger.info(`button_render_client_version_${ getClientVersion() }`);
-        logger.info(`button_render_color_${ color }`);
-        logger.info(`button_render_shape_${ shape }`);
-        logger.info(`button_render_label_${ label }`);
-        logger.info(`button_render_layout_${ layout }`);
-        logger.info(`button_render_tagline_${ tagline.toString() }`);
-        logger.info(`button_render_funding_count_${ fundingSources.length }`);
-        logger.info(`button_render_wallet_instrument_count_${ walletInstruments.length }`);
-        logger.info(`button_render_${ native_device }_storage_state_${ isStorageStateFresh() ? 'fresh' : 'not_fresh' }`);
-
-        for (const walletInstrument of walletInstruments) {
-            logger.info(`button_render_wallet_instrument_${ walletInstrument }`);
-        }
+        logger.info("smart_payment_buttons_render_options", {
+            color,
+            label,
+            layout,
+            nativeDevice,
+            shape,
+            fundingInstruments: fundingSources.join(","),
+            fundingInstrumentsCount: fundingSources.length.toString(),
+            js_sdk_version: getClientVersion() ,
+            storageState: isStorageStateFresh() ? 'fresh' : 'not_fresh',
+            tagline: tagline.toString(),
+            version: serverRenderVersion,
+            walletInstruments: walletInstruments.join(","),
+            walletInstrumentsCount: walletInstruments.length.toString(),
+        });
 
         if (window.performance) {
             try {
@@ -169,23 +169,19 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
                     [FPTI_KEY.PAGE]:                  'main:xo:paypal-components:smart-payment-buttons',
                     [FPTI_KEY.CPL_COMP_METRICS]:      JSON.stringify(cplPhases?.comp || {})
                 });
-            } catch (e) {
-                logger.info(`button_render_CPL_instrumentation_log_error`);
+            } catch (error) {
+                logger.info(`button_render_CPL_instrumentation_log_error`, error);
             }
         } else {
             logger.info(`button_render_CPL_instrumentation_not_executed`);
         }
 
-        const getFundingInstrumentID = function () : string | void {
-            let FI_ID;
-
+        const getFundingInstrumentId = function (): ?string {
             if (wallet?.paypal?.instruments[0]?.secondaryInstruments && wallet.paypal.instruments[0].instrumentID) {
-                FI_ID = `${ wallet.paypal.instruments[0].instrumentID },${ wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID }`;
+                return `${ wallet.paypal.instruments[0].instrumentID },${ wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID }`;
             } else if (wallet?.paypal?.instruments[0]?.instrumentID) {
-                FI_ID = `${ wallet.paypal.instruments[0].instrumentID }`;
+                return `${ wallet.paypal.instruments[0].instrumentID }`;
             }
-
-            return FI_ID;
         }
 
         const tracking = {
@@ -210,10 +206,10 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_PASSED]: onShippingChange ? '1' : '0'
         }
 
-        const fiID = getFundingInstrumentID();
+        const fundingInstrumentId = getFundingInstrumentId();
 
-        if (fiID) {
-            tracking[`${ FPTI_KEY.FI_ID }`] = fiID;
+        if (fundingInstrumentId) {
+            tracking[`${ FPTI_KEY.FI_ID }`] = fundingInstrumentId;
         }
 
         logger.track(tracking);

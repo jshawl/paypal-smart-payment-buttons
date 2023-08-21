@@ -68,7 +68,7 @@ type TriggerIntegrationErrorOptions = {|
     message? : string,
     orderID? : string,
     loggerPayload? : {|
-        [string] : ?(string | boolean)
+        [string] : mixed 
     |},
     throwError? : boolean,
     featureFlags: FeatureFlags

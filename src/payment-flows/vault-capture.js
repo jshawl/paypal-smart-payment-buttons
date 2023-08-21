@@ -8,7 +8,7 @@ import { initiateInstallments } from '@paypal/installments/src/interface';
 import type { MenuChoices } from '../types';
 import { validatePaymentMethod, getSupplementalOrderInfo, deleteVault, updateButtonClientConfig, loadFraudnet, confirmOrderAPI, buildPaymentSource, createAccessToken } from '../api';
 import { BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_MENU_OPTION } from '../constants';
-import { getLogger, sendMetric } from '../lib';
+import { getLogger, sendCountMetric } from '../lib';
 import { handleValidatePaymentMethodResponse } from "../lib/3ds"
 import type { ButtonProps } from '../button/props';
 
@@ -203,7 +203,7 @@ function setupVaultMenu({ props, payment, serviceData, components, config, resta
     }
 
     getLogger().info(`popup_dimensions_value_vault_capture`);
-    sendMetric({
+    sendCountMetric({
         name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
         dimensions: {
             spbPaymentFlow: "vault_capture",

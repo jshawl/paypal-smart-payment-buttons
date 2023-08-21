@@ -9,7 +9,7 @@ import type { ProxyWindow, ConnectOptions } from '../types';
 import { type CreateBillingAgreement, type CreateSubscription } from '../props';
 import { exchangeAccessTokenForAuthCode, getConnectURL, updateButtonClientConfig, getSmartWallet, loadFraudnet  } from '../api';
 import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_STATE, HEADERS } from '../constants';
-import { unresolvedPromise, getLogger, setBuyerAccessToken, sendMetric } from '../lib';
+import { unresolvedPromise, getLogger, setBuyerAccessToken, sendCountMetric } from '../lib';
 import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
 import { enableLoadingSpinner, getButtons } from "../button/dom";
@@ -136,7 +136,7 @@ function getContext({ win, isClick, merchantRequestedPopupsDisabled } : {| win :
 export const getDimensions = (fundingSource : string, popupIncreaseDimensions? : boolean) : {| width : number, height : number |} => {
     if (APM_LIST.indexOf(fundingSource) !== -1) {
         getLogger().info(`popup_dimensions_value_${ fundingSource }`);
-        sendMetric({
+        sendCountMetric({
             name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
             dimensions: {
                 spbPaymentFlow: "checkout",
@@ -147,7 +147,7 @@ export const getDimensions = (fundingSource : string, popupIncreaseDimensions? :
         return { width: CHECKOUT_APM_POPUP_DIMENSIONS.WIDTH, height: CHECKOUT_APM_POPUP_DIMENSIONS.HEIGHT };
     } else if (popupIncreaseDimensions) {
         getLogger().info(`popup_dimensions_value_${ fundingSource }`);
-        sendMetric({
+        sendCountMetric({
             name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
             dimensions: {
                 spbPaymentFlow: "checkout",
@@ -158,7 +158,7 @@ export const getDimensions = (fundingSource : string, popupIncreaseDimensions? :
         return { width: EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH, height: EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT };
     } else {
         getLogger().info(`popup_dimensions_${ fundingSource }`);
-        sendMetric({
+        sendCountMetric({
             name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
             dimensions: {
                 spbPaymentFlow: "checkout",
@@ -476,7 +476,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                         context = CONTEXT.IFRAME;
                     } else {
                         getLogger().warn('popup_open_error_blocked', { err: stringifyError(err) });
-                        sendMetric({
+                        sendCountMetric({
                             name: "pp.app.paypal_sdk.buttons.click.error.count",
                             dimensions: {
                                 errorName: 'checkout_blocked',
@@ -496,7 +496,7 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 return onClick ? onClick({ fundingSource }) : true;
             }).then(valid => {
                 if (win && !valid) {
-                    sendMetric({
+                    sendCountMetric({
                         name: "pp.app.paypal_sdk.buttons.click.error.count",
                         dimensions: {
                             errorName: 'invalid_funding_click',

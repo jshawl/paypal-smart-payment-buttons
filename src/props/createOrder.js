@@ -7,7 +7,7 @@ import { getDomain } from '@krakenjs/cross-domain-utils/src';
 
 import { createOrderID, billingTokenToOrderID, subscriptionIdToCartId, createPaymentToken } from '../api';
 import { FPTI_STATE, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_BUTTON_KEY } from '../constants';
-import { getClientsideTimestamp, getLogger, isEmailAddress, sendMetric } from '../lib';
+import { getClientsideTimestamp, getLogger, isEmailAddress, sendCountMetric } from '../lib';
 import { ENABLE_PAYMENT_API } from '../config';
 import {
   vaultApprovalSessionIdToOrderId,
@@ -217,7 +217,7 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
                 });
             }
         }).catch(err => {
-            sendMetric({
+            sendCountMetric({
                 name: "pp.app.paypal_sdk.buttons.create_order.error.count",
                 dimensions: {
                     errorName: 'generic',
@@ -237,7 +237,7 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
 
         }).then(orderID => {
             if (!orderID || typeof orderID !== 'string') {
-                sendMetric({
+                sendCountMetric({
                     name: "pp.app.paypal_sdk.buttons.create_order.error.count",
                     dimensions: {
                         errorName: 'no_order_id',
@@ -256,7 +256,7 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
             }
 
             if (orderID.indexOf('PAY-') === 0 || orderID.indexOf('PAYID-') === 0) {
-                sendMetric({
+                sendCountMetric({
                     name: "pp.app.paypal_sdk.buttons.create_order.error.count",
                     dimensions: {
                         errorName: 'pay_id',
@@ -276,7 +276,7 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
 
             const duration = Date.now() - startTime;
 
-            sendMetric({
+            sendCountMetric({
                 name: "pp.app.paypal_sdk.buttons.create_order.count",
                 dimensions: {
                     flow,

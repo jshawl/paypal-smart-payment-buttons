@@ -8,7 +8,7 @@ import type { MenuChoices, Wallet, WalletInstrument } from '../types';
 import { getSupplementalOrderInfo, oneClickApproveOrder, getSmartWallet, loadFraudnet, updateButtonClientConfig } from '../api';
 import { BUYER_INTENT, FPTI_TRANSITION, FPTI_MENU_OPTION, FPTI_STATE, HEADERS } from '../constants';
 import { type ButtonProps } from '../button/props';
-import { getBuyerAccessToken, getLogger, sendMetric } from '../lib';
+import { getBuyerAccessToken, getLogger, sendCountMetric } from '../lib';
 
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, IsEligibleOptions, IsPaymentEligibleOptions, InitOptions, MenuOptions, Payment } from './types';
 import { checkout, CHECKOUT_POPUP_DIMENSIONS, EXPERIMENTAL_POPUP_DIMENSIONS } from './checkout';
@@ -263,7 +263,7 @@ function setupWalletMenu({ props, payment, serviceData, components, config, rest
     }
 
     getLogger().info(`popup_dimensions_value_wallet_capture`);
-    sendMetric({
+    sendCountMetric({
         name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
         dimensions: {
             spbPaymentFlow: "wallet_capture",

@@ -5,7 +5,7 @@ import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FPTI_KEY } from '@paypal/sdk-constants/src';
 
 import { applepay, checkout, cardField, cardForm, paymentFields, native, vaultCapture, walletCapture, popupBridge, type Payment, type PaymentFlow } from '../payment-flows';
-import { getClientsideTimestamp, getLogger, sendBeacon, sendMetric } from '../lib';
+import { getClientsideTimestamp, getLogger, sendBeacon, sendCountMetric } from '../lib';
 import { FPTI_TRANSITION, BUYER_INTENT, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY, FPTI_STATE } from '../constants';
 import { updateButtonClientConfig } from '../api';
 import { getConfirmOrder } from '../props/confirmOrder';
@@ -86,7 +86,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
         const { name, init, inline, spinner, updateFlowClientConfig } = getPaymentFlow({ props, payment, config, components, serviceData });
         const { click, start, close } = init({ props, config, serviceData, components, payment, restart, experiments });
 
-        sendMetric({
+        sendCountMetric({
             name: 'pp.app.paypal_sdk.buttons.click.count',
             dimensions: {
                 fundingSource,

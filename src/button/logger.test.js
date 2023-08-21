@@ -11,7 +11,7 @@ import { setupButtonLogger } from "./logger";
 vi.mock("../lib/logger", () => ({
   getLogger: vi.fn(),
   setupLogger: vi.fn(),
-  sendMetric: vi.fn(),
+  sendCountMetric: vi.fn(),
 }));
 
 const buttonLoggerProps = {
@@ -38,6 +38,12 @@ const buttonLoggerProps = {
   },
   merchantID: ["XYZ12345"],
 };
+
+const findEventInMockLogs = (event, mock) =>
+  // mockCallback.mock.calls[0][0]
+  mock.mock.calls.some((mockArgs) =>
+    mockArgs.some((mockEvent) => mockEvent === event)
+  );
 
 describe("setupButtonLogger", () => {
   const infoMock = vi.fn();
@@ -83,11 +89,11 @@ describe("setupButtonLogger", () => {
 
     // $FlowIssue wants getQueriedEligibleFunding to be a ZalgoPromise
     await setupButtonLogger(buttonLoggerProps);
-    expect(infoMock).toHaveBeenCalledTimes(12);
-    expect(infoMock).toHaveBeenLastCalledWith(
-      "CPL_LATENCY_METRICS_SECOND_RENDER"
-    );
-    expect(trackMock).toHaveBeenCalledTimes(2);
+
+    expect(
+      findEventInMockLogs("CPL_LATENCY_METRICS_SECOND_RENDER", infoMock)
+    ).toEqual(true);
+
     expect(trackMock).toHaveBeenNthCalledWith(1, {
       state_name: "CPL_LATENCY_METRICS",
       transition_name: "process_client_metrics",
@@ -100,16 +106,30 @@ describe("setupButtonLogger", () => {
   it("should fail to get performance marks", async () => {
     window.performance = {};
     await setupButtonLogger(buttonLoggerProps);
-    expect(infoMock).toHaveBeenCalledWith(
-      "button_render_CPL_instrumentation_log_error"
-    );
+
+    expect(
+      findEventInMockLogs("CPL_LATENCY_METRICS_SECOND_RENDER", infoMock)
+    ).toEqual(false);
+    expect(
+      findEventInMockLogs(
+        "button_render_CPL_instrumentation_log_error",
+        infoMock
+      )
+    ).toEqual(true);
   });
 
   it("should not execute cpl instrumentation", async () => {
     window.performance = null;
     await setupButtonLogger(buttonLoggerProps);
-    expect(infoMock).toHaveBeenCalledWith(
-      "button_render_CPL_instrumentation_not_executed"
-    );
+
+    expect(
+      findEventInMockLogs("CPL_LATENCY_METRICS_SECOND_RENDER", infoMock)
+    ).toEqual(false);
+    expect(
+      findEventInMockLogs(
+        "button_render_CPL_instrumentation_not_executed",
+        infoMock
+      )
+    ).toEqual(true);
   });
 });

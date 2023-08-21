@@ -5,7 +5,7 @@ import { FUNDING, COUNTRY, FPTI_KEY, type FundingEligibilityType } from '@paypal
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import type { ContentType, Wallet, PersonalizationType, Experiments, FeatureFlags, InlinePaymentFieldsEligibility } from '../types';
-import { sendMetric, getLogger, getSmartFieldsByFundingSource, setBuyerAccessToken, registerServiceWorker, unregisterServiceWorker } from '../lib';
+import { sendCountMetric, getLogger, getSmartFieldsByFundingSource, setBuyerAccessToken, registerServiceWorker, unregisterServiceWorker } from '../lib';
 import { type FirebaseConfig } from '../api';
 import { DATA_ATTRIBUTES, BUYER_INTENT, FPTI_STATE, FPTI_CUSTOM_KEY, ORDER_CREATED_BY } from '../constants';
 import { type Payment } from '../payment-flows';
@@ -232,7 +232,7 @@ export function setupButton({
             const { onError } = paymentProps;
 
             payPromise.catch(err => {
-                sendMetric({
+                sendCountMetric({
                     name: "pp.app.paypal_sdk.buttons.click.error.count",
                     dimensions: {
                         errorName: 'payment_flow_error',
@@ -290,7 +290,7 @@ export function setupButton({
             const { onError } = paymentProps;
 
             payPromise.catch(err => {
-                sendMetric({
+                sendCountMetric({
                     name: "pp.app.paypal_sdk.buttons.click.error.count",
                     dimensions: {
                         fundingSource: paymentFundingSource,
