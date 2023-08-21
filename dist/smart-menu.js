@@ -129,24 +129,24 @@ window.spb = function(modules) {
         x.__r = 0;
     }
     function P(n, l, u, t, i, o, r, f, e, a, v) {
-        var p, y, _, b, m, w, x, P, S, H = 0, I = t && t.__k || s, T = I.length, j = T, z = l.length;
+        var p, y, _, b, m, w, x, P, C, H = 0, I = t && t.__k || s, T = I.length, j = T, z = l.length;
         for (u.__k = [], p = 0; p < z; p++) null != (b = u.__k[p] = null == (b = l[p]) || "boolean" == typeof b || "function" == typeof b ? null : "string" == typeof b || "number" == typeof b || "bigint" == typeof b ? d(null, b, null, null, b) : h(b) ? d(k, {
             children: b
         }, null, null, null) : b.__b > 0 ? d(b.type, b.props, b.key, b.ref ? b.ref : null, b.__v) : b) ? (b.__ = u, 
         b.__b = u.__b + 1, -1 === (P = A(b, I, x = p + H, j)) ? _ = c : (_ = I[P] || c, 
         I[P] = void 0, j--), L(n, b, _, i, o, r, f, e, a, v), m = b.__e, (y = b.ref) && _.ref != y && (_.ref && O(_.ref, null, b), 
-        v.push(y, b.__c || m, b)), null != m && (null == w && (w = m), (S = _ === c || null === _.__v) ? -1 == P && H-- : P !== x && (P === x + 1 ? H++ : P > x ? j > z - x ? H += P - x : H-- : H = P < x && P == x - 1 ? P - x : 0), 
-        x = p + H, "function" != typeof b.type || P === x && _.__k !== b.__k ? "function" == typeof b.type || P === x && !S ? void 0 !== b.__d ? (e = b.__d, 
-        b.__d = void 0) : e = m.nextSibling : e = $(n, m, e) : e = C(b, e, n), "function" == typeof u.type && (u.__d = e))) : (_ = I[p]) && null == _.key && _.__e && (_.__e == e && (e = g(_)), 
-        q(_, _, !1));
+        v.push(y, b.__c || m, b)), null != m && (null == w && (w = m), (C = _ === c || null === _.__v) ? -1 == P && H-- : P !== x && (P === x + 1 ? H++ : P > x ? j > z - x ? H += P - x : H-- : H = P < x && P == x - 1 ? P - x : 0), 
+        x = p + H, "function" != typeof b.type || P === x && _.__k !== b.__k ? "function" == typeof b.type || P === x && !C ? void 0 !== b.__d ? (e = b.__d, 
+        b.__d = void 0) : e = m.nextSibling : e = S(n, m, e) : e = $(b, e, n), "function" == typeof u.type && (u.__d = e))) : (_ = I[p]) && null == _.key && _.__e && (_.__e == e && (e = g(_)), 
+        q(_, _, !1), I[p] = null);
         for (u.__e = w, p = T; p--; ) null != I[p] && ("function" == typeof u.type && null != I[p].__e && I[p].__e == u.__d && (u.__d = I[p].__e.nextSibling), 
         q(I[p], I[p]));
     }
-    function C(n, l, u) {
-        for (var t, i = n.__k, o = 0; i && o < i.length; o++) (t = i[o]) && (t.__ = n, l = "function" == typeof t.type ? C(t, l, u) : $(u, t.__e, l));
+    function $(n, l, u) {
+        for (var t, i = n.__k, o = 0; i && o < i.length; o++) (t = i[o]) && (t.__ = n, l = "function" == typeof t.type ? $(t, l, u) : S(u, t.__e, l));
         return l;
     }
-    function $(n, l, u) {
+    function S(n, l, u) {
         return null == u || u.parentNode !== n ? n.insertBefore(l, null) : l == u && null != l.parentNode || n.insertBefore(l, u), 
         l.nextSibling;
     }
@@ -173,7 +173,7 @@ window.spb = function(modules) {
         n: if ("style" === l) if ("string" == typeof u) n.style.cssText = u; else {
             if ("string" == typeof t && (n.style.cssText = t = ""), t) for (l in t) u && l in u || I(n.style, l, "");
             if (u) for (l in u) t && u[l] === t[l] || I(n.style, l, u[l]);
-        } else if ("o" === l[0] && "n" === l[1]) o = l !== (l = l.replace(/Capture$/, "")), 
+        } else if ("o" === l[0] && "n" === l[1]) o = l !== (l = l.replace(/(PointerCapture)$|Capture$/, "$1")), 
         l = l.toLowerCase() in n ? l.toLowerCase().slice(2) : l.slice(2), n.l || (n.l = {}), 
         n.l[l + o] = u, u ? t || n.addEventListener(l, o ? z : j, o) : n.removeEventListener(l, o ? z : j, o); else if ("dangerouslySetInnerHTML" !== l) {
             if (i) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s"); else if ("width" !== l && "height" !== l && "href" !== l && "list" !== l && "form" !== l && "tabIndex" !== l && "download" !== l && "rowSpan" !== l && "colSpan" !== l && l in n) try {
@@ -190,37 +190,37 @@ window.spb = function(modules) {
         return this.l[n.type + !0](l.event ? l.event(n) : n);
     }
     function L(n, u, t, i, o, r, f, e, c, s) {
-        var a, p, y, d, _, g, m, w, x, C, S, $, A, H, I, T = u.type;
+        var a, p, y, d, _, g, m, w, x, $, C, S, A, H, I, T = u.type;
         if (void 0 !== u.constructor) return null;
         null != t.__h && (c = t.__h, e = u.__e = t.__e, u.__h = null, r = [ e ]), (a = l.__b) && a(u);
         n: if ("function" == typeof T) try {
-            if (w = u.props, x = (a = T.contextType) && i[a.__c], C = a ? x ? x.props.value : a.__ : i, 
-            t.__c ? m = (p = u.__c = t.__c).__ = p.__E : ("prototype" in T && T.prototype.render ? u.__c = p = new T(w, C) : (u.__c = p = new b(w, C), 
+            if (w = u.props, x = (a = T.contextType) && i[a.__c], $ = a ? x ? x.props.value : a.__ : i, 
+            t.__c ? m = (p = u.__c = t.__c).__ = p.__E : ("prototype" in T && T.prototype.render ? u.__c = p = new T(w, $) : (u.__c = p = new b(w, $), 
             p.constructor = T, p.render = B), x && x.sub(p), p.props = w, p.state || (p.state = {}), 
-            p.context = C, p.__n = i, y = p.__d = !0, p.__h = [], p._sb = []), null == p.__s && (p.__s = p.state), 
+            p.context = $, p.__n = i, y = p.__d = !0, p.__h = [], p._sb = []), null == p.__s && (p.__s = p.state), 
             null != T.getDerivedStateFromProps && (p.__s == p.state && (p.__s = v({}, p.__s)), 
             v(p.__s, T.getDerivedStateFromProps(w, p.__s))), d = p.props, _ = p.state, p.__v = u, 
             y) null == T.getDerivedStateFromProps && null != p.componentWillMount && p.componentWillMount(), 
             null != p.componentDidMount && p.__h.push(p.componentDidMount); else {
-                if (null == T.getDerivedStateFromProps && w !== d && null != p.componentWillReceiveProps && p.componentWillReceiveProps(w, C), 
-                !p.__e && (null != p.shouldComponentUpdate && !1 === p.shouldComponentUpdate(w, p.__s, C) || u.__v === t.__v)) {
+                if (null == T.getDerivedStateFromProps && w !== d && null != p.componentWillReceiveProps && p.componentWillReceiveProps(w, $), 
+                !p.__e && (null != p.shouldComponentUpdate && !1 === p.shouldComponentUpdate(w, p.__s, $) || u.__v === t.__v)) {
                     for (u.__v !== t.__v && (p.props = w, p.state = p.__s, p.__d = !1), u.__e = t.__e, 
                     u.__k = t.__k, u.__k.forEach((function(n) {
                         n && (n.__ = u);
-                    })), S = 0; S < p._sb.length; S++) p.__h.push(p._sb[S]);
+                    })), C = 0; C < p._sb.length; C++) p.__h.push(p._sb[C]);
                     p._sb = [], p.__h.length && f.push(p);
                     break n;
                 }
-                null != p.componentWillUpdate && p.componentWillUpdate(w, p.__s, C), null != p.componentDidUpdate && p.__h.push((function() {
+                null != p.componentWillUpdate && p.componentWillUpdate(w, p.__s, $), null != p.componentDidUpdate && p.__h.push((function() {
                     p.componentDidUpdate(d, _, g);
                 }));
             }
-            if (p.context = C, p.props = w, p.__P = n, p.__e = !1, $ = l.__r, A = 0, "prototype" in T && T.prototype.render) {
-                for (p.state = p.__s, p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), 
+            if (p.context = $, p.props = w, p.__P = n, p.__e = !1, S = l.__r, A = 0, "prototype" in T && T.prototype.render) {
+                for (p.state = p.__s, p.__d = !1, S && S(u), a = p.render(p.props, p.state, p.context), 
                 H = 0; H < p._sb.length; H++) p.__h.push(p._sb[H]);
                 p._sb = [];
             } else do {
-                p.__d = !1, $ && $(u), a = p.render(p.props, p.state, p.context), p.state = p.__s;
+                p.__d = !1, S && S(u), a = p.render(p.props, p.state, p.context), p.state = p.__s;
             } while (p.__d && ++A < 25);
             p.state = p.__s, null != p.getChildContext && (i = v(v({}, i), p.getChildContext())), 
             y || null == p.getSnapshotBeforeUpdate || (g = p.getSnapshotBeforeUpdate(d, _)), 
@@ -1599,7 +1599,7 @@ window.spb = function(modules) {
                         },
                         metric: function(metricPayload) {
                             if (!dom_isBrowser()) return logger;
-                            print("debug", "metric." + metricPayload.name, metricPayload.dimensions || {});
+                            print("debug", "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
                             metrics.push(metricPayload);
                             return logger;
                         },

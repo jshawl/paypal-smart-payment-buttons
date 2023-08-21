@@ -297,7 +297,7 @@ window.spb = function(modules) {
                 },
                 metric: function(metricPayload) {
                     if (!Object(belter_src.isBrowser)()) return logger;
-                    print(LOG_LEVEL.DEBUG, "metric." + metricPayload.name, metricPayload.dimensions || {});
+                    print(LOG_LEVEL.DEBUG, "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
                     metrics.push(metricPayload);
                     return logger;
                 },
@@ -9941,7 +9941,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.150", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.151", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -11900,7 +11900,7 @@ window.spb = function(modules) {
         var checkout_getDimensions = function(fundingSource, popupIncreaseDimensions) {
             if (-1 !== sdk_constants_src.APM_LIST.indexOf(fundingSource)) {
                 Object(lib.getLogger)().info("popup_dimensions_value_" + fundingSource);
-                Object(lib.sendMetric)({
+                Object(lib.sendCountMetric)({
                     name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
                     dimensions: {
                         spbPaymentFlow: "checkout",
@@ -11915,7 +11915,7 @@ window.spb = function(modules) {
             }
             if (popupIncreaseDimensions) {
                 Object(lib.getLogger)().info("popup_dimensions_value_" + fundingSource);
-                Object(lib.sendMetric)({
+                Object(lib.sendCountMetric)({
                     name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
                     dimensions: {
                         spbPaymentFlow: "checkout",
@@ -11929,7 +11929,7 @@ window.spb = function(modules) {
                 };
             }
             Object(lib.getLogger)().info("popup_dimensions_" + fundingSource);
-            Object(lib.sendMetric)({
+            Object(lib.sendCountMetric)({
                 name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
                 dimensions: {
                     spbPaymentFlow: "checkout",
@@ -12286,7 +12286,7 @@ window.spb = function(modules) {
                                     Object(lib.getLogger)().warn("popup_open_error_blocked", {
                                         err: Object(src.stringifyError)(err)
                                     });
-                                    Object(lib.sendMetric)({
+                                    Object(lib.sendCountMetric)({
                                         name: "pp.app.paypal_sdk.buttons.click.error.count",
                                         dimensions: {
                                             errorName: "checkout_blocked"
@@ -12305,7 +12305,7 @@ window.spb = function(modules) {
                                 });
                             })).then((function(valid) {
                                 if (win && !valid) {
-                                    Object(lib.sendMetric)({
+                                    Object(lib.sendCountMetric)({
                                         name: "pp.app.paypal_sdk.buttons.click.error.count",
                                         dimensions: {
                                             errorName: "invalid_funding_click"
@@ -12967,7 +12967,7 @@ window.spb = function(modules) {
                             !function(_ref10) {
                                 var _getLogger$track5;
                                 var cardFlowType = _ref10.cardFlowType, hcfSessionID = _ref10.hcfSessionID;
-                                Object(lib.sendMetric)({
+                                Object(lib.sendCountMetric)({
                                     name: "pp.app.paypal_sdk.card_fields.submit.count",
                                     dimensions: {
                                         cardFieldsFlow: cardFlowType
@@ -13074,7 +13074,7 @@ window.spb = function(modules) {
                                             !function(_ref4) {
                                                 var _getLogger$track;
                                                 var orderID = _ref4.orderID;
-                                                Object(lib.sendMetric)({
+                                                Object(lib.sendCountMetric)({
                                                     name: "pp.app.paypal_sdk.card_fields.submit.success.count",
                                                     dimensions: {
                                                         cardFieldsFlow: constants.PAYMENT_FLOWS.WITH_PURCHASE
@@ -13093,7 +13093,7 @@ window.spb = function(modules) {
                                             !function(_ref5) {
                                                 var _getLogger$track2;
                                                 var orderID = _ref5.orderID, error = _ref5.error;
-                                                Object(lib.sendMetric)({
+                                                Object(lib.sendCountMetric)({
                                                     name: "pp.app.paypal_sdk.card_fields.submit.error.count",
                                                     dimensions: {
                                                         cardFieldsFlow: constants.PAYMENT_FLOWS.WITH_PURCHASE
@@ -13145,7 +13145,7 @@ window.spb = function(modules) {
                                                 return function(_ref6) {
                                                     var _getLogger$track3;
                                                     var vaultToken = _ref6.vaultToken;
-                                                    Object(lib.sendMetric)({
+                                                    Object(lib.sendCountMetric)({
                                                         name: "pp.app.paypal_sdk.card_fields.submit.success.count",
                                                         dimensions: {
                                                             cardFieldsFlow: constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
@@ -13164,7 +13164,7 @@ window.spb = function(modules) {
                                                 !function(_ref7) {
                                                     var _getLogger$track4;
                                                     var vaultToken = _ref7.vaultToken, error = _ref7.error;
-                                                    Object(lib.sendMetric)({
+                                                    Object(lib.sendCountMetric)({
                                                         name: "pp.app.paypal_sdk.card_fields.submit.error.count",
                                                         dimensions: {
                                                             cardFieldsFlow: constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
@@ -13550,7 +13550,7 @@ window.spb = function(modules) {
                 var content = serviceData.content, facilitatorAccessToken = serviceData.facilitatorAccessToken, featureFlags = serviceData.featureFlags;
                 if (!clientAccessToken || !paymentMethodID) throw new Error("Client access token and payment method id required");
                 Object(lib.getLogger)().info("popup_dimensions_value_vault_capture");
-                Object(lib.sendMetric)({
+                Object(lib.sendCountMetric)({
                     name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
                     dimensions: {
                         spbPaymentFlow: "vault_capture",
@@ -13857,7 +13857,7 @@ window.spb = function(modules) {
                 var instrument = getInstrument(wallet, fundingSource, instrumentID);
                 if (!instrument) throw new Error("Can not render wallet menu without instrument");
                 Object(lib.getLogger)().info("popup_dimensions_value_wallet_capture");
-                Object(lib.sendMetric)({
+                Object(lib.sendCountMetric)({
                     name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
                     dimensions: {
                         spbPaymentFlow: "wallet_capture",
@@ -15639,7 +15639,7 @@ window.spb = function(modules) {
                     },
                     experiments: experiments
                 }), click = _init.click, start = _init.start, close = _init.close;
-                Object(lib.sendMetric)({
+                Object(lib.sendCountMetric)({
                     name: "pp.app.paypal_sdk.buttons.click.count",
                     dimensions: {
                         fundingSource: fundingSource,
@@ -16208,7 +16208,7 @@ window.spb = function(modules) {
                     var onError = paymentProps.onError;
                     payPromise.catch((function(err) {
                         var _getLogger$warn$track;
-                        Object(lib.sendMetric)({
+                        Object(lib.sendCountMetric)({
                             name: "pp.app.paypal_sdk.buttons.click.error.count",
                             dimensions: {
                                 errorName: "payment_flow_error",
@@ -16398,7 +16398,7 @@ window.spb = function(modules) {
                         var onError = paymentProps.onError;
                         payPromise.catch((function(err) {
                             var _getLogger$error$trac;
-                            Object(lib.sendMetric)({
+                            Object(lib.sendCountMetric)({
                                 name: "pp.app.paypal_sdk.buttons.click.error.count",
                                 dimensions: {
                                     fundingSource: paymentFundingSource,
@@ -16448,7 +16448,7 @@ window.spb = function(modules) {
                     var _ref2;
                     return (_ref2 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref2[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.150", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.151", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref2[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref2[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref2[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -16474,31 +16474,34 @@ window.spb = function(modules) {
                         return el.getAttribute(constants.DATA_ATTRIBUTES.PAY_NOW);
                     })).some(Boolean);
                     var layout = style.layout, color = style.color, shape = style.shape, label = style.label, _style$tagline = style.tagline, tagline = void 0 === _style$tagline || _style$tagline;
-                    var native_device = "non_native";
-                    Object(lib.isIOSSafari)() ? native_device = "ios_safari" : Object(lib.isAndroidChrome)() && (native_device = "android_chrome");
+                    var nativeDevice = "non_native";
+                    Object(lib.isIOSSafari)() ? nativeDevice = "ios_safari" : Object(lib.isAndroidChrome)() && (nativeDevice = "android_chrome");
                     var serverRenderVersion = (document.body && document.body.getAttribute("" + constants.DATA_ATTRIBUTES.RENDER_VERSION) || "unknown").replace(/[^a-zA-Z0-9]+/g, "_");
                     if (serverRenderVersion.split("_").join(".") !== sdkVersion) {
                         logger.warn("server_render_version_mismatch", {
                             sdkVersion: sdkVersion,
                             serverRenderVersion: serverRenderVersion
                         });
-                        Object(lib.sendMetric)({
+                        Object(lib.sendCountMetric)({
                             name: "pp.app.paypal_sdk.buttons.server_render_version_mismatch",
                             dimensions: {}
                         });
                     }
-                    logger.info("button_render");
-                    logger.info("button_render_template_version_" + serverRenderVersion);
-                    logger.info("button_render_client_version_" + (document.body && document.body.getAttribute("" + constants.DATA_ATTRIBUTES.CLIENT_VERSION) || "unknown").replace(/[^a-zA-Z0-9]+/g, "_"));
-                    logger.info("button_render_color_" + color);
-                    logger.info("button_render_shape_" + shape);
-                    logger.info("button_render_label_" + label);
-                    logger.info("button_render_layout_" + layout);
-                    logger.info("button_render_tagline_" + tagline.toString());
-                    logger.info("button_render_funding_count_" + fundingSources.length);
-                    logger.info("button_render_wallet_instrument_count_" + walletInstruments.length);
-                    logger.info("button_render_" + native_device + "_storage_state_" + (Object(lib.isStorageStateFresh)() ? "fresh" : "not_fresh"));
-                    for (var _i2 = 0; _i2 < walletInstruments.length; _i2++) logger.info("button_render_wallet_instrument_" + walletInstruments[_i2]);
+                    logger.info("smart_payment_buttons_render_options", {
+                        color: color,
+                        label: label,
+                        layout: layout,
+                        nativeDevice: nativeDevice,
+                        shape: shape,
+                        fundingInstruments: fundingSources.join(","),
+                        fundingInstrumentsCount: fundingSources.length.toString(),
+                        js_sdk_version: (document.body && document.body.getAttribute("" + constants.DATA_ATTRIBUTES.CLIENT_VERSION) || "unknown").replace(/[^a-zA-Z0-9]+/g, "_"),
+                        storageState: Object(lib.isStorageStateFresh)() ? "fresh" : "not_fresh",
+                        tagline: tagline.toString(),
+                        version: serverRenderVersion,
+                        walletInstruments: walletInstruments.join(","),
+                        walletInstrumentsCount: walletInstruments.length.toString()
+                    });
                     if (window.performance) try {
                         var _logger$track;
                         var responseStartTime = (startTime = document.body && document.body.getAttribute(constants.DATA_ATTRIBUTES.RESPONSE_START_TIME), 
@@ -16511,8 +16514,8 @@ window.spb = function(modules) {
                         _logger$track[sdk_constants_src.FPTI_KEY.PAGE] = "main:xo:paypal-components:smart-payment-buttons", 
                         _logger$track[sdk_constants_src.FPTI_KEY.CPL_COMP_METRICS] = JSON.stringify((null == cplPhases ? void 0 : cplPhases.comp) || {}), 
                         _logger$track));
-                    } catch (e) {
-                        logger.info("button_render_CPL_instrumentation_log_error");
+                    } catch (error) {
+                        logger.info("button_render_CPL_instrumentation_log_error", error);
                     } else logger.info("button_render_CPL_instrumentation_not_executed");
                     var startTime;
                     var tracking = ((_tracking = {})[sdk_constants_src.FPTI_KEY.STATE] = constants.FPTI_STATE.BUTTON, 
@@ -16529,13 +16532,9 @@ window.spb = function(modules) {
                     _tracking[constants.FPTI_BUTTON_KEY.BUTTON_TAGLINE_ENABLED] = tagline ? "1" : "0", 
                     _tracking[constants.FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_PASSED] = onShippingChange ? "1" : "0", 
                     _tracking);
-                    var fiID = function() {
-                        var _wallet$paypal, _wallet$paypal2;
-                        var FI_ID;
-                        null != wallet && null != (_wallet$paypal = wallet.paypal) && null != (_wallet$paypal = _wallet$paypal.instruments[0]) && _wallet$paypal.secondaryInstruments && wallet.paypal.instruments[0].instrumentID ? FI_ID = wallet.paypal.instruments[0].instrumentID + "," + wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID : null != wallet && null != (_wallet$paypal2 = wallet.paypal) && null != (_wallet$paypal2 = _wallet$paypal2.instruments[0]) && _wallet$paypal2.instrumentID && (FI_ID = "" + wallet.paypal.instruments[0].instrumentID);
-                        return FI_ID;
-                    }();
-                    fiID && (tracking["" + sdk_constants_src.FPTI_KEY.FI_ID] = fiID);
+                    var fundingInstrumentId = null != wallet && null != (_wallet$paypal = wallet.paypal) && null != (_wallet$paypal = _wallet$paypal.instruments[0]) && _wallet$paypal.secondaryInstruments && wallet.paypal.instruments[0].instrumentID ? wallet.paypal.instruments[0].instrumentID + "," + wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID : null != wallet && null != (_wallet$paypal2 = wallet.paypal) && null != (_wallet$paypal2 = _wallet$paypal2.instruments[0]) && _wallet$paypal2.instrumentID ? "" + wallet.paypal.instruments[0].instrumentID : void 0;
+                    var _wallet$paypal, _wallet$paypal2;
+                    fundingInstrumentId && (tracking["" + sdk_constants_src.FPTI_KEY.FI_ID] = fundingInstrumentId);
                     logger.track(tracking);
                     logger.flush();
                 }));
@@ -17206,8 +17205,11 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "getLogger", (function() {
             return logger.getLogger;
         }));
-        __webpack_require__.d(__webpack_exports__, "sendMetric", (function() {
-            return logger.sendMetric;
+        __webpack_require__.d(__webpack_exports__, "sendCountMetric", (function() {
+            return logger.sendCountMetric;
+        }));
+        __webpack_require__.d(__webpack_exports__, "sendGaugeMetric", (function() {
+            return logger.sendGaugeMetric;
         }));
         __webpack_require__.d(__webpack_exports__, "setupLogger", (function() {
             return logger.setupLogger;
@@ -17539,8 +17541,11 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "getLogger", (function() {
             return getLogger;
         }));
-        __webpack_require__.d(__webpack_exports__, "sendMetric", (function() {
-            return sendMetric;
+        __webpack_require__.d(__webpack_exports__, "sendCountMetric", (function() {
+            return sendCountMetric;
+        }));
+        __webpack_require__.d(__webpack_exports__, "sendGaugeMetric", (function() {
+            return sendGaugeMetric;
         }));
         __webpack_require__.d(__webpack_exports__, "setupLogger", (function() {
             return setupLogger;
@@ -17559,17 +17564,28 @@ window.spb = function(modules) {
                 });
             }));
         }
-        var sendMetric = function(_ref) {
-            var name = _ref.name, dimensions = _ref.dimensions;
+        var sendCountMetric = function(_ref) {
+            var dimensions = _ref.dimensions, _ref$event = _ref.event, event = void 0 === _ref$event ? "unused" : _ref$event, name = _ref.name, _ref$value = _ref.value, value = void 0 === _ref$value ? 1 : _ref$value;
             return getLogger().metric({
+                dimensions: dimensions,
+                metricEventName: event,
                 metricNamespace: name,
-                metricEventName: "unused",
-                metricValue: 1,
-                dimensions: dimensions
+                metricValue: value,
+                metricType: "counter"
             });
         };
-        function setupLogger(_ref2) {
-            var env = _ref2.env, sessionID = _ref2.sessionID, clientID = _ref2.clientID, sdkCorrelationID = _ref2.sdkCorrelationID, buyerCountry = _ref2.buyerCountry, locale = _ref2.locale, _ref2$sdkVersion = _ref2.sdkVersion, sdkVersion = void 0 === _ref2$sdkVersion ? window.paypal.version : _ref2$sdkVersion;
+        var sendGaugeMetric = function(_ref2) {
+            var dimensions = _ref2.dimensions, _ref2$event = _ref2.event, event = void 0 === _ref2$event ? "unused" : _ref2$event, name = _ref2.name, value = _ref2.value;
+            return getLogger().metric({
+                dimensions: dimensions,
+                metricEventName: event,
+                metricNamespace: name,
+                metricValue: value,
+                metricType: "gauge"
+            });
+        };
+        function setupLogger(_ref3) {
+            var env = _ref3.env, sessionID = _ref3.sessionID, clientID = _ref3.clientID, sdkCorrelationID = _ref3.sdkCorrelationID, buyerCountry = _ref3.buyerCountry, locale = _ref3.locale, _ref3$sdkVersion = _ref3.sdkVersion, sdkVersion = void 0 === _ref3$sdkVersion ? window.paypal.version : _ref3$sdkVersion;
             var logger = getLogger();
             logger.addPayloadBuilder((function() {
                 return {
@@ -17581,22 +17597,22 @@ window.spb = function(modules) {
                 };
             }));
             logger.addTrackingBuilder((function() {
-                var _ref3;
-                return (_ref3 = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.FEED] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_FEED.PAYMENTS_SDK, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.DATA_SOURCE] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_DATA_SOURCE.PAYMENTS_SDK, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CLIENT_ID] = clientID, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SESSION_UID] = sessionID, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.REFERER] = window.location.host, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.BUYER_COUNTRY] = buyerCountry, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.LOCALE] = locale.lang + "_" + locale.country, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.INTEGRATION_IDENTIFIER] = clientID, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_ENVIRONMENT] = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.isIos)() ? _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.MOBILE_ENV.IOS : Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.isAndroid)() ? _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.MOBILE_ENV.ANDROID : null, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_NAME] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_SDK_NAME.PAYMENTS_SDK, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_VERSION] = sdkVersion, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.USER_AGENT] = window.navigator && window.navigator.userAgent, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CONTEXT_CORRID] = sdkCorrelationID, 
-                _ref3[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.TIMESTAMP] = Date.now().toString(), 
-                _ref3;
+                var _ref4;
+                return (_ref4 = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.FEED] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_FEED.PAYMENTS_SDK, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.DATA_SOURCE] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_DATA_SOURCE.PAYMENTS_SDK, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CLIENT_ID] = clientID, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SESSION_UID] = sessionID, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.REFERER] = window.location.host, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.BUYER_COUNTRY] = buyerCountry, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.LOCALE] = locale.lang + "_" + locale.country, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.INTEGRATION_IDENTIFIER] = clientID, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_ENVIRONMENT] = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.isIos)() ? _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.MOBILE_ENV.IOS : Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.isAndroid)() ? _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.MOBILE_ENV.ANDROID : null, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_NAME] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_SDK_NAME.PAYMENTS_SDK, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.SDK_VERSION] = sdkVersion, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.USER_AGENT] = window.navigator && window.navigator.userAgent, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CONTEXT_CORRID] = sdkCorrelationID, 
+                _ref4[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.TIMESTAMP] = Date.now().toString(), 
+                _ref4;
             }));
             _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_2__.ZalgoPromise.onPossiblyUnhandledException((function(err) {
                 var _logger$track;
@@ -17605,6 +17621,13 @@ window.spb = function(modules) {
                 _logger$track));
                 logger.error("unhandled_error", {
                     err: Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.stringifyError)(err)
+                });
+                sendCountMetric({
+                    event: "error",
+                    name: "pp.app.paypal_sdk.buttons.unhandled_exception.count",
+                    dimensions: {
+                        errorType: "payments_sdk_error"
+                    }
                 });
                 logger.flush().catch(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.noop);
             }));
@@ -18025,7 +18048,7 @@ window.spb = function(modules) {
                     });
                 })).catch((function(err) {
                     var _getLogger$error$trac;
-                    Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendMetric)({
+                    Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendCountMetric)({
                         name: "pp.app.paypal_sdk.buttons.create_order.error.count",
                         dimensions: {
                             errorName: "generic",
@@ -18045,7 +18068,7 @@ window.spb = function(modules) {
                     var _getLogger$addPayload;
                     if (!orderID || "string" != typeof orderID) {
                         var _getLogger$track;
-                        Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendMetric)({
+                        Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendCountMetric)({
                             name: "pp.app.paypal_sdk.buttons.create_order.error.count",
                             dimensions: {
                                 errorName: "no_order_id",
@@ -18062,7 +18085,7 @@ window.spb = function(modules) {
                     }
                     if (0 === orderID.indexOf("PAY-") || 0 === orderID.indexOf("PAYID-")) {
                         var _getLogger$track2;
-                        Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendMetric)({
+                        Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendCountMetric)({
                             name: "pp.app.paypal_sdk.buttons.create_order.error.count",
                             dimensions: {
                                 errorName: "pay_id",
@@ -18078,7 +18101,7 @@ window.spb = function(modules) {
                         throw new Error("Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead");
                     }
                     var duration = Date.now() - startTime;
-                    Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendMetric)({
+                    Object(_lib__WEBPACK_IMPORTED_MODULE_7__.sendCountMetric)({
                         name: "pp.app.paypal_sdk.buttons.create_order.count",
                         dimensions: {
                             flow: flow,
@@ -18815,7 +18838,7 @@ window.spb = function(modules) {
         function getOnApprove(_ref21) {
             var intent = _ref21.intent, createBillingAgreement = _ref21.createBillingAgreement, createSubscription = _ref21.createSubscription, onApprove = _ref21.onApprove, partnerAttributionID = _ref21.partnerAttributionID, onError = _ref21.onError, clientAccessToken = _ref21.clientAccessToken, vault = _ref21.vault, clientID = _ref21.clientID, facilitatorAccessToken = _ref21.facilitatorAccessToken, branded = _ref21.branded, createOrder = _ref21.createOrder, paymentSource = _ref21.paymentSource, featureFlags = _ref21.featureFlags, createVaultSetupToken = _ref21.createVaultSetupToken, flow = _ref21.flow, experiments = _ref21.experiments;
             var beforeOnApprove = function() {
-                Object(_lib__WEBPACK_IMPORTED_MODULE_6__.sendMetric)({
+                Object(_lib__WEBPACK_IMPORTED_MODULE_6__.sendCountMetric)({
                     name: "pp.app.paypal_sdk.buttons.click.success.count",
                     dimensions: Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.default)({
                         spbPaymentFlow: flow
@@ -19442,6 +19465,7 @@ window.spb = function(modules) {
                     if (experiments.btSdkOrdersV2Migration && !data.paymentID) {
                         var _data$orderID;
                         data.paymentID = null == (_data$orderID = data.orderID) ? void 0 : _data$orderID.replace("EC-", "");
+                        data.paymentId = data.paymentID;
                     }
                     return onShippingChange(data, buildXShippingChangeActions({
                         orderID: orderID,
