@@ -13,7 +13,8 @@ import {
     isAndroidChrome,
     prepareLatencyInstrumentationPayload,
     getNavigationTimeOrigin,
-    sendCountMetric
+    sendCountMetric,
+    sendGaugeMetric
 } from '../lib';
 import {
     DATA_ATTRIBUTES, FPTI_TRANSITION, FPTI_BUTTON_TYPE, FPTI_BUTTON_KEY,
@@ -156,6 +157,16 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             walletInstruments: walletInstruments.join(","),
             walletInstrumentsCount: walletInstruments.length.toString(),
         });
+
+        sendGaugeMetric({
+            name: 'pp.app.paypal_sdk.buttons',
+            event: 'load',
+            value: 1,
+            dimensions: {
+                js_sdk_version: getClientVersion(),
+                spb_version: serverRenderVersion
+            }
+        })
 
         if (window.performance) {
             try {

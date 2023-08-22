@@ -12,6 +12,7 @@ vi.mock("../lib/logger", () => ({
   getLogger: vi.fn(),
   setupLogger: vi.fn(),
   sendCountMetric: vi.fn(),
+  sendGaugeMetric: vi.fn(),
 }));
 
 const buttonLoggerProps = {
