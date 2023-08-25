@@ -12,7 +12,6 @@ for (const [ module, alias ] of Object.entries(aliases)) {
         continue;
     }
 
-    // $FlowFixMe
-    console.info(`Alias: ${ module } -> ${ alias }`); // eslint-disable-line no-console
+    console.info(`Alias: ${ module } -> ${ String(alias) }`); // eslint-disable-line no-console
     moduleAlias.addAlias(module, alias);
 }
