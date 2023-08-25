@@ -15,7 +15,7 @@ export type XOnCancelDataType = {|
 |};
 
 export type XOnCancelActionsType = {|
-    
+    redirect: (url: string) => ZalgoPromise<void>;
 |};
 
 export type XOnCancel = (XOnCancelDataType, XOnCancelActionsType) => ZalgoPromise<void>;
@@ -41,8 +41,7 @@ export function buildXOnCancelActions() : XOnCancelActionsType {
 
         return redir(url, window.top);
     };
-    
-    // $FlowFixMe
+
     return {
         redirect
     };
