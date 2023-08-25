@@ -75,7 +75,6 @@ export function addGapsToCardNumber(cardNumber : string, cardType? : CardType) :
 
     // Remove all non-digits and all whitespaces
     cardNumber = cardNumber.trim().replace(/[^0-9]/g, '').replace(/\s/g, '');
-    // $FlowFixMe
     const gaps = cardType?.gaps || detectCardType(cardNumber)[0]?.gaps;
 
     // The gaps indicate where a space is inserted into the card number for display
