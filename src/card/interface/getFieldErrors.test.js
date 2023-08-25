@@ -6,6 +6,8 @@ import { getFieldErrors } from ".";
 describe("getFieldErrors", () => {
   let fields;
 
+  const alphabetizedComparator = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
   beforeEach(() => {
     fields = {
       cardCvvField: {
@@ -42,7 +44,7 @@ describe("getFieldErrors", () => {
   });
 
   it("returns an array with invalid error for each field name", () => {
-    expect([...getFieldErrors(fields)].sort()).toEqual(
+    expect([...getFieldErrors(fields)].sort(alphabetizedComparator)).toEqual(
       [
         "INVALID_CVV",
         "INVALID_NUMBER",
@@ -66,7 +68,7 @@ describe("getFieldErrors", () => {
   it("returns an array with invalid error only for invalid fields", () => {
     fields.cardExpiryField.isValid = true;
     fields.cardCvvField.isValid = true;
-    expect([...getFieldErrors(fields)].sort()).toEqual(
+    expect([...getFieldErrors(fields)].sort(alphabetizedComparator)).toEqual(
       ["INVALID_NUMBER", "INVALID_NAME", "INVALID_POSTAL"].sort()
     );
   });
