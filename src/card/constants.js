@@ -128,8 +128,7 @@ export const FILTER_CSS_SELECTORS : $ReadOnlyArray<RegExp> = [
     /</
 ];
 
-// $FlowFixMe
-export const VALIDATOR_TO_TYPE_MAP = {
+export const VALIDATOR_TO_TYPE_MAP: {|[string]: $Values<typeof CARD>|} = {
     [types.AMERICAN_EXPRESS]: CARD.AMEX,
     [types.DISCOVER]:         CARD.DISCOVER,
     [types.ELO]:              CARD.ELO,
