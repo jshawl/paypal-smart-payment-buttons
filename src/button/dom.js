@@ -16,9 +16,8 @@ export function getMenuButton(button : HTMLElement) : ?HTMLElement {
         return menu;
     }
 
-    const parent = button.parentNode;
+    const parent = button.parentElement;
     if (parent) {
-        // $FlowFixMe
         menu = parent.querySelector(`[${ DATA_ATTRIBUTES.MENU }]`);
     }
 
