@@ -6,7 +6,15 @@ import { getFieldErrors } from ".";
 describe("getFieldErrors", () => {
   let fields;
 
-  const alphabetizedComparator = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+  const alphabetizedComparator = (a, b) => {
+    if (a < b) {
+      return -1;
+    }
+    if (a > b) {
+      return 1;
+    }
+    return 0;
+  };
 
   beforeEach(() => {
     fields = {
