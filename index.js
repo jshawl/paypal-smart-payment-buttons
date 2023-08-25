@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint import/no-unassigned-import: off, import/no-commonjs: off */
 
-// $FlowFixMe
 const pkg = require('./package.json');
 
 const aliases = pkg.alias || {};
