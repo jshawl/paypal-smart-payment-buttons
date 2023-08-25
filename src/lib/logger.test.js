@@ -30,11 +30,9 @@ const loggerProps = {
 
 describe("setupLogger", () => {
   it("supports sdk mobile environments", () => {
-    // $FlowFixMe
     isIos.mockImplementation(() => true);
     getLogger().track({ tracking: true });
     setupLogger(loggerProps);
-    // $FlowFixMe
     isAndroid.mockImplementationOnce(() => true);
     getLogger().info("info about android os");
     setupLogger(loggerProps);
