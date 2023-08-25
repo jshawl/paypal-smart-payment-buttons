@@ -36,15 +36,14 @@ export function splice(str : string, idx : number, insert : string) : string {
     return str.slice(0, idx) + insert + str.slice(idx);
 }
 
-export function assertType(assertion : () => void, errorMsg : string) : void | TypeError {
+export function assertType(assertion : boolean, errorMsg : string) : void | TypeError {
     if (!assertion) {
         throw new TypeError(errorMsg);
     }
 }
 
-export function assertString<T>(...args : T) : void | TypeError {
-    // $FlowFixMe
-    assertType(args.every((s) => typeof s === 'string'), 'Expected a string');
+export function assertString(string : string) : void | TypeError {
+    assertType(typeof string === 'string', 'Expected a string');
 }
 
 export function removeSpaces(value : string) : string {

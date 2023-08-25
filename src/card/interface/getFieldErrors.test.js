@@ -55,7 +55,9 @@ describe("getFieldErrors", () => {
 
   it("returns an empty array when no fields are passed", () => {
     Object.keys(fields).forEach((field) => {
-      if (!fields[field]) return;
+      if (!fields[field]) {
+        return;
+      }
       fields[field].isValid = true;
     });
     expect(getFieldErrors(fields)).toStrictEqual([]);
