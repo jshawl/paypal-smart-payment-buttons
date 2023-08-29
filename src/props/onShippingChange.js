@@ -62,14 +62,17 @@ export type XOnShippingChangeDataType = {|
     selected_shipping_option? : ShippingOption,
     buyerAccessToken? : ?string,
     forceRestAPI? : boolean,
-    amount? : OrderAmount
+    amount? : OrderAmount,
+    appName?: string
 |};
+
+type EmptyObject = $Shape<{||}>
 
 export type XOnShippingChangeActionsType = {|
     resolve : () => ZalgoPromise<void>,
     reject : (string) => ZalgoPromise<void>,
     order : {|
-        patch : (data: $ReadOnlyArray<string>) => ZalgoPromise<OrderResponse>
+        patch : (data: $ReadOnlyArray<Query> | EmptyObject) => ZalgoPromise<OrderResponse>
     |}
 |};
 
@@ -92,7 +95,8 @@ export type OnShippingChangeData = {|
     |},
     selected_shipping_option? : ShippingOption,
     buyerAccessToken? : ?string,
-    forceRestAPI? : boolean
+    forceRestAPI? : boolean,
+    appName? : string
 |};
 
 export type OnShippingChangeActionsType = {|
@@ -100,11 +104,79 @@ export type OnShippingChangeActionsType = {|
     reject : (string) => ZalgoPromise<void>
 |};
 
-export function buildXShippingChangeActions({ orderID, actions, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, clientID, experiments } : {| orderID : string, actions : OnShippingChangeActionsType, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean, experiments: Experiments; clientID: string; |}) : XOnShippingChangeActionsType {
+export type LogInvalidShippingChangePatchesPayload = {|
+    appName : string,
+    buyerAccessToken? : ?string,
+    data : $ReadOnlyArray<Query> | EmptyObject,
+    shouldUsePatchShipping : boolean,
+|};
+
+/**
+ * Full matches the following;
+ *  /purchase_units/@reference_id=='default'/amount
+ *  /purchase_units/@reference_id=='default'/shipping/address
+ *  /purchase_units/@reference_id=='default'/shipping/options
+ *  /purchase_units/@reference_id=='d9f80740-38f0-11e8-b467-0ed5f89f718b'/amount
+ */
+const pathPattern = new RegExp(
+    /^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address))$/
+);
+
+export const sanitizePatch = (rejected: $ReadOnlyArray<string>, patch: Query): $ReadOnlyArray<string> => {
+    const { path } = patch;
+
+    if (!pathPattern.test(path)) {
+        // $FlowFixMe
+        rejected.push(path);
+    }
+    return rejected;
+};
+
+/**
+ *
+ * @param {string} appName
+ * @returns {boolean}
+ */
+export const isWeasley = (appName: string): boolean => appName === 'weasley';
+
+export const logInvalidShippingChangePatches = ({ appName, buyerAccessToken, data, shouldUsePatchShipping }: LogInvalidShippingChangePatchesPayload): void => {
+    const payload = {
+        appName,
+        hasBuyerAccessToken: String(Boolean(buyerAccessToken)),
+        shouldUsePatchShipping: String(shouldUsePatchShipping)
+    };
+    try {
+        if (Array.isArray(data)) {
+            const rejected = data.reduce(sanitizePatch, []);
+            if (rejected.length > 0) {
+                getLogger()
+                .info(`button_shipping_change_patch_data_has_invalid_path_${appName}`, {
+                    ...payload,
+                    rejected: JSON.stringify(rejected),
+                });
+            }
+        } else {
+            getLogger()
+            .info('button_shipping_change_patch_data_is_object', payload);
+        }
+    } catch(err) {
+        getLogger()
+        .error('button_shipping_change_patch_data_logging_failed', {
+            ...payload,
+            errMessage: JSON.stringify(err),
+        });
+    }
+}
+
+export function buildXShippingChangeActions({ orderID, actions, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, clientID, experiments, appName } : {| orderID : string, actions : OnShippingChangeActionsType, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean, experiments: Experiments; clientID: string; appName: string; |}) : XOnShippingChangeActionsType {
     const { useShippingChangeCallbackMutation } = experiments;
 
     const patch = (data = {}) => {
-        if(useShippingChangeCallbackMutation){
+        const shouldUsePatchShipping = Boolean(useShippingChangeCallbackMutation && !buyerAccessToken && isWeasley(appName));
+        logInvalidShippingChangePatches({ appName, buyerAccessToken, data, shouldUsePatchShipping });
+
+        // For more details about this change, see DTOPPOR-1620
+        if (shouldUsePatchShipping) {
             return patchShipping({ clientID, data, orderID }).catch(() => {
                 throw new Error('Order could not be patched');
             });
@@ -141,6 +213,7 @@ export function getOnShippingChange({ onShippingChange, partnerAttributionID, fe
         return ({
             buyerAccessToken,
             forceRestAPI = featureFlags.isLsatUpgradable,
+            appName = 'not_available',
             ...data
         }, actions) => {
             return createOrder().then(orderID => {
@@ -171,7 +244,7 @@ export function getOnShippingChange({ onShippingChange, partnerAttributionID, fe
                     // $FlowExpectedError
                     data.paymentId = data.paymentID;
                 }
-                return onShippingChange(buildXOnShippingChangeData(data), buildXShippingChangeActions({ orderID, facilitatorAccessToken, buyerAccessToken, actions, partnerAttributionID, forceRestAPI, clientID, experiments }));
+                return onShippingChange(buildXOnShippingChangeData(data), buildXShippingChangeActions({ orderID, facilitatorAccessToken, buyerAccessToken, actions, partnerAttributionID, forceRestAPI, clientID, experiments, appName }));
             });
         };
     }
