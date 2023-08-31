@@ -9941,7 +9941,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.151", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.152", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -10697,8 +10697,8 @@ window.spb = function(modules) {
             });
         }
         var _FRAUDNET_URL;
-        var FRAUDNET_URL = ((_FRAUDNET_URL = {})[sdk_constants_src.ENV.LOCAL] = "https://www.stage2d0107.stage.paypal.com/FDRegression/fb.js", 
-        _FRAUDNET_URL[sdk_constants_src.ENV.STAGE] = "https://www.stage2d0107.stage.paypal.com/FDRegression/fb.js", 
+        var FRAUDNET_URL = ((_FRAUDNET_URL = {})[sdk_constants_src.ENV.LOCAL] = "https://www.msmaster.qa.paypal.com/en_US/m/fb-raw.js", 
+        _FRAUDNET_URL[sdk_constants_src.ENV.STAGE] = "https://stage2mb044.qa.paypal.com/fraudnetjsnodeweb/automate/develop/stage_raw.js", 
         _FRAUDNET_URL[sdk_constants_src.ENV.SANDBOX] = "https://c.paypal.com/da/r/fb.js", 
         _FRAUDNET_URL[sdk_constants_src.ENV.PRODUCTION] = "https://c.paypal.com/da/r/fb.js", 
         _FRAUDNET_URL[sdk_constants_src.ENV.TEST] = "https://c.paypal.com/da/r/fb.js", _FRAUDNET_URL);
@@ -11167,6 +11167,9 @@ window.spb = function(modules) {
         }
         function disableLoadingSpinner(button) {
             button.classList.remove(constants.CLASS.LOADING);
+        }
+        function getClientVersion() {
+            return (document.body && document.body.getAttribute("" + constants.DATA_ATTRIBUTES.CLIENT_VERSION) || "unknown").replace(/[^a-zA-Z0-9]+/g, "_");
         }
         var api = __webpack_require__("./src/api/index.js");
         function isZeroAmount(value) {
@@ -16448,7 +16451,7 @@ window.spb = function(modules) {
                     var _ref2;
                     return (_ref2 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref2[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.151", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.152", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref2[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref2[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref2[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -16495,12 +16498,21 @@ window.spb = function(modules) {
                         shape: shape,
                         fundingInstruments: fundingSources.join(","),
                         fundingInstrumentsCount: fundingSources.length.toString(),
-                        js_sdk_version: (document.body && document.body.getAttribute("" + constants.DATA_ATTRIBUTES.CLIENT_VERSION) || "unknown").replace(/[^a-zA-Z0-9]+/g, "_"),
+                        js_sdk_version: getClientVersion(),
                         storageState: Object(lib.isStorageStateFresh)() ? "fresh" : "not_fresh",
                         tagline: tagline.toString(),
                         version: serverRenderVersion,
                         walletInstruments: walletInstruments.join(","),
                         walletInstrumentsCount: walletInstruments.length.toString()
+                    });
+                    Object(lib.sendGaugeMetric)({
+                        name: "pp.app.paypal_sdk.buttons",
+                        event: "load",
+                        value: 1,
+                        dimensions: {
+                            js_sdk_version: getClientVersion(),
+                            spb_version: serverRenderVersion
+                        }
                     });
                     if (window.performance) try {
                         var _logger$track;
@@ -18374,6 +18386,15 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "buildXOnShippingChangeData", (function() {
             return _onShippingChange__WEBPACK_IMPORTED_MODULE_10__.buildXOnShippingChangeData;
         }));
+        __webpack_require__.d(__webpack_exports__, "sanitizePatch", (function() {
+            return _onShippingChange__WEBPACK_IMPORTED_MODULE_10__.sanitizePatch;
+        }));
+        __webpack_require__.d(__webpack_exports__, "isWeasley", (function() {
+            return _onShippingChange__WEBPACK_IMPORTED_MODULE_10__.isWeasley;
+        }));
+        __webpack_require__.d(__webpack_exports__, "logInvalidShippingChangePatches", (function() {
+            return _onShippingChange__WEBPACK_IMPORTED_MODULE_10__.logInvalidShippingChangePatches;
+        }));
         __webpack_require__.d(__webpack_exports__, "buildXShippingChangeActions", (function() {
             return _onShippingChange__WEBPACK_IMPORTED_MODULE_10__.buildXShippingChangeActions;
         }));
@@ -18435,7 +18456,7 @@ window.spb = function(modules) {
         }));
         __webpack_require__("./src/props/getQueriedEligibleFunding.js");
         var _paymentRequest__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__("./src/props/paymentRequest.js");
-        for (var __WEBPACK_IMPORT_KEY__ in _paymentRequest__WEBPACK_IMPORTED_MODULE_20__) [ "default", "TYPES", "getProps", "buildXCreateOrderData", "buildOrderActions", "buildPaymentActions", "buildXCreateOrderActions", "getCreateOrder", "getConfirmOrder", "buildXCreateBillingAgreementData", "buildXCreateBillingAgreementActions", "getCreateBillingAgreement", "buildXCreateSubscriptionData", "buildXCreateSubscriptionActions", "getCreateSubscription", "buildXCreateVaultSetupTokenData", "getCreateVaultSetupToken", "getOnApproveOrder", "getOnApproveBilling", "getOnApproveTokenize", "getOnApproveSubscription", "getOnApproveVaultWithoutPurchase", "getOnApprove", "getOnComplete", "buildXOnInitActions", "getOnInit", "buildXOnCancelData", "buildXOnCancelActions", "getOnCancel", "ON_SHIPPING_CHANGE_PATHS", "SHIPPING_ADDRESS_ERROR_MESSAGES", "SHIPPING_OPTIONS_ERROR_MESSAGES", "GENERIC_REJECT_ADDRESS_MESSAGE", "buildXOnShippingChangeData", "buildXShippingChangeActions", "getOnShippingChange", "buildXOnShippingAddressChangeData", "buildXOnShippingAddressChangeActions", "getOnShippingAddressChange", "buildXOnShippingOptionsChangeData", "buildXOnShippingOptionsChangeActions", "getOnShippingOptionsChange", "CLICK_VALID", "buildXOnClickData", "buildXOnClickActions", "getOnClick", "getOnError", "POPUP_BRIDGE_OPTYPE", "getRememberFunding", "getGetPageUrl", "getOnAuth" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
+        for (var __WEBPACK_IMPORT_KEY__ in _paymentRequest__WEBPACK_IMPORTED_MODULE_20__) [ "default", "TYPES", "getProps", "buildXCreateOrderData", "buildOrderActions", "buildPaymentActions", "buildXCreateOrderActions", "getCreateOrder", "getConfirmOrder", "buildXCreateBillingAgreementData", "buildXCreateBillingAgreementActions", "getCreateBillingAgreement", "buildXCreateSubscriptionData", "buildXCreateSubscriptionActions", "getCreateSubscription", "buildXCreateVaultSetupTokenData", "getCreateVaultSetupToken", "getOnApproveOrder", "getOnApproveBilling", "getOnApproveTokenize", "getOnApproveSubscription", "getOnApproveVaultWithoutPurchase", "getOnApprove", "getOnComplete", "buildXOnInitActions", "getOnInit", "buildXOnCancelData", "buildXOnCancelActions", "getOnCancel", "ON_SHIPPING_CHANGE_PATHS", "SHIPPING_ADDRESS_ERROR_MESSAGES", "SHIPPING_OPTIONS_ERROR_MESSAGES", "GENERIC_REJECT_ADDRESS_MESSAGE", "buildXOnShippingChangeData", "sanitizePatch", "isWeasley", "logInvalidShippingChangePatches", "buildXShippingChangeActions", "getOnShippingChange", "buildXOnShippingAddressChangeData", "buildXOnShippingAddressChangeActions", "getOnShippingAddressChange", "buildXOnShippingOptionsChangeData", "buildXOnShippingOptionsChangeActions", "getOnShippingOptionsChange", "CLICK_VALID", "buildXOnClickData", "buildXOnClickActions", "getOnClick", "getOnError", "POPUP_BRIDGE_OPTYPE", "getRememberFunding", "getGetPageUrl", "getOnAuth" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
             __webpack_require__.d(__webpack_exports__, key, (function() {
                 return _paymentRequest__WEBPACK_IMPORTED_MODULE_20__[key];
             }));
@@ -19385,6 +19406,15 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "buildXOnShippingChangeData", (function() {
             return buildXOnShippingChangeData;
         }));
+        __webpack_require__.d(__webpack_exports__, "sanitizePatch", (function() {
+            return sanitizePatch;
+        }));
+        __webpack_require__.d(__webpack_exports__, "isWeasley", (function() {
+            return isWeasley;
+        }));
+        __webpack_require__.d(__webpack_exports__, "logInvalidShippingChangePatches", (function() {
+            return logInvalidShippingChangePatches;
+        }));
         __webpack_require__.d(__webpack_exports__, "buildXShippingChangeActions", (function() {
             return buildXShippingChangeActions;
         }));
@@ -19392,12 +19422,13 @@ window.spb = function(modules) {
             return getOnShippingChange;
         }));
         var _babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js");
-        var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./node_modules/@krakenjs/zalgo-promise/src/index.js");
-        var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./node_modules/@paypal/sdk-constants/src/index.js");
-        var _api__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("./src/api/index.js");
-        var _constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__("./src/constants.js");
-        var _lib__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__("./src/lib/index.js");
-        var _excluded = [ "buyerAccessToken", "forceRestAPI" ];
+        var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./node_modules/@babel/runtime/helpers/esm/extends.js");
+        var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./node_modules/@krakenjs/zalgo-promise/src/index.js");
+        var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("./node_modules/@paypal/sdk-constants/src/index.js");
+        var _api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__("./src/api/index.js");
+        var _constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__("./src/constants.js");
+        var _lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("./src/lib/index.js");
+        var _excluded = [ "buyerAccessToken", "forceRestAPI", "appName" ];
         var ON_SHIPPING_CHANGE_PATHS = {
             AMOUNT: "/purchase_units/@reference_id=='default'/amount",
             OPTIONS: "/purchase_units/@reference_id=='default'/shipping/options"
@@ -19416,26 +19447,62 @@ window.spb = function(modules) {
         function buildXOnShippingChangeData(data) {
             return data;
         }
-        function buildXShippingChangeActions(_ref) {
-            var orderID = _ref.orderID, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI, clientID = _ref.clientID;
-            var useShippingChangeCallbackMutation = _ref.experiments.useShippingChangeCallbackMutation;
+        var pathPattern = new RegExp(/^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address))$/);
+        var sanitizePatch = function(rejected, patch) {
+            var path = patch.path;
+            pathPattern.test(path) || rejected.push(path);
+            return rejected;
+        };
+        var isWeasley = function(appName) {
+            return "weasley" === appName;
+        };
+        var logInvalidShippingChangePatches = function(_ref) {
+            var appName = _ref.appName, data = _ref.data, shouldUsePatchShipping = _ref.shouldUsePatchShipping;
+            var payload = {
+                appName: appName,
+                hasBuyerAccessToken: String(Boolean(_ref.buyerAccessToken)),
+                shouldUsePatchShipping: String(shouldUsePatchShipping)
+            };
+            try {
+                if (Array.isArray(data)) {
+                    var rejected = data.reduce(sanitizePatch, []);
+                    rejected.length > 0 && Object(_lib__WEBPACK_IMPORTED_MODULE_6__.getLogger)().info("button_shipping_change_patch_data_has_invalid_path_" + appName, Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({}, payload, {
+                        rejected: JSON.stringify(rejected)
+                    }));
+                } else Object(_lib__WEBPACK_IMPORTED_MODULE_6__.getLogger)().info("button_shipping_change_patch_data_is_object", payload);
+            } catch (err) {
+                Object(_lib__WEBPACK_IMPORTED_MODULE_6__.getLogger)().error("button_shipping_change_patch_data_logging_failed", Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({}, payload, {
+                    errMessage: JSON.stringify(err)
+                }));
+            }
+        };
+        function buildXShippingChangeActions(_ref2) {
+            var orderID = _ref2.orderID, facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, forceRestAPI = _ref2.forceRestAPI, clientID = _ref2.clientID, appName = _ref2.appName;
+            var useShippingChangeCallbackMutation = _ref2.experiments.useShippingChangeCallbackMutation;
             return {
                 resolve: function() {
-                    return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.ZalgoPromise.resolve();
+                    return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_2__.ZalgoPromise.resolve();
                 },
-                reject: _ref.actions.reject || function() {
+                reject: _ref2.actions.reject || function() {
                     throw new Error("Missing reject action callback");
                 },
                 order: {
                     patch: function(data) {
                         void 0 === data && (data = {});
-                        return useShippingChangeCallbackMutation ? Object(_api__WEBPACK_IMPORTED_MODULE_3__.patchShipping)({
+                        var shouldUsePatchShipping = Boolean(useShippingChangeCallbackMutation && !buyerAccessToken && isWeasley(appName));
+                        logInvalidShippingChangePatches({
+                            appName: appName,
+                            buyerAccessToken: buyerAccessToken,
+                            data: data,
+                            shouldUsePatchShipping: shouldUsePatchShipping
+                        });
+                        return shouldUsePatchShipping ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchShipping)({
                             clientID: clientID,
                             data: data,
                             orderID: orderID
                         }).catch((function() {
                             throw new Error("Order could not be patched");
-                        })) : Object(_api__WEBPACK_IMPORTED_MODULE_3__.patchOrder)(orderID, data, {
+                        })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
                             facilitatorAccessToken: facilitatorAccessToken,
                             buyerAccessToken: buyerAccessToken,
                             partnerAttributionID: partnerAttributionID,
@@ -19447,20 +19514,20 @@ window.spb = function(modules) {
                 }
             };
         }
-        function getOnShippingChange(_ref2, _ref3) {
-            var onShippingChange = _ref2.onShippingChange, partnerAttributionID = _ref2.partnerAttributionID, featureFlags = _ref2.featureFlags, experiments = _ref2.experiments, clientID = _ref2.clientID;
-            var facilitatorAccessToken = _ref3.facilitatorAccessToken, createOrder = _ref3.createOrder;
-            if (onShippingChange) return function(_ref4, actions) {
-                var buyerAccessToken = _ref4.buyerAccessToken, _ref4$forceRestAPI = _ref4.forceRestAPI, forceRestAPI = void 0 === _ref4$forceRestAPI ? featureFlags.isLsatUpgradable : _ref4$forceRestAPI, data = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_0__.default)(_ref4, _excluded);
+        function getOnShippingChange(_ref3, _ref4) {
+            var onShippingChange = _ref3.onShippingChange, partnerAttributionID = _ref3.partnerAttributionID, featureFlags = _ref3.featureFlags, experiments = _ref3.experiments, clientID = _ref3.clientID;
+            var facilitatorAccessToken = _ref4.facilitatorAccessToken, createOrder = _ref4.createOrder;
+            if (onShippingChange) return function(_ref5, actions) {
+                var buyerAccessToken = _ref5.buyerAccessToken, _ref5$forceRestAPI = _ref5.forceRestAPI, forceRestAPI = void 0 === _ref5$forceRestAPI ? featureFlags.isLsatUpgradable : _ref5$forceRestAPI, _ref5$appName = _ref5.appName, appName = void 0 === _ref5$appName ? "not_available" : _ref5$appName, data = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_0__.default)(_ref5, _excluded);
                 return createOrder().then((function(orderID) {
                     var _getLogger$info$track;
-                    Object(_lib__WEBPACK_IMPORTED_MODULE_5__.getLogger)().info("button_shipping_change").track((_getLogger$info$track = {}, 
-                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.TRANSITION] = _constants__WEBPACK_IMPORTED_MODULE_4__.FPTI_TRANSITION.CHECKOUT_SHIPPING_CHANGE, 
-                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.EVENT_NAME] = _constants__WEBPACK_IMPORTED_MODULE_4__.FPTI_TRANSITION.CHECKOUT_SHIPPING_CHANGE, 
-                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.CONTEXT_TYPE] = _constants__WEBPACK_IMPORTED_MODULE_4__.FPTI_CONTEXT_TYPE.ORDER_ID, 
-                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.TOKEN] = orderID, 
-                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.CONTEXT_ID] = orderID, 
-                    _getLogger$info$track[_constants__WEBPACK_IMPORTED_MODULE_4__.FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_INVOKED] = "1", 
+                    Object(_lib__WEBPACK_IMPORTED_MODULE_6__.getLogger)().info("button_shipping_change").track((_getLogger$info$track = {}, 
+                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.TRANSITION] = _constants__WEBPACK_IMPORTED_MODULE_5__.FPTI_TRANSITION.CHECKOUT_SHIPPING_CHANGE, 
+                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.EVENT_NAME] = _constants__WEBPACK_IMPORTED_MODULE_5__.FPTI_TRANSITION.CHECKOUT_SHIPPING_CHANGE, 
+                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CONTEXT_TYPE] = _constants__WEBPACK_IMPORTED_MODULE_5__.FPTI_CONTEXT_TYPE.ORDER_ID, 
+                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.TOKEN] = orderID, 
+                    _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CONTEXT_ID] = orderID, 
+                    _getLogger$info$track[_constants__WEBPACK_IMPORTED_MODULE_5__.FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_INVOKED] = "1", 
                     _getLogger$info$track)).flush();
                     if (experiments.btSdkOrdersV2Migration && !data.paymentID) {
                         var _data$orderID;
@@ -19475,7 +19542,8 @@ window.spb = function(modules) {
                         partnerAttributionID: partnerAttributionID,
                         forceRestAPI: forceRestAPI,
                         clientID: clientID,
-                        experiments: experiments
+                        experiments: experiments,
+                        appName: appName
                     }));
                 }));
             };

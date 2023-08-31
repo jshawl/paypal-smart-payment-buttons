@@ -2506,8 +2506,8 @@
             }));
         }));
         var _FRAUDNET_URL;
-        var FRAUDNET_URL = ((_FRAUDNET_URL = {}).local = "https://www.stage2d0107.stage.paypal.com/FDRegression/fb.js", 
-        _FRAUDNET_URL.stage = "https://www.stage2d0107.stage.paypal.com/FDRegression/fb.js", 
+        var FRAUDNET_URL = ((_FRAUDNET_URL = {}).local = "https://www.msmaster.qa.paypal.com/en_US/m/fb-raw.js", 
+        _FRAUDNET_URL.stage = "https://stage2mb044.qa.paypal.com/fraudnetjsnodeweb/automate/develop/stage_raw.js", 
         _FRAUDNET_URL.sandbox = "https://c.paypal.com/da/r/fb.js", _FRAUDNET_URL.production = "https://c.paypal.com/da/r/fb.js", 
         _FRAUDNET_URL.test = "https://c.paypal.com/da/r/fb.js", _FRAUDNET_URL);
         memoize((function(_ref) {
@@ -3167,7 +3167,7 @@
             logger.addTrackingBuilder((function() {
                 var _ref;
                 return (_ref = {}).state_name = "smart_button", _ref.context_type = "EC-Token", 
-                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.151", 
+                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.152", 
                 _ref.selected_payment_method = fundingSource, _ref;
             }));
             (function() {

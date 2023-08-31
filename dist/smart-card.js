@@ -1941,7 +1941,7 @@ window.smartCard = function(modules) {
     __webpack_require__.d(__webpack_exports__, "f", (function() {
         return createAccessToken;
     }));
-    __webpack_require__.d(__webpack_exports__, "w", (function() {
+    __webpack_require__.d(__webpack_exports__, "x", (function() {
         return upgradeFacilitatorAccessToken;
     }));
     __webpack_require__.d(__webpack_exports__, "g", (function() {
@@ -1962,10 +1962,10 @@ window.smartCard = function(modules) {
     __webpack_require__.d(__webpack_exports__, "b", (function() {
         return authorizeOrder;
     }));
-    __webpack_require__.d(__webpack_exports__, "r", (function() {
+    __webpack_require__.d(__webpack_exports__, "s", (function() {
         return patchOrder;
     }));
-    __webpack_require__.d(__webpack_exports__, "t", (function() {
+    __webpack_require__.d(__webpack_exports__, "u", (function() {
         return patchShipping;
     }));
     __webpack_require__.d(__webpack_exports__, "e", (function() {
@@ -1974,7 +1974,7 @@ window.smartCard = function(modules) {
     __webpack_require__.d(__webpack_exports__, "c", (function() {
         return billingTokenToOrderID;
     }));
-    __webpack_require__.d(__webpack_exports__, "v", (function() {
+    __webpack_require__.d(__webpack_exports__, "w", (function() {
         return subscriptionIdToCartId;
     }));
     __webpack_require__.d(__webpack_exports__, "o", (function() {
@@ -1992,13 +1992,13 @@ window.smartCard = function(modules) {
     __webpack_require__.d(__webpack_exports__, "j", (function() {
         return executePayment;
     }));
-    __webpack_require__.d(__webpack_exports__, "s", (function() {
+    __webpack_require__.d(__webpack_exports__, "t", (function() {
         return patchPayment;
     }));
     __webpack_require__.d(__webpack_exports__, "i", (function() {
         return createSubscription;
     }));
-    __webpack_require__.d(__webpack_exports__, "u", (function() {
+    __webpack_require__.d(__webpack_exports__, "v", (function() {
         return reviseSubscription;
     }));
     __webpack_require__.d(__webpack_exports__, "a", (function() {
@@ -2006,6 +2006,9 @@ window.smartCard = function(modules) {
     }));
     __webpack_require__.d(__webpack_exports__, "n", (function() {
         return getSubscription;
+    }));
+    __webpack_require__.d(__webpack_exports__, "r", (function() {
+        return loadFraudnet;
     }));
     var src = __webpack_require__(4);
     var belter_src = __webpack_require__(3);
@@ -2670,12 +2673,12 @@ window.smartCard = function(modules) {
         }));
     }));
     var _FRAUDNET_URL;
-    var FRAUDNET_URL = ((_FRAUDNET_URL = {})[sdk_constants_src.b.LOCAL] = "https://www.stage2d0107.stage.paypal.com/FDRegression/fb.js", 
-    _FRAUDNET_URL[sdk_constants_src.b.STAGE] = "https://www.stage2d0107.stage.paypal.com/FDRegression/fb.js", 
+    var FRAUDNET_URL = ((_FRAUDNET_URL = {})[sdk_constants_src.b.LOCAL] = "https://www.msmaster.qa.paypal.com/en_US/m/fb-raw.js", 
+    _FRAUDNET_URL[sdk_constants_src.b.STAGE] = "https://stage2mb044.qa.paypal.com/fraudnetjsnodeweb/automate/develop/stage_raw.js", 
     _FRAUDNET_URL[sdk_constants_src.b.SANDBOX] = "https://c.paypal.com/da/r/fb.js", 
     _FRAUDNET_URL[sdk_constants_src.b.PRODUCTION] = "https://c.paypal.com/da/r/fb.js", 
     _FRAUDNET_URL[sdk_constants_src.b.TEST] = "https://c.paypal.com/da/r/fb.js", _FRAUDNET_URL);
-    Object(belter_src.o)((function(_ref) {
+    var loadFraudnet = Object(belter_src.o)((function(_ref) {
         var env = _ref.env, clientMetadataID = _ref.clientMetadataID, cspNonce = _ref.cspNonce, _ref$timeout = _ref.timeout, timeout = void 0 === _ref$timeout ? 1e3 : _ref$timeout, _ref$queryStringParam = _ref.queryStringParams, queryStringParams = void 0 === _ref$queryStringParam ? {} : _ref$queryStringParam;
         return new src.a((function(resolve) {
             var config = {
@@ -2745,6 +2748,7 @@ window.smartCard = function(modules) {
         return GENERIC_REJECT_ADDRESS_MESSAGE;
     }));
     __webpack_require__(17);
+    __webpack_require__(5);
     __webpack_require__(4);
     __webpack_require__(0);
     __webpack_require__(8);
@@ -2765,6 +2769,7 @@ window.smartCard = function(modules) {
         STORE_UNAVAILABLE: "Part of your order isn't available at this store."
     };
     var GENERIC_REJECT_ADDRESS_MESSAGE = "Unable to update address. Please try again.";
+    new RegExp(/^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address))$/);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.d(__webpack_exports__, "c", (function() {
@@ -8889,11 +8894,12 @@ window.smartCard = function(modules) {
     function hooks_module_B(n, t) {
         return "function" == typeof t ? t(n) : t;
     }
+    var src = __webpack_require__(3);
     var lib = __webpack_require__(2);
     var dist = __webpack_require__(12);
     var dist_default = __webpack_require__.n(dist);
     var constants = __webpack_require__(1);
-    var src = __webpack_require__(0);
+    var sdk_constants_src = __webpack_require__(0);
     var _CARD_FIELD_TYPE_TO_F, _VALIDATOR_TO_TYPE_MA;
     var types = dist_default.a.creditCardType.types;
     var CARD_FIELD_TYPE_TO_FRAME_NAME = ((_CARD_FIELD_TYPE_TO_F = {}).single = constants.h.CARD_FIELD, 
@@ -8940,11 +8946,11 @@ window.smartCard = function(modules) {
     };
     var FILTER_CSS_VALUES = [ /;/, /[<>]/, /\\/, /@import/i, /expression/i, /javascript/i, /url/i ];
     var FILTER_CSS_SELECTORS = [ /^\s*$/, /supports/i, /import/i, /[{}]/, /</ ];
-    var VALIDATOR_TO_TYPE_MAP = ((_VALIDATOR_TO_TYPE_MA = {})[types.AMERICAN_EXPRESS] = src.a.AMEX, 
-    _VALIDATOR_TO_TYPE_MA[types.DISCOVER] = src.a.DISCOVER, _VALIDATOR_TO_TYPE_MA[types.ELO] = src.a.ELO, 
-    _VALIDATOR_TO_TYPE_MA[types.HIPER] = src.a.HIPER, _VALIDATOR_TO_TYPE_MA[types.JCB] = src.a.JCB, 
-    _VALIDATOR_TO_TYPE_MA[types.MASTERCARD] = src.a.MASTERCARD, _VALIDATOR_TO_TYPE_MA[types.UNIONPAY] = src.a.CUP, 
-    _VALIDATOR_TO_TYPE_MA[types.VISA] = src.a.VISA, _VALIDATOR_TO_TYPE_MA);
+    var VALIDATOR_TO_TYPE_MAP = ((_VALIDATOR_TO_TYPE_MA = {})[types.AMERICAN_EXPRESS] = sdk_constants_src.a.AMEX, 
+    _VALIDATOR_TO_TYPE_MA[types.DISCOVER] = sdk_constants_src.a.DISCOVER, _VALIDATOR_TO_TYPE_MA[types.ELO] = sdk_constants_src.a.ELO, 
+    _VALIDATOR_TO_TYPE_MA[types.HIPER] = sdk_constants_src.a.HIPER, _VALIDATOR_TO_TYPE_MA[types.JCB] = sdk_constants_src.a.JCB, 
+    _VALIDATOR_TO_TYPE_MA[types.MASTERCARD] = sdk_constants_src.a.MASTERCARD, _VALIDATOR_TO_TYPE_MA[types.UNIONPAY] = sdk_constants_src.a.CUP, 
+    _VALIDATOR_TO_TYPE_MA[types.VISA] = sdk_constants_src.a.VISA, _VALIDATOR_TO_TYPE_MA);
     var DEFAULT_CARD_TYPE = {
         gaps: [ 4, 8, 12 ],
         lengths: [ 16 ],
@@ -9562,12 +9568,11 @@ window.smartCard = function(modules) {
     }
     var zalgo_promise_src = __webpack_require__(4);
     var src_props = __webpack_require__(49);
-    var belter_src = __webpack_require__(3);
     var createVaultSetupToken_getCreateVaultSetupToken = function(_ref) {
         var createVaultSetupToken = _ref.createVaultSetupToken;
-        if (createVaultSetupToken) return Object(belter_src.o)((function() {
+        if (createVaultSetupToken) return Object(src.o)((function() {
             return createVaultSetupToken({
-                paymentSource: src.g.CARD
+                paymentSource: sdk_constants_src.g.CARD
             }).then((function(vaultSetupToken) {
                 if (!vaultSetupToken || "string" != typeof vaultSetupToken) throw new Error("Expected a vault setup token to be returned from createVaultSetupToken");
                 return vaultSetupToken;
@@ -9576,10 +9581,10 @@ window.smartCard = function(modules) {
     };
     function getCreateOrder(_ref) {
         var createOrder = _ref.createOrder;
-        if (createOrder) return Object(belter_src.o)((function() {
+        if (createOrder) return Object(src.o)((function() {
             return zalgo_promise_src.a.try((function() {
                 return createOrder({
-                    paymentSource: src.g.CARD
+                    paymentSource: sdk_constants_src.g.CARD
                 });
             })).then((function(orderID) {
                 if (!orderID || "string" != typeof orderID) throw new Error("Expected an order id to be passed");
@@ -9739,10 +9744,11 @@ window.smartCard = function(modules) {
                         cardFieldsFlow: constants.l.VAULT_WITHOUT_PURCHASE
                     }
                 });
-                Object(lib.c)().track((_getLogger$track3 = {}, _getLogger$track3[src.e.TRANSITION] = "hcf_transaction_success", 
-                _getLogger$track3[src.e.EVENT_NAME] = "hcf_transaction_success", _getLogger$track3.vault_token = vaultToken, 
-                _getLogger$track3[src.e.PAYMENT_FLOW] = constants.l.VAULT_WITHOUT_PURCHASE, _getLogger$track3[src.e.CONTEXT_TYPE] = "vault_setup_token", 
-                _getLogger$track3[src.e.CONTEXT_ID] = vaultToken, _getLogger$track3)).flush();
+                Object(lib.c)().track((_getLogger$track3 = {}, _getLogger$track3[sdk_constants_src.e.TRANSITION] = "hcf_transaction_success", 
+                _getLogger$track3[sdk_constants_src.e.EVENT_NAME] = "hcf_transaction_success", _getLogger$track3.vault_token = vaultToken, 
+                _getLogger$track3[sdk_constants_src.e.PAYMENT_FLOW] = constants.l.VAULT_WITHOUT_PURCHASE, 
+                _getLogger$track3[sdk_constants_src.e.CONTEXT_TYPE] = "vault_setup_token", _getLogger$track3[sdk_constants_src.e.CONTEXT_ID] = vaultToken, 
+                _getLogger$track3)).flush();
             }({
                 vaultToken: vaultToken
             });
@@ -9757,10 +9763,10 @@ window.smartCard = function(modules) {
                         cardFieldsFlow: constants.l.VAULT_WITHOUT_PURCHASE
                     }
                 });
-                Object(lib.c)().track((_getLogger$track4 = {}, _getLogger$track4[src.e.ERROR_CODE] = "hcf_transaction_error", 
-                _getLogger$track4[src.e.EVENT_NAME] = "hcf_transaction_error", _getLogger$track4[src.e.ERROR_DESC] = Object(belter_src.w)(error), 
-                _getLogger$track4.vault_token = vaultToken, _getLogger$track4[src.e.PAYMENT_FLOW] = constants.l.VAULT_WITHOUT_PURCHASE, 
-                _getLogger$track4[src.e.CONTEXT_TYPE] = "vault_setup_token", _getLogger$track4[src.e.CONTEXT_ID] = vaultToken, 
+                Object(lib.c)().track((_getLogger$track4 = {}, _getLogger$track4[sdk_constants_src.e.ERROR_CODE] = "hcf_transaction_error", 
+                _getLogger$track4[sdk_constants_src.e.EVENT_NAME] = "hcf_transaction_error", _getLogger$track4[sdk_constants_src.e.ERROR_DESC] = Object(src.w)(error), 
+                _getLogger$track4.vault_token = vaultToken, _getLogger$track4[sdk_constants_src.e.PAYMENT_FLOW] = constants.l.VAULT_WITHOUT_PURCHASE, 
+                _getLogger$track4[sdk_constants_src.e.CONTEXT_TYPE] = "vault_setup_token", _getLogger$track4[sdk_constants_src.e.CONTEXT_ID] = vaultToken, 
                 _getLogger$track4)).flush();
             }({
                 error: error,
@@ -9786,9 +9792,9 @@ window.smartCard = function(modules) {
                     cardFieldsFlow: cardFlowType
                 }
             });
-            Object(lib.c)().track(((_getLogger$track5 = {})[src.e.TRANSITION] = "hcf_fields_submit", 
-            _getLogger$track5[src.e.EVENT_NAME] = "hcf_fields_submit", _getLogger$track5[src.e.CONTEXT_TYPE] = "hosted_session_id", 
-            _getLogger$track5[src.e.PAYMENT_FLOW] = cardFlowType, _getLogger$track5[src.e.CONTEXT_ID] = hcfSessionID, 
+            Object(lib.c)().track(((_getLogger$track5 = {})[sdk_constants_src.e.TRANSITION] = "hcf_fields_submit", 
+            _getLogger$track5[sdk_constants_src.e.EVENT_NAME] = "hcf_fields_submit", _getLogger$track5[sdk_constants_src.e.CONTEXT_TYPE] = "hosted_session_id", 
+            _getLogger$track5[sdk_constants_src.e.PAYMENT_FLOW] = cardFlowType, _getLogger$track5[sdk_constants_src.e.CONTEXT_ID] = hcfSessionID, 
             _getLogger$track5));
         }({
             cardFlowType: cardProps.productAction,
@@ -9852,10 +9858,11 @@ window.smartCard = function(modules) {
                                     cardFieldsFlow: constants.l.WITH_PURCHASE
                                 }
                             });
-                            Object(lib.c)().track((_getLogger$track = {}, _getLogger$track[src.e.TRANSITION] = "hcf_transaction_success", 
-                            _getLogger$track[src.e.EVENT_NAME] = "hcf_transaction_success", _getLogger$track.order_id = orderID, 
-                            _getLogger$track[src.e.PAYMENT_FLOW] = constants.l.WITH_PURCHASE, _getLogger$track[src.e.CONTEXT_TYPE] = "order_id", 
-                            _getLogger$track[src.e.CONTEXT_ID] = orderID, _getLogger$track)).flush();
+                            Object(lib.c)().track((_getLogger$track = {}, _getLogger$track[sdk_constants_src.e.TRANSITION] = "hcf_transaction_success", 
+                            _getLogger$track[sdk_constants_src.e.EVENT_NAME] = "hcf_transaction_success", _getLogger$track.order_id = orderID, 
+                            _getLogger$track[sdk_constants_src.e.PAYMENT_FLOW] = constants.l.WITH_PURCHASE, 
+                            _getLogger$track[sdk_constants_src.e.CONTEXT_TYPE] = "order_id", _getLogger$track[sdk_constants_src.e.CONTEXT_ID] = orderID, 
+                            _getLogger$track)).flush();
                         }({
                             orderID: orderID
                         });
@@ -9870,11 +9877,11 @@ window.smartCard = function(modules) {
                                     cardFieldsFlow: constants.l.WITH_PURCHASE
                                 }
                             });
-                            Object(lib.c)().track((_getLogger$track2 = {}, _getLogger$track2[src.e.ERROR_CODE] = "hcf_transaction_error", 
-                            _getLogger$track2[src.e.EVENT_NAME] = "hcf_transaction_error", _getLogger$track2[src.e.ERROR_DESC] = Object(belter_src.w)(error), 
-                            _getLogger$track2[src.e.PAYMENT_FLOW] = constants.l.WITH_PURCHASE, _getLogger$track2.order_id = orderID, 
-                            _getLogger$track2[src.e.CONTEXT_TYPE] = "order_id", _getLogger$track2[src.e.CONTEXT_ID] = orderID, 
-                            _getLogger$track2)).flush();
+                            Object(lib.c)().track((_getLogger$track2 = {}, _getLogger$track2[sdk_constants_src.e.ERROR_CODE] = "hcf_transaction_error", 
+                            _getLogger$track2[sdk_constants_src.e.EVENT_NAME] = "hcf_transaction_error", _getLogger$track2[sdk_constants_src.e.ERROR_DESC] = Object(src.w)(error), 
+                            _getLogger$track2[sdk_constants_src.e.PAYMENT_FLOW] = constants.l.WITH_PURCHASE, 
+                            _getLogger$track2.order_id = orderID, _getLogger$track2[sdk_constants_src.e.CONTEXT_TYPE] = "order_id", 
+                            _getLogger$track2[sdk_constants_src.e.CONTEXT_ID] = orderID, _getLogger$track2)).flush();
                         }({
                             error: error,
                             orderID: orderID
@@ -11360,6 +11367,7 @@ window.smartCard = function(modules) {
             featureFlags: featureFlags,
             experiments: experiments
         });
+        var env = props.env, clientMetadataID = props.clientMetadataID;
         !function(_ref) {
             var _tracking;
             var env = _ref.env, sessionID = _ref.sessionID, clientID = _ref.clientID, partnerAttributionID = _ref.partnerAttributionID, sdkCorrelationID = _ref.sdkCorrelationID, cardCorrelationID = _ref.cardCorrelationID, locale = _ref.locale, merchantID = _ref.merchantID, merchantDomain = _ref.merchantDomain, buyerCountry = _ref.buyerCountry, type = _ref.type, hcfSessionID = _ref.hcfSessionID, productAction = _ref.productAction;
@@ -11374,27 +11382,29 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[src.e.BUTTON_VERSION] = "5.0.151", _ref2.hcf_session_id = hcfSessionID, 
-                _ref2.hcf_correlation_id = cardCorrelationID, _ref2[src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
-                _ref2[src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[src.e.TIMESTAMP] = Date.now().toString(), 
-                _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[src.c.PAYMENTS_SDK] = clientID, 
-                _ref2[src.e.SELLER_ID] = null == merchantID ? void 0 : merchantID[0], _ref2.hcf_version = "v2", 
-                _ref2[src.e.PAYMENT_FLOW] = productAction, _ref2;
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.152", _ref2.hcf_session_id = hcfSessionID, 
+                _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
+                _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
+                _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 
+                _ref2[sdk_constants_src.e.SELLER_ID] = null == merchantID ? void 0 : merchantID[0], 
+                _ref2.hcf_version = "v2", _ref2[sdk_constants_src.e.PAYMENT_FLOW] = productAction, 
+                _ref2;
             }));
-            var tracking = ((_tracking = {})[src.e.STATE] = constants.f.CARD, _tracking[src.e.TRANSITION] = "hcf_" + type + "_field_rendered", 
-            _tracking[src.e.EVENT_NAME] = "hcf_" + type + "_field_rendered", _tracking);
+            var tracking = ((_tracking = {})[sdk_constants_src.e.STATE] = constants.f.CARD, 
+            _tracking[sdk_constants_src.e.TRANSITION] = "hcf_" + type + "_field_rendered", _tracking[sdk_constants_src.e.EVENT_NAME] = "hcf_" + type + "_field_rendered", 
+            _tracking);
             zalgo_promise_src.a.hash({
-                pageRenderTime: Object(belter_src.d)()
+                pageRenderTime: Object(src.d)()
             }).then((function(_ref3) {
                 var _extends2;
                 var pageRenderTime = _ref3.pageRenderTime;
-                logger.track(Object(esm_extends.a)({}, tracking, ((_extends2 = {})[src.e.CONTEXT_TYPE] = "hosted_session_id", 
-                _extends2[src.e.CONTEXT_ID] = hcfSessionID, _extends2[src.e.PAGE_LOAD_TIME] = pageRenderTime ? pageRenderTime.toString() : "", 
+                logger.track(Object(esm_extends.a)({}, tracking, ((_extends2 = {})[sdk_constants_src.e.CONTEXT_TYPE] = "hosted_session_id", 
+                _extends2[sdk_constants_src.e.CONTEXT_ID] = hcfSessionID, _extends2[sdk_constants_src.e.PAGE_LOAD_TIME] = pageRenderTime ? pageRenderTime.toString() : "", 
                 _extends2)));
                 logger.flush();
             }));
         }({
-            env: props.env,
+            env: env,
             sessionID: props.sessionID,
             cardSessionID: props.cardSessionID,
             clientID: props.clientID,
@@ -11409,15 +11419,21 @@ window.smartCard = function(modules) {
             hcfSessionID: props.hcfSessionID,
             productAction: props.productAction
         });
-        !function(u, t, i) {
-            var r, f, e;
-            l.__ && l.__(u, t), r = !1 ? null : t.__k, f = [], e = [], L(t, u = t.__k = y(k, null, [ u ]), r || c, c, void 0 !== t.ownerSVGElement, r ? null : t.firstChild ? n.call(t.childNodes) : null, f, r ? r.__e : t.firstChild, !1, e), 
-            M(f, u, e);
-        }(y(Page, {
-            cspNonce: cspNonce,
-            props: props,
-            featureFlags: featureFlags,
-            experiments: experiments
-        }), Object(lib.a)());
+        Object(api.r)({
+            env: env,
+            clientMetadataID: clientMetadataID,
+            cspNonce: cspNonce
+        }).catch(src.p).then((function() {
+            !function(u, t, i) {
+                var r, f, e;
+                l.__ && l.__(u, t), r = !1 ? null : t.__k, f = [], e = [], L(t, u = t.__k = y(k, null, [ u ]), r || c, c, void 0 !== t.ownerSVGElement, r ? null : t.firstChild ? n.call(t.childNodes) : null, f, r ? r.__e : t.firstChild, !1, e), 
+                M(f, u, e);
+            }(y(Page, {
+                cspNonce: cspNonce,
+                props: props,
+                featureFlags: featureFlags,
+                experiments: experiments
+            }), Object(lib.a)());
+        }));
     }
 } ]);
