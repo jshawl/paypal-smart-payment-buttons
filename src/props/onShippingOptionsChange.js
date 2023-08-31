@@ -3,36 +3,34 @@
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FPTI_KEY } from '@paypal/sdk-constants/src';
 
-import { getShippingOrderInfo, patchShipping, type OrderResponse } from '../api';
+import { getShippingOrderInfo } from '../api';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY } from '../constants';
 import { getLogger } from '../lib';
-import type { OrderAmount } from '../types';
+import type { CheckoutOrderAmount, CheckoutShippingOption } from '../types';
 
 import type { CreateOrder } from './createOrder';
 import {
-    type ShippingOption,
     type Query,
     type ON_SHIPPING_CHANGE_EVENT,
     ON_SHIPPING_CHANGE_PATHS,
     SHIPPING_OPTIONS_ERROR_MESSAGES,
     GENERIC_REJECT_ADDRESS_MESSAGE
 } from './onShippingChange';
-import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions, updateShippingOptions } from './utils';
+import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions, updateShippingOptions, breakdownKeyChanges, optionsKeyChanges } from './utils';
        
 export type XOnShippingOptionsChangeDataType = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    selectedShippingOption? : ShippingOption,
+    selectedShippingOption? : CheckoutShippingOption,
     errors : typeof SHIPPING_OPTIONS_ERROR_MESSAGES
 |};
 
 export type XOnShippingOptionsChangeActionsType = {|
-    patch : () => ZalgoPromise<OrderResponse>,
     query : () => ZalgoPromise<$ReadOnlyArray<Query>>,
     reject : (string) => ZalgoPromise<void>,
     updateShippingDiscount : ({| discount : string |}) => XOnShippingOptionsChangeActionsType,
-    updateShippingOption : ({| option : ShippingOption |}) => XOnShippingOptionsChangeActionsType
+    updateShippingOption : ({| option : CheckoutShippingOption |}) => XOnShippingOptionsChangeActionsType
 |};
 
 export type XOnShippingOptionsChange = (XOnShippingOptionsChangeDataType, XOnShippingOptionsChangeActionsType) => ZalgoPromise<void>;
@@ -41,9 +39,9 @@ export type OnShippingOptionsChangeData = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    selected_shipping_option? : ShippingOption,
-    options? : $ReadOnlyArray<ShippingOption>,
-    amount? : OrderAmount,
+    selectedShippingOption? : CheckoutShippingOption,
+    options? : $ReadOnlyArray<CheckoutShippingOption>,
+    amount? : CheckoutOrderAmount,
     event? : ON_SHIPPING_CHANGE_EVENT,
     buyerAccessToken? : ?string,
     forceRestAPI? : boolean
@@ -56,7 +54,7 @@ export type OnShippingOptionsChangeActionsType = {|
             
 export function buildXOnShippingOptionsChangeData(data : OnShippingOptionsChangeData) : XOnShippingOptionsChangeDataType {
     // eslint-disable-next-line no-unused-vars
-    const { amount, buyerAccessToken, event, forceRestAPI, options, selected_shipping_option: selectedShippingOption, ...rest } = data;
+    const { amount, buyerAccessToken, event, forceRestAPI, options, selectedShippingOption, ...rest } = data;
 
     return {
         errors: SHIPPING_OPTIONS_ERROR_MESSAGES,
@@ -65,11 +63,11 @@ export function buildXOnShippingOptionsChangeData(data : OnShippingOptionsChange
     };
 }
 
-export function buildXOnShippingOptionsChangeActions({ clientID, data, actions: passedActions, orderID } : {| clientID: string, data : OnShippingOptionsChangeData, actions : OnShippingOptionsChangeActionsType, orderID : string |}) : XOnShippingOptionsChangeActionsType {
+export function buildXOnShippingOptionsChangeActions({ data, actions: passedActions, orderID } : {| data : OnShippingOptionsChangeData, actions : OnShippingOptionsChangeActionsType, orderID : string |}) : XOnShippingOptionsChangeActionsType {
     const patchQueries = {};
 
     let newAmount;
-    let breakdown = data.amount?.breakdown || {};
+    let breakdown = data.amount?.breakdown ? breakdownKeyChanges(data.amount.breakdown) : {};
 
     if (Object.keys(breakdown).length === 0) {
         throw new Error('Must pass breakdown into data attribute for onShippingAddressChange callback.');
@@ -90,9 +88,9 @@ export function buildXOnShippingOptionsChangeActions({ clientID, data, actions: 
         updateShippingOption: ({ option }) => {
             if (option && data.options) {
                 const selectedShippingOptionAmount = option?.amount?.value;
-                const options = updateShippingOptions({ option, options: data.options });
+                const options = optionsKeyChanges(updateShippingOptions({ option, options: data.options }));
 
-                newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown: data?.amount?.breakdown || {}, updatedAmounts: { shipping: selectedShippingOptionAmount } });
+                newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
                 breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
 
                 if (options && options.length > 0) {
@@ -108,7 +106,7 @@ export function buildXOnShippingOptionsChangeActions({ clientID, data, actions: 
                     path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                     value: {
                         value:         `${ newAmount }`,
-                        currency_code: data?.amount?.currency_code,
+                        currency_code: data?.amount?.currencyCode,
                         breakdown
                     }
                 };
@@ -118,7 +116,7 @@ export function buildXOnShippingOptionsChangeActions({ clientID, data, actions: 
         },
 
         updateShippingDiscount: ({ discount }) => {
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown: data?.amount?.breakdown || {}, updatedAmounts: { shipping_discount: discount } });
+            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shippingDiscount: discount } });
             breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping_discount: discount } });
 
             patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
@@ -126,30 +124,12 @@ export function buildXOnShippingOptionsChangeActions({ clientID, data, actions: 
                 path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                 value: {
                     value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currency_code,
+                    currency_code: data?.amount?.currencyCode,
                     breakdown
                 }
             };
 
             return actions;
-        },
-
-        patch: () => {
-            return getShippingOrderInfo(orderID).then(sessionData => {
-                let queries = [];
-                const shippingMethods = sessionData?.checkoutSession?.cart?.shippingMethods || [];
-                const hasShippingMethods = Boolean(shippingMethods.length > 0);
-                
-                if (hasShippingMethods) {
-                    queries = updateOperationForShippingOptions({ queries: patchQueries });
-                } else {
-                    queries = convertQueriesToArray({ queries: patchQueries });
-                }
-
-                return patchShipping({ clientID, orderID, data: queries }).catch(() => {
-                    throw new Error('Order could not be patched');
-                });
-            });
         },
 
         query: () => {
@@ -176,11 +156,10 @@ export function buildXOnShippingOptionsChangeActions({ clientID, data, actions: 
 export type OnShippingOptionsChange = (OnShippingOptionsChangeData, OnShippingOptionsChangeActionsType) => ZalgoPromise<void>;
 
 type OnShippingOptionsChangeXProps = {|
-    onShippingOptionsChange : ?XOnShippingOptionsChange,
-    clientID : string
+    onShippingOptionsChange : ?XOnShippingOptionsChange
 |};
 
-export function getOnShippingOptionsChange({ onShippingOptionsChange, clientID } : OnShippingOptionsChangeXProps, { createOrder } : {| createOrder : CreateOrder |}) : ?OnShippingOptionsChange {
+export function getOnShippingOptionsChange({ onShippingOptionsChange } : OnShippingOptionsChangeXProps, { createOrder } : {| createOrder : CreateOrder |}) : ?OnShippingOptionsChange {
     if (onShippingOptionsChange) {
         return ({ ...data }, actions) => {
             return createOrder().then(orderID => {
@@ -195,7 +174,7 @@ export function getOnShippingOptionsChange({ onShippingOptionsChange, clientID }
                         [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_INVOKED]: '1'
                     }).flush();
                 
-                return onShippingOptionsChange(buildXOnShippingOptionsChangeData(data), buildXOnShippingOptionsChangeActions({ clientID, data, actions, orderID }));
+                return onShippingOptionsChange(buildXOnShippingOptionsChangeData(data), buildXOnShippingOptionsChangeActions({ data, actions, orderID }));
             });
         };
     }

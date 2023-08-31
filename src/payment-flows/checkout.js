@@ -384,8 +384,8 @@ function initCheckout({ props, components, serviceData, payment, config, restart
 
             onShippingAddressChange: onShippingAddressChange
                 ? (data, actions) => {
-                    if (!data.shipping_address) {
-                        throw new Error('Must pass shipping_address in data to handle changes in shipping address.');
+                    if (!data.shippingAddress) {
+                        throw new Error('Must pass shippingAddress in data to handle changes in shipping address.');
                     }
                     
                     return onShippingAddressChange({ ...data }, actions);
@@ -393,8 +393,8 @@ function initCheckout({ props, components, serviceData, payment, config, restart
 
             onShippingOptionsChange: onShippingOptionsChange
                 ? (data, actions) => {
-                    if (!data.selected_shipping_option) {
-                        throw new Error('Must pass selected_shipping_option in data to handle changes in shipping options.');
+                    if (!data.selectedShippingOption) {
+                        throw new Error('Must pass selectedShippingOption in data to handle changes in shipping options.');
                     }
                     
                     return onShippingOptionsChange({ ...data }, actions);

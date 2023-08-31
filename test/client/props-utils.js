@@ -1,25 +1,27 @@
 /* @flow */
 
-import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions, updateShippingOptions } from '../../src/props/utils';
+import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions, updateShippingOptions, breakdownKeyChanges, optionsKeyChanges } from '../../src/props/utils';
 import { ON_SHIPPING_CHANGE_PATHS } from '../../src/props/onShippingChange';
+
+import { areObjectsIdentical } from './util';
 
 describe('onShippingChange utils', () => {
     describe('calculateTotalFromShippingBreakdownAmounts', () => {
         it('should calculate correct amount from current breakdown and updated amount when update amount is in breakdown', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 handling: {
                     value: '1.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 handling: '5.0'
             };
@@ -31,16 +33,16 @@ describe('onShippingChange utils', () => {
         });
 
         it('should calculate correct amount from current breakdown and updated amount when update amount is not in breakdown', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 handling: '5.0'
             };
@@ -52,16 +54,16 @@ describe('onShippingChange utils', () => {
         });
 
         it('should calculate correct amount when shipping_discount is updated with a positive number', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 shipping_discount: '5.0'
             };
@@ -73,16 +75,16 @@ describe('onShippingChange utils', () => {
         });
 
         it('should calculate correct amount when shipping_discount is updated with a negative number', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 shipping_discount: '-5.0'
             };
@@ -94,16 +96,16 @@ describe('onShippingChange utils', () => {
         });
 
         it('should calculate correct amount when discount is updated with a positive number', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 discount: '5.0'
             };
@@ -115,16 +117,16 @@ describe('onShippingChange utils', () => {
         });
 
         it('should calculate correct amount when shipping_discount is updated with a negative number', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 discount: '-5.0'
             };
@@ -138,126 +140,128 @@ describe('onShippingChange utils', () => {
 
     describe('buildBreakdown', () => {
         it('should build breakdown for shipping_discount to be positive if sent as negative', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 shipping_discount: '-5.0'
             };
 
-            const expectedResult = JSON.stringify({"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"shipping_discount":{"currency_code":"USD","value":"5.00"}});
-            const result = JSON.stringify(buildBreakdown({ breakdown, updatedAmounts }));
+            const expectedResult = {"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"shipping_discount":{"currency_code":"USD","value":"5.00"}};
+            const result = buildBreakdown({ breakdown, updatedAmounts });
 
-            if (result !== expectedResult) {
-                throw new Error(`Expected result, ${ expectedResult } to match result, ${ result }`);
+            if (!areObjectsIdentical(expectedResult, result)) {
+                throw new Error(`Expected result, ${ JSON.stringify(result) }, to be, ${ JSON.stringify(expectedResult) }`);
             }
         });
 
         it('should build breakdown for discount to be positive if sent as negative', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 discount: '-5.0'
             };
 
-            const expectedResult = JSON.stringify({"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"discount":{"currency_code":"USD","value":"5.00"}});
-            const result = JSON.stringify(buildBreakdown({ breakdown, updatedAmounts }));
+            const expectedResult = {"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"discount":{"currency_code":"USD","value":"5.00"}};
+            const result = buildBreakdown({ breakdown, updatedAmounts });
 
-            if (result !== expectedResult) {
-                throw new Error(`Expected result, ${ expectedResult } to match result, ${ result }`);
+            if (!areObjectsIdentical(expectedResult, result)) {
+                throw new Error(`Expected result, ${ JSON.stringify(result) }, to be, ${ JSON.stringify(expectedResult) }`);
             }
         });
 
         it('should build the breakdown request for shipping change patch call with updated amounts present in breakdown', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 handling: '5.0'
             };
 
-            const expectedResult = JSON.stringify({"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"handling":{"currency_code":"USD","value":"5.0"}});
-            const result = JSON.stringify(buildBreakdown({ breakdown, updatedAmounts }));
+            const expectedResult = {"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"handling":{"currency_code":"USD","value":"5.0"}};
+            const result = buildBreakdown({ breakdown, updatedAmounts });
 
-            if (result !== expectedResult) {
-                throw new Error(`Expected result, ${ expectedResult } to match result, ${ result }`);
+            if (!areObjectsIdentical(expectedResult, result)) {
+                throw new Error(`Expected result, ${ JSON.stringify(result) }, to be, ${ JSON.stringify(expectedResult) }`);
             }
         });
 
         it('should build the breakdown request for shipping change patch call with updated amounts not present in breakdown', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'USD'
+                    currencyCode: 'USD'
                 }
-            };
+            });
             const updatedAmounts = {
                 handling: '5.0'
             };
 
-            const expectedResult = JSON.stringify({"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"handling":{"currency_code":"USD","value":"5.0"}});
-            const result = JSON.stringify(buildBreakdown({ breakdown, updatedAmounts }));
-            if (result !== expectedResult) {
-                throw new Error(`Expected result, ${ expectedResult } to match result, ${ result }`);
+            const expectedResult = {"item_total":{"value":"100.0","currency_code":"USD"},"shipping":{"value":"10.0","currency_code":"USD"},"handling":{"currency_code":"USD","value":"5.0"}};
+            const result = buildBreakdown({ breakdown, updatedAmounts });
+
+            if (!areObjectsIdentical(expectedResult, result)) {
+                throw new Error(`Expected result, ${ JSON.stringify(result) }, to be, ${ JSON.stringify(expectedResult) }`);
             }
         });
 
 
         it('should build the breakdown request for shipping change patch call with updated amounts present in breakdown with correct currency code', () => {
-            const breakdown = {
-                item_total: {
+            const breakdown = breakdownKeyChanges({
+                itemTotal: {
                     value: '100.0',
-                    currency_code: 'CAD'
+                    currencyCode: 'CAD'
                 },
                 shipping: {
                     value: '10.0',
-                    currency_code: 'CAD'
+                    currencyCode: 'CAD'
                 },
                 handling: {
                     value: '1.0',
-                    currency_code: 'CAD'
+                    currencyCode: 'CAD'
                 }
-            };
+            });
             const updatedAmounts = {
                 handling: '5.0'
             };
 
-            const expectedResult = JSON.stringify({"item_total":{"value":"100.0","currency_code":"CAD"},"shipping":{"value":"10.0","currency_code":"CAD"},"handling":{"value":"5.0","currency_code":"CAD"}});
-            const result = JSON.stringify(buildBreakdown({ breakdown, updatedAmounts }));
-            if (result !== expectedResult) {
-                throw new Error(`Expected result, ${ expectedResult } to match result, ${ result }`);
+            const expectedResult = {"item_total":{"value":"100.0","currency_code":"CAD"},"shipping":{"value":"10.0","currency_code":"CAD"},"handling":{"value":"5.0","currency_code":"CAD"}};
+            const result = buildBreakdown({ breakdown, updatedAmounts });
+
+            if (!areObjectsIdentical(expectedResult, result)) {
+                throw new Error(`Expected result, ${ JSON.stringify(result) }, to be, ${ JSON.stringify(expectedResult) }`);
             }
         });
     });
 
     describe('convertQueriesToArray', () => {
-        const shippingOptions = [
+        const shippingOptions = optionsKeyChanges([
             {
                 id: "SHIP_1234",
                 label: "Free Shipping",
@@ -265,7 +269,7 @@ describe('onShippingChange utils', () => {
                 selected: true,
                 amount: {
                     value: "0.00",
-                    currency_code: "USD"
+                    currencyCode: "USD"
                 }
             },
             {
@@ -275,7 +279,7 @@ describe('onShippingChange utils', () => {
                 selected: false,
                 amount: {
                     value: "20.00",
-                    currency_code: "USD"
+                    currencyCode: "USD"
                 }
             },
             {
@@ -285,20 +289,20 @@ describe('onShippingChange utils', () => {
                 selected: false,
                 amount: {
                     value: "40.00",
-                    currency_code: "USD"
+                    currencyCode: "USD"
                 }
             }
-        ];
-        const breakdown = {
-            item_total: {
+        ]);
+        const breakdown = breakdownKeyChanges({
+            itemTotal: {
                 value: '100.0',
-                currency_code: 'USD'
+                currencyCode: 'USD'
             },
             shipping: {
                 value: '10.0',
-                currency_code: 'USD'
+                currencyCode: 'USD'
             }
-        };
+        });
 
         it('should convert object amount queries to array', () => {
             const queries = {
@@ -400,7 +404,7 @@ describe('onShippingChange utils', () => {
                 selected: true,
                 amount: {
                     value: "0.00",
-                    currency_code: "USD"
+                    currencyCode: "USD"
                 }
             },
             {
@@ -410,7 +414,7 @@ describe('onShippingChange utils', () => {
                 selected: false,
                 amount: {
                     value: "20.00",
-                    currency_code: "USD"
+                    currencyCode: "USD"
                 }
             },
             {
@@ -420,7 +424,7 @@ describe('onShippingChange utils', () => {
                 selected: false,
                 amount: {
                     value: "40.00",
-                    currency_code: "USD"
+                    currencyCode: "USD"
                 }
             }
         ];
@@ -433,7 +437,7 @@ describe('onShippingChange utils', () => {
                 selected: true,
                 amount: {
                     value: "20.00",
-                    currency_code: "USD"
+                    currencyCode: "USD"
                 }
             };
 

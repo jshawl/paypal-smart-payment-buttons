@@ -3,21 +3,20 @@
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { COUNTRY, FPTI_KEY } from '@paypal/sdk-constants/src';
 
-import { getShippingOrderInfo, type OrderResponse, patchShipping } from '../api';
+import { getShippingOrderInfo } from '../api';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY } from '../constants';
 import { getLogger } from '../lib';
-import type { OrderAmount } from '../types';
+import type { CheckoutOrderAmount, CheckoutShippingOption } from '../types';
  
 import type { CreateOrder } from './createOrder';
 import {
-    type ShippingOption,
     type Query,
     type ON_SHIPPING_CHANGE_EVENT,
     ON_SHIPPING_CHANGE_PATHS,
     SHIPPING_ADDRESS_ERROR_MESSAGES,
     GENERIC_REJECT_ADDRESS_MESSAGE
 } from './onShippingChange';
-import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions } from './utils';
+import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions, breakdownKeyChanges, optionsKeyChanges } from './utils';
         
 export type XOnShippingAddressChangeDataType = {|
     orderID? : string,
@@ -26,18 +25,17 @@ export type XOnShippingAddressChangeDataType = {|
     shippingAddress? : {|
         city : string,
         state : string,
-        country_code : $Values<typeof COUNTRY>,
-        postal_code : string
+        countryCode : $Values<typeof COUNTRY>,
+        postalCode : string
     |},
     errors : typeof SHIPPING_ADDRESS_ERROR_MESSAGES
 |};
 
 export type XOnShippingAddressChangeActionsType = {|
-    patch : () => ZalgoPromise<OrderResponse>,
     query : () => ZalgoPromise<$ReadOnlyArray<Query>>,
     reject : (string) => ZalgoPromise<void>,
     updateShippingDiscount : ({| discount : string |}) => XOnShippingAddressChangeActionsType,
-    updateShippingOptions : ({| options : $ReadOnlyArray<ShippingOption> |}) => XOnShippingAddressChangeActionsType,
+    updateShippingOptions : ({| options : $ReadOnlyArray<CheckoutShippingOption> |}) => XOnShippingAddressChangeActionsType,
     updateTax : ({| tax : string |}) => XOnShippingAddressChangeActionsType
 |};
 
@@ -47,13 +45,13 @@ export type OnShippingAddressChangeData = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    shipping_address? : {|
+    shippingAddress? : {|
         city : string,
         state : string,
-        country_code : $Values<typeof COUNTRY>,
-        postal_code : string
+        countryCode : $Values<typeof COUNTRY>,
+        postalCode : string
     |},
-    amount? : OrderAmount,
+    amount? : CheckoutOrderAmount,
     event? : ON_SHIPPING_CHANGE_EVENT,
     buyerAccessToken? : ?string,
     forceRestAPI? : boolean
@@ -66,7 +64,7 @@ export type OnShippingAddressChangeActionsType = {|
             
 export function buildXOnShippingAddressChangeData(data : OnShippingAddressChangeData) : XOnShippingAddressChangeDataType {
     // eslint-disable-next-line no-unused-vars
-    const { amount, buyerAccessToken, event, forceRestAPI, shipping_address: shippingAddress, ...rest } = data;
+    const { amount, buyerAccessToken, event, forceRestAPI, shippingAddress, ...rest } = data;
 
     return {
         errors: SHIPPING_ADDRESS_ERROR_MESSAGES,
@@ -75,11 +73,11 @@ export function buildXOnShippingAddressChangeData(data : OnShippingAddressChange
     };
 }
 
-export function buildXOnShippingAddressChangeActions({ clientID, data, actions: passedActions, orderID } : {| clientID : string, data : OnShippingAddressChangeData, actions : OnShippingAddressChangeActionsType, orderID : string |}) : XOnShippingAddressChangeActionsType {
+export function buildXOnShippingAddressChangeActions({ data, actions: passedActions, orderID } : {| data : OnShippingAddressChangeData, actions : OnShippingAddressChangeActionsType, orderID : string |}) : XOnShippingAddressChangeActionsType {
     const patchQueries = {};
 
     let newAmount;
-    let breakdown = data.amount?.breakdown || {};
+    let breakdown = data.amount?.breakdown ? breakdownKeyChanges(data.amount.breakdown) : {};
 
     if (Object.keys(breakdown).length === 0) {
         throw new Error('Must pass amount with breakdown into data attribute for onShippingAddressChange callback.');
@@ -106,7 +104,7 @@ export function buildXOnShippingAddressChangeActions({ clientID, data, actions: 
                 path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                 value: {
                     value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currency_code,
+                    currency_code: data?.amount?.currencyCode,
                     breakdown
                 }
             };
@@ -115,6 +113,7 @@ export function buildXOnShippingAddressChangeActions({ clientID, data, actions: 
         },
 
         updateShippingOptions: ({ options }) => {
+            const ordersV2Options = optionsKeyChanges(options);
             const selectedShippingOption = options.filter(option => option.selected === true);
             const selectedShippingOptionAmount = selectedShippingOption && selectedShippingOption.length > 0
                 ? selectedShippingOption[0]?.amount?.value
@@ -128,7 +127,7 @@ export function buildXOnShippingAddressChangeActions({ clientID, data, actions: 
                 path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                 value: {
                     value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currency_code,
+                    currency_code: data?.amount?.currencyCode,
                     breakdown
                 }
             };
@@ -136,7 +135,7 @@ export function buildXOnShippingAddressChangeActions({ clientID, data, actions: 
             patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
                 op:    data?.event || 'replace', // or 'add' if there are none.
                 path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
-                value: options
+                value: ordersV2Options
             };
 
             return actions;
@@ -151,30 +150,12 @@ export function buildXOnShippingAddressChangeActions({ clientID, data, actions: 
                 path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                 value: {
                     value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currency_code,
+                    currency_code: data?.amount?.currencyCode,
                     breakdown
                 }
             };
 
             return actions;
-        },
-
-        patch: () => {
-            return getShippingOrderInfo(orderID).then(sessionData => {
-                let queries = [];
-                const shippingMethods = sessionData?.checkoutSession?.cart?.shippingMethods || [];
-                const hasShippingMethods = Boolean(shippingMethods.length > 0);
-                
-                if (hasShippingMethods) {
-                    queries = updateOperationForShippingOptions({ queries: patchQueries });
-                } else {
-                    queries = convertQueriesToArray({ queries: patchQueries });
-                }
-
-                return patchShipping({ clientID, orderID,data: queries }).catch(() => {
-                    throw new Error('Order could not be patched');
-                });
-            });
         },
 
         query: () => {
@@ -201,11 +182,10 @@ export function buildXOnShippingAddressChangeActions({ clientID, data, actions: 
 export type OnShippingAddressChange = (OnShippingAddressChangeData, OnShippingAddressChangeActionsType) => ZalgoPromise<void>;
 
 type OnShippingAddressChangeXProps = {|
-    onShippingAddressChange : ?XOnShippingAddressChange,
-    clientID : string
+    onShippingAddressChange : ?XOnShippingAddressChange
 |};
 
-export function getOnShippingAddressChange({ onShippingAddressChange, clientID } : OnShippingAddressChangeXProps, { createOrder } : {| createOrder : CreateOrder |}) : ?OnShippingAddressChange {
+export function getOnShippingAddressChange({ onShippingAddressChange } : OnShippingAddressChangeXProps, { createOrder } : {| createOrder : CreateOrder |}) : ?OnShippingAddressChange {
     if (onShippingAddressChange) {
         return ({ ...data }, actions) => {
             return createOrder().then(orderID => {
@@ -220,7 +200,7 @@ export function getOnShippingAddressChange({ onShippingAddressChange, clientID }
                         [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_INVOKED]: '1'
                     }).flush();
                 
-                return onShippingAddressChange(buildXOnShippingAddressChangeData(data), buildXOnShippingAddressChangeActions({ clientID, data, actions, orderID }));
+                return onShippingAddressChange(buildXOnShippingAddressChangeData(data), buildXOnShippingAddressChangeActions({ data, actions, orderID }));
             });
         };
     }

@@ -1,8 +1,8 @@
 /* @flow */
 
-import type { Breakdown } from '../types';
+import type { Breakdown, CheckoutBreakdown, CheckoutShippingOption, ShippingOption } from '../types';
 
-import { type Query, type ShippingOption, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
+import { type Query, ON_SHIPPING_CHANGE_PATHS } from './onShippingChange';
 
 
 export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown, updatedAmounts } : {| breakdown : Breakdown, updatedAmounts : {| [string] : ?string |} |}) : string => {
@@ -41,6 +41,36 @@ export const calculateTotalFromShippingBreakdownAmounts = ({ breakdown, updatedA
     return newAmount.toFixed(2);
 };
 
+export const optionsKeyChanges = ( options : $ReadOnlyArray<CheckoutShippingOption> ) : $ReadOnlyArray<ShippingOption> => {
+    const ordersV2Options = [];
+
+    options.forEach(element => {
+        const shippingOption = {
+            ...element,
+            amount: { value: element.amount.value, currency_code: element.amount.currencyCode}
+        };
+
+        ordersV2Options.push(shippingOption);
+    });
+
+    return ordersV2Options;
+}
+
+export const breakdownKeyChanges = ( breakdown : CheckoutBreakdown ) : Breakdown => {
+    const ordersV2Transform = {
+        ...(breakdown.discount ? { discount: {value: breakdown.discount.value, currency_code: breakdown.discount.currencyCode} } : undefined),
+        ...(breakdown.handling ? { handling: {value: breakdown.handling.value, currency_code: breakdown.handling.currencyCode} } : undefined),
+        ...(breakdown.insurance ? { insurance: {value: breakdown.insurance.value, currency_code: breakdown.insurance.currencyCode} } : undefined),
+        ...(breakdown.itemTotal ? { item_total: {value: breakdown.itemTotal.value, currency_code: breakdown.itemTotal.currencyCode} } : undefined),
+        ...(breakdown.shipping ? { shipping: {value: breakdown.shipping.value, currency_code: breakdown.shipping.currencyCode} } : undefined),
+        // $FlowFixMe
+        ...(breakdown.shippingDiscount ? { shipping_discount: {value: breakdown.shippingDiscount.value, currency_code: breakdown.shippingDiscount.currencyCode} } : undefined),
+        ...(breakdown.taxTotal ? { tax_total: {value: breakdown.taxTotal.value, currency_code: breakdown.taxTotal.currencyCode} } : undefined)
+    };
+
+    return ordersV2Transform;
+}
+
 export const buildBreakdown = ({ breakdown = {}, updatedAmounts = {} } : {| breakdown : Breakdown, updatedAmounts : {| [string] : ?string |} |}) : Breakdown => {
     const discountKeys = [ 'shipping_discount', 'discount' ];
     const updatedAmountKeys = Object.keys(updatedAmounts);
@@ -69,7 +99,7 @@ export const convertQueriesToArray = ({ queries } : {| queries : {| [$Values<typ
     return Object.values(queries) || [];
 };
 
-export const updateShippingOptions = ({ option, options } : {| option: ShippingOption, options : $ReadOnlyArray<ShippingOption>|}) : $ReadOnlyArray<ShippingOption> => {
+export const updateShippingOptions = ({ option, options } : {| option: CheckoutShippingOption, options : $ReadOnlyArray<CheckoutShippingOption>|}) : $ReadOnlyArray<CheckoutShippingOption> => {
     const updatedOptions = [];
 
     options.forEach(opt => {

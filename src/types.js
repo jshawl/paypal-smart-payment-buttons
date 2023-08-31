@@ -321,39 +321,68 @@ export type PersonalizationType = {|
     |}
 |};
 
+export type BreakdownItem = {|
+    currency_code : $Values<typeof CURRENCY>,
+    value : string
+|};
+
 export type Breakdown = {|
-    item_total? : {|
-        currency_code : $Values<typeof CURRENCY>,
-        value : string
-    |},
-    shipping? : {|
-        currency_code : $Values<typeof CURRENCY>,
-        value : string
-    |},
-    handling? : {|
-        currency_code : $Values<typeof CURRENCY>,
-        value : string
-    |},
-    tax_total? : {|
-        currency_code : $Values<typeof CURRENCY>,
-        value : string
-    |},
-    insurance? : {|
-        currency_code : $Values<typeof CURRENCY>,
-        value : string
-    |},
-    shipping_discount? : {|
-        currency_code : $Values<typeof CURRENCY>,
-        value : string
-    |},
-    discount? : {|
-        currency_code : $Values<typeof CURRENCY>,
-        value : string
-    |}
+    item_total? : BreakdownItem,
+    shipping? : BreakdownItem,
+    handling? : BreakdownItem,
+    tax_total? : BreakdownItem,
+    insurance? : BreakdownItem,
+    shipping_discount? : BreakdownItem,
+    discount? : BreakdownItem
 |};
 
 export type OrderAmount = {|
     breakdown? : Breakdown,
     currency_code : $Values<typeof CURRENCY>,
     value : string
+|};
+
+type SHIPPING_OPTION_TYPE = 'SHIPPING' | 'PICKUP';
+
+export type ShippingOption = {|
+    id? : string,
+    label : string,
+    selected : boolean,
+    type : SHIPPING_OPTION_TYPE,
+    amount : {|
+        currency_code : string,
+        value : string
+    |}
+|};
+
+export type CheckoutBreakdownItem = {|
+    currencyCode : $Values<typeof CURRENCY>,
+    value : string
+|};
+
+export type CheckoutBreakdown = {|
+    itemTotal? : CheckoutBreakdownItem,
+    shipping? : CheckoutBreakdownItem,
+    handling? : CheckoutBreakdownItem,
+    taxTotal? : CheckoutBreakdownItem,
+    insurance? : CheckoutBreakdownItem,
+    shippingDiscount? : CheckoutBreakdownItem,
+    discount? : CheckoutBreakdownItem
+|};
+
+export type CheckoutOrderAmount = {|
+    breakdown? : CheckoutBreakdown,
+    currencyCode : $Values<typeof CURRENCY>,
+    value : string
+|};
+
+export type CheckoutShippingOption = {|
+    id? : string,
+    label : string,
+    selected : boolean,
+    type : SHIPPING_OPTION_TYPE,
+    amount : {|
+        currencyCode : string,
+        value : string
+    |}
 |};

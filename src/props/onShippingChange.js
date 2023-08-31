@@ -6,11 +6,10 @@ import { COUNTRY, FPTI_KEY } from '@paypal/sdk-constants/src';
 import { patchShipping, patchOrder, type OrderResponse } from '../api';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY } from '../constants';
 import { getLogger } from '../lib';
-import type { OrderAmount, Experiments, FeatureFlags } from '../types';
+import type { OrderAmount, Experiments, FeatureFlags, ShippingOption } from '../types';
 
 import type { CreateOrder } from './createOrder';
 
-export type SHIPPING_OPTION_TYPE = 'SHIPPING' | 'PICKUP';
 export type ON_SHIPPING_CHANGE_EVENT = 'add' | 'replace';
 
 export const ON_SHIPPING_CHANGE_PATHS = {
@@ -31,17 +30,6 @@ export const SHIPPING_OPTIONS_ERROR_MESSAGES = {
 };
 
 export const GENERIC_REJECT_ADDRESS_MESSAGE = 'Unable to update address. Please try again.';
-
-export type ShippingOption = {|
-    id? : string,
-    label : string,
-    selected : boolean,
-    type : SHIPPING_OPTION_TYPE,
-    amount : {|
-        currency_code : string,
-        value : string
-    |}
-|};
 
 export type Query = {|
     op : ON_SHIPPING_CHANGE_EVENT,

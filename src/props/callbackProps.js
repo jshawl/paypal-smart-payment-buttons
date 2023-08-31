@@ -110,8 +110,8 @@ export function getCallbackProps({
    const onComplete = getOnComplete({ intent, onComplete: inputOnComplete, partnerAttributionID, onError, clientID, facilitatorAccessToken, createOrder, featureFlags });
    const onCancel = getOnCancel({ onCancel: inputOnCancel, onError }, { createOrder });
    const onShippingChange = getOnShippingChange({ onShippingChange: inputOnShippingChange, partnerAttributionID, experiments, featureFlags, clientID }, { facilitatorAccessToken, createOrder });
-   const onShippingAddressChange = getOnShippingAddressChange({ onShippingAddressChange: inputOnShippingAddressChange, clientID }, { createOrder });
-   const onShippingOptionsChange = getOnShippingOptionsChange({ onShippingOptionsChange: inputOnShippingOptionsChange, clientID }, { createOrder });
+   const onShippingAddressChange = getOnShippingAddressChange({ onShippingAddressChange: inputOnShippingAddressChange }, { createOrder });
+   const onShippingOptionsChange = getOnShippingOptionsChange({ onShippingOptionsChange: inputOnShippingOptionsChange }, { createOrder });
    const onAuth = getOnAuth({ facilitatorAccessToken, createOrder, createSubscription, featureFlags });
 
   return {
