@@ -124,7 +124,7 @@ export function submitCardFields({
     switch (cardProps.productAction) {
       case PAYMENT_FLOWS.WITH_PURCHASE: {
         return handlePurchaseFlow(
-        // $FlowIssue need to work on card props with the different production actions
+          // $FlowIssue need to work on card props with the different production actions
           cardProps,
           card,
           extraFields,

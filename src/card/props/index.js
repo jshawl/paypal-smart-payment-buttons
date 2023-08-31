@@ -98,6 +98,7 @@ export type CardXProps = {|
   createOrder?: XCreateOrder,
   createVaultSetupToken: XCreateVaultSetupToken,
   hcfSessionID: string,
+  clientMetadataID: string,
 |};
 
 export type CardProps = {|
@@ -120,6 +121,7 @@ export type CardProps = {|
   onApprove: SaveActionOnApprove,
   onError: OnError,
   productAction: string,
+  clientMetadataID: string,
 |};
 
 export type PurchaseFlowCardProps = {|

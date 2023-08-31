@@ -7,11 +7,11 @@ import { memoize, type Memoized } from '@krakenjs/belter/src';
 import { getBody } from '../lib';
 
 const FRAUDNET_URL = {
-    [ ENV.LOCAL ]:      'https://www.stage2d0107.stage.paypal.com/FDRegression/fb.js',
-    [ ENV.STAGE ]:      'https://www.stage2d0107.stage.paypal.com/FDRegression/fb.js',
-    [ ENV.SANDBOX ]:    'https://c.paypal.com/da/r/fb.js',
-    [ ENV.PRODUCTION ]: 'https://c.paypal.com/da/r/fb.js',
-    [ ENV.TEST ]:       'https://c.paypal.com/da/r/fb.js'
+  [ENV.LOCAL]: "https://www.msmaster.qa.paypal.com/en_US/m/fb-raw.js",
+  [ENV.STAGE]: "https://stage2mb044.qa.paypal.com/fraudnetjsnodeweb/automate/develop/stage_raw.js",
+  [ENV.SANDBOX]: "https://c.paypal.com/da/r/fb.js",
+  [ENV.PRODUCTION]: "https://c.paypal.com/da/r/fb.js",
+  [ENV.TEST]: "https://c.paypal.com/da/r/fb.js",
 };
 
 export const FRAUDNET_FNCLS = 'fnparams-dede7cc5-15fd-4c75-a9f4-36c430ee3a99';

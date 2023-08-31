@@ -1,8 +1,9 @@
 /* @flow */
 /** @jsx h */
 
-import { h, render, Fragment } from 'preact';
-import { useState, useEffect, useRef } from 'preact/hooks';
+import { h, render, Fragment } from "preact";
+import { useState, useEffect, useRef } from "preact/hooks";
+import { noop } from "@krakenjs/belter/src";
 
 import { getBody } from '../../lib';
 import { setupExports, autoFocusOnFirstInput, filterExtraFields, kebabToCamelCase, parsedCardType} from '../lib';
@@ -12,6 +13,7 @@ import { getCardProps, type CardProps } from '../props';
 import type { SetupCardOptions} from '../types';
 import type {FeatureFlags } from '../../types'
 import { setupCardLogger } from '../logger';
+import { loadFraudnet } from "../../api";
 
 import { CardField, CardNumberField, CardCVVField, CardExpiryField, CardNameField, CardPostalCodeField } from './fields';
 
@@ -332,42 +334,55 @@ function Page({ cspNonce, props, featureFlags, experiments } : PageProps) : mixe
 }
 
 export function setupCard({ cspNonce, facilitatorAccessToken, featureFlags, experiments, buyerCountry, metadata } : SetupCardOptions) {
-    const props = getCardProps({
-        facilitatorAccessToken,
-        featureFlags,
-        experiments,
-    });
+  const props = getCardProps({
+      facilitatorAccessToken,
+      featureFlags,
+      experiments,
+  });
 
-    const {
-        env,
-        sessionID,
-        clientID,
-        partnerAttributionID,
-        sdkCorrelationID,
-        locale,
-        merchantID,
-        merchantDomain,
-        cardSessionID,
-        type,
-        hcfSessionID
-    } = props;
+  const {
+    env,
+    sessionID,
+    clientID,
+    partnerAttributionID,
+    sdkCorrelationID,
+    locale,
+    merchantID,
+    merchantDomain,
+    cardSessionID,
+    type,
+    hcfSessionID,
+    clientMetadataID,
+  } = props;
 
-    setupCardLogger({
-        env,
-        sessionID,
-        cardSessionID,
-        clientID,
-        partnerAttributionID,
-        sdkCorrelationID,
-        cardCorrelationID: metadata?.correlationID,
-        locale,
-        merchantID,
-        merchantDomain,
-        buyerCountry,
-        type,
-        hcfSessionID,
-        productAction: props.productAction
-    })
+  setupCardLogger({
+      env,
+      sessionID,
+      cardSessionID,
+      clientID,
+      partnerAttributionID,
+      sdkCorrelationID,
+      cardCorrelationID: metadata?.correlationID,
+      locale,
+      merchantID,
+      merchantDomain,
+      buyerCountry,
+      type,
+      hcfSessionID,
+      productAction: props.productAction
+  })
 
-    render(<Page cspNonce={ cspNonce } props={ props } featureFlags={featureFlags} experiments={experiments} />, getBody());
+  loadFraudnet({ env, clientMetadataID, cspNonce })
+      .catch(noop)
+      .then(() => {
+      render(
+      <Page
+        cspNonce={cspNonce}
+        props={props}
+        featureFlags={featureFlags}
+        experiments={experiments}
+      />,
+      getBody()
+    );
+  });
 }
