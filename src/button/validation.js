@@ -239,7 +239,7 @@ export function validateOrder(orderID : string, { env, merchantID, currency, int
             });
         }
 
-        if (cartBillingType && !cartAmount && intent !== INTENT.TOKENIZE && !window.xprops.createVaultSetupToken) {
+        if (cartBillingType && !cartAmount && intent !== INTENT.TOKENIZE && !window.xprops.createVaultSetupToken && !window.xprops.createSubscription) {
             triggerIntegrationError({
                 error:         `smart_button_validation_error_billing_without_purchase_intent_tokenize_not_passed`,
                 message:       `Expected ${ SDK_QUERY_KEYS.INTENT }=${ INTENT.TOKENIZE } for a billing-without-purchase transaction`,
