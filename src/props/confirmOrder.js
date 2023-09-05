@@ -25,7 +25,7 @@ export function getConfirmOrder({ orderID, payload, partnerAttributionID } : Con
     const startTime = Date.now();
 
     return ZalgoPromise.try(() => {
-        return confirmOrderAPI(orderID, payload, { facilitatorAccessToken, partnerAttributionID });
+        return confirmOrderAPI(orderID, payload, { facilitatorAccessToken, partnerAttributionID, experiments: {} });
     })
         .catch(err => {
             getLogger().error('confirm_order_error', { err: stringifyError(err) });

@@ -70,6 +70,7 @@ function handlePurchaseFlow(
       return confirmOrderAPI(orderID, data, {
         facilitatorAccessToken,
         partnerAttributionID: "",
+        experiments: {}
       })
     })
     .then((res) => {

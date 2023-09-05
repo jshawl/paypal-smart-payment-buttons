@@ -66,7 +66,7 @@ type InitiatePaymentOptions = {|
     serviceData : ServiceData,
     config : Config,
     components : Components,
-    experiments? : Experiments
+    experiments : Experiments
 |};
 
 export function initiatePaymentFlow({ payment, serviceData, config, components, props, experiments } : InitiatePaymentOptions) : ZalgoPromise<void> {
@@ -81,7 +81,7 @@ export function initiatePaymentFlow({ payment, serviceData, config, components, 
         sendPersonalizationBeacons(personalization);
 
         const restart = ({ payment: restartPayment }) =>
-            initiatePaymentFlow({ payment: restartPayment, serviceData, config, components, props });
+            initiatePaymentFlow({ payment: restartPayment, serviceData, config, components, props, experiments });
 
         const { name, init, inline, spinner, updateFlowClientConfig } = getPaymentFlow({ props, payment, config, components, serviceData });
         const { click, start, close } = init({ props, config, serviceData, components, payment, restart, experiments });
@@ -253,7 +253,7 @@ type InitiateMenuOptions = {|
     serviceData : ServiceData,
     config : Config,
     components : Components,
-    experiments? : Experiments
+    experiments : Experiments
 |};
 
 export function initiateMenuFlow({ payment, serviceData, config, components, props, experiments } : InitiateMenuOptions) : ZalgoPromise<void> {
@@ -274,7 +274,7 @@ export function initiateMenuFlow({ payment, serviceData, config, components, pro
         }).flush();
 
         const restart = ({ payment: restartPayment }) =>
-            initiatePaymentFlow({ payment: restartPayment, serviceData, config, components, props });
+            initiatePaymentFlow({ payment: restartPayment, serviceData, config, components, props, experiments });
 
         const choices = setupMenu({ props, payment, serviceData, components, config, restart, experiments }).map(choice => {
             return {

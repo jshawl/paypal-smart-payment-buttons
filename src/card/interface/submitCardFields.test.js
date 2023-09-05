@@ -157,6 +157,7 @@ describe("submitCardFields", () => {
       {
         facilitatorAccessToken: "test-access-token",
         partnerAttributionID: "",
+        experiments: {},
       }
     );
     expect(mockGetCardPropsReturn.onApprove).toHaveBeenCalledWith(

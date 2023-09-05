@@ -11,7 +11,7 @@ import { type OrderResponse, type PaymentResponse, getOrder, captureOrder, autho
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_STATE } from '../constants';
 import { unresolvedPromise, getLogger, sendCountMetric } from '../lib';
 import { ENABLE_PAYMENT_API } from '../config';
-import type {FeatureFlags, Experiments} from '../types'
+import type { FeatureFlags, Experiments} from '../types'
 
 import type { CreateOrder } from './createOrder';
 import type { CreateVaultSetupToken } from './createVaultSetupToken';
@@ -142,12 +142,13 @@ type OrderActionOptions = {|
     buyerAccessToken : ?string,
     partnerAttributionID : ?string,
     forceRestAPI : boolean,
-    onError : OnError
+    onError : OnError,
+    experiments: Experiments
 |};
 
-function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError } : OrderActionOptions) : OrderActions {
+function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments } : OrderActionOptions) : OrderActions {
     const get = memoize(() => {
-        return getOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI });
+        return getOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments });
     });
 
     const capture = memoize(() => {
@@ -155,7 +156,7 @@ function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, b
             throw new Error(`Use ${ SDK_QUERY_KEYS.INTENT }=${ INTENT.CAPTURE } to use client-side capture`);
         }
 
-        return captureOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI })
+        return captureOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments })
             .finally(get.reset)
             .finally(capture.reset)
             .catch(err => {
@@ -168,14 +169,14 @@ function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, b
             throw new Error(`Use ${ SDK_QUERY_KEYS.INTENT }=${ INTENT.AUTHORIZE } to use client-side authorize`);
         }
 
-        return authorizeOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI })
+        return authorizeOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments })
             .finally(get.reset)
             .finally(authorize.reset)
             .catch(err => handleProcessorError<OrderResponse>(err, restart, onError));
     });
 
     const patch = (data = {}) => {
-        return patchOrder(orderID, data, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI }).catch(() => {
+        return patchOrder(orderID, data, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments }).catch(() => {
             throw new Error('Order could not be patched');
         });
     };
@@ -248,11 +249,12 @@ type ApproveOrderActionOptions = {|
     buyerAccessToken : ?string,
     partnerAttributionID : ?string,
     forceRestAPI : boolean,
-    onError : OnError
+    onError : OnError,
+    experiments: Experiments
 |};
 
-function buildXApproveOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError } : ApproveOrderActionOptions) : XOnApproveOrderActionsType {
-    const order = buildOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError });
+function buildXApproveOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments } : ApproveOrderActionOptions) : XOnApproveOrderActionsType {
+    const order = buildOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments });
     const payment = buildPaymentActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError });
 
     return {
@@ -401,7 +403,7 @@ export function getOnApproveOrder({ intent, onApprove = getDefaultOnApproveOrder
                     paymentID = orderID.replace(/EC-/, '');
                 }
                 const data = { orderID, payerID, paymentID, billingToken, facilitatorAccessToken, authCode, paymentSource };
-                const actions = buildXApproveOrderActions({ orderID, paymentID, payerID, intent, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError });
+                const actions = buildXApproveOrderActions({ orderID, paymentID, payerID, intent, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, onError, forceRestAPI, experiments });
 
                 beforeOnApprove();
                 return onApprove(data, actions).catch(err => {

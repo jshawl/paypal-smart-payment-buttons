@@ -10,7 +10,7 @@ import { getClientsideTimestamp, getLogger, setBuyerAccessToken } from '../lib';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, HEADERS, SMART_PAYMENT_BUTTONS,
     INTEGRATION_ARTIFACT, ITEM_CATEGORY, USER_EXPERIENCE_FLOW, PRODUCT_FLOW, PREFER, ORDER_API_ERROR } from '../constants';
 import type { ShippingMethod, ShippingAddress } from '../payment-flows/types';
-import type { FeatureFlags } from '../types';
+import type { FeatureFlags, Experiments } from '../types';
 
 import { callSmartAPI, callGraphQL, callRestAPI, getResponseCorrelationID, getErrorResponseCorrelationID } from './api';
 import { getLsatUpgradeError, getLsatUpgradeCalled } from './auth';
@@ -38,7 +38,8 @@ export type OrderAPIOptions = {|
     facilitatorAccessToken : string,
     buyerAccessToken? : ?string,
     partnerAttributionID : ?string,
-    forceRestAPI? : boolean
+    forceRestAPI? : boolean,
+    experiments: Experiments
 |};
 
 export function createOrderID(order : OrderCreateRequest, { facilitatorAccessToken, partnerAttributionID } : OrderAPIOptions) : ZalgoPromise<string> {
@@ -79,7 +80,7 @@ export function isInvalidResourceIDError(err: mixed) : boolean {
     }))
 }
 
-export function getOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
+export function getOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false, experiments } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`get_order_lsat_upgrade_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`);
     getLogger().info(`get_order_lsat_upgrade_${ getLsatUpgradeError() ? 'errored' : 'did_not_error' }`, { err: stringifyError(getLsatUpgradeError()) });
 
@@ -98,6 +99,10 @@ export function getOrder(orderID : string, { facilitatorAccessToken, buyerAccess
 
             if (isInvalidResourceIDError(err)) {
                 getLogger().warn(`get_order_invalid_resource_id_error`, { restCorrID, orderID, err: stringifyError(err) })
+            }
+
+            if(experiments.disableSmartAPI){
+                throw err;
             }
 
             return callSmartAPI({
@@ -146,7 +151,7 @@ export function isUnprocessableEntityError(err : mixed) : boolean {
     }));
 }
 
-export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
+export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false, experiments } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`capture_order_lsat_upgrade_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`);
     getLogger().info(`capture_order_lsat_upgrade_${ getLsatUpgradeError() ? 'errored' : 'did_not_error' }`, { err: stringifyError(getLsatUpgradeError()) });
 
@@ -170,6 +175,10 @@ export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAc
             }
 
             if (isProcessorDeclineError(err) || isUnprocessableEntityError(err)) {
+                throw err;
+            }
+
+            if(experiments.disableSmartAPI){
                 throw err;
             }
 
@@ -208,7 +217,7 @@ export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAc
     });
 }
 
-export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
+export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false, experiments } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`authorize_order_lsat_upgrade_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`);
     getLogger().info(`authorize_order_lsat_upgrade_${ getLsatUpgradeError() ? 'errored' : 'did_not_error' }`, { err: stringifyError(getLsatUpgradeError()) });
 
@@ -231,6 +240,10 @@ export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyer
             }
 
             if (isProcessorDeclineError(err)) {
+                throw err;
+            }
+
+            if(experiments.disableSmartAPI){
                 throw err;
             }
 
@@ -272,7 +285,7 @@ export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyer
 
 export type PatchData = mixed;
 
-export function patchOrder(orderID : string, data : PatchData, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
+export function patchOrder(orderID : string, data : PatchData, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false, experiments } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`patch_order_lsat_upgrade_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`);
     getLogger().info(`patch_order_lsat_upgrade_${ getLsatUpgradeError() ? 'errored' : 'did_not_error' }`, { err: stringifyError(getLsatUpgradeError()) });
 
@@ -293,6 +306,10 @@ export function patchOrder(orderID : string, data : PatchData, { facilitatorAcce
 
             if (isInvalidResourceIDError(err)) {
                 getLogger().warn(`patch_order_invalid_resource_id_error`, { restCorrID, orderID, err: stringifyError(err) })
+            }
+
+            if(experiments.disableSmartAPI){
+                throw err;
             }
 
             let requestData : PatchData;

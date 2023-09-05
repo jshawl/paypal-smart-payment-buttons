@@ -114,6 +114,7 @@ describe("onShippingChange", () => {
             buyerAccessToken,
             partnerAttributionID,
             forceRestAPI: featureFlags.isLsatUpgradable,
+            experiments,
           });
         }
 
@@ -153,6 +154,7 @@ describe("onShippingChange", () => {
             buyerAccessToken,
             partnerAttributionID,
             forceRestAPI: featureFlags.isLsatUpgradable,
+            experiments,
           });
         }
 

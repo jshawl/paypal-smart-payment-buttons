@@ -7,7 +7,7 @@ import { INTENT, FPTI_KEY } from '@paypal/sdk-constants/src';
 import { getLogger, promiseNoop } from '../lib';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE } from '../constants';
 import { getOrder, type OrderResponse } from '../api';
-import type { FeatureFlags } from '../types';
+import type { FeatureFlags, Experiments } from '../types';
 
 import type { CreateOrder } from './createOrder';
 import type { OnError } from './onError';
@@ -47,7 +47,8 @@ type OnCompleteActionOptions = {|
     buyerAccessToken : ?string,
     partnerAttributionID : ?string,
     forceRestAPI : boolean,
-    onError : OnError
+    onError : OnError,
+    experiments: Experiments
 |};
 
 type GetOnCompleteOptions = {|
@@ -58,7 +59,8 @@ type GetOnCompleteOptions = {|
     clientID : string,
     facilitatorAccessToken : string,
     createOrder : CreateOrder,
-    featureFlags: FeatureFlags
+    featureFlags: FeatureFlags,
+    experiments: Experiments
 |};
 
 const redirect = (url) => {
@@ -76,9 +78,9 @@ const redirect = (url) => {
     return redir(url, window.top);
 };
 
-const buildOnCompleteActions = ({ orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI } : OnCompleteActionOptions) : XOnCompleteActions => {
+const buildOnCompleteActions = ({ orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments } : OnCompleteActionOptions) : XOnCompleteActions => {
     const get = memoize(() => {
-        return getOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI })
+        return getOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments })
             .finally(get.reset);
     });
 
@@ -90,7 +92,7 @@ const buildOnCompleteActions = ({ orderID, facilitatorAccessToken, buyerAccessTo
     };
 };
 
-export function getOnComplete({ intent, onComplete, partnerAttributionID, onError, facilitatorAccessToken, createOrder, featureFlags } : GetOnCompleteOptions) : OnComplete {
+export function getOnComplete({ intent, onComplete, partnerAttributionID, onError, facilitatorAccessToken, createOrder, featureFlags, experiments } : GetOnCompleteOptions) : OnComplete {
     if (!onComplete) {
         return promiseNoop;
     }
@@ -109,7 +111,7 @@ export function getOnComplete({ intent, onComplete, partnerAttributionID, onErro
                     [FPTI_KEY.TOKEN]:        orderID,
                     [FPTI_KEY.CONTEXT_ID]:   orderID
                 }).flush();
-            const actions = buildOnCompleteActions({ orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError });
+            const actions = buildOnCompleteActions({ orderID, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, onError, forceRestAPI, experiments });
 
             return onComplete({ orderID, intent }, actions).catch(err => {
                 return ZalgoPromise.try(() => {

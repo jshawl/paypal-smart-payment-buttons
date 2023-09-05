@@ -33,6 +33,7 @@ export type Experiments = $Shape<{|
     payPalWalletVaultWithoutPurchase?: boolean;
     popupIncreaseDimensions?: boolean;
     btSdkOrdersV2Migration?: boolean;
+    disableSmartAPI?: boolean;
 |}>
 
 export type ProxyWindow = _ProxyWindow;

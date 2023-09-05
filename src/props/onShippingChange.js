@@ -169,7 +169,7 @@ export function buildXShippingChangeActions({ orderID, actions, facilitatorAcces
                 throw new Error('Order could not be patched');
             });
         }
-        return patchOrder(orderID, data, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI }).catch(() => {
+        return patchOrder(orderID, data, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments }).catch(() => {
             throw new Error('Order could not be patched');
         });
     };
@@ -196,7 +196,7 @@ type OnShippingChangeXProps = {|
     clientID: string,
 |};
 
-export function getOnShippingChange({ onShippingChange, partnerAttributionID, featureFlags, experiments, clientID } : OnShippingChangeXProps, { facilitatorAccessToken, createOrder } : {| facilitatorAccessToken : string, createOrder : CreateOrder |}) : ?OnShippingChange {
+export function getOnShippingChange({ onShippingChange, partnerAttributionID, featureFlags,experiments, clientID } : OnShippingChangeXProps, { facilitatorAccessToken, createOrder } : {| facilitatorAccessToken : string, createOrder : CreateOrder |}) : ?OnShippingChange {
     if (onShippingChange) {
         return ({
             buyerAccessToken,

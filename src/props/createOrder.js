@@ -12,6 +12,7 @@ import { ENABLE_PAYMENT_API } from '../config';
 import {
   vaultApprovalSessionIdToOrderId,
 } from "../api/vault";
+import type { Experiments } from '../types';
 
 import type { CreateSubscription } from './createSubscription';
 import type { CreateBillingAgreement } from './createBillingAgreement';
@@ -47,10 +48,11 @@ type OrderOptions = {|
     intent : $Values<typeof INTENT>,
     currency : $Values<typeof CURRENCY>,
     merchantID : $ReadOnlyArray<string>,
-    partnerAttributionID : ?string
+    partnerAttributionID : ?string,
+    experiments: Experiments
 |};
 
-export function buildOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID } : OrderOptions) : OrderActions {
+export function buildOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID, experiments } : OrderOptions) : OrderActions {
     const create = (data) => {
 
         let order : Object = { ...data };
@@ -89,7 +91,7 @@ export function buildOrderActions({ facilitatorAccessToken, intent, currency, me
 
         order.application_context = order.application_context || {};
 
-        return createOrderID(order, { facilitatorAccessToken, partnerAttributionID, forceRestAPI: false });
+        return createOrderID(order, { facilitatorAccessToken, partnerAttributionID, forceRestAPI: false, experiments });
     };
 
     return { create };
@@ -145,9 +147,9 @@ export function buildPaymentActions({ facilitatorAccessToken, intent, currency, 
     return { create };
 }
 
-export function buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID } : OrderOptions) : XCreateOrderActionsType {
-    const order = buildOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID });
-    const payment = buildPaymentActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID });
+export function buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID, experiments } : OrderOptions) : XCreateOrderActionsType {
+    const order = buildOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID, experiments });
+    const payment = buildPaymentActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID, experiments });
 
     return {
         order,
@@ -161,7 +163,8 @@ type CreateOrderXProps = {|
     currency : $Values<typeof CURRENCY>,
     merchantID : $ReadOnlyArray<string>,
     partnerAttributionID : ?string,
-    paymentSource : $Values<typeof FUNDING> | null
+    paymentSource : $Values<typeof FUNDING> | null,
+    experiments: Experiments
 |};
 
 type CreateOrderProps = {|
@@ -174,9 +177,9 @@ type CreateOrderProps = {|
     smartWalletOrderID?: string,
   |};
 
-export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow } : CreateOrderProps) : CreateOrder {
+export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource, experiments } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow } : CreateOrderProps) : CreateOrder {
     const data = buildXCreateOrderData({ paymentSource });
-    const actions = buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID });
+    const actions = buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID, experiments });
     // this is purely for analytics purposes. We'd like to know whether
     // create order was called by a client side integration (actions.order)
     // or a server-side (all other callbacks only allow server-side)
