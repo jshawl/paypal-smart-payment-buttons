@@ -3,29 +3,26 @@
 import { describe, expect, it, vi } from "vitest";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-const callRestAPI = vi.fn(() =>
-  ZalgoPromise.reject({
-    response: {
-      headers: {},
-    },
-  })
-);
-const callSmartAPI = vi.fn(() =>
-  ZalgoPromise.resolve({
-    data: {},
-    headers: {},
-  })
-);
-
-// eslint-disable-next-line import/first
 import { getOrder, authorizeOrder, captureOrder, patchOrder } from "./order";
+import { callSmartAPI } from "./api";
 
 vi.mock("./api", async () => {
   const actual = await vi.importActual("./api");
   return {
     ...actual,
-    callRestAPI,
-    callSmartAPI,
+    callRestAPI: vi.fn(() =>
+      ZalgoPromise.reject({
+        response: {
+          headers: {},
+        },
+      })
+    ),
+    callSmartAPI: vi.fn(() =>
+      ZalgoPromise.resolve({
+        data: {},
+        headers: {},
+      })
+    ),
   };
 });
 

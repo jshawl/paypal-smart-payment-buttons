@@ -2,7 +2,10 @@
 import { describe, test, expect, vi } from "vitest";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-const sendCountMetricSpy = vi.fn();
+import { sendCountMetric } from "../lib";
+
+import { getOnApprove, getOnApproveOrder } from "./onApprove";
+
 const merchantOnApprove = vi
   .fn()
   .mockImplementation(() => ZalgoPromise.try(vi.fn()));
@@ -12,7 +15,7 @@ vi.mock("../lib", async () => {
   const actual = await vi.importActual("../lib");
   return {
     ...actual,
-    sendCountMetric: sendCountMetricSpy,
+    sendCountMetric: vi.fn(),
   };
 });
 
@@ -23,9 +26,6 @@ vi.mock("../api", async () => {
     getSupplementalOrderInfo: () => ZalgoPromise.try(vi.fn()),
   };
 });
-
-// eslint-disable-next-line import/first
-import { getOnApprove, getOnApproveOrder } from "./onApprove";
 
 const orderID = "EC-abc123";
 
@@ -60,7 +60,7 @@ describe("onApprove", () => {
     test("is invoked before onApprove for the checkout flow", () => {
       const onApprove = getOnApprove(getOnApproveOptions);
       onApprove({ payerID: "" }, { restart });
-      expect(sendCountMetricSpy).toHaveBeenCalledWith({
+      expect(sendCountMetric).toHaveBeenCalledWith({
         dimensions: {
           spbPaymentFlow: "checkout",
           useShippingChangeCallbackMutation: true,

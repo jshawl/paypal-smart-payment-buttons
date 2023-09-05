@@ -3,32 +3,27 @@
 import { describe, expect, it, vi } from "vitest";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-const request = vi.fn();
-const warn = vi.fn();
+import { callRestAPI } from "./api";
 
 vi.mock("@krakenjs/belter/src", async () => ({
   ...(await vi.importActual("@krakenjs/belter/src")),
-  request,
+  request: vi.fn().mockImplementationOnce(() =>
+    ZalgoPromise.resolve({
+      status: 403,
+      headers: {},
+    })
+  ),
 }));
 
+const warn = vi.fn();
 vi.mock("../lib", async () => ({
   ...(await vi.importActual("../lib")),
-  getLogger: () => ({ warn }),
+  getLogger: vi.fn().mockImplementationOnce(() => ({ warn })),
 }));
-
-// eslint-disable-next-line import/first
-import { callRestAPI } from "./api";
 
 describe("API", () => {
   describe("callRestAPI", () => {
     it("logs 403 errors", () => {
-      request.mockImplementationOnce(() =>
-        ZalgoPromise.resolve({
-          status: 403,
-          headers: {},
-        })
-      );
-
       expect(
         callRestAPI({
           accessToken: "accessToken",

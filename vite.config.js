@@ -40,6 +40,9 @@ export default defineConfig({
     deps: {
       inline: ["@krakenjs/post-robot"],
     },
+    coverage: {
+      provider: "v8",
+    },
   },
   optimizeDeps: {
     esbuildOptions: {

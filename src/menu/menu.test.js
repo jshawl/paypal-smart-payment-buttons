@@ -1,8 +1,12 @@
 /* @flow */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import { openPopup } from "../ui";
+
+import { setupMenu } from ".";
+
 const warn = vi.fn();
-const openPopup = vi.fn();
+
 const onSelect = vi.fn();
 
 vi.mock("../lib", async () => {
@@ -15,10 +19,9 @@ vi.mock("../lib", async () => {
   };
 });
 
-vi.mock("../ui", () => ({ openPopup }));
-
-/* eslint-disable-next-line import/first */
-import { setupMenu } from ".";
+vi.mock("../ui", () => ({
+  openPopup: vi.fn(),
+}));
 
 describe("Menu", () => {
   const cspNonce = "ABCD";
@@ -47,6 +50,7 @@ describe("Menu", () => {
   });
   it("should render a button with menu, click the button, fail to open a popup", () => {
     // error out window open
+    // $FlowFixMe
     openPopup.mockImplementationOnce(() => {
       throw new Error("window.open is not implemented");
     });
