@@ -3092,22 +3092,29 @@ window.smartCard = function(modules) {
     }
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    __webpack_require__.d(__webpack_exports__, "b", (function() {
+    __webpack_require__.d(__webpack_exports__, "c", (function() {
         return calculateTotalFromShippingBreakdownAmounts;
     }));
+    __webpack_require__.d(__webpack_exports__, "e", (function() {
+        return optionsKeyChanges;
+    }));
     __webpack_require__.d(__webpack_exports__, "a", (function() {
+        return breakdownKeyChanges;
+    }));
+    __webpack_require__.d(__webpack_exports__, "b", (function() {
         return buildBreakdown;
     }));
-    __webpack_require__.d(__webpack_exports__, "c", (function() {
+    __webpack_require__.d(__webpack_exports__, "d", (function() {
         return convertQueriesToArray;
     }));
-    __webpack_require__.d(__webpack_exports__, "e", (function() {
+    __webpack_require__.d(__webpack_exports__, "g", (function() {
         return updateShippingOptions;
     }));
-    __webpack_require__.d(__webpack_exports__, "d", (function() {
+    __webpack_require__.d(__webpack_exports__, "f", (function() {
         return updateOperationForShippingOptions;
     }));
-    var _onShippingChange__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9);
+    var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+    var _onShippingChange__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
     var calculateTotalFromShippingBreakdownAmounts = function(_ref) {
         var breakdown = _ref.breakdown, updatedAmounts = _ref.updatedAmounts;
         var newAmount = 0;
@@ -3126,6 +3133,57 @@ window.smartCard = function(modules) {
             breakdown[key] || updatedAmounts[key] && (discountKeys.includes(key) ? newAmount -= Math.abs(parseFloat(updatedAmounts[key])) : newAmount += parseFloat(updatedAmounts[key]));
         }));
         return newAmount.toFixed(2);
+    };
+    var optionsKeyChanges = function(options) {
+        var ordersV2Options = [];
+        options.forEach((function(element) {
+            var shippingOption = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.a)({}, element, {
+                amount: {
+                    value: element.amount.value,
+                    currency_code: element.amount.currencyCode
+                }
+            });
+            ordersV2Options.push(shippingOption);
+        }));
+        return ordersV2Options;
+    };
+    var breakdownKeyChanges = function(breakdown) {
+        return Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.a)({}, breakdown.discount ? {
+            discount: {
+                value: breakdown.discount.value,
+                currency_code: breakdown.discount.currencyCode
+            }
+        } : void 0, breakdown.handling ? {
+            handling: {
+                value: breakdown.handling.value,
+                currency_code: breakdown.handling.currencyCode
+            }
+        } : void 0, breakdown.insurance ? {
+            insurance: {
+                value: breakdown.insurance.value,
+                currency_code: breakdown.insurance.currencyCode
+            }
+        } : void 0, breakdown.itemTotal ? {
+            item_total: {
+                value: breakdown.itemTotal.value,
+                currency_code: breakdown.itemTotal.currencyCode
+            }
+        } : void 0, breakdown.shipping ? {
+            shipping: {
+                value: breakdown.shipping.value,
+                currency_code: breakdown.shipping.currencyCode
+            }
+        } : void 0, breakdown.shippingDiscount ? {
+            shipping_discount: {
+                value: breakdown.shippingDiscount.value,
+                currency_code: breakdown.shippingDiscount.currencyCode
+            }
+        } : void 0, breakdown.taxTotal ? {
+            tax_total: {
+                value: breakdown.taxTotal.value,
+                currency_code: breakdown.taxTotal.currencyCode
+            }
+        } : void 0);
     };
     var buildBreakdown = function(_ref2) {
         var _Object$values$;
@@ -3161,7 +3219,7 @@ window.smartCard = function(modules) {
     };
     var updateOperationForShippingOptions = function(_ref5) {
         var queries = _ref5.queries;
-        queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_0__.b.OPTIONS] && (queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_0__.b.OPTIONS].op = "replace");
+        queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_1__.b.OPTIONS] && (queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_1__.b.OPTIONS].op = "replace");
         return convertQueriesToArray({
             queries: queries
         });
@@ -11382,7 +11440,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.152", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.153", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 

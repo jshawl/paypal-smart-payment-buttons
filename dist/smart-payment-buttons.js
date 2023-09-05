@@ -9941,7 +9941,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.152", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.153", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -11061,14 +11061,12 @@ window.spb = function(modules) {
                         createOrder: createOrder
                     }),
                     onShippingAddressChange: Object(props_onShippingAddressChange.getOnShippingAddressChange)({
-                        onShippingAddressChange: inputOnShippingAddressChange,
-                        clientID: clientID
+                        onShippingAddressChange: inputOnShippingAddressChange
                     }, {
                         createOrder: createOrder
                     }),
                     onShippingOptionsChange: Object(props_onShippingOptionsChange.getOnShippingOptionsChange)({
-                        onShippingOptionsChange: inputOnShippingOptionsChange,
-                        clientID: clientID
+                        onShippingOptionsChange: inputOnShippingOptionsChange
                     }, {
                         createOrder: createOrder
                     }),
@@ -12207,11 +12205,11 @@ window.spb = function(modules) {
                             }, data), actions);
                         } : null,
                         onShippingAddressChange: onShippingAddressChange ? function(data, actions) {
-                            if (!data.shipping_address) throw new Error("Must pass shipping_address in data to handle changes in shipping address.");
+                            if (!data.shippingAddress) throw new Error("Must pass shippingAddress in data to handle changes in shipping address.");
                             return onShippingAddressChange(Object(esm_extends.default)({}, data), actions);
                         } : null,
                         onShippingOptionsChange: onShippingOptionsChange ? function(data, actions) {
-                            if (!data.selected_shipping_option) throw new Error("Must pass selected_shipping_option in data to handle changes in shipping options.");
+                            if (!data.selectedShippingOption) throw new Error("Must pass selectedShippingOption in data to handle changes in shipping options.");
                             return onShippingOptionsChange(Object(esm_extends.default)({}, data), actions);
                         } : null,
                         onClose: function() {
@@ -15047,11 +15045,11 @@ window.spb = function(modules) {
                         }, data), actions);
                     } : null,
                     onShippingAddressChange: onShippingAddressChange ? function(data, actions) {
-                        if (!data.shipping_address) throw new Error("Must pass shipping_address in data to handle changes in shipping address.");
+                        if (!data.shippingAddress) throw new Error("Must pass shippingAddress in data to handle changes in shipping address.");
                         return onShippingAddressChange(Object(esm_extends.default)({}, data), actions);
                     } : null,
                     onShippingOptionsChange: onShippingOptionsChange ? function(data, actions) {
-                        if (!data.selected_shipping_option) throw new Error("Must pass selected_shipping_option in data to handle changes in shipping options.");
+                        if (!data.selectedShippingOption) throw new Error("Must pass selectedShippingOption in data to handle changes in shipping options.");
                         return onShippingOptionsChange(Object(esm_extends.default)({}, data), actions);
                     } : null,
                     onClose: function() {
@@ -15919,7 +15917,7 @@ window.spb = function(modules) {
                                         },
                                         throwError: !1
                                     });
-                                    !cartBillingType || cartAmount || intent === sdk_constants_src.INTENT.TOKENIZE || window.xprops.createVaultSetupToken || triggerIntegrationError({
+                                    !cartBillingType || cartAmount || intent === sdk_constants_src.INTENT.TOKENIZE || window.xprops.createVaultSetupToken || window.xprops.createSubscription || triggerIntegrationError({
                                         error: "smart_button_validation_error_billing_without_purchase_intent_tokenize_not_passed",
                                         message: "Expected " + sdk_constants_src.SDK_QUERY_KEYS.INTENT + "=" + sdk_constants_src.INTENT.TOKENIZE + " for a billing-without-purchase transaction",
                                         featureFlags: featureFlags,
@@ -16451,7 +16449,7 @@ window.spb = function(modules) {
                     var _ref2;
                     return (_ref2 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref2[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.152", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.153", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref2[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref2[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref2[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -19221,9 +19219,9 @@ window.spb = function(modules) {
         var _lib__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("./src/lib/index.js");
         var _onShippingChange__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__("./src/props/onShippingChange.js");
         var _utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__("./src/props/utils.js");
-        var _excluded = [ "amount", "buyerAccessToken", "event", "forceRestAPI", "shipping_address" ];
+        var _excluded = [ "amount", "buyerAccessToken", "event", "forceRestAPI", "shippingAddress" ];
         function buildXOnShippingAddressChangeData(data) {
-            var shippingAddress = data.shipping_address, rest = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_2__.default)(data, _excluded);
+            var shippingAddress = data.shippingAddress, rest = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_2__.default)(data, _excluded);
             return Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({
                 errors: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.SHIPPING_ADDRESS_ERROR_MESSAGES,
                 shippingAddress: shippingAddress
@@ -19231,10 +19229,10 @@ window.spb = function(modules) {
         }
         function buildXOnShippingAddressChangeActions(_ref) {
             var _data$amount;
-            var clientID = _ref.clientID, data = _ref.data, passedActions = _ref.actions, orderID = _ref.orderID;
+            var data = _ref.data, passedActions = _ref.actions, orderID = _ref.orderID;
             var patchQueries = {};
             var newAmount;
-            var breakdown = (null == (_data$amount = data.amount) ? void 0 : _data$amount.breakdown) || {};
+            var breakdown = null != (_data$amount = data.amount) && _data$amount.breakdown ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.breakdownKeyChanges)(data.amount.breakdown) : {};
             if (0 === Object.keys(breakdown).length) throw new Error("Must pass amount with breakdown into data attribute for onShippingAddressChange callback.");
             var actions = {
                 reject: passedActions.reject ? function(message) {
@@ -19262,7 +19260,7 @@ window.spb = function(modules) {
                         path: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                         value: {
                             value: "" + newAmount,
-                            currency_code: null == data || null == (_data$amount2 = data.amount) ? void 0 : _data$amount2.currency_code,
+                            currency_code: null == data || null == (_data$amount2 = data.amount) ? void 0 : _data$amount2.currencyCode,
                             breakdown: breakdown
                         }
                     };
@@ -19271,6 +19269,7 @@ window.spb = function(modules) {
                 updateShippingOptions: function(_ref3) {
                     var _selectedShippingOpti, _data$amount3;
                     var options = _ref3.options;
+                    var ordersV2Options = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.optionsKeyChanges)(options);
                     var selectedShippingOption = options.filter((function(option) {
                         return !0 === option.selected;
                     }));
@@ -19292,14 +19291,14 @@ window.spb = function(modules) {
                         path: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                         value: {
                             value: "" + newAmount,
-                            currency_code: null == data || null == (_data$amount3 = data.amount) ? void 0 : _data$amount3.currency_code,
+                            currency_code: null == data || null == (_data$amount3 = data.amount) ? void 0 : _data$amount3.currencyCode,
                             breakdown: breakdown
                         }
                     };
                     patchQueries[_onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
                         op: (null == data ? void 0 : data.event) || "replace",
                         path: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.OPTIONS,
-                        value: options
+                        value: ordersV2Options
                     };
                     return actions;
                 },
@@ -19323,35 +19322,16 @@ window.spb = function(modules) {
                         path: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                         value: {
                             value: "" + newAmount,
-                            currency_code: null == data || null == (_data$amount4 = data.amount) ? void 0 : _data$amount4.currency_code,
+                            currency_code: null == data || null == (_data$amount4 = data.amount) ? void 0 : _data$amount4.currencyCode,
                             breakdown: breakdown
                         }
                     };
                     return actions;
                 },
-                patch: function() {
-                    return Object(_api__WEBPACK_IMPORTED_MODULE_5__.getShippingOrderInfo)(orderID).then((function(sessionData) {
-                        var _sessionData$checkout;
-                        var queries;
-                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout = sessionData.checkoutSession) || null == (_sessionData$checkout = _sessionData$checkout.cart) ? void 0 : _sessionData$checkout.shippingMethods) || [];
-                        queries = Boolean(shippingMethods.length > 0) ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
-                            queries: patchQueries
-                        }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
-                            queries: patchQueries
-                        });
-                        return Object(_api__WEBPACK_IMPORTED_MODULE_5__.patchShipping)({
-                            clientID: clientID,
-                            orderID: orderID,
-                            data: queries
-                        }).catch((function() {
-                            throw new Error("Order could not be patched");
-                        }));
-                    }));
-                },
                 query: function() {
                     return Object(_api__WEBPACK_IMPORTED_MODULE_5__.getShippingOrderInfo)(orderID).then((function(sessionData) {
-                        var _sessionData$checkout2;
-                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout2 = sessionData.checkoutSession) || null == (_sessionData$checkout2 = _sessionData$checkout2.cart) ? void 0 : _sessionData$checkout2.shippingMethods) || [];
+                        var _sessionData$checkout;
+                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout = sessionData.checkoutSession) || null == (_sessionData$checkout = _sessionData$checkout.cart) ? void 0 : _sessionData$checkout.shippingMethods) || [];
                         return Boolean(shippingMethods.length > 0) ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
                             queries: patchQueries
                         }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
@@ -19363,7 +19343,7 @@ window.spb = function(modules) {
             return actions;
         }
         function getOnShippingAddressChange(_ref5, _ref6) {
-            var onShippingAddressChange = _ref5.onShippingAddressChange, clientID = _ref5.clientID;
+            var onShippingAddressChange = _ref5.onShippingAddressChange;
             var createOrder = _ref6.createOrder;
             if (onShippingAddressChange) return function(_ref7, actions) {
                 var data = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({}, (Object(_babel_runtime_helpers_esm_objectDestructuringEmpty__WEBPACK_IMPORTED_MODULE_0__.default)(_ref7), 
@@ -19379,7 +19359,6 @@ window.spb = function(modules) {
                     _getLogger$info$track[_constants__WEBPACK_IMPORTED_MODULE_6__.FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_INVOKED] = "1", 
                     _getLogger$info$track)).flush();
                     return onShippingAddressChange(buildXOnShippingAddressChangeData(data), buildXOnShippingAddressChangeActions({
-                        clientID: clientID,
                         data: data,
                         actions: actions,
                         orderID: orderID
@@ -19571,9 +19550,9 @@ window.spb = function(modules) {
         var _lib__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("./src/lib/index.js");
         var _onShippingChange__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__("./src/props/onShippingChange.js");
         var _utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__("./src/props/utils.js");
-        var _excluded = [ "amount", "buyerAccessToken", "event", "forceRestAPI", "options", "selected_shipping_option" ];
+        var _excluded = [ "amount", "buyerAccessToken", "event", "forceRestAPI", "options", "selectedShippingOption" ];
         function buildXOnShippingOptionsChangeData(data) {
-            var selectedShippingOption = data.selected_shipping_option, rest = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_2__.default)(data, _excluded);
+            var selectedShippingOption = data.selectedShippingOption, rest = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_2__.default)(data, _excluded);
             return Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({
                 errors: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.SHIPPING_OPTIONS_ERROR_MESSAGES,
                 selectedShippingOption: selectedShippingOption
@@ -19581,10 +19560,10 @@ window.spb = function(modules) {
         }
         function buildXOnShippingOptionsChangeActions(_ref) {
             var _data$amount;
-            var clientID = _ref.clientID, data = _ref.data, passedActions = _ref.actions, orderID = _ref.orderID;
+            var data = _ref.data, passedActions = _ref.actions, orderID = _ref.orderID;
             var patchQueries = {};
             var newAmount;
-            var breakdown = (null == (_data$amount = data.amount) ? void 0 : _data$amount.breakdown) || {};
+            var breakdown = null != (_data$amount = data.amount) && _data$amount.breakdown ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.breakdownKeyChanges)(data.amount.breakdown) : {};
             if (0 === Object.keys(breakdown).length) throw new Error("Must pass breakdown into data attribute for onShippingAddressChange callback.");
             var actions = {
                 reject: passedActions.reject ? function(message) {
@@ -19595,14 +19574,14 @@ window.spb = function(modules) {
                 updateShippingOption: function(_ref2) {
                     var option = _ref2.option;
                     if (option && data.options) {
-                        var _option$amount, _data$amount2, _data$amount3;
+                        var _option$amount, _data$amount2;
                         var selectedShippingOptionAmount = null == option || null == (_option$amount = option.amount) ? void 0 : _option$amount.value;
-                        var options = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateShippingOptions)({
+                        var options = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.optionsKeyChanges)(Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateShippingOptions)({
                             option: option,
                             options: data.options
-                        });
+                        }));
                         newAmount = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.calculateTotalFromShippingBreakdownAmounts)({
-                            breakdown: (null == data || null == (_data$amount2 = data.amount) ? void 0 : _data$amount2.breakdown) || {},
+                            breakdown: breakdown,
                             updatedAmounts: {
                                 shipping: selectedShippingOptionAmount
                             }
@@ -19623,7 +19602,7 @@ window.spb = function(modules) {
                             path: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                             value: {
                                 value: "" + newAmount,
-                                currency_code: null == data || null == (_data$amount3 = data.amount) ? void 0 : _data$amount3.currency_code,
+                                currency_code: null == data || null == (_data$amount2 = data.amount) ? void 0 : _data$amount2.currencyCode,
                                 breakdown: breakdown
                             }
                         };
@@ -19631,12 +19610,12 @@ window.spb = function(modules) {
                     return actions;
                 },
                 updateShippingDiscount: function(_ref3) {
-                    var _data$amount4, _data$amount5;
+                    var _data$amount3;
                     var discount = _ref3.discount;
                     newAmount = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.calculateTotalFromShippingBreakdownAmounts)({
-                        breakdown: (null == data || null == (_data$amount4 = data.amount) ? void 0 : _data$amount4.breakdown) || {},
+                        breakdown: breakdown,
                         updatedAmounts: {
-                            shipping_discount: discount
+                            shippingDiscount: discount
                         }
                     });
                     breakdown = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.buildBreakdown)({
@@ -19650,35 +19629,16 @@ window.spb = function(modules) {
                         path: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.AMOUNT,
                         value: {
                             value: "" + newAmount,
-                            currency_code: null == data || null == (_data$amount5 = data.amount) ? void 0 : _data$amount5.currency_code,
+                            currency_code: null == data || null == (_data$amount3 = data.amount) ? void 0 : _data$amount3.currencyCode,
                             breakdown: breakdown
                         }
                     };
                     return actions;
                 },
-                patch: function() {
-                    return Object(_api__WEBPACK_IMPORTED_MODULE_5__.getShippingOrderInfo)(orderID).then((function(sessionData) {
-                        var _sessionData$checkout;
-                        var queries;
-                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout = sessionData.checkoutSession) || null == (_sessionData$checkout = _sessionData$checkout.cart) ? void 0 : _sessionData$checkout.shippingMethods) || [];
-                        queries = Boolean(shippingMethods.length > 0) ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
-                            queries: patchQueries
-                        }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
-                            queries: patchQueries
-                        });
-                        return Object(_api__WEBPACK_IMPORTED_MODULE_5__.patchShipping)({
-                            clientID: clientID,
-                            orderID: orderID,
-                            data: queries
-                        }).catch((function() {
-                            throw new Error("Order could not be patched");
-                        }));
-                    }));
-                },
                 query: function() {
                     return Object(_api__WEBPACK_IMPORTED_MODULE_5__.getShippingOrderInfo)(orderID).then((function(sessionData) {
-                        var _sessionData$checkout2;
-                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout2 = sessionData.checkoutSession) || null == (_sessionData$checkout2 = _sessionData$checkout2.cart) ? void 0 : _sessionData$checkout2.shippingMethods) || [];
+                        var _sessionData$checkout;
+                        var shippingMethods = (null == sessionData || null == (_sessionData$checkout = sessionData.checkoutSession) || null == (_sessionData$checkout = _sessionData$checkout.cart) ? void 0 : _sessionData$checkout.shippingMethods) || [];
                         return Boolean(shippingMethods.length > 0) ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
                             queries: patchQueries
                         }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
@@ -19690,7 +19650,7 @@ window.spb = function(modules) {
             return actions;
         }
         function getOnShippingOptionsChange(_ref4, _ref5) {
-            var onShippingOptionsChange = _ref4.onShippingOptionsChange, clientID = _ref4.clientID;
+            var onShippingOptionsChange = _ref4.onShippingOptionsChange;
             var createOrder = _ref5.createOrder;
             if (onShippingOptionsChange) return function(_ref6, actions) {
                 var data = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({}, (Object(_babel_runtime_helpers_esm_objectDestructuringEmpty__WEBPACK_IMPORTED_MODULE_0__.default)(_ref6), 
@@ -19706,7 +19666,6 @@ window.spb = function(modules) {
                     _getLogger$info$track[_constants__WEBPACK_IMPORTED_MODULE_6__.FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_INVOKED] = "1", 
                     _getLogger$info$track)).flush();
                     return onShippingOptionsChange(buildXOnShippingOptionsChangeData(data), buildXOnShippingOptionsChangeActions({
-                        clientID: clientID,
                         data: data,
                         actions: actions,
                         orderID: orderID
@@ -19823,6 +19782,12 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "calculateTotalFromShippingBreakdownAmounts", (function() {
             return calculateTotalFromShippingBreakdownAmounts;
         }));
+        __webpack_require__.d(__webpack_exports__, "optionsKeyChanges", (function() {
+            return optionsKeyChanges;
+        }));
+        __webpack_require__.d(__webpack_exports__, "breakdownKeyChanges", (function() {
+            return breakdownKeyChanges;
+        }));
         __webpack_require__.d(__webpack_exports__, "buildBreakdown", (function() {
             return buildBreakdown;
         }));
@@ -19835,7 +19800,8 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "updateOperationForShippingOptions", (function() {
             return updateOperationForShippingOptions;
         }));
-        var _onShippingChange__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/props/onShippingChange.js");
+        var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@babel/runtime/helpers/esm/extends.js");
+        var _onShippingChange__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/props/onShippingChange.js");
         var calculateTotalFromShippingBreakdownAmounts = function(_ref) {
             var breakdown = _ref.breakdown, updatedAmounts = _ref.updatedAmounts;
             var newAmount = 0;
@@ -19854,6 +19820,57 @@ window.spb = function(modules) {
                 breakdown[key] || updatedAmounts[key] && (discountKeys.includes(key) ? newAmount -= Math.abs(parseFloat(updatedAmounts[key])) : newAmount += parseFloat(updatedAmounts[key]));
             }));
             return newAmount.toFixed(2);
+        };
+        var optionsKeyChanges = function(options) {
+            var ordersV2Options = [];
+            options.forEach((function(element) {
+                var shippingOption = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.default)({}, element, {
+                    amount: {
+                        value: element.amount.value,
+                        currency_code: element.amount.currencyCode
+                    }
+                });
+                ordersV2Options.push(shippingOption);
+            }));
+            return ordersV2Options;
+        };
+        var breakdownKeyChanges = function(breakdown) {
+            return Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.default)({}, breakdown.discount ? {
+                discount: {
+                    value: breakdown.discount.value,
+                    currency_code: breakdown.discount.currencyCode
+                }
+            } : void 0, breakdown.handling ? {
+                handling: {
+                    value: breakdown.handling.value,
+                    currency_code: breakdown.handling.currencyCode
+                }
+            } : void 0, breakdown.insurance ? {
+                insurance: {
+                    value: breakdown.insurance.value,
+                    currency_code: breakdown.insurance.currencyCode
+                }
+            } : void 0, breakdown.itemTotal ? {
+                item_total: {
+                    value: breakdown.itemTotal.value,
+                    currency_code: breakdown.itemTotal.currencyCode
+                }
+            } : void 0, breakdown.shipping ? {
+                shipping: {
+                    value: breakdown.shipping.value,
+                    currency_code: breakdown.shipping.currencyCode
+                }
+            } : void 0, breakdown.shippingDiscount ? {
+                shipping_discount: {
+                    value: breakdown.shippingDiscount.value,
+                    currency_code: breakdown.shippingDiscount.currencyCode
+                }
+            } : void 0, breakdown.taxTotal ? {
+                tax_total: {
+                    value: breakdown.taxTotal.value,
+                    currency_code: breakdown.taxTotal.currencyCode
+                }
+            } : void 0);
         };
         var buildBreakdown = function(_ref2) {
             var _Object$values$;
@@ -19889,7 +19906,7 @@ window.spb = function(modules) {
         };
         var updateOperationForShippingOptions = function(_ref5) {
             var queries = _ref5.queries;
-            queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_0__.ON_SHIPPING_CHANGE_PATHS.OPTIONS] && (queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_0__.ON_SHIPPING_CHANGE_PATHS.OPTIONS].op = "replace");
+            queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_1__.ON_SHIPPING_CHANGE_PATHS.OPTIONS] && (queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_1__.ON_SHIPPING_CHANGE_PATHS.OPTIONS].op = "replace");
             return convertQueriesToArray({
                 queries: queries
             });
