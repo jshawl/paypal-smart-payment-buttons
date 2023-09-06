@@ -40,3 +40,5 @@ jobs:
 
       - name: ⬆️ Upload coverage report
         uses: codecov/codecov-action@v3
+        with:
+          files: coverage/lcov.info, coverage-vitest/clover.xml

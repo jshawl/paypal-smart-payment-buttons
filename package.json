@@ -47,7 +47,7 @@
     "release:dry-run": "DRY_RUN=true grabthar-release",
     "setup": "npm install && npm run flow-typed",
     "start": "npm run webpack -- --progress --watch",
-    "test": "npm run vitest -- run && npm run karma",
+    "test": "npm run coverage && npm run karma",
     "typecheck": "npm run flow-typed && npm run flow -- check",
     "vitest": "vitest",
     "webpack": "babel-node --plugins=transform-es2015-modules-commonjs $(npm bin)/webpack",
