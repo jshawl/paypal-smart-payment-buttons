@@ -2,9 +2,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { setupNativeFallback } from "../src/native/fallback";
-
-import { setupWindowPayPal, setupWindowXprops } from "./utilities";
+import { setupNativeFallback } from "./fallback";
+import { setupWindowPayPal, setupWindowXprops } from "./test-utilities";
 
 describe("Native fallback cases", () => {
   const postRobotSend = vi.fn().mockResolvedValue({
