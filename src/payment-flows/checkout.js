@@ -1,7 +1,7 @@
 /* @flow */
 
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { memoize, noop, supportsPopups, stringifyError, extendUrl, PopupOpenError, parseQuery, submitForm } from '@krakenjs/belter/src';
+import { memoize, noop, supportsPopups, stringifyError, extendUrl, PopupOpenError, parseQuery, submitForm, isWebView } from '@krakenjs/belter/src';
 import { FUNDING, FPTI_KEY, APM_LIST } from '@paypal/sdk-constants/src';
 import { getParent, getTop, type CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 
@@ -134,7 +134,18 @@ function getContext({ win, isClick, merchantRequestedPopupsDisabled } : {| win :
 }
 
 export const getDimensions = (fundingSource : string, popupIncreaseDimensions? : boolean) : {| width : number, height : number |} => {
-    if (APM_LIST.indexOf(fundingSource) !== -1) {
+    if (isWebView()) {
+        getLogger().info(`popup_dimensions_${ fundingSource }`);
+        sendCountMetric({
+            name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
+            dimensions: {
+                spbPaymentFlow: "checkout",
+                fundingSource,
+                dimensionType: 'webview',
+            }
+        })
+        return { width: window.outerWidth - 4, height: window.outerHeight - 20 };
+    } else if (APM_LIST.indexOf(fundingSource) !== -1) {
         getLogger().info(`popup_dimensions_value_${ fundingSource }`);
         sendCountMetric({
             name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
