@@ -16,8 +16,8 @@ import { VENMO_WEB_URL } from './config';
 import type { NativeFallbackOptions } from './eligibility';
 
 export const VENMO_POPUP_DIMENSIONS = {
-    WIDTH:  534,
-    HEIGHT: 590
+    WIDTH:  500,
+    HEIGHT: 692
 };
 
 let canRenderTop = false;
