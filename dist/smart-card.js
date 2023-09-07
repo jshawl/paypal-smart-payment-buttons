@@ -2113,7 +2113,7 @@ window.smartCard = function(modules) {
     }
     function getOrder(orderID, _ref2) {
         var _headers4;
-        var facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, _ref2$forceRestAPI = _ref2.forceRestAPI, forceRestAPI = void 0 !== _ref2$forceRestAPI && _ref2$forceRestAPI;
+        var facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, _ref2$forceRestAPI = _ref2.forceRestAPI, forceRestAPI = void 0 !== _ref2$forceRestAPI && _ref2$forceRestAPI, experiments = _ref2.experiments;
         Object(lib.c)().info("get_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
         Object(lib.c)().info("get_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
             err: Object(belter_src.v)(getLsatUpgradeError())
@@ -2139,6 +2139,7 @@ window.smartCard = function(modules) {
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
                 });
+                if (experiments.disableSmartAPI) throw err;
                 return Object(api.c)({
                     accessToken: buyerAccessToken,
                     url: src_config.i.ORDER + "/" + orderID,
@@ -2188,7 +2189,7 @@ window.smartCard = function(modules) {
     }
     function captureOrder(orderID, _ref4) {
         var _headers7;
-        var facilitatorAccessToken = _ref4.facilitatorAccessToken, buyerAccessToken = _ref4.buyerAccessToken, partnerAttributionID = _ref4.partnerAttributionID, _ref4$forceRestAPI = _ref4.forceRestAPI, forceRestAPI = void 0 !== _ref4$forceRestAPI && _ref4$forceRestAPI;
+        var facilitatorAccessToken = _ref4.facilitatorAccessToken, buyerAccessToken = _ref4.buyerAccessToken, partnerAttributionID = _ref4.partnerAttributionID, _ref4$forceRestAPI = _ref4.forceRestAPI, forceRestAPI = void 0 !== _ref4$forceRestAPI && _ref4$forceRestAPI, experiments = _ref4.experiments;
         Object(lib.c)().info("capture_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
         Object(lib.c)().info("capture_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
             err: Object(belter_src.v)(getLsatUpgradeError())
@@ -2217,6 +2218,7 @@ window.smartCard = function(modules) {
                     err: Object(belter_src.v)(err)
                 });
                 if (isProcessorDeclineError(err) || isUnprocessableEntityError(err)) throw err;
+                if (experiments.disableSmartAPI) throw err;
                 return Object(api.c)({
                     accessToken: buyerAccessToken,
                     method: "post",
@@ -2265,7 +2267,7 @@ window.smartCard = function(modules) {
     }
     function authorizeOrder(orderID, _ref6) {
         var _headers10;
-        var facilitatorAccessToken = _ref6.facilitatorAccessToken, buyerAccessToken = _ref6.buyerAccessToken, partnerAttributionID = _ref6.partnerAttributionID, _ref6$forceRestAPI = _ref6.forceRestAPI, forceRestAPI = void 0 !== _ref6$forceRestAPI && _ref6$forceRestAPI;
+        var facilitatorAccessToken = _ref6.facilitatorAccessToken, buyerAccessToken = _ref6.buyerAccessToken, partnerAttributionID = _ref6.partnerAttributionID, _ref6$forceRestAPI = _ref6.forceRestAPI, forceRestAPI = void 0 !== _ref6$forceRestAPI && _ref6$forceRestAPI, experiments = _ref6.experiments;
         Object(lib.c)().info("authorize_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
         Object(lib.c)().info("authorize_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
             err: Object(belter_src.v)(getLsatUpgradeError())
@@ -2293,6 +2295,7 @@ window.smartCard = function(modules) {
                     err: Object(belter_src.v)(err)
                 });
                 if (isProcessorDeclineError(err)) throw err;
+                if (experiments.disableSmartAPI) throw err;
                 return Object(api.c)({
                     accessToken: buyerAccessToken,
                     method: "post",
@@ -2342,7 +2345,7 @@ window.smartCard = function(modules) {
     }
     function patchOrder(orderID, data, _ref8) {
         var _headers13;
-        var facilitatorAccessToken = _ref8.facilitatorAccessToken, buyerAccessToken = _ref8.buyerAccessToken, partnerAttributionID = _ref8.partnerAttributionID, _ref8$forceRestAPI = _ref8.forceRestAPI, forceRestAPI = void 0 !== _ref8$forceRestAPI && _ref8$forceRestAPI;
+        var facilitatorAccessToken = _ref8.facilitatorAccessToken, buyerAccessToken = _ref8.buyerAccessToken, partnerAttributionID = _ref8.partnerAttributionID, _ref8$forceRestAPI = _ref8.forceRestAPI, forceRestAPI = void 0 !== _ref8$forceRestAPI && _ref8$forceRestAPI, experiments = _ref8.experiments;
         Object(lib.c)().info("patch_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
         Object(lib.c)().info("patch_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
             err: Object(belter_src.v)(getLsatUpgradeError())
@@ -2370,6 +2373,7 @@ window.smartCard = function(modules) {
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
                 });
+                if (experiments.disableSmartAPI) throw err;
                 var requestData;
                 requestData = Array.isArray(data) ? {
                     patch: data,
@@ -2769,7 +2773,7 @@ window.smartCard = function(modules) {
         STORE_UNAVAILABLE: "Part of your order isn't available at this store."
     };
     var GENERIC_REJECT_ADDRESS_MESSAGE = "Unable to update address. Please try again.";
-    new RegExp(/^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address))$/);
+    new RegExp(/^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address|name))$/);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.d(__webpack_exports__, "c", (function() {
@@ -9891,7 +9895,8 @@ window.smartCard = function(modules) {
                         orderID = id;
                         return Object(api.e)(orderID, data, {
                             facilitatorAccessToken: facilitatorAccessToken,
-                            partnerAttributionID: ""
+                            partnerAttributionID: "",
+                            experiments: {}
                         });
                     })).then((function(res) {
                         return handleThreeDomainSecureContingency({
@@ -11440,7 +11445,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.153", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.154", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 

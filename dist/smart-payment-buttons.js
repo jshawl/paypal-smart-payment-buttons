@@ -9580,7 +9580,7 @@ window.spb = function(modules) {
         }
         function getOrder(orderID, _ref2) {
             var _headers4;
-            var facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, _ref2$forceRestAPI = _ref2.forceRestAPI, forceRestAPI = void 0 !== _ref2$forceRestAPI && _ref2$forceRestAPI;
+            var facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, _ref2$forceRestAPI = _ref2.forceRestAPI, forceRestAPI = void 0 !== _ref2$forceRestAPI && _ref2$forceRestAPI, experiments = _ref2.experiments;
             Object(lib.getLogger)().info("get_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
             Object(lib.getLogger)().info("get_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
                 err: Object(belter_src.stringifyError)(getLsatUpgradeError())
@@ -9606,6 +9606,7 @@ window.spb = function(modules) {
                         orderID: orderID,
                         err: Object(belter_src.stringifyError)(err)
                     });
+                    if (experiments.disableSmartAPI) throw err;
                     return Object(api.callSmartAPI)({
                         accessToken: buyerAccessToken,
                         url: src_config.SMART_API_URI.ORDER + "/" + orderID,
@@ -9657,7 +9658,7 @@ window.spb = function(modules) {
         }
         function captureOrder(orderID, _ref4) {
             var _headers7;
-            var facilitatorAccessToken = _ref4.facilitatorAccessToken, buyerAccessToken = _ref4.buyerAccessToken, partnerAttributionID = _ref4.partnerAttributionID, _ref4$forceRestAPI = _ref4.forceRestAPI, forceRestAPI = void 0 !== _ref4$forceRestAPI && _ref4$forceRestAPI;
+            var facilitatorAccessToken = _ref4.facilitatorAccessToken, buyerAccessToken = _ref4.buyerAccessToken, partnerAttributionID = _ref4.partnerAttributionID, _ref4$forceRestAPI = _ref4.forceRestAPI, forceRestAPI = void 0 !== _ref4$forceRestAPI && _ref4$forceRestAPI, experiments = _ref4.experiments;
             Object(lib.getLogger)().info("capture_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
             Object(lib.getLogger)().info("capture_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
                 err: Object(belter_src.stringifyError)(getLsatUpgradeError())
@@ -9686,6 +9687,7 @@ window.spb = function(modules) {
                         err: Object(belter_src.stringifyError)(err)
                     });
                     if (isProcessorDeclineError(err) || isUnprocessableEntityError(err)) throw err;
+                    if (experiments.disableSmartAPI) throw err;
                     return Object(api.callSmartAPI)({
                         accessToken: buyerAccessToken,
                         method: "post",
@@ -9736,7 +9738,7 @@ window.spb = function(modules) {
         }
         function authorizeOrder(orderID, _ref6) {
             var _headers10;
-            var facilitatorAccessToken = _ref6.facilitatorAccessToken, buyerAccessToken = _ref6.buyerAccessToken, partnerAttributionID = _ref6.partnerAttributionID, _ref6$forceRestAPI = _ref6.forceRestAPI, forceRestAPI = void 0 !== _ref6$forceRestAPI && _ref6$forceRestAPI;
+            var facilitatorAccessToken = _ref6.facilitatorAccessToken, buyerAccessToken = _ref6.buyerAccessToken, partnerAttributionID = _ref6.partnerAttributionID, _ref6$forceRestAPI = _ref6.forceRestAPI, forceRestAPI = void 0 !== _ref6$forceRestAPI && _ref6$forceRestAPI, experiments = _ref6.experiments;
             Object(lib.getLogger)().info("authorize_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
             Object(lib.getLogger)().info("authorize_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
                 err: Object(belter_src.stringifyError)(getLsatUpgradeError())
@@ -9764,6 +9766,7 @@ window.spb = function(modules) {
                         err: Object(belter_src.stringifyError)(err)
                     });
                     if (isProcessorDeclineError(err)) throw err;
+                    if (experiments.disableSmartAPI) throw err;
                     return Object(api.callSmartAPI)({
                         accessToken: buyerAccessToken,
                         method: "post",
@@ -9815,7 +9818,7 @@ window.spb = function(modules) {
         }
         function patchOrder(orderID, data, _ref8) {
             var _headers13;
-            var facilitatorAccessToken = _ref8.facilitatorAccessToken, buyerAccessToken = _ref8.buyerAccessToken, partnerAttributionID = _ref8.partnerAttributionID, _ref8$forceRestAPI = _ref8.forceRestAPI, forceRestAPI = void 0 !== _ref8$forceRestAPI && _ref8$forceRestAPI;
+            var facilitatorAccessToken = _ref8.facilitatorAccessToken, buyerAccessToken = _ref8.buyerAccessToken, partnerAttributionID = _ref8.partnerAttributionID, _ref8$forceRestAPI = _ref8.forceRestAPI, forceRestAPI = void 0 !== _ref8$forceRestAPI && _ref8$forceRestAPI, experiments = _ref8.experiments;
             Object(lib.getLogger)().info("patch_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
             Object(lib.getLogger)().info("patch_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
                 err: Object(belter_src.stringifyError)(getLsatUpgradeError())
@@ -9843,6 +9846,7 @@ window.spb = function(modules) {
                         orderID: orderID,
                         err: Object(belter_src.stringifyError)(err)
                     });
+                    if (experiments.disableSmartAPI) throw err;
                     var requestData;
                     requestData = Array.isArray(data) ? {
                         patch: data,
@@ -9941,7 +9945,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.153", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.154", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -11001,7 +11005,8 @@ window.spb = function(modules) {
                     intent: intent,
                     merchantID: merchantID,
                     partnerAttributionID: partnerAttributionID,
-                    paymentSource: paymentSource
+                    paymentSource: paymentSource,
+                    experiments: experiments
                 }, {
                     facilitatorAccessToken: facilitatorAccessToken,
                     createBillingAgreement: createBillingAgreement,
@@ -11042,7 +11047,8 @@ window.spb = function(modules) {
                         clientID: clientID,
                         facilitatorAccessToken: facilitatorAccessToken,
                         createOrder: createOrder,
-                        featureFlags: featureFlags
+                        featureFlags: featureFlags,
+                        experiments: experiments
                     }),
                     onCancel: Object(props_onCancel.getOnCancel)({
                         onCancel: inputOnCancel,
@@ -11165,9 +11171,6 @@ window.spb = function(modules) {
         }
         function disableLoadingSpinner(button) {
             button.classList.remove(constants.CLASS.LOADING);
-        }
-        function getClientVersion() {
-            return (document.body && document.body.getAttribute("" + constants.DATA_ATTRIBUTES.CLIENT_VERSION) || "unknown").replace(/[^a-zA-Z0-9]+/g, "_");
         }
         var api = __webpack_require__("./src/api/index.js");
         function isZeroAmount(value) {
@@ -11899,6 +11902,21 @@ window.spb = function(modules) {
         var smokeHash = "";
         var buyerAccessTokenReceivedOnAuth = null;
         var checkout_getDimensions = function(fundingSource, popupIncreaseDimensions) {
+            if (Object(src.isWebView)()) {
+                Object(lib.getLogger)().info("popup_dimensions_" + fundingSource);
+                Object(lib.sendCountMetric)({
+                    name: "pp.app.paypal_sdk.checkout_ui.dimension.count",
+                    dimensions: {
+                        spbPaymentFlow: "checkout",
+                        fundingSource: fundingSource,
+                        dimensionType: "webview"
+                    }
+                });
+                return {
+                    width: window.outerWidth - 4,
+                    height: window.outerHeight - 20
+                };
+            }
             if (-1 !== sdk_constants_src.APM_LIST.indexOf(fundingSource)) {
                 Object(lib.getLogger)().info("popup_dimensions_value_" + fundingSource);
                 Object(lib.sendCountMetric)({
@@ -13056,7 +13074,8 @@ window.spb = function(modules) {
                                             orderID = id;
                                             return Object(api.confirmOrderAPI)(orderID, data, {
                                                 facilitatorAccessToken: facilitatorAccessToken,
-                                                partnerAttributionID: ""
+                                                partnerAttributionID: "",
+                                                experiments: {}
                                             });
                                         })).then((function(res) {
                                             return handleThreeDomainSecureContingency({
@@ -13340,7 +13359,8 @@ window.spb = function(modules) {
                                 payment_source: Object(api.buildPaymentSource)(paymentMethodID)
                             }, {
                                 facilitatorAccessToken: accessToken,
-                                partnerAttributionID: partnerAttributionID
+                                partnerAttributionID: partnerAttributionID,
+                                experiments: {}
                             }).then((function() {
                                 return onApprove({}, {
                                     restart: restart
@@ -14944,8 +14964,8 @@ window.spb = function(modules) {
         var venmo_getDimensions = function(fundingSource) {
             Object(lib.getLogger)().info("popup_dimensions_" + fundingSource).flush();
             return {
-                width: 534,
-                height: 590
+                width: 500,
+                height: 692
             };
         };
         function initVenmoWeb(_ref4) {
@@ -15635,7 +15655,8 @@ window.spb = function(modules) {
                             serviceData: serviceData,
                             config: config,
                             components: components,
-                            props: props
+                            props: props,
+                            experiments: experiments
                         });
                     },
                     experiments: experiments
@@ -16276,7 +16297,8 @@ window.spb = function(modules) {
                                                     serviceData: serviceData,
                                                     config: config,
                                                     components: components,
-                                                    props: props
+                                                    props: props,
+                                                    experiments: experiments
                                                 });
                                             },
                                             experiments: experiments
@@ -16449,7 +16471,7 @@ window.spb = function(modules) {
                     var _ref2;
                     return (_ref2 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref2[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.153", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.154", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref2[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref2[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref2[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -16496,21 +16518,12 @@ window.spb = function(modules) {
                         shape: shape,
                         fundingInstruments: fundingSources.join(","),
                         fundingInstrumentsCount: fundingSources.length.toString(),
-                        js_sdk_version: getClientVersion(),
+                        js_sdk_version: (document.body && document.body.getAttribute("" + constants.DATA_ATTRIBUTES.CLIENT_VERSION) || "unknown").replace(/[^a-zA-Z0-9]+/g, "_"),
                         storageState: Object(lib.isStorageStateFresh)() ? "fresh" : "not_fresh",
                         tagline: tagline.toString(),
                         version: serverRenderVersion,
                         walletInstruments: walletInstruments.join(","),
                         walletInstrumentsCount: walletInstruments.length.toString()
-                    });
-                    Object(lib.sendGaugeMetric)({
-                        name: "pp.app.paypal_sdk.buttons",
-                        event: "load",
-                        value: 1,
-                        dimensions: {
-                            js_sdk_version: getClientVersion(),
-                            spb_version: serverRenderVersion
-                        }
                     });
                     if (window.performance) try {
                         var _logger$track;
@@ -17841,7 +17854,8 @@ window.spb = function(modules) {
             return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_0__.ZalgoPromise.try((function() {
                 return Object(_api__WEBPACK_IMPORTED_MODULE_3__.confirmOrderAPI)(orderID, payload, {
                     facilitatorAccessToken: facilitatorAccessToken,
-                    partnerAttributionID: partnerAttributionID
+                    partnerAttributionID: partnerAttributionID,
+                    experiments: {}
                 });
             })).catch((function(err) {
                 Object(_lib__WEBPACK_IMPORTED_MODULE_5__.getLogger)().error("confirm_order_error", {
@@ -17929,7 +17943,7 @@ window.spb = function(modules) {
             };
         }
         function buildOrderActions(_ref2) {
-            var facilitatorAccessToken = _ref2.facilitatorAccessToken, intent = _ref2.intent, currency = _ref2.currency, merchantID = _ref2.merchantID, partnerAttributionID = _ref2.partnerAttributionID;
+            var facilitatorAccessToken = _ref2.facilitatorAccessToken, intent = _ref2.intent, currency = _ref2.currency, merchantID = _ref2.merchantID, partnerAttributionID = _ref2.partnerAttributionID, experiments = _ref2.experiments;
             return {
                 create: function(data) {
                     var order = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.default)({}, data);
@@ -17958,7 +17972,8 @@ window.spb = function(modules) {
                     return Object(_api__WEBPACK_IMPORTED_MODULE_5__.createOrderID)(order, {
                         facilitatorAccessToken: facilitatorAccessToken,
                         partnerAttributionID: partnerAttributionID,
-                        forceRestAPI: !1
+                        forceRestAPI: !1,
+                        experiments: experiments
                     });
                 }
             };
@@ -18003,20 +18018,22 @@ window.spb = function(modules) {
             };
         }
         function buildXCreateOrderActions(_ref4) {
-            var facilitatorAccessToken = _ref4.facilitatorAccessToken, intent = _ref4.intent, currency = _ref4.currency, merchantID = _ref4.merchantID, partnerAttributionID = _ref4.partnerAttributionID;
+            var facilitatorAccessToken = _ref4.facilitatorAccessToken, intent = _ref4.intent, currency = _ref4.currency, merchantID = _ref4.merchantID, partnerAttributionID = _ref4.partnerAttributionID, experiments = _ref4.experiments;
             var order = buildOrderActions({
                 facilitatorAccessToken: facilitatorAccessToken,
                 intent: intent,
                 currency: currency,
                 merchantID: merchantID,
-                partnerAttributionID: partnerAttributionID
+                partnerAttributionID: partnerAttributionID,
+                experiments: experiments
             });
             var payment = buildPaymentActions({
                 facilitatorAccessToken: facilitatorAccessToken,
                 intent: intent,
                 currency: currency,
                 merchantID: merchantID,
-                partnerAttributionID: partnerAttributionID
+                partnerAttributionID: partnerAttributionID,
+                experiments: experiments
             });
             return {
                 order: order,
@@ -18024,7 +18041,7 @@ window.spb = function(modules) {
             };
         }
         function getCreateOrder(_ref5, _ref6) {
-            var createOrder = _ref5.createOrder, intent = _ref5.intent, currency = _ref5.currency, merchantID = _ref5.merchantID, partnerAttributionID = _ref5.partnerAttributionID;
+            var createOrder = _ref5.createOrder, intent = _ref5.intent, currency = _ref5.currency, merchantID = _ref5.merchantID, partnerAttributionID = _ref5.partnerAttributionID, experiments = _ref5.experiments;
             var facilitatorAccessToken = _ref6.facilitatorAccessToken, createBillingAgreement = _ref6.createBillingAgreement, createSubscription = _ref6.createSubscription, enableOrdersApprovalSmartWallet = _ref6.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref6.smartWalletOrderID, createVaultSetupToken = _ref6.createVaultSetupToken, flow = _ref6.flow;
             var data = buildXCreateOrderData({
                 paymentSource: _ref5.paymentSource
@@ -18034,7 +18051,8 @@ window.spb = function(modules) {
                 intent: intent,
                 currency: currency,
                 merchantID: merchantID,
-                partnerAttributionID: partnerAttributionID
+                partnerAttributionID: partnerAttributionID,
+                experiments: experiments
             });
             var integrationType = "server-side";
             return Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
@@ -18550,13 +18568,14 @@ window.spb = function(modules) {
                         var actions = function(_ref3) {
                             var intent = _ref3.intent, orderID = _ref3.orderID, paymentID = _ref3.paymentID, payerID = _ref3.payerID, restart = _ref3.restart, facilitatorAccessToken = _ref3.facilitatorAccessToken, buyerAccessToken = _ref3.buyerAccessToken, partnerAttributionID = _ref3.partnerAttributionID, forceRestAPI = _ref3.forceRestAPI, onError = _ref3.onError;
                             var order = function(_ref) {
-                                var intent = _ref.intent, orderID = _ref.orderID, restart = _ref.restart, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI, onError = _ref.onError;
+                                var intent = _ref.intent, orderID = _ref.orderID, restart = _ref.restart, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI, onError = _ref.onError, experiments = _ref.experiments;
                                 var get = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
                                     return Object(_api__WEBPACK_IMPORTED_MODULE_4__.getOrder)(orderID, {
                                         facilitatorAccessToken: facilitatorAccessToken,
                                         buyerAccessToken: buyerAccessToken,
                                         partnerAttributionID: partnerAttributionID,
-                                        forceRestAPI: forceRestAPI
+                                        forceRestAPI: forceRestAPI,
+                                        experiments: experiments
                                     });
                                 }));
                                 var capture = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
@@ -18565,7 +18584,8 @@ window.spb = function(modules) {
                                         facilitatorAccessToken: facilitatorAccessToken,
                                         buyerAccessToken: buyerAccessToken,
                                         partnerAttributionID: partnerAttributionID,
-                                        forceRestAPI: forceRestAPI
+                                        forceRestAPI: forceRestAPI,
+                                        experiments: experiments
                                     }).finally(get.reset).finally(capture.reset).catch((function(err) {
                                         return handleProcessorError(err, restart, onError);
                                     }));
@@ -18576,7 +18596,8 @@ window.spb = function(modules) {
                                         facilitatorAccessToken: facilitatorAccessToken,
                                         buyerAccessToken: buyerAccessToken,
                                         partnerAttributionID: partnerAttributionID,
-                                        forceRestAPI: forceRestAPI
+                                        forceRestAPI: forceRestAPI,
+                                        experiments: experiments
                                     }).finally(get.reset).finally(authorize.reset).catch((function(err) {
                                         return handleProcessorError(err, restart, onError);
                                     }));
@@ -18590,7 +18611,8 @@ window.spb = function(modules) {
                                             facilitatorAccessToken: facilitatorAccessToken,
                                             buyerAccessToken: buyerAccessToken,
                                             partnerAttributionID: partnerAttributionID,
-                                            forceRestAPI: forceRestAPI
+                                            forceRestAPI: forceRestAPI,
+                                            experiments: experiments
                                         }).catch((function() {
                                             throw new Error("Order could not be patched");
                                         }));
@@ -18607,7 +18629,8 @@ window.spb = function(modules) {
                                 buyerAccessToken: buyerAccessToken,
                                 partnerAttributionID: partnerAttributionID,
                                 forceRestAPI: forceRestAPI,
-                                onError: onError
+                                onError: onError,
+                                experiments: _ref3.experiments
                             });
                             var payment = function(_ref2) {
                                 var intent = _ref2.intent, paymentID = _ref2.paymentID, payerID = _ref2.payerID, restart = _ref2.restart, facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, onError = _ref2.onError;
@@ -18672,8 +18695,9 @@ window.spb = function(modules) {
                             facilitatorAccessToken: facilitatorAccessToken,
                             buyerAccessToken: buyerAccessToken,
                             partnerAttributionID: partnerAttributionID,
+                            onError: onError,
                             forceRestAPI: forceRestAPI,
-                            onError: onError
+                            experiments: experiments
                         });
                         beforeOnApprove();
                         return onApprove(data, actions).catch((function(err) {
@@ -19088,7 +19112,7 @@ window.spb = function(modules) {
             return Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.redirect)(url, window.top);
         };
         function getOnComplete(_ref2) {
-            var intent = _ref2.intent, onComplete = _ref2.onComplete, partnerAttributionID = _ref2.partnerAttributionID, onError = _ref2.onError, facilitatorAccessToken = _ref2.facilitatorAccessToken, createOrder = _ref2.createOrder, featureFlags = _ref2.featureFlags;
+            var intent = _ref2.intent, onComplete = _ref2.onComplete, partnerAttributionID = _ref2.partnerAttributionID, onError = _ref2.onError, facilitatorAccessToken = _ref2.facilitatorAccessToken, createOrder = _ref2.createOrder, featureFlags = _ref2.featureFlags, experiments = _ref2.experiments;
             return onComplete ? Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.memoize)((function(_ref3) {
                 var buyerAccessToken = _ref3.buyerAccessToken, _ref3$forceRestAPI = _ref3.forceRestAPI, forceRestAPI = void 0 === _ref3$forceRestAPI ? featureFlags.isLsatUpgradable : _ref3$forceRestAPI;
                 return createOrder().then((function(orderID) {
@@ -19101,13 +19125,14 @@ window.spb = function(modules) {
                     _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_2__.FPTI_KEY.CONTEXT_ID] = orderID, 
                     _getLogger$info$track)).flush();
                     var actions = function(_ref) {
-                        var orderID = _ref.orderID, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI;
+                        var orderID = _ref.orderID, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI, experiments = _ref.experiments;
                         var get = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.memoize)((function() {
                             return Object(_api__WEBPACK_IMPORTED_MODULE_5__.getOrder)(orderID, {
                                 facilitatorAccessToken: facilitatorAccessToken,
                                 buyerAccessToken: buyerAccessToken,
                                 partnerAttributionID: partnerAttributionID,
-                                forceRestAPI: forceRestAPI
+                                forceRestAPI: forceRestAPI,
+                                experiments: experiments
                             }).finally(get.reset);
                         }));
                         return {
@@ -19121,8 +19146,9 @@ window.spb = function(modules) {
                         facilitatorAccessToken: facilitatorAccessToken,
                         buyerAccessToken: buyerAccessToken,
                         partnerAttributionID: partnerAttributionID,
+                        onError: onError,
                         forceRestAPI: forceRestAPI,
-                        onError: onError
+                        experiments: experiments
                     });
                     return onComplete({
                         orderID: orderID,
@@ -19426,7 +19452,7 @@ window.spb = function(modules) {
         function buildXOnShippingChangeData(data) {
             return data;
         }
-        var pathPattern = new RegExp(/^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address))$/);
+        var pathPattern = new RegExp(/^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address|name))$/);
         var sanitizePatch = function(rejected, patch) {
             var path = patch.path;
             pathPattern.test(path) || rejected.push(path);
@@ -19456,8 +19482,8 @@ window.spb = function(modules) {
             }
         };
         function buildXShippingChangeActions(_ref2) {
-            var orderID = _ref2.orderID, facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, forceRestAPI = _ref2.forceRestAPI, clientID = _ref2.clientID, appName = _ref2.appName;
-            var useShippingChangeCallbackMutation = _ref2.experiments.useShippingChangeCallbackMutation;
+            var orderID = _ref2.orderID, facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, forceRestAPI = _ref2.forceRestAPI, clientID = _ref2.clientID, experiments = _ref2.experiments, appName = _ref2.appName;
+            var useShippingChangeCallbackMutation = experiments.useShippingChangeCallbackMutation;
             return {
                 resolve: function() {
                     return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_2__.ZalgoPromise.resolve();
@@ -19485,7 +19511,8 @@ window.spb = function(modules) {
                             facilitatorAccessToken: facilitatorAccessToken,
                             buyerAccessToken: buyerAccessToken,
                             partnerAttributionID: partnerAttributionID,
-                            forceRestAPI: forceRestAPI
+                            forceRestAPI: forceRestAPI,
+                            experiments: experiments
                         }).catch((function() {
                             throw new Error("Order could not be patched");
                         }));
