@@ -31,12 +31,15 @@ export type XOnShippingAddressChangeDataType = {|
     errors : typeof SHIPPING_ADDRESS_ERROR_MESSAGES
 |};
 
+type BuildPatchPayloadArgs = {|
+    options?: $ReadOnlyArray<CheckoutShippingOption>,
+    discount?: string,
+    tax?: string
+|}
+
 export type XOnShippingAddressChangeActionsType = {|
-    query : () => ZalgoPromise<$ReadOnlyArray<Query>>,
     reject : (string) => ZalgoPromise<void>,
-    updateShippingDiscount : ({| discount : string |}) => XOnShippingAddressChangeActionsType,
-    updateShippingOptions : ({| options : $ReadOnlyArray<CheckoutShippingOption> |}) => XOnShippingAddressChangeActionsType,
-    updateTax : ({| tax : string |}) => XOnShippingAddressChangeActionsType
+    buildPatchPayload: (args: BuildPatchPayloadArgs) => ZalgoPromise<$ReadOnlyArray<Query>>,
 |};
 
 export type XOnShippingAddressChange = (XOnShippingAddressChangeDataType, XOnShippingAddressChangeActionsType) => ZalgoPromise<void>;
@@ -95,84 +98,75 @@ export function buildXOnShippingAddressChangeActions({ data, actions: passedActi
                 throw new Error(`Missing reject action callback`);
             },
 
-        updateTax: ({ tax }) => {
-            breakdown = buildBreakdown({ breakdown, updatedAmounts: { tax_total: tax } });
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { tax_total: tax } });
-        
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
-                op:       'replace',
-                path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
-                value: {
-                    value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currencyCode,
-                    breakdown
-                }
-            };
+        buildPatchPayload: ({tax, options, discount}) => {
+            if (tax) {
+                breakdown = buildBreakdown({ breakdown, updatedAmounts: { tax_total: tax } });
+                newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { tax_total: tax } });
 
-            return actions;
-        },
+                patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
+                    op:       'replace',
+                    path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
+                    value: {
+                        value:         `${ newAmount }`,
+                        currency_code: data?.amount?.currencyCode,
+                        breakdown
+                    }
+                };
+            }
+            if(options) {
+                const ordersV2Options = optionsKeyChanges(options);
+                const selectedShippingOption = options.filter(option => option.selected === true);
+                const selectedShippingOptionAmount = selectedShippingOption && selectedShippingOption.length > 0
+                    ? selectedShippingOption[0]?.amount?.value
+                    : '0.00';
 
-        updateShippingOptions: ({ options }) => {
-            const ordersV2Options = optionsKeyChanges(options);
-            const selectedShippingOption = options.filter(option => option.selected === true);
-            const selectedShippingOptionAmount = selectedShippingOption && selectedShippingOption.length > 0
-                ? selectedShippingOption[0]?.amount?.value
-                : '0.00';
+                breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
+                newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
 
-            breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
-        
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
-                op:       'replace',
-                path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
-                value: {
-                    value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currencyCode,
-                    breakdown
-                }
-            };
+                patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
+                    op:       'replace',
+                    path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
+                    value: {
+                        value:         `${ newAmount }`,
+                        currency_code: data?.amount?.currencyCode,
+                        breakdown
+                    }
+                };
 
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
-                op:    data?.event || 'replace', // or 'add' if there are none.
-                path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
-                value: ordersV2Options
-            };
+                patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
+                    op:    data?.event || 'replace', // or 'add' if there are none.
+                    path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
+                    value: ordersV2Options
+                };
+            }
 
-            return actions;
-        },
+            if(discount){
+                newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping_discount: discount } });
+                breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping_discount: discount } });
 
-        updateShippingDiscount: ({ discount }) => {
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping_discount: discount } });
-            breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping_discount: discount } });
-
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
-                op:       'replace',
-                path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
-                value: {
-                    value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currencyCode,
-                    breakdown
-                }
-            };
-
-            return actions;
-        },
-
-        query: () => {
+                patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
+                    op:       'replace',
+                    path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
+                    value: {
+                        value:         `${ newAmount }`,
+                        currency_code: data?.amount?.currencyCode,
+                        breakdown
+                    }
+                };
+            }
             return getShippingOrderInfo(orderID).then(sessionData => {
                 let queries = [];
                 const shippingMethods = sessionData?.checkoutSession?.cart?.shippingMethods || [];
                 const hasShippingMethods = Boolean(shippingMethods.length > 0);
-                
+
                 if (hasShippingMethods) {
                     queries = updateOperationForShippingOptions({ queries: patchQueries });
                 } else {
                     queries = convertQueriesToArray({ queries: patchQueries });
                 }
-                
                 return queries;
             });
-        }
+        },
 
     };
 
