@@ -103,11 +103,12 @@ export type LogInvalidShippingChangePatchesPayload = {|
  * Full matches the following;
  *  /purchase_units/@reference_id=='default'/amount
  *  /purchase_units/@reference_id=='default'/shipping/address
+ *  /purchase_units/@reference_id=='default'/shipping/name
  *  /purchase_units/@reference_id=='default'/shipping/options
  *  /purchase_units/@reference_id=='d9f80740-38f0-11e8-b467-0ed5f89f718b'/amount
  */
 const pathPattern = new RegExp(
-    /^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address))$/
+    /^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address|name))$/
 );
 
 export const sanitizePatch = (rejected: $ReadOnlyArray<string>, patch: Query): $ReadOnlyArray<string> => {
