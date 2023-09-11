@@ -103,10 +103,12 @@ export const updateVaultSetupToken = ({
   clientID,
   vaultSetupToken,
   paymentSource,
+  idToken,
 }: {|
   clientID: string,
   vaultSetupToken: string,
   paymentSource: PaymentSourceInput,
+  idToken: string,
 |}): ZalgoPromise<{| id: string, status: VaultTokenStatus |}> =>
   callGraphQL<{| id: string, status: VaultTokenStatus |}>({
     name: "UpdateVaultSetupToken",
@@ -115,11 +117,13 @@ export const updateVaultSetupToken = ({
         $clientID: String!
         $vaultSetupToken: String!
         $paymentSource: PaymentSource
+        $idToken: String
       ) {
         updateVaultSetupToken(
           clientId: $clientID
           vaultSetupToken: $vaultSetupToken
           paymentSource: $paymentSource
+          idToken: $idToken
         ) {
           id,
           status,
@@ -132,6 +136,7 @@ export const updateVaultSetupToken = ({
       clientID,
       vaultSetupToken,
       paymentSource,
+      idToken
     },
   });
 

@@ -30,7 +30,7 @@ type SubmitCardFieldsOptions = {|
 
 function handleVaultWithoutPurchaseFlow(cardProps: VaultWithoutPurchaseFlowCardProps, card: Card, extraFields?: ExtraFields): ZalgoPromise<void> {
   const { ThreeDomainSecure } = getComponents();
-  const { getParent, createVaultSetupToken, onError,clientID, onApprove } = cardProps;
+  const { getParent, createVaultSetupToken, onError,clientID, onApprove, userIDToken } = cardProps;
 
   return savePaymentSource({
     onApprove,
@@ -41,6 +41,7 @@ function handleVaultWithoutPurchaseFlow(cardProps: VaultWithoutPurchaseFlowCardP
     ThreeDomainSecure,
     clientID,
     paymentSource: convertCardToPaymentSource(card, extraFields),
+    idToken: userIDToken,
   });
 }
 

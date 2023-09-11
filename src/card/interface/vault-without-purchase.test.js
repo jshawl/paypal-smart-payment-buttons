@@ -141,4 +141,39 @@ describe("savePaymentSource", () => {
       vaultToken: defaultVaultSetupToken,
     });
   });
+
+  test("should handle successful vault without purchase with an ID token passed", async () => {
+    const idToken = "eyja1234567";
+    const updateVaultSetupTokenResult = {
+      updateVaultSetupToken: { status: "SOME_VALID_STATUS", links: {} },
+    };
+
+    defaultOptions.idToken = idToken;
+    // $FlowIssue
+    updateVaultSetupToken.mockResolvedValue(updateVaultSetupTokenResult);
+
+    await savePaymentSource(defaultOptions);
+
+    expect.assertions(4);
+    expect(defaultOptions.createVaultSetupToken).toHaveBeenCalled();
+    expect(updateVaultSetupToken).toHaveBeenCalledWith({
+      vaultSetupToken: "vault-setup-token",
+      clientID: "client-id",
+      idToken: "eyja1234567",
+      paymentSource: {
+        card: {
+          expiry: "01/24",
+          name: "John Doe",
+          number: "4111111111111111",
+          securityCode: "123",
+        },
+      },
+    });
+    expect(defaultOptions.onApprove).toHaveBeenCalledWith({
+      vaultSetupToken: "vault-setup-token",
+    });
+    expect(vaultWithoutPurchaseSuccess).toHaveBeenCalledWith({
+      vaultToken: defaultVaultSetupToken,
+    });
+  });
 });

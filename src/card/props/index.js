@@ -99,6 +99,7 @@ export type CardXProps = {|
   createVaultSetupToken: XCreateVaultSetupToken,
   hcfSessionID: string,
   clientMetadataID: string,
+  userIDToken: string,
 |};
 
 export type CardProps = {|
@@ -122,6 +123,7 @@ export type CardProps = {|
   onError: OnError,
   productAction: string,
   clientMetadataID: string,
+  userIDToken: string
 |};
 
 export type PurchaseFlowCardProps = {|
@@ -199,6 +201,7 @@ export function getCardProps({
     sdkCorrelationID,
     partnerAttributionID,
     hcfSessionID,
+    userIDToken
   } = xprops;
 
   const returnData = {
@@ -216,6 +219,7 @@ export function getCardProps({
     sdkCorrelationID,
     partnerAttributionID,
     hcfSessionID,
+    userIDToken
   };
 
   const baseProps = getProps({ branded });

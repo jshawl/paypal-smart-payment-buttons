@@ -28,6 +28,7 @@ type VaultPaymenSourceOptions = {|
   paymentSource: PaymentSourceInput,
   getParent : () => CrossDomainWindowType,
   ThreeDomainSecure : ThreeDomainSecureFlowType,
+  idToken: string,
 |};
 
 export const savePaymentSource = ({
@@ -38,6 +39,7 @@ export const savePaymentSource = ({
   paymentSource,
   getParent,
   ThreeDomainSecure,
+  idToken,
 }: VaultPaymenSourceOptions): ZalgoPromise<void> => {
   let vaultToken;
   return createVaultSetupToken()
@@ -50,6 +52,7 @@ export const savePaymentSource = ({
         vaultSetupToken,
         clientID,
         paymentSource,
+        idToken,
       });
     })
     .then((res) => {
