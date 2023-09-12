@@ -23,7 +23,7 @@ type GetSmartWalletOptions = {|
     headers? : { [string] : string } 
 |};
 
-const DEFAULT_AMOUNT = '0.00';
+const DEFAULT_AMOUNT = '0';
 
 type GetSmartWallet = (GetSmartWalletOptions) => ZalgoPromise<Wallet>;
 
