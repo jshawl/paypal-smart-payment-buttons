@@ -515,6 +515,7 @@ export const DEFAULT_FUNDING_ELIGIBILITY : FundingEligibilityType = {
     }
 };
 
+// eslint-disable-next-line complexity
 export function createButtonHTML({ fundingEligibility = DEFAULT_FUNDING_ELIGIBILITY, wallet } : {| fundingEligibility? : Object, wallet? : Object |} = {}) {
     const buttons = [];
 
@@ -540,6 +541,9 @@ export function createButtonHTML({ fundingEligibility = DEFAULT_FUNDING_ELIGIBIL
                     buttons.push(`<div><div role="button" data-funding-source="${ fundingSource }"></div></div>`);
                 }
             }
+        } else if (fundingSource === FUNDING.VENMO && wallet && wallet[fundingSource] && wallet[fundingSource].instruments.length) {
+            const walletInstrument = wallet[fundingSource].instruments[0];
+            buttons.push(`<div><div role="button" data-funding-source="${fundingSource}" data-payment-method-id="${walletInstrument.tokenID}"></div>`);
         } else {
             if (fundingConfig.vaultedInstruments && fundingConfig.vaultedInstruments.length) {
                 const vaultedInstrument = fundingConfig.vaultedInstruments[0];

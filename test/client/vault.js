@@ -9,7 +9,7 @@ import { EXPERIMENTAL_POPUP_DIMENSIONS } from '../../src/payment-flows/checkout'
 
 import {
     mockSetupButton, mockAsyncProp, createButtonHTML, getValidatePaymentMethodApiMock, getConfirmOrderApiMock,
-    clickButton, getGraphQLApiMock, generateOrderID, mockMenu, clickMenu, getMockWindowOpen, getCreateAccessTokenMock, DEFAULT_FUNDING_ELIGIBILITY
+    clickButton, getGraphQLApiMock, generateOrderID, mockMenu, clickMenu, getMockWindowOpen, DEFAULT_FUNDING_ELIGIBILITY
 } from './mocks';
 
 const fundingEligibilityPayPalVaulted = {
@@ -1552,17 +1552,12 @@ describe('vault cases', () => {
         });
     });
 
-    it('should pay with a vaulted card and create a new access token with the target subject for ID token and merchant ID case', async () => {
+    it('should pay with a vaulted card and use the ID token as a bearer token', async () => {
         return await wrapPromise(async ({ expect, avoid }) => {
-            const facilitatorAccessToken = 'abcde-12345';
-            const merchantID = ['XYZ12345'];
-            const payees = merchantID;
-            const accessTokenWithTargetSubject = 'edcba-54321';
             const paymentMethodID = 'xyz123';
-            const orderID = generateOrderID();
+            const userIDToken = 'eyja1234567'
 
-            window.xprops.userIDToken = 'eyja1234567';
-            window.xprops.merchantID = merchantID;
+            window.xprops.userIDToken = userIDToken;
 
             const gqlMock = getGraphQLApiMock({
                 extraHandler: ({ data }) => {
@@ -1584,17 +1579,6 @@ describe('vault cases', () => {
                                     flags: {
                                         isChangeShippingAddressAllowed: false
                                     },
-                                    payees: payees.map(id => {
-                                        return (id.indexOf('@') === -1)
-                                            ? {
-                                                merchantId: id
-                                            }
-                                            : {
-                                                email: {
-                                                    stringValue: id
-                                                }
-                                            };
-                                    })
                                 }
                             }
                         };
@@ -1604,36 +1588,14 @@ describe('vault cases', () => {
 
             window.paypal.Menu = expect('Menu', mockMenu);
 
+            const orderID = generateOrderID();
             window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
                 return orderID;
             }));
 
-            const createAccessTokenCall = getCreateAccessTokenMock({
-                handler: expect('createAccessToken', ({ data }) => {
-                    if (!data.includes('target_subject') && !data.includes(merchantID)) {
-                        throw new Error(`Expected target subject to be set on access token request`)
-                    }
-
-                    return {
-                        access_token: accessTokenWithTargetSubject
-                    }
-                })
-            }).expectCalls();
-
-
-            const vpmCall = getValidatePaymentMethodApiMock({
-                extraHandler: expect('validatePaymentMethod', ({ headers }) => {
-                    if (headers.authorization !== `Bearer ${accessTokenWithTargetSubject}`) {
-                        throw new Error(`Expected call to come with correct access token`);
-                    }
-
-                    return {};
-                })
-            }).expectCalls();
-
             const confirmCall = getConfirmOrderApiMock({
                 extraHandler: expect('confirmOrder', ({ headers }) => {
-                    if (headers.authorization !== `Bearer ${accessTokenWithTargetSubject}`) {
+                    if (headers.authorization !== `Bearer ${userIDToken}`) {
                         throw new Error(`Expected call to come with correct access token`);
                     }
 
@@ -1646,8 +1608,6 @@ describe('vault cases', () => {
                     throw new Error(`Expected orderID to be ${orderID}, got ${data.orderID}`);
                 }
 
-                createAccessTokenCall.done();
-                vpmCall.done();
                 confirmCall.done();
             }));
 
@@ -1674,22 +1634,55 @@ describe('vault cases', () => {
             window.paypal.Checkout = avoid('Checkout', window.paypal.Checkout);
 
             createButtonHTML({ fundingEligibility });
-            await mockSetupButton({ merchantID, fundingEligibility, facilitatorAccessToken });
+            await mockSetupButton({
+                fundingEligibility,
+                experiments: {
+                    deprecateVaultValidatePaymentMethod: true
+                } 
+            });
 
             await clickButton(FUNDING.CARD);
             gqlMock.done();
         });
     });
 
-    it('should pay with a vaulted card and use the facilitator access token for ID token case', async () => {
-        return await wrapPromise(async ({ expect, avoid }) => {
-            const facilitatorAccessToken = 'abcde-12345';
+    it('should pay with venmo vault using only confirm payment source and skip validate payment method', async () => {
+        return await wrapPromise(async ({ expect }) => {
             const paymentMethodID = 'xyz123';
+            const userIDToken = 'eyja1234567';
 
-            window.xprops.userIDToken = 'eyja1234567';
+            window.xprops.userIDToken = userIDToken;
+
+            const wallet = {
+                [FUNDING.VENMO]: {
+                    instruments: [
+                        {
+                            type: 'venmo',
+                            tokenID: paymentMethodID,
+                            oneClick: true,
+                            label: '@username',
+                            branded: null,
+                        }
+                    ]
+                }
+            };
 
             const gqlMock = getGraphQLApiMock({
                 extraHandler: ({ data }) => {
+                    if (data.query.includes('query GetSmartWallet')) {
+                        if (data.variables.userIDToken !== userIDToken) {
+                            throw new Error(`Expected correct userIdToken`);
+                        }
+
+                        return {
+                            data: {
+                                smartWallet: {
+                                    ...wallet
+                                }
+                            }
+                        };
+                    }
+
                     if (data.query.includes('query GetCheckoutDetails')) {
                         return {
                             data: {
@@ -1708,6 +1701,14 @@ describe('vault cases', () => {
                                     flags: {
                                         isChangeShippingAddressAllowed: false
                                     },
+                                    payees: [
+                                        {
+                                            merchantId: 'XYZ12345',
+                                            email: {
+                                                stringValue: 'xyz-us-b1@paypal.com'
+                                            }
+                                        }
+                                    ]
                                 }
                             }
                         };
@@ -1715,42 +1716,26 @@ describe('vault cases', () => {
                 }
             }).expectCalls();
 
-            window.paypal.Menu = expect('Menu', mockMenu);
-
             const orderID = generateOrderID();
             window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
                 return orderID;
             }));
 
-            let createAccessTokenCalled = false;
-            const createAccessTokenCall = getCreateAccessTokenMock({
+            let vpmCalled = false;
+            const vpmCall = getValidatePaymentMethodApiMock({
                 handler: () => {
-                    createAccessTokenCalled = true;
+                    vpmCalled = true;
                 }
             }).listen();
 
-            const vpmCall = getValidatePaymentMethodApiMock({
-                extraHandler: expect('validatePaymentMethod', ({ headers }) => {
-                    if (createAccessTokenCalled) {
-                        throw new Error(`Expected createAccessToken not to be called`)
-                    }
-
-                    if (headers.authorization !== `Bearer ${facilitatorAccessToken}`) {
-                        throw new Error(`Expected call to come with correct access token`);
-                    }
-
-                    return {};
-                })
-            }).expectCalls();
-
             const confirmCall = getConfirmOrderApiMock({
-                extraHandler: expect('confirmOrder', ({ headers }) => {
-                    if (headers.authorization !== `Bearer ${facilitatorAccessToken}`) {
-                        throw new Error(`Expected call to come with correct access token`);
+                handler: () => {
+                    if (vpmCalled) {
+                        throw new Error(`Expected validate payment method to not be called`);
                     }
 
                     return {};
-                })
+                }
             }).expectCalls();
 
             window.xprops.onApprove = mockAsyncProp(expect('onApprove', async (data) => {
@@ -1758,37 +1743,29 @@ describe('vault cases', () => {
                     throw new Error(`Expected orderID to be ${orderID}, got ${data.orderID}`);
                 }
 
-                createAccessTokenCall.done();
                 vpmCall.done();
                 confirmCall.done();
             }));
 
             const fundingEligibility = {
-                [FUNDING.CARD]: {
+                venmo: {
                     eligible: true,
-                    branded: true,
-                    vendors: {
-                        visa: {
-                            eligible: true,
-                            vaultedInstruments: [
-                                {
-                                    id: paymentMethodID,
-                                    label: {
-                                        description: 'Visa x-1234'
-                                    }
-                                }
-                            ]
-                        }
-                    }
+                    branded: false,
                 }
             };
 
-            window.paypal.Checkout = avoid('Checkout', window.paypal.Checkout);
+            createButtonHTML({ wallet, fundingEligibility });
+            // $FlowIssue
+            await mockSetupButton({
+                merchantID: ['XYZ12345'],
+                fundingEligibility,
+                wallet,
+                experiments: {
+                    deprecateVaultValidatePaymentMethod: true
+                }
+            });
 
-            createButtonHTML({ fundingEligibility });
-            await mockSetupButton({ fundingEligibility, facilitatorAccessToken });
-
-            await clickButton(FUNDING.CARD);
+            await clickButton(FUNDING.VENMO);
             gqlMock.done();
         });
     });

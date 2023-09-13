@@ -2,14 +2,14 @@
 
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { FUNDING, FPTI_KEY } from '@paypal/sdk-constants/src';
-import { destroyElement, noop, stringifyError } from '@krakenjs/belter/src';
+import { destroyElement, noop } from '@krakenjs/belter/src';
 import { initiateInstallments } from '@paypal/installments/src/interface';
 
 import type { MenuChoices } from '../types';
-import { validatePaymentMethod, getSupplementalOrderInfo, deleteVault, updateButtonClientConfig, loadFraudnet, confirmOrderAPI, buildPaymentSource, createAccessToken } from '../api';
+import { validatePaymentMethod, getSupplementalOrderInfo, deleteVault, updateButtonClientConfig, loadFraudnet, confirmOrderAPI, buildPaymentSource } from '../api';
 import { BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_MENU_OPTION } from '../constants';
 import { getLogger, sendCountMetric } from '../lib';
-import { handleValidatePaymentMethodResponse } from "../lib/3ds"
+import { handleValidatePaymentMethodResponse, handleThreeDomainSecureContingency } from "../lib/3ds"
 import type { ButtonProps } from '../button/props';
 
 import type { PaymentFlow, PaymentFlowInstance, IsEligibleOptions, IsPaymentEligibleOptions, IsInstallmentsEligibleOptions, InitOptions, MenuOptions, Payment } from './types';
@@ -65,20 +65,16 @@ function getClientMetadataID({ props } : {| props : ButtonProps |}) : string {
     return clientMetadataID || sessionID;
 }
 
-function initVaultCapture({ props, components, payment, serviceData, config } : InitOptions) : PaymentFlowInstance {
+function initVaultCapture({ props, components, payment, serviceData, config, experiments } : InitOptions) : PaymentFlowInstance {
     const { createOrder, onApprove, clientAccessToken,
-        enableThreeDomainSecure, partnerAttributionID, getParent, userIDToken, clientID, env, merchantID, disableSetCookie } = props;
+        enableThreeDomainSecure, partnerAttributionID, getParent, userIDToken, clientID, env, disableSetCookie } = props;
     const { ThreeDomainSecure, Installments } = components;
     const { fundingSource, paymentMethodID, button } = payment;
     const { facilitatorAccessToken, buyerCountry } = serviceData;
     const { cspNonce } = config;
 
     const clientMetadataID = getClientMetadataID({ props });
-    let accessToken = facilitatorAccessToken;
-
-    if (clientAccessToken) {
-        accessToken = clientAccessToken;
-    }
+    let accessToken = clientAccessToken ?? facilitatorAccessToken;
 
     if (!paymentMethodID) {
         throw new Error(`Payment method id required for vault capture`);
@@ -111,24 +107,42 @@ function initVaultCapture({ props, components, payment, serviceData, config } : 
         });
     };
 
-    const createAccessTokenWithTargetSubject = (): ZalgoPromise<string> => {
-        return ZalgoPromise.try(() => {
-            return createAccessToken(
-                clientID,
-                { targetSubject: merchantID[0] }
-            ).catch(err => {
-                getLogger().warn('vault_access_token_with_target_subject_failure', { error: stringifyError(err) });
-                throw err;
-            });
-        })
-    }
+    const startExperimentPaymentFlow = (orderID) => {
+        if (userIDToken) {
+            accessToken = userIDToken;
+        }
 
-    if (userIDToken && merchantID && merchantID[0]) {
-        getLogger().info('vault_create_access_token', { merchantID: merchantID[0], clientID });
-        createAccessTokenWithTargetSubject().then(accessTokenWithTargetSubject => {
-            accessToken = accessTokenWithTargetSubject;
+        ZalgoPromise.try(() => {
+            return shippingRequired(orderID).then((shippingRequiredFlag) => {
+                if (shippingRequiredFlag) {
+                    if (fundingSource !== FUNDING.PAYPAL) {
+                        getLogger().error('vault_shipping_required');
+                        throw new Error(`Shipping address requested for ${fundingSource} payment`);
+                    }
+
+                    return fallbackToWebCheckout();
+                }
+
+                return confirmOrderAPI(
+                    orderID,
+                    { payment_source: buildPaymentSource({ paymentMethodID, fundingSource, enableThreeDomainSecure }) },
+                    {
+                        facilitatorAccessToken: accessToken,
+                        partnerAttributionID,
+                        experiments: {},
+                    })
+                    .then((res) => {
+                        // $FlowFixMe
+                        const { status, links } = res;
+                        return handleThreeDomainSecureContingency({ status, links, ThreeDomainSecure, createOrder, getParent });
+                    })
+                    .then(() => {
+                        return onApprove({}, { restart });
+                    }
+                );
+            });
         });
-    }
+    };
 
     const startPaymentFlow = (orderID, installmentPlan) => {
         return ZalgoPromise.hash({
@@ -146,7 +160,7 @@ function initVaultCapture({ props, components, payment, serviceData, config } : 
 
             const { status, body } = validate;
             return handleValidatePaymentMethodResponse({ ThreeDomainSecure, status, body, createOrder, getParent }).then(() => {
-                return confirmOrderAPI(orderID, { payment_source: buildPaymentSource(paymentMethodID) }, { facilitatorAccessToken: accessToken, partnerAttributionID, experiments: {} })
+                return confirmOrderAPI(orderID, { payment_source: buildPaymentSource({ paymentMethodID, fundingSource }) }, { facilitatorAccessToken: accessToken, partnerAttributionID, experiments: {} })
                 .then(() => {
                   return onApprove({}, { restart });
                 });
@@ -174,6 +188,8 @@ function initVaultCapture({ props, components, payment, serviceData, config } : 
                         const cartAmount = order.checkoutSession.cart.amounts.total.currencyFormatSymbolISOCurrency;
                         return initiateInstallments({ clientID, Installments, paymentMethodID, button, buyerCountry, orderID, accessToken, cartAmount, onPay: startPaymentFlow, getLogger });
                     });
+                } else if (experiments?.deprecateVaultValidatePaymentMethod) {
+                    return startExperimentPaymentFlow(orderID);
                 } else {
                     return startPaymentFlow(orderID);
                 }

@@ -405,15 +405,18 @@ type ConfirmPaymentSource = {|
         id?: string
     |}
 |}
-type LimitedNonceSource = {|
-    token : {|
-        id : string,
-        type : 'NONCE'
+
+type SetupTokenSource = {|
+    [$Values<typeof FUNDING>] : {|
+        vault_id : string,
+        verification_method?: {|
+            method?: "SCA_ALWAYS"
+        |}
     |},
 |}
 
 export type ConfirmData = {|
-    payment_source : ConfirmPaymentSource | LimitedNonceSource
+    payment_source : ConfirmPaymentSource | SetupTokenSource
 |};
 
 export function confirmOrderAPI(orderID : string, data : ConfirmData, { facilitatorAccessToken, partnerAttributionID } : OrderAPIOptions) : ZalgoPromise<OrderConfirmResponse> {
@@ -457,16 +460,21 @@ export type ValidatePaymentMethodResponse = {|
     |}>
 |};
 
-
-export function buildPaymentSource(tokenID: string): LimitedNonceSource {
-    const paymentSource = {
-        token: {
-            id:   tokenID,
-            type: 'NONCE'
+/* eslint-disable flowtype/require-exact-type */
+export function buildPaymentSource({ paymentMethodID, fundingSource, enableThreeDomainSecure }: { paymentMethodID: string, fundingSource: $Values<typeof FUNDING>, enableThreeDomainSecure?: boolean }): SetupTokenSource {
+    return {
+        // $FlowFixMe invalid-computed-prop
+        [fundingSource]: {
+            vault_id: paymentMethodID,
+            ...(enableThreeDomainSecure && {
+                verification_method: {
+                    method: "SCA_ALWAYS"
+                }
+            })
         }
-    };
-    return paymentSource;
+    }
 }
+/* eslint-enable flowtype/require-exact-type */
 
 type PaymentSource = {|
     token : {|
