@@ -183,9 +183,10 @@ export function isNativeEligible({ props, config, serviceData } : IsEligibleOpti
     return true;
 }
 
-export function isNativePaymentEligible({ props, payment } : IsPaymentEligibleOptions) : boolean {
+export function isNativePaymentEligible({ props, payment, serviceData } : IsPaymentEligibleOptions) : boolean {
     const { platform } = props;
     const { fundingSource, win } = payment;
+    const { eligibility: { venmoWebEnabled } } = serviceData;
 
     if (!NATIVE_CHECKOUT_URI[fundingSource] || !NATIVE_CHECKOUT_POPUP_URI[fundingSource] || !NATIVE_CHECKOUT_FALLBACK_URI[fundingSource]) {
         return false;
@@ -197,6 +198,11 @@ export function isNativePaymentEligible({ props, payment } : IsPaymentEligibleOp
 
     // For Venmo desktop
     if (platform && platform === PLATFORM.DESKTOP) {
+        // For Venmo Web
+        if (venmoWebEnabled) {
+            return true;
+        }
+        
         return nativeEligibilityResults && nativeEligibilityResults[fundingSource]
             ? nativeEligibilityResults[fundingSource].eligibility
             : false;
