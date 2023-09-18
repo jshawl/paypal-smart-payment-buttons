@@ -108,8 +108,8 @@ export const updateShippingOptions = ({ option, options } : {| option: CheckoutS
         }
 
         if (opt.id === option.id) {
-            opt.selected = true;
-            updatedOptions.push(opt);
+            option.selected = true;
+            updatedOptions.push(option);
         } else {
             opt.selected = false;
             updatedOptions.push(opt);

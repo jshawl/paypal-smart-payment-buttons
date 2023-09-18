@@ -22,7 +22,7 @@ export type XOnShippingAddressChangeDataType = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    shippingAddress? : {|
+    shippingAddress : {|
         city : string,
         state : string,
         countryCode : $Values<typeof COUNTRY>,
@@ -31,12 +31,19 @@ export type XOnShippingAddressChangeDataType = {|
     errors : typeof SHIPPING_ADDRESS_ERROR_MESSAGES
 |};
 
+type BuildOrderPatchPayloadArgs = {|
+    discount?: string,
+    handling?: string,
+    insurance?: string,
+    itemTotal?: string,
+    shippingOptions?: $ReadOnlyArray<CheckoutShippingOption>,
+    shippingDiscount?: string,
+    taxTotal?: string
+|}
+
 export type XOnShippingAddressChangeActionsType = {|
-    query : () => ZalgoPromise<$ReadOnlyArray<Query>>,
     reject : (string) => ZalgoPromise<void>,
-    updateShippingDiscount : ({| discount : string |}) => XOnShippingAddressChangeActionsType,
-    updateShippingOptions : ({| options : $ReadOnlyArray<CheckoutShippingOption> |}) => XOnShippingAddressChangeActionsType,
-    updateTax : ({| tax : string |}) => XOnShippingAddressChangeActionsType
+    buildOrderPatchPayload: (args?: BuildOrderPatchPayloadArgs) => ZalgoPromise<$ReadOnlyArray<Query>>,
 |};
 
 export type XOnShippingAddressChange = (XOnShippingAddressChangeDataType, XOnShippingAddressChangeActionsType) => ZalgoPromise<void>;
@@ -45,7 +52,7 @@ export type OnShippingAddressChangeData = {|
     orderID? : string,
     paymentID? : string,
     paymentToken? : string,
-    shippingAddress? : {|
+    shippingAddress : {|
         city : string,
         state : string,
         countryCode : $Values<typeof COUNTRY>,
@@ -76,7 +83,6 @@ export function buildXOnShippingAddressChangeData(data : OnShippingAddressChange
 export function buildXOnShippingAddressChangeActions({ data, actions: passedActions, orderID } : {| data : OnShippingAddressChangeData, actions : OnShippingAddressChangeActionsType, orderID : string |}) : XOnShippingAddressChangeActionsType {
     const patchQueries = {};
 
-    let newAmount;
     let breakdown = data.amount?.breakdown ? breakdownKeyChanges(data.amount.breakdown) : {};
 
     if (Object.keys(breakdown).length === 0) {
@@ -95,81 +101,77 @@ export function buildXOnShippingAddressChangeActions({ data, actions: passedActi
                 throw new Error(`Missing reject action callback`);
             },
 
-        updateTax: ({ tax }) => {
-            breakdown = buildBreakdown({ breakdown, updatedAmounts: { tax_total: tax } });
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { tax_total: tax } });
-        
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
-                op:       'replace',
-                path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
-                value: {
-                    value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currencyCode,
-                    breakdown
-                }
-            };
+        buildOrderPatchPayload: ({discount, handling, insurance, itemTotal, shippingOptions, shippingDiscount, taxTotal} = {}) => {
+            const selectedShippingOption = shippingOptions?.find(option => option.selected === true);
+            const selectedShippingOptionAmount = selectedShippingOption?.amount?.value ?? '0.00';
 
-            return actions;
-        },
+            const updatedAmounts = {};
 
-        updateShippingOptions: ({ options }) => {
-            const ordersV2Options = optionsKeyChanges(options);
-            const selectedShippingOption = options.filter(option => option.selected === true);
-            const selectedShippingOptionAmount = selectedShippingOption && selectedShippingOption.length > 0
-                ? selectedShippingOption[0]?.amount?.value
-                : '0.00';
+            if (discount) {
+                updatedAmounts.discount = discount;
+            }
 
-            breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping: selectedShippingOptionAmount } });
-        
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
-                op:       'replace',
-                path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
-                value: {
-                    value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currencyCode,
-                    breakdown
-                }
-            };
+            if (handling) {
+                updatedAmounts.handling = handling;
+            }
 
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
-                op:    data?.event || 'replace', // or 'add' if there are none.
-                path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
-                value: ordersV2Options
-            };
+            if (insurance) {
+                updatedAmounts.insurance = insurance;
+            }
 
-            return actions;
-        },
+            if (itemTotal) {
+                updatedAmounts.item_total = itemTotal;
+            }
 
-        updateShippingDiscount: ({ discount }) => {
-            newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts: { shipping_discount: discount } });
-            breakdown = buildBreakdown({ breakdown, updatedAmounts: { shipping_discount: discount } });
+            if (selectedShippingOption) {
+                updatedAmounts.shipping = selectedShippingOptionAmount;
+            }
 
-            patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
-                op:       'replace',
-                path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
-                value: {
-                    value:         `${ newAmount }`,
-                    currency_code: data?.amount?.currencyCode,
-                    breakdown
-                }
-            };
+            if (shippingDiscount) {
+                updatedAmounts.shipping_discount = shippingDiscount;
+            }
 
-            return actions;
-        },
+            if (taxTotal) {
+                updatedAmounts.tax_total = taxTotal;
+            }
 
-        query: () => {
+            breakdown = buildBreakdown({ breakdown, updatedAmounts });
+            const newAmount = calculateTotalFromShippingBreakdownAmounts({ breakdown, updatedAmounts });
+            
+            if (Object.keys(updatedAmounts).length) {
+                patchQueries[ON_SHIPPING_CHANGE_PATHS.AMOUNT] = {
+                    op:       'replace',
+                    path:     ON_SHIPPING_CHANGE_PATHS.AMOUNT,
+                    value: {
+                        value:         `${ newAmount }`,
+                        currency_code: data?.amount?.currencyCode,
+                        breakdown
+                    }
+                };
+            }
+
             return getShippingOrderInfo(orderID).then(sessionData => {
                 let queries = [];
                 const shippingMethods = sessionData?.checkoutSession?.cart?.shippingMethods || [];
                 const hasShippingMethods = Boolean(shippingMethods.length > 0);
-                
+
+                if (shippingOptions?.length) {
+                    // build payload for patching the order with all available shipping options
+                    const ordersV2Options = optionsKeyChanges(shippingOptions);
+    
+                    patchQueries[ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
+                        op:    hasShippingMethods ? 'replace' : 'add',
+                        path:  ON_SHIPPING_CHANGE_PATHS.OPTIONS,
+                        value: ordersV2Options
+                    };
+                }
+
                 if (hasShippingMethods) {
                     queries = updateOperationForShippingOptions({ queries: patchQueries });
                 } else {
                     queries = convertQueriesToArray({ queries: patchQueries });
                 }
-                
+
                 return queries;
             });
         }

@@ -51,10 +51,10 @@ describe('onShippingAddressChange', () => {
         postalCode: '11111'
     };
 
-    const tax = '20.00';
-    const discount = '10.00';
+    const taxTotal = '20.00';
+    const shippingDiscount = '10.00';
 
-    const options = [
+    const shippingOptions = [
         {
             id: 'SHIP_1234',
             label: 'Free Shipping',
@@ -165,10 +165,7 @@ describe('onShippingAddressChange', () => {
 
             window.xprops.onShippingAddressChange = mockAsyncProp(expect('onShippingAddressChange', async (data, actions) => {
                 const query = await actions
-                    .updateTax({ tax })
-                    .updateShippingOptions({ options })
-                    .updateShippingDiscount({ discount })
-                    .query();
+                    .buildOrderPatchPayload({taxTotal, shippingOptions, shippingDiscount});
                 const expectedQuery = [{"op":"replace","path":"/purchase_units/@reference_id=='default'/amount","value":{"value":"181.00","currency_code":"USD","breakdown":{"item_total":{"currency_code":"USD","value":"180.00"},"shipping":{"currency_code":"USD","value":"0.00"},"handling":{"currency_code":"USD","value":"1.00"},"tax_total":{"currency_code":"USD","value":"20.00"},"discount":{"currency_code":"USD","value":"10.00"},"shipping_discount":{"currency_code":"USD","value":"10.00"}}}},{"op":"replace","path":"/purchase_units/@reference_id=='default'/shipping/options","value":[{"id":"SHIP_1234","label":"Free Shipping","type":"SHIPPING","selected":true,"amount":{"value":"0.00","currency_code":"USD"}},{"id":"SHIP_123","label":"Shipping","type":"SHIPPING","selected":false,"amount":{"value":"20.00","currency_code":"USD"}},{"id":"SHIP_124","label":"Overnight","type":"SHIPPING","selected":false,"amount":{"value":"40.00","currency_code":"USD"}}]}];
 
                 if (!areArraysIdentical(expectedQuery, query)) {
@@ -218,74 +215,6 @@ describe('onShippingAddressChange', () => {
         });
     });
 
-    it('should update tax, shipping discount and shipping options, and provide query when address changes and actions are called in any order for server-side integrations', async () => {
-        return await wrapPromise(async ({ expect, avoid }) => {
-
-            const orderID = uniqueID();
-            const accessToken = uniqueID();
-            const payerID = 'YYYYYYYYYY';
-            const facilitatorAccessToken = uniqueID();
-
-            window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
-                return ZalgoPromise.try(() => {
-                    return orderID;
-                });
-            }));
-
-            window.xprops.onShippingAddressChange = mockAsyncProp(expect('onShippingAddressChange', async (data, actions) => {
-                const query = await actions
-                    .updateShippingDiscount({ discount })
-                    .updateShippingOptions({ options })
-                    .updateTax({ tax })
-                    .query();
-                const expectedQuery = [{"op":"replace","path":"/purchase_units/@reference_id=='default'/amount","value":{"value":"181.00","currency_code":"USD","breakdown":{"item_total":{"currency_code":"USD","value":"180.00"},"shipping":{"currency_code":"USD","value":"0.00"},"handling":{"currency_code":"USD","value":"1.00"},"tax_total":{"currency_code":"USD","value":"20.00"},"discount":{"currency_code":"USD","value":"10.00"},"shipping_discount":{"currency_code":"USD","value":"10.00"}}}},{"op":"replace","path":"/purchase_units/@reference_id=='default'/shipping/options","value":[{"id":"SHIP_1234","label":"Free Shipping","type":"SHIPPING","selected":true,"amount":{"value":"0.00","currency_code":"USD"}},{"id":"SHIP_123","label":"Shipping","type":"SHIPPING","selected":false,"amount":{"value":"20.00","currency_code":"USD"}},{"id":"SHIP_124","label":"Overnight","type":"SHIPPING","selected":false,"amount":{"value":"40.00","currency_code":"USD"}}]}];
-
-                if (!areArraysIdentical(expectedQuery, query)) {
-                    throw new Error(`Expected query, ${ JSON.stringify(query) }, to be, ${ JSON.stringify(expectedQuery) }`);
-                }
-            }));
-
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ original: CheckoutOriginal, args: [ props ] }) => {
-                props.onAuth({ accessToken });
-                mockFunction(props, 'onApprove', expect('onApprove', ({ original: onApproveOriginal, args: [ data, actions ] }) => {
-                    return onApproveOriginal({ ...data, payerID }, actions);
-                }));
-
-                const checkoutInstance = CheckoutOriginal(props);
-
-                mockFunction(checkoutInstance, 'renderTo', expect('renderTo', async ({ original: renderToOriginal, args }) => {
-                    return props.createOrder().then(id => {
-                        if (id !== orderID) {
-                            throw new Error(`Expected orderID to be ${ orderID }, got ${ id }`);
-                        }
-
-                        return renderToOriginal(...args).then(() => {
-                            return props.onShippingAddressChange({
-                                orderID,
-                                amount,
-                                shippingAddress,
-                            }, { reject: avoid('reject') });
-                        });
-                    });
-                }));
-
-                return checkoutInstance;
-            }));
-
-            createButtonHTML();
-
-            await mockSetupButton({
-                facilitatorAccessToken,
-                merchantID:                    [ 'XYZ12345' ],
-                fundingEligibility:            DEFAULT_FUNDING_ELIGIBILITY,
-                personalization:               {},
-                buyerCountry:                  COUNTRY.US,
-            });
-
-            await clickButton(FUNDING.PAYPAL);
-        });
-    });
-
     it('should not update tax amount and shipping options, or patch when address changes and there is an error', async () => {
         return await wrapPromise(async ({ expect, avoid }) => {
 
@@ -309,7 +238,7 @@ describe('onShippingAddressChange', () => {
                     })
                 });
 
-                const query = await actions.query();
+                const query = await actions.buildOrderPatchPayload();
                 if (query && query.length > 0) {
                     throw new Error(`Expected query to be an empty array but was, ${ JSON.stringify(query) }`);
                 }

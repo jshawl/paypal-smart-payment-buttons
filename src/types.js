@@ -373,7 +373,7 @@ export type CheckoutBreakdown = {|
 |};
 
 export type CheckoutOrderAmount = {|
-    breakdown? : CheckoutBreakdown,
+    breakdown : CheckoutBreakdown,
     currencyCode : $Values<typeof CURRENCY>,
     value : string
 |};
