@@ -545,9 +545,9 @@ window.smartCard = function(modules) {
         return getPostRobot;
     }));
     var util = __webpack_require__(16);
-    var logger = __webpack_require__(13);
+    var logger = __webpack_require__(12);
     __webpack_require__(1);
-    __webpack_require__(10);
+    __webpack_require__(9);
     var belter_src = __webpack_require__(3);
     function getSDKStorage() {
         return Object(belter_src.f)({
@@ -677,7 +677,7 @@ window.smartCard = function(modules) {
     }
     __webpack_require__(5);
     var zalgo_promise_src = __webpack_require__(4);
-    var cross_domain_utils_src = __webpack_require__(10);
+    var cross_domain_utils_src = __webpack_require__(9);
     function safeIndexOf(collection, item) {
         for (var i = 0; i < collection.length; i++) try {
             if (collection[i] === item) return i;
@@ -2462,8 +2462,8 @@ window.smartCard = function(modules) {
             method: "post",
             eventName: "payment_ectoken",
             url: src_config.i.PAYMENT + "/" + billingToken + "/ectoken"
-        }).then((function(_ref13) {
-            return _ref13.data.token;
+        }).then((function(_ref15) {
+            return _ref15.data.token;
         }));
     }
     function subscriptionIdToCartId(subscriptionID) {
@@ -2472,8 +2472,8 @@ window.smartCard = function(modules) {
             method: "post",
             eventName: "billagmt_subscriptions_cartid",
             url: src_config.i.SUBSCRIPTION + "/" + subscriptionID + "/cartid"
-        }).then((function(_ref14) {
-            return _ref14.data.token;
+        }).then((function(_ref16) {
+            return _ref16.data.token;
         }));
     }
     var getSupplementalOrderInfo = Object(belter_src.o)((function(orderID) {
@@ -2716,7 +2716,7 @@ window.smartCard = function(modules) {
         }));
     }));
     Object(belter_src.o)((function(_ref) {
-        var clientID = _ref.clientID, merchantID = _ref.merchantID, currency = _ref.currency, _ref$amount = _ref.amount, amount = void 0 === _ref$amount ? "0.00" : _ref$amount, clientMetadataID = _ref.clientMetadataID, userIDToken = _ref.userIDToken, _ref$vetted = _ref.vetted, vetted = void 0 === _ref$vetted || _ref$vetted, paymentMethodToken = _ref.paymentMethodToken, branded = _ref.branded, _ref$allowBillingPaym = _ref.allowBillingPayments, allowBillingPayments = void 0 === _ref$allowBillingPaym || _ref$allowBillingPaym, _ref$headers = _ref.headers, headers = void 0 === _ref$headers ? {} : _ref$headers;
+        var clientID = _ref.clientID, merchantID = _ref.merchantID, currency = _ref.currency, _ref$amount = _ref.amount, amount = void 0 === _ref$amount ? "0" : _ref$amount, clientMetadataID = _ref.clientMetadataID, userIDToken = _ref.userIDToken, _ref$vetted = _ref.vetted, vetted = void 0 === _ref$vetted || _ref$vetted, paymentMethodToken = _ref.paymentMethodToken, branded = _ref.branded, _ref$allowBillingPaym = _ref.allowBillingPayments, allowBillingPayments = void 0 === _ref$allowBillingPaym || _ref$allowBillingPaym, _ref$headers = _ref.headers, headers = void 0 === _ref$headers ? {} : _ref$headers;
         clientMetadataID && (headers[constants.i.CLIENT_METADATA_ID] = String(clientMetadataID));
         return Object(api.a)({
             name: "GetSmartWallet",
@@ -2737,43 +2737,6 @@ window.smartCard = function(modules) {
             return _ref2.smartWallet;
         }));
     }));
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__.d(__webpack_exports__, "b", (function() {
-        return ON_SHIPPING_CHANGE_PATHS;
-    }));
-    __webpack_require__.d(__webpack_exports__, "c", (function() {
-        return SHIPPING_ADDRESS_ERROR_MESSAGES;
-    }));
-    __webpack_require__.d(__webpack_exports__, "d", (function() {
-        return SHIPPING_OPTIONS_ERROR_MESSAGES;
-    }));
-    __webpack_require__.d(__webpack_exports__, "a", (function() {
-        return GENERIC_REJECT_ADDRESS_MESSAGE;
-    }));
-    __webpack_require__(17);
-    __webpack_require__(5);
-    __webpack_require__(4);
-    __webpack_require__(0);
-    __webpack_require__(8);
-    __webpack_require__(1);
-    __webpack_require__(2);
-    var ON_SHIPPING_CHANGE_PATHS = {
-        AMOUNT: "/purchase_units/@reference_id=='default'/amount",
-        OPTIONS: "/purchase_units/@reference_id=='default'/shipping/options"
-    };
-    var SHIPPING_ADDRESS_ERROR_MESSAGES = {
-        ADDRESS_ERROR: "Your order can't be shipped to this address.",
-        COUNTRY_ERROR: "Your order can't be shipped to this country.",
-        STATE_ERROR: "Your order can't be shipped to this state.",
-        ZIP_ERROR: "Your order can't be shipped to this zip."
-    };
-    var SHIPPING_OPTIONS_ERROR_MESSAGES = {
-        METHOD_UNAVAILABLE: "The shipping method you chose is unavailable. To continue, choose another way to get your order.",
-        STORE_UNAVAILABLE: "Part of your order isn't available at this store."
-    };
-    var GENERIC_REJECT_ADDRESS_MESSAGE = "Unable to update address. Please try again.";
-    new RegExp(/^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address|name))$/);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.d(__webpack_exports__, "c", (function() {
@@ -3096,138 +3059,41 @@ window.smartCard = function(modules) {
     }
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    __webpack_require__.d(__webpack_exports__, "c", (function() {
-        return calculateTotalFromShippingBreakdownAmounts;
-    }));
-    __webpack_require__.d(__webpack_exports__, "e", (function() {
-        return optionsKeyChanges;
-    }));
-    __webpack_require__.d(__webpack_exports__, "a", (function() {
-        return breakdownKeyChanges;
-    }));
     __webpack_require__.d(__webpack_exports__, "b", (function() {
-        return buildBreakdown;
+        return ON_SHIPPING_CHANGE_PATHS;
+    }));
+    __webpack_require__.d(__webpack_exports__, "c", (function() {
+        return SHIPPING_ADDRESS_ERROR_MESSAGES;
     }));
     __webpack_require__.d(__webpack_exports__, "d", (function() {
-        return convertQueriesToArray;
+        return SHIPPING_OPTIONS_ERROR_MESSAGES;
     }));
-    __webpack_require__.d(__webpack_exports__, "g", (function() {
-        return updateShippingOptions;
+    __webpack_require__.d(__webpack_exports__, "a", (function() {
+        return GENERIC_REJECT_ADDRESS_MESSAGE;
     }));
-    __webpack_require__.d(__webpack_exports__, "f", (function() {
-        return updateOperationForShippingOptions;
-    }));
-    var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-    var _onShippingChange__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(9);
-    var calculateTotalFromShippingBreakdownAmounts = function(_ref) {
-        var breakdown = _ref.breakdown, updatedAmounts = _ref.updatedAmounts;
-        var newAmount = 0;
-        var updatedAmountKeys = Object.keys(updatedAmounts) || [];
-        var discountKeys = [ "shipping_discount", "discount" ];
-        Object.keys(breakdown).forEach((function(item) {
-            if (-1 !== updatedAmountKeys.indexOf(item)) discountKeys.includes(item) ? newAmount -= Math.abs(parseFloat(updatedAmounts[item])) : newAmount += parseFloat(updatedAmounts[item]); else if (discountKeys.includes(item)) {
-                var _breakdown$item;
-                newAmount -= Math.abs(parseFloat(null == (_breakdown$item = breakdown[item]) ? void 0 : _breakdown$item.value));
-            } else {
-                var _breakdown$item2;
-                newAmount += parseFloat(null == (_breakdown$item2 = breakdown[item]) ? void 0 : _breakdown$item2.value);
-            }
-        }));
-        updatedAmountKeys.forEach((function(key) {
-            breakdown[key] || updatedAmounts[key] && (discountKeys.includes(key) ? newAmount -= Math.abs(parseFloat(updatedAmounts[key])) : newAmount += parseFloat(updatedAmounts[key]));
-        }));
-        return newAmount.toFixed(2);
+    __webpack_require__(17);
+    __webpack_require__(5);
+    __webpack_require__(4);
+    __webpack_require__(0);
+    __webpack_require__(8);
+    __webpack_require__(1);
+    __webpack_require__(2);
+    var ON_SHIPPING_CHANGE_PATHS = {
+        AMOUNT: "/purchase_units/@reference_id=='default'/amount",
+        OPTIONS: "/purchase_units/@reference_id=='default'/shipping/options"
     };
-    var optionsKeyChanges = function(options) {
-        var ordersV2Options = [];
-        options.forEach((function(element) {
-            var shippingOption = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.a)({}, element, {
-                amount: {
-                    value: element.amount.value,
-                    currency_code: element.amount.currencyCode
-                }
-            });
-            ordersV2Options.push(shippingOption);
-        }));
-        return ordersV2Options;
+    var SHIPPING_ADDRESS_ERROR_MESSAGES = {
+        ADDRESS_ERROR: "Your order can't be shipped to this address.",
+        COUNTRY_ERROR: "Your order can't be shipped to this country.",
+        STATE_ERROR: "Your order can't be shipped to this state.",
+        ZIP_ERROR: "Your order can't be shipped to this zip."
     };
-    var breakdownKeyChanges = function(breakdown) {
-        return Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.a)({}, breakdown.discount ? {
-            discount: {
-                value: breakdown.discount.value,
-                currency_code: breakdown.discount.currencyCode
-            }
-        } : void 0, breakdown.handling ? {
-            handling: {
-                value: breakdown.handling.value,
-                currency_code: breakdown.handling.currencyCode
-            }
-        } : void 0, breakdown.insurance ? {
-            insurance: {
-                value: breakdown.insurance.value,
-                currency_code: breakdown.insurance.currencyCode
-            }
-        } : void 0, breakdown.itemTotal ? {
-            item_total: {
-                value: breakdown.itemTotal.value,
-                currency_code: breakdown.itemTotal.currencyCode
-            }
-        } : void 0, breakdown.shipping ? {
-            shipping: {
-                value: breakdown.shipping.value,
-                currency_code: breakdown.shipping.currencyCode
-            }
-        } : void 0, breakdown.shippingDiscount ? {
-            shipping_discount: {
-                value: breakdown.shippingDiscount.value,
-                currency_code: breakdown.shippingDiscount.currencyCode
-            }
-        } : void 0, breakdown.taxTotal ? {
-            tax_total: {
-                value: breakdown.taxTotal.value,
-                currency_code: breakdown.taxTotal.currencyCode
-            }
-        } : void 0);
+    var SHIPPING_OPTIONS_ERROR_MESSAGES = {
+        METHOD_UNAVAILABLE: "The shipping method you chose is unavailable. To continue, choose another way to get your order.",
+        STORE_UNAVAILABLE: "Part of your order isn't available at this store."
     };
-    var buildBreakdown = function(_ref2) {
-        var _Object$values$;
-        var _ref2$breakdown = _ref2.breakdown, breakdown = void 0 === _ref2$breakdown ? {} : _ref2$breakdown, _ref2$updatedAmounts = _ref2.updatedAmounts, updatedAmounts = void 0 === _ref2$updatedAmounts ? {} : _ref2$updatedAmounts;
-        var discountKeys = [ "shipping_discount", "discount" ];
-        var updatedAmountKeys = Object.keys(updatedAmounts);
-        var currency_code = null == (_Object$values$ = Object.values(breakdown)[0]) ? void 0 : _Object$values$.currency_code;
-        updatedAmountKeys.forEach((function(key) {
-            breakdown[key] ? breakdown[key].value = updatedAmounts[key] : updatedAmounts[key] && (breakdown[key] = {
-                currency_code: currency_code,
-                value: updatedAmounts[key] && discountKeys.includes(key) ? Math.abs(parseFloat(updatedAmounts[key])).toFixed(2) : updatedAmounts[key]
-            });
-        }));
-        return breakdown;
-    };
-    var convertQueriesToArray = function(_ref3) {
-        return Object.values(_ref3.queries) || [];
-    };
-    var updateShippingOptions = function(_ref4) {
-        var option = _ref4.option;
-        var updatedOptions = [];
-        _ref4.options.forEach((function(opt) {
-            if (!opt.id) throw new Error("Must provide an id with each shipping option.");
-            if (opt.id === option.id) {
-                opt.selected = !0;
-                updatedOptions.push(opt);
-            } else {
-                opt.selected = !1;
-                updatedOptions.push(opt);
-            }
-        }));
-        return updatedOptions;
-    };
-    var updateOperationForShippingOptions = function(_ref5) {
-        var queries = _ref5.queries;
-        queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_1__.b.OPTIONS] && (queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_1__.b.OPTIONS].op = "replace");
-        return convertQueriesToArray({
-            queries: queries
-        });
-    };
+    var GENERIC_REJECT_ADDRESS_MESSAGE = "Unable to update address. Please try again.";
+    new RegExp(/^\/purchase_units\/@reference_id=='(?:\w|-)*'\/(?:amount|shipping\/(?:options|address|name))$/);
 }, function(module, exports, __webpack_require__) {
     "use strict";
     var __createBinding = this && this.__createBinding || (Object.create ? function(o, m, k, k2) {
@@ -3293,7 +3159,7 @@ window.smartCard = function(modules) {
     var extendIfDefined = function(target, source) {
         for (var key in source) source.hasOwnProperty(key) && (target[key] = source[key]);
     };
-    var cross_domain_utils_src = __webpack_require__(10);
+    var cross_domain_utils_src = __webpack_require__(9);
     var sdk_constants_src = __webpack_require__(0);
     var config = __webpack_require__(7);
     function getLogger() {
@@ -3554,6 +3420,140 @@ window.smartCard = function(modules) {
             logger.flush().catch(belter_src.p);
         }));
     }
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__.d(__webpack_exports__, "c", (function() {
+        return calculateTotalFromShippingBreakdownAmounts;
+    }));
+    __webpack_require__.d(__webpack_exports__, "e", (function() {
+        return optionsKeyChanges;
+    }));
+    __webpack_require__.d(__webpack_exports__, "a", (function() {
+        return breakdownKeyChanges;
+    }));
+    __webpack_require__.d(__webpack_exports__, "b", (function() {
+        return buildBreakdown;
+    }));
+    __webpack_require__.d(__webpack_exports__, "d", (function() {
+        return convertQueriesToArray;
+    }));
+    __webpack_require__.d(__webpack_exports__, "g", (function() {
+        return updateShippingOptions;
+    }));
+    __webpack_require__.d(__webpack_exports__, "f", (function() {
+        return updateOperationForShippingOptions;
+    }));
+    var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
+    var _onShippingChange__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+    var calculateTotalFromShippingBreakdownAmounts = function(_ref) {
+        var breakdown = _ref.breakdown, updatedAmounts = _ref.updatedAmounts;
+        var newAmount = 0;
+        var updatedAmountKeys = Object.keys(updatedAmounts) || [];
+        var discountKeys = [ "shipping_discount", "discount" ];
+        Object.keys(breakdown).forEach((function(item) {
+            if (-1 !== updatedAmountKeys.indexOf(item)) discountKeys.includes(item) ? newAmount -= Math.abs(parseFloat(updatedAmounts[item])) : newAmount += parseFloat(updatedAmounts[item]); else if (discountKeys.includes(item)) {
+                var _breakdown$item;
+                newAmount -= Math.abs(parseFloat(null == (_breakdown$item = breakdown[item]) ? void 0 : _breakdown$item.value));
+            } else {
+                var _breakdown$item2;
+                newAmount += parseFloat(null == (_breakdown$item2 = breakdown[item]) ? void 0 : _breakdown$item2.value);
+            }
+        }));
+        updatedAmountKeys.forEach((function(key) {
+            breakdown[key] || updatedAmounts[key] && (discountKeys.includes(key) ? newAmount -= Math.abs(parseFloat(updatedAmounts[key])) : newAmount += parseFloat(updatedAmounts[key]));
+        }));
+        return newAmount.toFixed(2);
+    };
+    var optionsKeyChanges = function(options) {
+        var ordersV2Options = [];
+        options.forEach((function(element) {
+            var shippingOption = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.a)({}, element, {
+                amount: {
+                    value: element.amount.value,
+                    currency_code: element.amount.currencyCode
+                }
+            });
+            ordersV2Options.push(shippingOption);
+        }));
+        return ordersV2Options;
+    };
+    var breakdownKeyChanges = function(breakdown) {
+        return Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.a)({}, breakdown.discount ? {
+            discount: {
+                value: breakdown.discount.value,
+                currency_code: breakdown.discount.currencyCode
+            }
+        } : void 0, breakdown.handling ? {
+            handling: {
+                value: breakdown.handling.value,
+                currency_code: breakdown.handling.currencyCode
+            }
+        } : void 0, breakdown.insurance ? {
+            insurance: {
+                value: breakdown.insurance.value,
+                currency_code: breakdown.insurance.currencyCode
+            }
+        } : void 0, breakdown.itemTotal ? {
+            item_total: {
+                value: breakdown.itemTotal.value,
+                currency_code: breakdown.itemTotal.currencyCode
+            }
+        } : void 0, breakdown.shipping ? {
+            shipping: {
+                value: breakdown.shipping.value,
+                currency_code: breakdown.shipping.currencyCode
+            }
+        } : void 0, breakdown.shippingDiscount ? {
+            shipping_discount: {
+                value: breakdown.shippingDiscount.value,
+                currency_code: breakdown.shippingDiscount.currencyCode
+            }
+        } : void 0, breakdown.taxTotal ? {
+            tax_total: {
+                value: breakdown.taxTotal.value,
+                currency_code: breakdown.taxTotal.currencyCode
+            }
+        } : void 0);
+    };
+    var buildBreakdown = function(_ref2) {
+        var _Object$values$;
+        var _ref2$breakdown = _ref2.breakdown, breakdown = void 0 === _ref2$breakdown ? {} : _ref2$breakdown, _ref2$updatedAmounts = _ref2.updatedAmounts, updatedAmounts = void 0 === _ref2$updatedAmounts ? {} : _ref2$updatedAmounts;
+        var discountKeys = [ "shipping_discount", "discount" ];
+        var updatedAmountKeys = Object.keys(updatedAmounts);
+        var currency_code = null == (_Object$values$ = Object.values(breakdown)[0]) ? void 0 : _Object$values$.currency_code;
+        updatedAmountKeys.forEach((function(key) {
+            breakdown[key] ? breakdown[key].value = updatedAmounts[key] : updatedAmounts[key] && (breakdown[key] = {
+                currency_code: currency_code,
+                value: updatedAmounts[key] && discountKeys.includes(key) ? Math.abs(parseFloat(updatedAmounts[key])).toFixed(2) : updatedAmounts[key]
+            });
+        }));
+        return breakdown;
+    };
+    var convertQueriesToArray = function(_ref3) {
+        return Object.values(_ref3.queries) || [];
+    };
+    var updateShippingOptions = function(_ref4) {
+        var option = _ref4.option;
+        var updatedOptions = [];
+        _ref4.options.forEach((function(opt) {
+            if (!opt.id) throw new Error("Must provide an id with each shipping option.");
+            if (opt.id === option.id) {
+                option.selected = !0;
+                updatedOptions.push(option);
+            } else {
+                opt.selected = !1;
+                updatedOptions.push(opt);
+            }
+        }));
+        return updatedOptions;
+    };
+    var updateOperationForShippingOptions = function(_ref5) {
+        var queries = _ref5.queries;
+        queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_1__.b.OPTIONS] && (queries[_onShippingChange__WEBPACK_IMPORTED_MODULE_1__.b.OPTIONS].op = "replace");
+        return convertQueriesToArray({
+            queries: queries
+        });
+    };
 }, function(module, exports, __webpack_require__) {
     "use strict";
     module.exports = {
@@ -3595,9 +3595,9 @@ window.smartCard = function(modules) {
     var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
     var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
     __webpack_require__(0);
-    __webpack_require__(10);
+    __webpack_require__(9);
     __webpack_require__(1);
-    __webpack_require__(13);
+    __webpack_require__(12);
     function unresolvedPromise() {
         return new _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.a(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.p);
     }
@@ -3915,14 +3915,15 @@ window.smartCard = function(modules) {
     var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
     var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6);
     var updateVaultSetupToken = function(_ref2) {
-        var clientID = _ref2.clientID, vaultSetupToken = _ref2.vaultSetupToken, paymentSource = _ref2.paymentSource;
+        var clientID = _ref2.clientID, vaultSetupToken = _ref2.vaultSetupToken, paymentSource = _ref2.paymentSource, idToken = _ref2.idToken;
         return Object(_api__WEBPACK_IMPORTED_MODULE_2__.a)({
             name: "UpdateVaultSetupToken",
-            query: "\n      mutation UpdateVaultSetupToken(\n        $clientID: String!\n        $vaultSetupToken: String!\n        $paymentSource: PaymentSource\n      ) {\n        updateVaultSetupToken(\n          clientId: $clientID\n          vaultSetupToken: $vaultSetupToken\n          paymentSource: $paymentSource\n        ) {\n          id,\n          status,\n          links {\n            rel, href\n          }\n        }\n      }",
+            query: "\n      mutation UpdateVaultSetupToken(\n        $clientID: String!\n        $vaultSetupToken: String!\n        $paymentSource: PaymentSource\n        $idToken: String\n      ) {\n        updateVaultSetupToken(\n          clientId: $clientID\n          vaultSetupToken: $vaultSetupToken\n          paymentSource: $paymentSource\n          idToken: $idToken\n        ) {\n          id,\n          status,\n          links {\n            rel, href\n          }\n        }\n      }",
             variables: {
                 clientID: clientID,
                 vaultSetupToken: vaultSetupToken,
-                paymentSource: paymentSource
+                paymentSource: paymentSource,
+                idToken: idToken
             }
         });
     };
@@ -4188,7 +4189,7 @@ window.smartCard = function(modules) {
     __webpack_require__(4);
     __webpack_require__(3);
     __webpack_require__(0);
-    __webpack_require__(10);
+    __webpack_require__(9);
     __webpack_require__(8);
     __webpack_require__(1);
     __webpack_require__(2);
@@ -4250,8 +4251,8 @@ window.smartCard = function(modules) {
     __webpack_require__(8);
     __webpack_require__(1);
     __webpack_require__(2);
-    __webpack_require__(9);
-    __webpack_require__(11);
+    __webpack_require__(10);
+    __webpack_require__(13);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(24);
@@ -4262,8 +4263,8 @@ window.smartCard = function(modules) {
     __webpack_require__(8);
     __webpack_require__(1);
     __webpack_require__(2);
-    __webpack_require__(9);
-    __webpack_require__(11);
+    __webpack_require__(10);
+    __webpack_require__(13);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(4);
@@ -4366,7 +4367,7 @@ window.smartCard = function(modules) {
     __webpack_require__(36);
     __webpack_require__(20);
     __webpack_require__(37);
-    __webpack_require__(9);
+    __webpack_require__(10);
     __webpack_require__(38);
     __webpack_require__(39);
     __webpack_require__(21);
@@ -8958,7 +8959,7 @@ window.smartCard = function(modules) {
     }
     var src = __webpack_require__(3);
     var lib = __webpack_require__(2);
-    var dist = __webpack_require__(12);
+    var dist = __webpack_require__(11);
     var dist_default = __webpack_require__.n(dist);
     var constants = __webpack_require__(1);
     var sdk_constants_src = __webpack_require__(0);
@@ -9476,7 +9477,7 @@ window.smartCard = function(modules) {
             }
         });
     }
-    var cross_domain_utils_src = __webpack_require__(10);
+    var cross_domain_utils_src = __webpack_require__(9);
     function getExportsByFrameName(name) {
         try {
             for (var _i2 = 0, _getAllFramesInWindow2 = Object(cross_domain_utils_src.b)(window); _i2 < _getAllFramesInWindow2.length; _i2++) {
@@ -9680,7 +9681,8 @@ window.smartCard = function(modules) {
             facilitatorAccessToken: facilitatorAccessToken,
             sdkCorrelationID: xprops.sdkCorrelationID,
             partnerAttributionID: xprops.partnerAttributionID,
-            hcfSessionID: xprops.hcfSessionID
+            hcfSessionID: xprops.hcfSessionID,
+            userIDToken: xprops.userIDToken
         };
         var baseProps = Object(src_props.getProps)({
             branded: branded
@@ -9773,7 +9775,7 @@ window.smartCard = function(modules) {
     }
     var vault = __webpack_require__(23);
     var vault_without_purchase_savePaymentSource = function(_ref) {
-        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, getParent = _ref.getParent, ThreeDomainSecure = _ref.ThreeDomainSecure;
+        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, getParent = _ref.getParent, ThreeDomainSecure = _ref.ThreeDomainSecure, idToken = _ref.idToken;
         var vaultToken;
         return (0, _ref.createVaultSetupToken)().then((function(vaultSetupToken) {
             if ("string" != typeof vaultSetupToken) throw new TypeError("Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string");
@@ -9781,7 +9783,8 @@ window.smartCard = function(modules) {
             return Object(vault.a)({
                 vaultSetupToken: vaultSetupToken,
                 clientID: clientID,
-                paymentSource: paymentSource
+                paymentSource: paymentSource,
+                idToken: idToken
             });
         })).then((function(res) {
             var _ref2 = (null == res ? void 0 : res.updateVaultSetupToken) || {};
@@ -9957,6 +9960,7 @@ window.smartCard = function(modules) {
               case constants.l.VAULT_WITHOUT_PURCHASE:
                 return function(cardProps, card, extraFields) {
                     var _getComponents = getComponents();
+                    var userIDToken = cardProps.userIDToken;
                     return vault_without_purchase_savePaymentSource({
                         onApprove: cardProps.onApprove,
                         createVaultSetupToken: cardProps.createVaultSetupToken,
@@ -9964,7 +9968,8 @@ window.smartCard = function(modules) {
                         getParent: cardProps.getParent,
                         ThreeDomainSecure: _getComponents.ThreeDomainSecure,
                         clientID: cardProps.clientID,
-                        paymentSource: convertCardToPaymentSource(card, extraFields)
+                        paymentSource: convertCardToPaymentSource(card, extraFields),
+                        idToken: userIDToken
                     });
                 }(cardProps, card, extraFields);
 
@@ -11445,7 +11450,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.154", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.155", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 

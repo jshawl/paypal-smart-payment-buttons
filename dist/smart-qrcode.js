@@ -2544,7 +2544,7 @@
             }));
         }));
         memoize((function(_ref) {
-            var clientID = _ref.clientID, merchantID = _ref.merchantID, currency = _ref.currency, _ref$amount = _ref.amount, amount = void 0 === _ref$amount ? "0.00" : _ref$amount, clientMetadataID = _ref.clientMetadataID, userIDToken = _ref.userIDToken, _ref$vetted = _ref.vetted, vetted = void 0 === _ref$vetted || _ref$vetted, paymentMethodToken = _ref.paymentMethodToken, branded = _ref.branded, _ref$allowBillingPaym = _ref.allowBillingPayments, allowBillingPayments = void 0 === _ref$allowBillingPaym || _ref$allowBillingPaym, _ref$headers = _ref.headers, headers = void 0 === _ref$headers ? {} : _ref$headers;
+            var clientID = _ref.clientID, merchantID = _ref.merchantID, currency = _ref.currency, _ref$amount = _ref.amount, amount = void 0 === _ref$amount ? "0" : _ref$amount, clientMetadataID = _ref.clientMetadataID, userIDToken = _ref.userIDToken, _ref$vetted = _ref.vetted, vetted = void 0 === _ref$vetted || _ref$vetted, paymentMethodToken = _ref.paymentMethodToken, branded = _ref.branded, _ref$allowBillingPaym = _ref.allowBillingPayments, allowBillingPayments = void 0 === _ref$allowBillingPaym || _ref$allowBillingPaym, _ref$headers = _ref.headers, headers = void 0 === _ref$headers ? {} : _ref$headers;
             clientMetadataID && (headers["paypal-client-metadata-id"] = String(clientMetadataID));
             return callGraphQL({
                 name: "GetSmartWallet",
@@ -3167,7 +3167,7 @@
             logger.addTrackingBuilder((function() {
                 var _ref;
                 return (_ref = {}).state_name = "smart_button", _ref.context_type = "EC-Token", 
-                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.154", 
+                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.155", 
                 _ref.selected_payment_method = fundingSource, _ref;
             }));
             (function() {
