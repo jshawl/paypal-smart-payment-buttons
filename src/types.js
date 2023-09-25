@@ -35,6 +35,7 @@ export type Experiments = $Shape<{|
     btSdkOrdersV2Migration?: boolean;
     disableSmartAPI?: boolean;
     deprecateVaultValidatePaymentMethod?: boolean;
+    upgradeLSATWithIgnoreCache?: boolean;
 |}>
 
 export type ProxyWindow = _ProxyWindow;

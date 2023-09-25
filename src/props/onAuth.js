@@ -5,7 +5,7 @@ import { stringifyError } from '@krakenjs/belter/src';
 
 import { upgradeFacilitatorAccessToken } from '../api';
 import { getLogger } from '../lib';
-import type { FeatureFlags } from '../types';
+import type { FeatureFlags, Experiments } from '../types';
 
 import type { CreateOrder } from './createOrder';
 import type { CreateSubscription } from './createSubscription';
@@ -20,23 +20,27 @@ type GetOnAuthOptions = {|
     facilitatorAccessToken : string,
     createOrder : CreateOrder,
     createSubscription : ?CreateSubscription,
-    featureFlags: FeatureFlags
+    featureFlags: FeatureFlags,
+    experiments: Experiments
 |};
 
-export function getOnAuth({ facilitatorAccessToken, createOrder, createSubscription, featureFlags } : GetOnAuthOptions) : OnAuth {
+export function getOnAuth({ facilitatorAccessToken, createOrder, createSubscription, featureFlags, experiments } : GetOnAuthOptions) : OnAuth {
     return ({ accessToken } : XOnAuthDataType) => {
         getLogger().info(`spb_onauth_access_token_${ accessToken ? 'present' : 'not_present' }`);
-
         return ZalgoPromise.try(() => {
             if (accessToken) {
                 if (featureFlags.isLsatUpgradable) {
+                    const isInIgnoreCacheExperiment = experiments?.upgradeLSATWithIgnoreCache
                     return createOrder()
                         .then(orderID => {
-                            if (createSubscription) {
+                            if (createSubscription || isInIgnoreCacheExperiment) {
                                 return accessToken;
                             }
 
-                            return upgradeFacilitatorAccessToken(facilitatorAccessToken, { buyerAccessToken: accessToken, orderID });
+                            return upgradeFacilitatorAccessToken(facilitatorAccessToken, {
+                                    buyerAccessToken: accessToken,
+                                    orderID
+                                })
                         })
                         .then(() => {
                             getLogger().info(`upgrade_lsat_success`);
