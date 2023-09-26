@@ -5,7 +5,7 @@ import { FPTI_KEY } from '@paypal/sdk-constants/src';
 
 import { PAYMENTS_API_URL } from '../config';
 import { getLogger } from '../lib';
-import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, HEADERS } from '../constants';
+import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, HEADERS, PRODUCT_FLOW } from '../constants';
 import type { ApplePayPayment } from '../payment-flows/types';
 
 import { callGraphQL, callRestAPI } from './api';
@@ -140,6 +140,7 @@ export function approveApplePayPayment(orderID : string, clientID : string, appl
                 $clientID : String!
                 $billingContact: ApplePayPaymentContact!
                 $shippingContact: ApplePayPaymentContact
+                $productFlow: String
             ) {
                 approveApplePayPayment(
                     token: $token
@@ -147,10 +148,11 @@ export function approveApplePayPayment(orderID : string, clientID : string, appl
                     clientID: $clientID
                     billingContact: $billingContact
                     shippingContact: $shippingContact
+                    productFlow: $productFlow
                 )
             }
         `,
-        variables: { token, orderID, clientID, billingContact, shippingContact }
+        variables: { token, orderID, clientID, billingContact, shippingContact, productFlow: PRODUCT_FLOW.SMART_PAYMENT_BUTTONS, }
     }).then((gqlResult) => {
         if (!gqlResult || !gqlResult.approveApplePayPayment) {
             throw new Error(`GraphQL GetApplePayPayment returned no applePayment object`);
