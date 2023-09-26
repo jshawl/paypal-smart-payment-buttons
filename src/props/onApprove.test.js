@@ -1,10 +1,17 @@
 /* @flow */
 import { describe, test, expect, vi } from "vitest";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import { FPTI_KEY } from "@paypal/sdk-constants/src";
 
+import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE } from "../constants";
 import { sendCountMetric } from "../lib";
+import { getLogger } from "../lib/logger";
 
-import { getOnApprove, getOnApproveOrder } from "./onApprove";
+import {
+  getOnApprove,
+  getOnApproveOrder,
+  getOnApproveVaultWithoutPurchase,
+} from "./onApprove";
 
 const merchantOnApprove = vi
   .fn()
@@ -16,6 +23,20 @@ vi.mock("../lib", async () => {
   return {
     ...actual,
     sendCountMetric: vi.fn(),
+  };
+});
+
+vi.mock("../lib/logger", async () => {
+  const actual = await vi.importActual("../lib/logger");
+  return {
+    ...actual,
+    getLogger: vi.fn(() => {
+      return {
+        track: vi.fn().mockReturnThis(),
+        flush: vi.fn().mockReturnThis(),
+        info: vi.fn().mockReturnThis(),
+      };
+    }),
   };
 });
 
@@ -104,6 +125,54 @@ describe("onApprove", () => {
         }),
         expect.anything()
       );
+    });
+  });
+
+  describe("getOnApproveVaultWithoutPurchase()", () => {
+    test("should call onApprove and log success analytics", async () => {
+      const trackMock = vi.fn().mockReturnThis();
+      // $FlowFixMe
+      getLogger.mockImplementation(() => {
+        return {
+          info: vi.fn().mockReturnThis(),
+          flush: vi.fn().mockReturnThis(),
+          track: trackMock,
+        };
+      });
+      const mockVaultSetupToken = "23iruewfjkns";
+      const mockPayerID = "u3i2rnkwjefs";
+      // $FlowFixMe
+      const inputArgs = {
+        onApprove: vi.fn().mockResolvedValue(),
+        onError: vi.fn().mockResolvedValue(),
+        facilitatorAccessToken: "some-access-token",
+        createOrder: vi.fn().mockResolvedValue("1234ksjndf"),
+        paymentSource: "paypal",
+        createVaultSetupToken: vi.fn().mockResolvedValue(mockVaultSetupToken),
+        beforeOnApprove: vi.fn(),
+      };
+      // $FlowFixMe
+      const onApproveVaultWithoutPurchase =
+        getOnApproveVaultWithoutPurchase(inputArgs);
+
+      await onApproveVaultWithoutPurchase(
+        { payerID: mockPayerID },
+        { restart: vi.fn() }
+      );
+      expect(inputArgs.createOrder).toBeCalled();
+      expect(inputArgs.createVaultSetupToken).toBeCalled();
+      expect(inputArgs.onApprove).toBeCalled({
+        payerID: mockPayerID,
+        facilitatorAccessToken: inputArgs.facilitatorAccessToken,
+        paymentSource: inputArgs.paymentSource,
+        vaultSetupToken: mockVaultSetupToken,
+      });
+      expect(trackMock).toBeCalledWith({
+        [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.CHECKOUT_APPROVE,
+        [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.VAULT_SETUP_TOKEN,
+        [FPTI_KEY.TOKEN]: mockVaultSetupToken,
+        [FPTI_KEY.CONTEXT_ID]: mockVaultSetupToken,
+      });
     });
   });
 });

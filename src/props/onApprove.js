@@ -580,6 +580,7 @@ export function getOnApproveVaultWithoutPurchase({ onApprove, onError, facilitat
   if (!onApprove) {
       throw new Error(`Expected onApprove`);
   }
+  
   return memoize(({ payerID } : OnApproveData) => {
       return createOrder().then(orderID => {
           getLogger()
@@ -595,13 +596,26 @@ export function getOnApproveVaultWithoutPurchase({ onApprove, onError, facilitat
           return createVaultSetupToken().then(vaultSetupToken => {
             const data = { payerID, facilitatorAccessToken, paymentSource, vaultSetupToken };
             beforeOnApprove();
-            return onApprove(data).catch(err => {
+            return onApprove(data)
+              .then((res) => {
+                getLogger()
+                  .track({
+                    [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.CHECKOUT_APPROVE,
+                    [FPTI_KEY.CONTEXT_TYPE]:
+                      FPTI_CONTEXT_TYPE.VAULT_SETUP_TOKEN,
+                    [FPTI_KEY.TOKEN]: vaultSetupToken,
+                    [FPTI_KEY.CONTEXT_ID]: vaultSetupToken,
+                  })
+                  .flush();
+                return res;
+              })
+              .catch((err) => {
                 return ZalgoPromise.try(() => {
-                    return onError(err);
+                  return onError(err);
                 }).then(() => {
-                    throw err;
+                  throw err;
                 });
-            });
+              });
           });
       });
   });

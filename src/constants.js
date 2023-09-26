@@ -86,7 +86,8 @@ export const FPTI_CONTEXT_TYPE = {
     BUTTON_SESSION_ID: ('button_session_id' : 'button_session_id'),
     WALLET_SESSION_ID: ('wallet_session_id' : 'wallet_session_id'),
     ORDER_ID:          ('EC-Token' : 'EC-Token'),
-    PAYMENT_ID:        ('Pay-ID' : 'Pay-ID')
+    PAYMENT_ID:        ('Pay-ID' : 'Pay-ID'),
+    VAULT_SETUP_TOKEN: ('vault_setup_token' : 'vault_setup_token'),
 };
 
 export const FPTI_STATE = {
@@ -115,6 +116,7 @@ export const FPTI_TRANSITION = {
     CREATE_ORDER:             ('process_create_order' : 'process_create_order'),
     CONFIRM_ORDER:             ('process_confirm_order' : 'process_confirm_order'),
     RECEIVE_ORDER:            ('process_receive_order' : 'process_receive_order'),
+    RECEIVE_VAULT_SETUP_TOKEN: ('process_receive_vault_setup_token' : 'process_receive_vault_setup_token'),
     CREATE_PAYMENT:           ('process_create_payment' : 'process_create_payment'),
     CAPTURE_AUTHORIZATION:    ('process_capture_authorization' : 'process_capture_authorization'),
 

@@ -171,13 +171,16 @@ type CreateOrderProps = {|
     facilitatorAccessToken: string,
     createBillingAgreement?: ?CreateBillingAgreement,
     createSubscription?: ?CreateSubscription,
-    createVaultSetupToken?: CreateVaultSetupToken,
+    createVaultSetupToken?: ?CreateVaultSetupToken,
     enableOrdersApprovalSmartWallet?: boolean,
     flow: ?string,
     smartWalletOrderID?: string,
   |};
 
 export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource, experiments } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow } : CreateOrderProps) : CreateOrder {
+    
+    const isVaultWithoutPurchase = (flow === "vault_without_purchase" && createVaultSetupToken);
+    
     const data = buildXCreateOrderData({ paymentSource });
     const actions = buildXCreateOrderActions({ facilitatorAccessToken, intent, currency, merchantID, partnerAttributionID, experiments });
     // this is purely for analytics purposes. We'd like to know whether
@@ -198,8 +201,11 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
         const startTime = Date.now();
 
         return ZalgoPromise.try(() => {
-            if (flow === "vault_without_purchase" && createVaultSetupToken) {
-                return createVaultSetupToken().then(vaultApprovalSessionIdToOrderId);
+            if (isVaultWithoutPurchase) {
+              // $FlowFixMe
+              return createVaultSetupToken().then(
+                vaultApprovalSessionIdToOrderId
+              );
             } else if (createBillingAgreement) {
                 return createBillingAgreement().then(billingTokenToOrderID);
             } else if (createSubscription) {
@@ -219,26 +225,30 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
                     ]
                 });
             }
-        }).catch(err => {
-            sendCountMetric({
-                name: "pp.app.paypal_sdk.buttons.create_order.error.count",
-                dimensions: {
-                    errorName: 'generic',
-                    flow,
-                    intent,
-                    integrationType
-                }
-            })
-            getLogger()
-                .error('create_order_error', { err: stringifyErrorMessage(err) })
-                .track({
-                    [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
-                    [FPTI_KEY.ERROR_CODE]: 'smart_buttons_create_order_error',
-                    [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(err)
-                });
-            throw err;
+      })
+        .catch(err => {
+          if(!isVaultWithoutPurchase){
+              sendCountMetric({
+                  name: "pp.app.paypal_sdk.buttons.create_order.error.count",
+                  dimensions: {
+                      errorName: 'generic',
+                      flow,
+                      intent,
+                      integrationType
+                  }
+              })
+              getLogger()
+                  .error('create_order_error', { err: stringifyErrorMessage(err) })
+                  .track({
+                      [FPTI_KEY.STATE]:      FPTI_STATE.BUTTON,
+                      [FPTI_KEY.ERROR_CODE]: 'smart_buttons_create_order_error',
+                      [FPTI_KEY.ERROR_DESC]: stringifyErrorMessage(err)
+                  });
+          }
+          throw err;
 
-        }).then(orderID => {
+        })
+        .then(orderID => {
             if (!orderID || typeof orderID !== 'string') {
                 sendCountMetric({
                     name: "pp.app.paypal_sdk.buttons.create_order.error.count",
@@ -276,45 +286,46 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
                     });
                 throw new Error(`Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead`);
             }
+            if (!isVaultWithoutPurchase) {
+                const duration = Date.now() - startTime;
 
-            const duration = Date.now() - startTime;
+                sendCountMetric({
+                    name: "pp.app.paypal_sdk.buttons.create_order.count",
+                    dimensions: {
+                        flow,
+                        intent,
+                        integrationType
+                    }
+                })            
 
-            sendCountMetric({
-                name: "pp.app.paypal_sdk.buttons.create_order.count",
-                dimensions: {
-                    flow,
-                    intent,
-                    integrationType
+                getLogger()
+                  .addPayloadBuilder(() => {
+                      return {
+                          token: orderID
+                      };
+                  })
+                  .addTrackingBuilder(() => {
+                      return {
+                          [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID,
+                          [FPTI_KEY.CONTEXT_ID]:   orderID,
+                          [FPTI_KEY.TOKEN]:        orderID
+                      };
+                  })
+                  .track({
+                      [FPTI_KEY.STATE]:               FPTI_STATE.BUTTON,
+                      [FPTI_KEY.TRANSITION]:          FPTI_TRANSITION.RECEIVE_ORDER,
+                      [FPTI_KEY.EVENT_NAME]:          FPTI_TRANSITION.RECEIVE_ORDER,
+                      [FPTI_KEY.CONTEXT_TYPE]:        FPTI_CONTEXT_TYPE.ORDER_ID,
+                      [FPTI_BUTTON_KEY.BUTTON_WIDTH]: window.innerWidth,
+                      [FPTI_KEY.CONTEXT_ID]:          orderID,
+                      [FPTI_KEY.TOKEN]:               orderID,
+                      [FPTI_KEY.RESPONSE_DURATION]:   duration.toString(),
+                      client_time: getClientsideTimestamp()
+                  })
+                  .flush();
+
                 }
-            })            
-
-            getLogger()
-                .addPayloadBuilder(() => {
-                    return {
-                        token: orderID
-                    };
-                })
-                .addTrackingBuilder(() => {
-                    return {
-                        [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID,
-                        [FPTI_KEY.CONTEXT_ID]:   orderID,
-                        [FPTI_KEY.TOKEN]:        orderID
-                    };
-                })
-                .track({
-                    [FPTI_KEY.STATE]:               FPTI_STATE.BUTTON,
-                    [FPTI_KEY.TRANSITION]:          FPTI_TRANSITION.RECEIVE_ORDER,
-                    [FPTI_KEY.EVENT_NAME]:          FPTI_TRANSITION.RECEIVE_ORDER,
-                    [FPTI_KEY.CONTEXT_TYPE]:        FPTI_CONTEXT_TYPE.ORDER_ID,
-                    [FPTI_BUTTON_KEY.BUTTON_WIDTH]: window.innerWidth,
-                    [FPTI_KEY.CONTEXT_ID]:          orderID,
-                    [FPTI_KEY.TOKEN]:               orderID,
-                    [FPTI_KEY.RESPONSE_DURATION]:   duration.toString(),
-                    client_time: getClientsideTimestamp()
-                })
-                .flush();
-
             return orderID;
-        });
-    });
+        })
+  })
 }
