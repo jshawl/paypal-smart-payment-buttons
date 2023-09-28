@@ -367,7 +367,8 @@ window.smartCard = function(modules) {
         BUTTON_SESSION_ID: "button_session_id",
         WALLET_SESSION_ID: "wallet_session_id",
         ORDER_ID: "EC-Token",
-        PAYMENT_ID: "Pay-ID"
+        PAYMENT_ID: "Pay-ID",
+        VAULT_SETUP_TOKEN: "vault_setup_token"
     };
     var FPTI_STATE = {
         BUTTON: "smart_button",
@@ -390,6 +391,7 @@ window.smartCard = function(modules) {
         CREATE_ORDER: "process_create_order",
         CONFIRM_ORDER: "process_confirm_order",
         RECEIVE_ORDER: "process_receive_order",
+        RECEIVE_VAULT_SETUP_TOKEN: "process_receive_vault_setup_token",
         CREATE_PAYMENT: "process_create_payment",
         CAPTURE_AUTHORIZATION: "process_capture_authorization",
         CHECKOUT_SHIPPING_CHANGE: "process_checkout_shipping_change",
@@ -4216,6 +4218,8 @@ window.smartCard = function(modules) {
     __webpack_require__(3);
     __webpack_require__(4);
     __webpack_require__(0);
+    __webpack_require__(1);
+    __webpack_require__(2);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(5);
@@ -8569,8 +8573,8 @@ window.smartCard = function(modules) {
         return vault_without_purchase_savePaymentSource;
     }));
     var esm_extends = __webpack_require__(5);
-    var n, l, preact_module_u, preact_module_i, preact_module_o, preact_module_r, f, c = {}, preact_module_s = [], a = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i, h = Array.isArray;
-    function v(n, l) {
+    var n, l, preact_module_u, preact_module_i, preact_module_o, preact_module_r, f, c = {}, preact_module_s = [], a = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i, v = Array.isArray;
+    function h(n, l) {
         for (var u in l) n[u] = l[u];
         return n;
     }
@@ -8611,7 +8615,7 @@ window.smartCard = function(modules) {
     }
     function g(n, l) {
         if (null == l) return n.__ ? g(n.__, n.__.__k.indexOf(n) + 1) : null;
-        for (var u; l < n.__k.length; l++) if (null != (u = n.__k[l]) && null != u.__e) return u.__e;
+        for (var u; l < n.__k.length; l++) if (null != (u = n.__k[l]) && null != u.__e) return u.__d || u.__e;
         return "function" == typeof n.type ? g(n) : null;
     }
     function m(n) {
@@ -8631,23 +8635,23 @@ window.smartCard = function(modules) {
         var n, l, u, t, o, r, e, c, s;
         for (preact_module_i.sort(f); n = preact_module_i.shift(); ) n.__d && (l = preact_module_i.length, 
         t = void 0, o = void 0, r = void 0, c = (e = (u = n).__v).__e, (s = u.__P) && (t = [], 
-        o = [], (r = v({}, e)).__v = e.__v + 1, L(s, e, r, u.__n, void 0 !== s.ownerSVGElement, null != e.__h ? [ c ] : null, t, null == c ? g(e) : c, e.__h, o), 
-        M(t, e, o), e.__e != c && m(e)), preact_module_i.length > l && preact_module_i.sort(f));
+        o = [], (r = h({}, e)).__v = e.__v + 1, z(s, e, r, u.__n, void 0 !== s.ownerSVGElement, null != e.__h ? [ c ] : null, t, null == c ? g(e) : c, e.__h, o), 
+        L(t, e, o), e.__e != c && m(e)), preact_module_i.length > l && preact_module_i.sort(f));
         x.__r = 0;
     }
-    function P(n, l, u, t, i, o, r, f, e, a, v) {
-        var p, y, _, b, m, w, x, P, C, H = 0, I = t && t.__k || preact_module_s, T = I.length, j = T, z = l.length;
-        for (u.__k = [], p = 0; p < z; p++) null != (b = u.__k[p] = null == (b = l[p]) || "boolean" == typeof b || "function" == typeof b ? null : "string" == typeof b || "number" == typeof b || "bigint" == typeof b ? preact_module_d(null, b, null, null, b) : h(b) ? preact_module_d(k, {
+    function P(n, l, u, t, i, o, r, f, e, a, h) {
+        var p, y, _, b, m, w, x, P, C, D = 0, H = t && t.__k || preact_module_s, I = H.length, T = I, j = l.length;
+        for (u.__k = [], p = 0; p < j; p++) null != (b = u.__k[p] = null == (b = l[p]) || "boolean" == typeof b || "function" == typeof b ? null : "string" == typeof b || "number" == typeof b || "bigint" == typeof b ? preact_module_d(null, b, null, null, b) : v(b) ? preact_module_d(k, {
             children: b
         }, null, null, null) : b.__b > 0 ? preact_module_d(b.type, b.props, b.key, b.ref ? b.ref : null, b.__v) : b) ? (b.__ = u, 
-        b.__b = u.__b + 1, -1 === (P = A(b, I, x = p + H, j)) ? _ = c : (_ = I[P] || c, 
-        I[P] = void 0, j--), L(n, b, _, i, o, r, f, e, a, v), m = b.__e, (y = b.ref) && _.ref != y && (_.ref && O(_.ref, null, b), 
-        v.push(y, b.__c || m, b)), null != m && (null == w && (w = m), (C = _ === c || null === _.__v) ? -1 == P && H-- : P !== x && (P === x + 1 ? H++ : P > x ? j > z - x ? H += P - x : H-- : H = P < x && P == x - 1 ? P - x : 0), 
-        x = p + H, "function" != typeof b.type || P === x && _.__k !== b.__k ? "function" == typeof b.type || P === x && !C ? void 0 !== b.__d ? (e = b.__d, 
-        b.__d = void 0) : e = m.nextSibling : e = S(n, m, e) : e = $(b, e, n), "function" == typeof u.type && (u.__d = e))) : (_ = I[p]) && null == _.key && _.__e && (_.__e == e && (e = g(_)), 
-        q(_, _, !1), I[p] = null);
-        for (u.__e = w, p = T; p--; ) null != I[p] && ("function" == typeof u.type && null != I[p].__e && I[p].__e == u.__d && (u.__d = I[p].__e.nextSibling), 
-        q(I[p], I[p]));
+        b.__b = u.__b + 1, -1 === (P = A(b, H, x = p + D, T)) ? _ = c : (_ = H[P] || c, 
+        H[P] = void 0, T--), z(n, b, _, i, o, r, f, e, a, h), m = b.__e, (y = b.ref) && _.ref != y && (_.ref && N(_.ref, null, b), 
+        h.push(y, b.__c || m, b)), null != m && (null == w && (w = m), (C = _ === c || null === _.__v) ? -1 == P && D-- : P !== x && (P === x + 1 ? D++ : P > x ? T > j - x ? D += P - x : D-- : D = P < x && P == x - 1 ? P - x : 0), 
+        x = p + D, "function" != typeof b.type || P === x && _.__k !== b.__k ? "function" == typeof b.type || P === x && !C ? void 0 !== b.__d ? (e = b.__d, 
+        b.__d = void 0) : e = m.nextSibling : e = S(n, m, e) : e = $(b, e, n), "function" == typeof u.type && (u.__d = e))) : (_ = H[p]) && null == _.key && _.__e && (_.__e == e && (_.__ = t, 
+        e = g(_)), O(_, _, !1), H[p] = null);
+        for (u.__e = w, p = I; p--; ) null != H[p] && ("function" == typeof u.type && null != H[p].__e && H[p].__e == u.__d && (u.__d = H[p].__e.nextSibling), 
+        O(H[p], H[p]));
     }
     function $(n, l, u) {
         for (var t, i = n.__k, o = 0; i && o < i.length; o++) (t = i[o]) && (t.__ = n, l = "function" == typeof t.type ? $(t, l, u) : S(u, t.__e, l));
@@ -8672,44 +8676,48 @@ window.smartCard = function(modules) {
         }
         return -1;
     }
-    function I(n, l, u) {
+    function H(n, l, u) {
         "-" === l[0] ? n.setProperty(l, null == u ? "" : u) : n[l] = null == u ? "" : "number" != typeof u || a.test(l) ? u : u + "px";
     }
-    function T(n, l, u, t, i) {
+    function I(n, l, u, t, i) {
         var o;
         n: if ("style" === l) if ("string" == typeof u) n.style.cssText = u; else {
-            if ("string" == typeof t && (n.style.cssText = t = ""), t) for (l in t) u && l in u || I(n.style, l, "");
-            if (u) for (l in u) t && u[l] === t[l] || I(n.style, l, u[l]);
+            if ("string" == typeof t && (n.style.cssText = t = ""), t) for (l in t) u && l in u || H(n.style, l, "");
+            if (u) for (l in u) t && u[l] === t[l] || H(n.style, l, u[l]);
         } else if ("o" === l[0] && "n" === l[1]) o = l !== (l = l.replace(/(PointerCapture)$|Capture$/, "$1")), 
         l = l.toLowerCase() in n ? l.toLowerCase().slice(2) : l.slice(2), n.l || (n.l = {}), 
-        n.l[l + o] = u, u ? t || n.addEventListener(l, o ? z : j, o) : n.removeEventListener(l, o ? z : j, o); else if ("dangerouslySetInnerHTML" !== l) {
-            if (i) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s"); else if ("width" !== l && "height" !== l && "href" !== l && "list" !== l && "form" !== l && "tabIndex" !== l && "download" !== l && "rowSpan" !== l && "colSpan" !== l && l in n) try {
+        n.l[l + o] = u, u ? t ? u.u = t.u : (u.u = Date.now(), n.addEventListener(l, o ? j : T, o)) : n.removeEventListener(l, o ? j : T, o); else if ("dangerouslySetInnerHTML" !== l) {
+            if (i) l = l.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s"); else if ("width" !== l && "height" !== l && "href" !== l && "list" !== l && "form" !== l && "tabIndex" !== l && "download" !== l && "rowSpan" !== l && "colSpan" !== l && "role" !== l && l in n) try {
                 n[l] = null == u ? "" : u;
                 break n;
             } catch (n) {}
             "function" == typeof u || (null == u || !1 === u && "-" !== l[4] ? n.removeAttribute(l) : n.setAttribute(l, u));
         }
     }
-    function j(n) {
-        return this.l[n.type + !1](l.event ? l.event(n) : n);
+    function T(n) {
+        var u = this.l[n.type + !1];
+        if (n.t) {
+            if (n.t <= u.u) return;
+        } else n.t = Date.now();
+        return u(l.event ? l.event(n) : n);
     }
-    function z(n) {
+    function j(n) {
         return this.l[n.type + !0](l.event ? l.event(n) : n);
     }
-    function L(n, u, t, i, o, r, f, e, c, s) {
-        var a, p, y, d, _, g, m, w, x, $, C, S, A, H, I, T = u.type;
+    function z(n, u, t, i, o, r, f, e, c, s) {
+        var a, p, y, d, _, g, m, w, x, $, C, S, A, D, H, I = u.type;
         if (void 0 !== u.constructor) return null;
         null != t.__h && (c = t.__h, e = u.__e = t.__e, u.__h = null, r = [ e ]), (a = l.__b) && a(u);
-        n: if ("function" == typeof T) try {
-            if (w = u.props, x = (a = T.contextType) && i[a.__c], $ = a ? x ? x.props.value : a.__ : i, 
-            t.__c ? m = (p = u.__c = t.__c).__ = p.__E : ("prototype" in T && T.prototype.render ? u.__c = p = new T(w, $) : (u.__c = p = new b(w, $), 
-            p.constructor = T, p.render = B), x && x.sub(p), p.props = w, p.state || (p.state = {}), 
+        n: if ("function" == typeof I) try {
+            if (w = u.props, x = (a = I.contextType) && i[a.__c], $ = a ? x ? x.props.value : a.__ : i, 
+            t.__c ? m = (p = u.__c = t.__c).__ = p.__E : ("prototype" in I && I.prototype.render ? u.__c = p = new I(w, $) : (u.__c = p = new b(w, $), 
+            p.constructor = I, p.render = q), x && x.sub(p), p.props = w, p.state || (p.state = {}), 
             p.context = $, p.__n = i, y = p.__d = !0, p.__h = [], p._sb = []), null == p.__s && (p.__s = p.state), 
-            null != T.getDerivedStateFromProps && (p.__s == p.state && (p.__s = v({}, p.__s)), 
-            v(p.__s, T.getDerivedStateFromProps(w, p.__s))), d = p.props, _ = p.state, p.__v = u, 
-            y) null == T.getDerivedStateFromProps && null != p.componentWillMount && p.componentWillMount(), 
+            null != I.getDerivedStateFromProps && (p.__s == p.state && (p.__s = h({}, p.__s)), 
+            h(p.__s, I.getDerivedStateFromProps(w, p.__s))), d = p.props, _ = p.state, p.__v = u, 
+            y) null == I.getDerivedStateFromProps && null != p.componentWillMount && p.componentWillMount(), 
             null != p.componentDidMount && p.__h.push(p.componentDidMount); else {
-                if (null == T.getDerivedStateFromProps && w !== d && null != p.componentWillReceiveProps && p.componentWillReceiveProps(w, $), 
+                if (null == I.getDerivedStateFromProps && w !== d && null != p.componentWillReceiveProps && p.componentWillReceiveProps(w, $), 
                 !p.__e && (null != p.shouldComponentUpdate && !1 === p.shouldComponentUpdate(w, p.__s, $) || u.__v === t.__v)) {
                     for (u.__v !== t.__v && (p.props = w, p.state = p.__s, p.__d = !1), u.__e = t.__e, 
                     u.__k = t.__k, u.__k.forEach((function(n) {
@@ -8722,25 +8730,25 @@ window.smartCard = function(modules) {
                     p.componentDidUpdate(d, _, g);
                 }));
             }
-            if (p.context = $, p.props = w, p.__P = n, p.__e = !1, S = l.__r, A = 0, "prototype" in T && T.prototype.render) {
+            if (p.context = $, p.props = w, p.__P = n, p.__e = !1, S = l.__r, A = 0, "prototype" in I && I.prototype.render) {
                 for (p.state = p.__s, p.__d = !1, S && S(u), a = p.render(p.props, p.state, p.context), 
-                H = 0; H < p._sb.length; H++) p.__h.push(p._sb[H]);
+                D = 0; D < p._sb.length; D++) p.__h.push(p._sb[D]);
                 p._sb = [];
             } else do {
                 p.__d = !1, S && S(u), a = p.render(p.props, p.state, p.context), p.state = p.__s;
             } while (p.__d && ++A < 25);
-            p.state = p.__s, null != p.getChildContext && (i = v(v({}, i), p.getChildContext())), 
+            p.state = p.__s, null != p.getChildContext && (i = h(h({}, i), p.getChildContext())), 
             y || null == p.getSnapshotBeforeUpdate || (g = p.getSnapshotBeforeUpdate(d, _)), 
-            P(n, h(I = null != a && a.type === k && null == a.key ? a.props.children : a) ? I : [ I ], u, t, i, o, r, f, e, c, s), 
+            P(n, v(H = null != a && a.type === k && null == a.key ? a.props.children : a) ? H : [ H ], u, t, i, o, r, f, e, c, s), 
             p.base = u.__e, u.__h = null, p.__h.length && f.push(p), m && (p.__E = p.__ = null);
         } catch (n) {
             u.__v = null, (c || null != r) && (u.__e = e, u.__h = !!c, r[r.indexOf(e)] = null), 
             l.__e(n, u, t);
-        } else null == r && u.__v === t.__v ? (u.__k = t.__k, u.__e = t.__e) : u.__e = N(t.__e, u, t, i, o, r, f, c, s);
+        } else null == r && u.__v === t.__v ? (u.__k = t.__k, u.__e = t.__e) : u.__e = M(t.__e, u, t, i, o, r, f, c, s);
         (a = l.diffed) && a(u);
     }
-    function M(n, u, t) {
-        for (var i = 0; i < t.length; i++) O(t[i], t[++i], t[++i]);
+    function L(n, u, t) {
+        for (var i = 0; i < t.length; i++) N(t[i], t[++i], t[++i]);
         l.__c && l.__c(u, n), n.some((function(u) {
             try {
                 n = u.__h, u.__h = [], n.some((function(n) {
@@ -8751,8 +8759,8 @@ window.smartCard = function(modules) {
             }
         }));
     }
-    function N(l, u, t, i, o, r, f, e, s) {
-        var a, v, y, d = t.props, _ = u.props, k = u.type, b = 0;
+    function M(l, u, t, i, o, r, f, e, s) {
+        var a, h, y, d = t.props, _ = u.props, k = u.type, b = 0;
         if ("svg" === k && (o = !0), null != r) for (;b < r.length; b++) if ((a = r[b]) && "setAttribute" in a == !!k && (k ? a.localName === k : 3 === a.nodeType)) {
             l = a, r[b] = null;
             break;
@@ -8763,32 +8771,32 @@ window.smartCard = function(modules) {
             r = null, e = !1;
         }
         if (null === k) d === _ || e && l.data === _ || (l.data = _); else {
-            if (r = r && n.call(l.childNodes), v = (d = t.props || c).dangerouslySetInnerHTML, 
+            if (r = r && n.call(l.childNodes), h = (d = t.props || c).dangerouslySetInnerHTML, 
             y = _.dangerouslySetInnerHTML, !e) {
                 if (null != r) for (d = {}, b = 0; b < l.attributes.length; b++) d[l.attributes[b].name] = l.attributes[b].value;
-                (y || v) && (y && (v && y.__html == v.__html || y.__html === l.innerHTML) || (l.innerHTML = y && y.__html || ""));
+                (y || h) && (y && (h && y.__html == h.__html || y.__html === l.innerHTML) || (l.innerHTML = y && y.__html || ""));
             }
             if (function(n, l, u, t, i) {
                 var o;
-                for (o in u) "children" === o || "key" === o || o in l || T(n, o, null, u[o], t);
-                for (o in l) i && "function" != typeof l[o] || "children" === o || "key" === o || "value" === o || "checked" === o || u[o] === l[o] || T(n, o, l[o], u[o], t);
-            }(l, _, d, o, e), y) u.__k = []; else if (P(l, h(b = u.props.children) ? b : [ b ], u, t, i, o && "foreignObject" !== k, r, f, r ? r[0] : t.__k && g(t, 0), e, s), 
+                for (o in u) "children" === o || "key" === o || o in l || I(n, o, null, u[o], t);
+                for (o in l) i && "function" != typeof l[o] || "children" === o || "key" === o || "value" === o || "checked" === o || u[o] === l[o] || I(n, o, l[o], u[o], t);
+            }(l, _, d, o, e), y) u.__k = []; else if (P(l, v(b = u.props.children) ? b : [ b ], u, t, i, o && "foreignObject" !== k, r, f, r ? r[0] : t.__k && g(t, 0), e, s), 
             null != r) for (b = r.length; b--; ) null != r[b] && p(r[b]);
-            e || ("value" in _ && void 0 !== (b = _.value) && (b !== l.value || "progress" === k && !b || "option" === k && b !== d.value) && T(l, "value", b, d.value, !1), 
-            "checked" in _ && void 0 !== (b = _.checked) && b !== l.checked && T(l, "checked", b, d.checked, !1));
+            e || ("value" in _ && void 0 !== (b = _.value) && (b !== l.value || "progress" === k && !b || "option" === k && b !== d.value) && I(l, "value", b, d.value, !1), 
+            "checked" in _ && void 0 !== (b = _.checked) && b !== l.checked && I(l, "checked", b, d.checked, !1));
         }
         return l;
     }
-    function O(n, u, t) {
+    function N(n, u, t) {
         try {
             "function" == typeof n ? n(u) : n.current = u;
         } catch (n) {
             l.__e(n, t);
         }
     }
-    function q(n, u, t) {
+    function O(n, u, t) {
         var i, o;
-        if (l.unmount && l.unmount(n), (i = n.ref) && (i.current && i.current !== n.__e || O(i, null, u)), 
+        if (l.unmount && l.unmount(n), (i = n.ref) && (i.current && i.current !== n.__e || N(i, null, u)), 
         null != (i = n.__c)) {
             if (i.componentWillUnmount) try {
                 i.componentWillUnmount();
@@ -8797,10 +8805,10 @@ window.smartCard = function(modules) {
             }
             i.base = i.__P = null, n.__c = void 0;
         }
-        if (i = n.__k) for (o = 0; o < i.length; o++) i[o] && q(i[o], u, t || "function" != typeof n.type);
+        if (i = n.__k) for (o = 0; o < i.length; o++) i[o] && O(i[o], u, t || "function" != typeof n.type);
         t || null == n.__e || p(n.__e), n.__ = n.__e = n.__d = void 0;
     }
-    function B(n, l, u) {
+    function q(n, l, u) {
         return this.constructor(n, u);
     }
     n = preact_module_s.slice, l = {
@@ -8816,8 +8824,8 @@ window.smartCard = function(modules) {
         }
     }, preact_module_u = 0, b.prototype.setState = function(n, l) {
         var u;
-        u = null != this.__s && this.__s !== this.state ? this.__s : this.__s = v({}, this.state), 
-        "function" == typeof n && (n = n(v({}, u), this.props)), n && v(u, n), null != n && this.__v && (l && this._sb.push(l), 
+        u = null != this.__s && this.__s !== this.state ? this.__s : this.__s = h({}, this.state), 
+        "function" == typeof n && (n = n(h({}, u), this.props)), n && h(u, n), null != n && this.__v && (l && this._sb.push(l), 
         w(this));
     }, b.prototype.forceUpdate = function(n) {
         this.__v && (this.__e = !0, n && this.__h.push(n), w(this));
@@ -11450,7 +11458,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.155", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.156", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 
@@ -11494,8 +11502,8 @@ window.smartCard = function(modules) {
         }).catch(src.p).then((function() {
             !function(u, t, i) {
                 var r, f, e;
-                l.__ && l.__(u, t), r = !1 ? null : t.__k, f = [], e = [], L(t, u = t.__k = y(k, null, [ u ]), r || c, c, void 0 !== t.ownerSVGElement, r ? null : t.firstChild ? n.call(t.childNodes) : null, f, r ? r.__e : t.firstChild, !1, e), 
-                M(f, u, e);
+                l.__ && l.__(u, t), r = !1 ? null : t.__k, f = [], e = [], z(t, u = t.__k = y(k, null, [ u ]), r || c, c, void 0 !== t.ownerSVGElement, r ? null : t.firstChild ? n.call(t.childNodes) : null, f, r ? r.__e : t.firstChild, !1, e), 
+                L(f, u, e);
             }(y(Page, {
                 cspNonce: cspNonce,
                 props: props,
