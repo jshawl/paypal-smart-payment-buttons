@@ -110,6 +110,28 @@ describe("onApprove", () => {
       );
     });
 
+    test("invokes the merchant's onApprove call with an undefined paymentID when billingToken is present", async () => {
+      const getOnApproveOrderResult = getOnApproveOrder({
+        ...getOnApproveOrderOptions,
+        experiments: {
+          btSdkOrdersV2Migration: true,
+        },
+      });
+      await getOnApproveOrderResult(
+        {
+          billingToken: "BA-XXXXXX",
+        },
+        { restart }
+      );
+      expect(merchantOnApprove).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderID,
+          paymentID: undefined,
+        }),
+        expect.anything()
+      );
+    });
+
     test("invokes the merchant's onApprove call with a paymentID aliased to orderID", async () => {
       const getOnApproveOrderResult = getOnApproveOrder({
         ...getOnApproveOrderOptions,
