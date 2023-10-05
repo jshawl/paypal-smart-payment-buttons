@@ -1757,7 +1757,7 @@ window.smartCard = function(modules) {
     var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
     __webpack_require__(4);
     var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
-    var _config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
+    var _config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
     var _constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(1);
     var _lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(2);
     function callRestAPI(_ref) {
@@ -1879,72 +1879,13 @@ window.smartCard = function(modules) {
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.d(__webpack_exports__, "f", (function() {
-        return LOGGER_URL;
-    }));
-    __webpack_require__.d(__webpack_exports__, "a", (function() {
-        return AUTH_API_URL;
-    }));
-    __webpack_require__.d(__webpack_exports__, "g", (function() {
-        return ORDERS_API_URL;
-    }));
-    __webpack_require__.d(__webpack_exports__, "h", (function() {
-        return PAYMENTS_API_URL;
-    }));
-    __webpack_require__.d(__webpack_exports__, "b", (function() {
-        return CREATE_SUBSCRIPTIONS_API_URL;
-    }));
-    __webpack_require__.d(__webpack_exports__, "j", (function() {
-        return VALIDATE_PAYMENT_METHOD_API;
-    }));
-    __webpack_require__.d(__webpack_exports__, "k", (function() {
-        return VAULT_SETUP_TOKENS_API_URL;
-    }));
-    __webpack_require__.d(__webpack_exports__, "i", (function() {
-        return SMART_API_URI;
-    }));
-    __webpack_require__.d(__webpack_exports__, "e", (function() {
-        return GRAPHQL_URI;
-    }));
-    __webpack_require__.d(__webpack_exports__, "d", (function() {
-        return FIREBASE_SCRIPTS;
-    }));
-    __webpack_require__.d(__webpack_exports__, "c", (function() {
-        return ENABLE_PAYMENT_API;
-    }));
-    var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
-    var _FUNDING_SKIP_LOGIN;
-    var LOGGER_URL = "/xoplatform/logger/api/logger";
-    var AUTH_API_URL = "/v1/oauth2/token";
-    var ORDERS_API_URL = "/v2/checkout/orders";
-    var PAYMENTS_API_URL = "/v1/payments/payment";
-    var CREATE_SUBSCRIPTIONS_API_URL = "/v1/billing/subscriptions";
-    var VALIDATE_PAYMENT_METHOD_API = "validate-payment-method";
-    var VAULT_SETUP_TOKENS_API_URL = "/v3/vault/setup-tokens";
-    var SMART_API_URI = {
-        AUTH: "/smart/api/auth",
-        CHECKOUT: "/smart/api/checkout",
-        ORDER: "/smart/api/order",
-        PAYMENT: "/smart/api/payment",
-        SUBSCRIPTION: "/smart/api/billagmt/subscriptions",
-        VAULT: "/smart/api/vault"
-    };
-    var GRAPHQL_URI = "/graphql";
-    (_FUNDING_SKIP_LOGIN = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL, 
-    _FUNDING_SKIP_LOGIN[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYLATER] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL, 
-    _FUNDING_SKIP_LOGIN[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.CREDIT] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL;
-    var FIREBASE_SCRIPTS = {
-        APP: "https://www.paypalobjects.com/checkout/js/lib/firebase-app.js",
-        AUTH: "https://www.paypalobjects.com/checkout/js/lib/firebase-auth.js",
-        DATABASE: "https://www.paypalobjects.com/checkout/js/lib/firebase-database.js"
-    };
-    var ENABLE_PAYMENT_API = !1;
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__.d(__webpack_exports__, "f", (function() {
         return createAccessToken;
     }));
     __webpack_require__.d(__webpack_exports__, "x", (function() {
         return upgradeFacilitatorAccessToken;
+    }));
+    __webpack_require__.d(__webpack_exports__, "y", (function() {
+        return upgradeFacilitatorAccessTokenWithIgnoreCache;
     }));
     __webpack_require__.d(__webpack_exports__, "g", (function() {
         return createOrderID;
@@ -2015,7 +1956,7 @@ window.smartCard = function(modules) {
     var src = __webpack_require__(4);
     var belter_src = __webpack_require__(3);
     var sdk_constants_src = __webpack_require__(0);
-    var src_config = __webpack_require__(7);
+    var src_config = __webpack_require__(8);
     var lib = __webpack_require__(2);
     var constants = __webpack_require__(1);
     var api = __webpack_require__(6);
@@ -2053,20 +1994,27 @@ window.smartCard = function(modules) {
     }
     var lsatUpgradeCalled = !1;
     var lsatUpgradeError;
+    var onLsatUpgradeCalled = function() {
+        lsatUpgradeCalled = !0;
+    };
     var getLsatUpgradeCalled = function() {
         return lsatUpgradeCalled;
+    };
+    var onLsatUpgradeError = function(err) {
+        lsatUpgradeError = err;
     };
     var getLsatUpgradeError = function() {
         return lsatUpgradeError;
     };
+    var clearLsatState = function() {
+        lsatUpgradeCalled = !1;
+        lsatUpgradeError = null;
+    };
     function upgradeFacilitatorAccessToken(facilitatorAccessToken, _ref3) {
         var _headers;
         var buyerAccessToken = _ref3.buyerAccessToken, orderID = _ref3.orderID;
-        !function() {
-            lsatUpgradeCalled = !1;
-            lsatUpgradeError = null;
-        }();
-        lsatUpgradeCalled = !0;
+        clearLsatState();
+        onLsatUpgradeCalled();
         return Object(api.a)({
             name: "UpgradeFacilitatorAccessToken",
             headers: (_headers = {}, _headers[constants.i.ACCESS_TOKEN] = buyerAccessToken, 
@@ -2078,11 +2026,33 @@ window.smartCard = function(modules) {
                 orderID: orderID
             }
         }).then(belter_src.p).catch((function(err) {
-            !function(err) {
-                lsatUpgradeError = err;
-            }(err);
+            onLsatUpgradeError(err);
             throw err;
         }));
+    }
+    function upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID) {
+        return Object(belter_src.i)(upgradeFacilitatorAccessTokenWithIgnoreCache, (function() {
+            var _headers2;
+            clearLsatState();
+            onLsatUpgradeCalled();
+            return Object(api.a)({
+                name: "CreateUpgradedLowScopeAccessToken",
+                headers: (_headers2 = {}, _headers2[constants.i.ACCESS_TOKEN] = buyerAccessToken, 
+                _headers2[constants.i.CLIENT_CONTEXT] = orderID, _headers2),
+                query: "\n            mutation CreateUpgradedLowScopeAccessToken(\n                $orderID: String!\n                $buyerAccessToken: String!\n                $facilitatorAccessToken: String!\n            ) {\n                createUpgradedLowScopeAccessToken(\n                    token: $orderID\n                    buyerAccessToken: $buyerAccessToken\n                    merchantLSAT: $facilitatorAccessToken\n                )\n            }\n        ",
+                variables: {
+                    facilitatorAccessToken: facilitatorAccessToken,
+                    buyerAccessToken: buyerAccessToken,
+                    orderID: orderID
+                }
+            }).then((function(res) {
+                return null == res ? void 0 : res.createUpgradedLowScopeAccessToken;
+            })).catch((function(err) {
+                Object(lib.c)().warn("rest_api_upgrade_facilitator_access_token_with_ignore_cache_error");
+                onLsatUpgradeError(err);
+                return facilitatorAccessToken;
+            }));
+        }), [ facilitatorAccessToken, buyerAccessToken, orderID ]);
     }
     var esm_extends = __webpack_require__(5);
     function createOrderID(order, _ref) {
@@ -2741,6 +2711,68 @@ window.smartCard = function(modules) {
     }));
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
+    __webpack_require__.d(__webpack_exports__, "f", (function() {
+        return LOGGER_URL;
+    }));
+    __webpack_require__.d(__webpack_exports__, "a", (function() {
+        return AUTH_API_URL;
+    }));
+    __webpack_require__.d(__webpack_exports__, "g", (function() {
+        return ORDERS_API_URL;
+    }));
+    __webpack_require__.d(__webpack_exports__, "h", (function() {
+        return PAYMENTS_API_URL;
+    }));
+    __webpack_require__.d(__webpack_exports__, "b", (function() {
+        return CREATE_SUBSCRIPTIONS_API_URL;
+    }));
+    __webpack_require__.d(__webpack_exports__, "j", (function() {
+        return VALIDATE_PAYMENT_METHOD_API;
+    }));
+    __webpack_require__.d(__webpack_exports__, "k", (function() {
+        return VAULT_SETUP_TOKENS_API_URL;
+    }));
+    __webpack_require__.d(__webpack_exports__, "i", (function() {
+        return SMART_API_URI;
+    }));
+    __webpack_require__.d(__webpack_exports__, "e", (function() {
+        return GRAPHQL_URI;
+    }));
+    __webpack_require__.d(__webpack_exports__, "d", (function() {
+        return FIREBASE_SCRIPTS;
+    }));
+    __webpack_require__.d(__webpack_exports__, "c", (function() {
+        return ENABLE_PAYMENT_API;
+    }));
+    var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+    var _FUNDING_SKIP_LOGIN;
+    var LOGGER_URL = "/xoplatform/logger/api/logger";
+    var AUTH_API_URL = "/v1/oauth2/token";
+    var ORDERS_API_URL = "/v2/checkout/orders";
+    var PAYMENTS_API_URL = "/v1/payments/payment";
+    var CREATE_SUBSCRIPTIONS_API_URL = "/v1/billing/subscriptions";
+    var VALIDATE_PAYMENT_METHOD_API = "validate-payment-method";
+    var VAULT_SETUP_TOKENS_API_URL = "/v3/vault/setup-tokens";
+    var SMART_API_URI = {
+        AUTH: "/smart/api/auth",
+        CHECKOUT: "/smart/api/checkout",
+        ORDER: "/smart/api/order",
+        PAYMENT: "/smart/api/payment",
+        SUBSCRIPTION: "/smart/api/billagmt/subscriptions",
+        VAULT: "/smart/api/vault"
+    };
+    var GRAPHQL_URI = "/graphql";
+    (_FUNDING_SKIP_LOGIN = {})[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL, 
+    _FUNDING_SKIP_LOGIN[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYLATER] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL, 
+    _FUNDING_SKIP_LOGIN[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.CREDIT] = _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.PAYPAL;
+    var FIREBASE_SCRIPTS = {
+        APP: "https://www.paypalobjects.com/checkout/js/lib/firebase-app.js",
+        AUTH: "https://www.paypalobjects.com/checkout/js/lib/firebase-auth.js",
+        DATABASE: "https://www.paypalobjects.com/checkout/js/lib/firebase-database.js"
+    };
+    var ENABLE_PAYMENT_API = !1;
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
     __webpack_require__.d(__webpack_exports__, "c", (function() {
         return getDomain;
     }));
@@ -3077,7 +3109,7 @@ window.smartCard = function(modules) {
     __webpack_require__(5);
     __webpack_require__(4);
     __webpack_require__(0);
-    __webpack_require__(8);
+    __webpack_require__(7);
     __webpack_require__(1);
     __webpack_require__(2);
     var ON_SHIPPING_CHANGE_PATHS = {
@@ -3163,7 +3195,7 @@ window.smartCard = function(modules) {
     };
     var cross_domain_utils_src = __webpack_require__(9);
     var sdk_constants_src = __webpack_require__(0);
-    var config = __webpack_require__(7);
+    var config = __webpack_require__(8);
     function getLogger() {
         var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? config.f + "?disableSetCookie=true" : config.f;
         return Object(belter_src.i)(getLogger, (function() {
@@ -3914,7 +3946,7 @@ window.smartCard = function(modules) {
         return vaultApprovalSessionIdToOrderId;
     }));
     __webpack_require__(4);
-    var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+    var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8);
     var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(6);
     var updateVaultSetupToken = function(_ref2) {
         var clientID = _ref2.clientID, vaultSetupToken = _ref2.vaultSetupToken, paymentSource = _ref2.paymentSource, idToken = _ref2.idToken;
@@ -4192,17 +4224,17 @@ window.smartCard = function(modules) {
     __webpack_require__(3);
     __webpack_require__(0);
     __webpack_require__(9);
-    __webpack_require__(8);
+    __webpack_require__(7);
     __webpack_require__(1);
     __webpack_require__(2);
-    __webpack_require__(7);
+    __webpack_require__(8);
     __webpack_require__(23);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(4);
     __webpack_require__(3);
     __webpack_require__(0);
-    __webpack_require__(8);
+    __webpack_require__(7);
     __webpack_require__(1);
     __webpack_require__(2);
 }, function(module, __webpack_exports__, __webpack_require__) {
@@ -4211,7 +4243,7 @@ window.smartCard = function(modules) {
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__(0);
-    __webpack_require__(8);
+    __webpack_require__(7);
     __webpack_require__(2);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
@@ -4226,20 +4258,20 @@ window.smartCard = function(modules) {
     __webpack_require__(4);
     __webpack_require__(3);
     __webpack_require__(0);
-    __webpack_require__(8);
+    __webpack_require__(7);
     __webpack_require__(1);
     __webpack_require__(2);
+    __webpack_require__(8);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__(4);
+    __webpack_require__(3);
+    __webpack_require__(0);
+    __webpack_require__(2);
+    __webpack_require__(1);
     __webpack_require__(7);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    __webpack_require__(4);
-    __webpack_require__(3);
-    __webpack_require__(0);
-    __webpack_require__(2);
-    __webpack_require__(1);
-    __webpack_require__(8);
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
     __webpack_require__(3);
     __webpack_require__(4);
     __webpack_require__(0);
@@ -4252,7 +4284,7 @@ window.smartCard = function(modules) {
     __webpack_require__(17);
     __webpack_require__(4);
     __webpack_require__(0);
-    __webpack_require__(8);
+    __webpack_require__(7);
     __webpack_require__(1);
     __webpack_require__(2);
     __webpack_require__(10);
@@ -4264,7 +4296,7 @@ window.smartCard = function(modules) {
     __webpack_require__(17);
     __webpack_require__(4);
     __webpack_require__(0);
-    __webpack_require__(8);
+    __webpack_require__(7);
     __webpack_require__(1);
     __webpack_require__(2);
     __webpack_require__(10);
@@ -4283,7 +4315,7 @@ window.smartCard = function(modules) {
     "use strict";
     __webpack_require__(4);
     __webpack_require__(3);
-    __webpack_require__(8);
+    __webpack_require__(7);
     __webpack_require__(2);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
@@ -9714,7 +9746,7 @@ window.smartCard = function(modules) {
         });
         var _ref;
     }
-    var api = __webpack_require__(8);
+    var api = __webpack_require__(7);
     var logger_threeDsAuthStatus = function(_ref8) {
         var authStatus = _ref8.authStatus;
         Object(lib.c)().addTrackingBuilder((function() {
@@ -11458,7 +11490,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.156", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.157", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 
