@@ -7,7 +7,7 @@ import { INTENT, SDK_QUERY_KEYS, FPTI_KEY, FUNDING } from '@paypal/sdk-constants
 
 import { type OrderResponse, type PaymentResponse, getOrder, captureOrder, authorizeOrder, patchOrder,
     getSubscription, activateSubscription, type SubscriptionResponse, getPayment, executePayment, patchPayment,
-    getSupplementalOrderInfo, isProcessorDeclineError, isUnprocessableEntityError } from '../api';
+    getSupplementalOrderInfo, isProcessorDeclineError, isUnprocessableEntityError, upgradeFacilitatorAccessTokenWithIgnoreCache } from '../api';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_STATE } from '../constants';
 import { unresolvedPromise, getLogger, sendCountMetric } from '../lib';
 import { ENABLE_PAYMENT_API } from '../config';
@@ -131,7 +131,6 @@ const handleProcessorError = <T>(err : mixed, restart : () => ZalgoPromise<void>
     throw err;
 };
 
-
 type OrderActionOptions = {|
     orderID : string,
     paymentID : ?string,
@@ -148,12 +147,32 @@ type OrderActionOptions = {|
 
 function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments } : OrderActionOptions) : OrderActions {
     const get = memoize(() => {
+        if (experiments?.upgradeLSATWithIgnoreCache) {
+            // $FlowFixMe
+            return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
+                .then((upgradedFacilitatorAccessToken) => {
+                    return getOrder(orderID, { facilitatorAccessToken:upgradedFacilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments });
+            })
+        }
         return getOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments });
     });
 
     const capture = memoize(() => {
         if (intent !== INTENT.CAPTURE) {
             throw new Error(`Use ${ SDK_QUERY_KEYS.INTENT }=${ INTENT.CAPTURE } to use client-side capture`);
+        }
+
+        if (experiments?.upgradeLSATWithIgnoreCache) {
+            // $FlowFixMe
+            return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
+                .then((upgradedFacilitatorAccessToken) => {
+                    return captureOrder(orderID, { facilitatorAccessToken:upgradedFacilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments })
+                        .finally(get.reset)
+                        .finally(capture.reset)
+                        .catch(err => {
+                            return handleProcessorError<OrderResponse>(err, restart, onError);
+                    });
+            })
         }
 
         return captureOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments })
@@ -169,6 +188,17 @@ function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, b
             throw new Error(`Use ${ SDK_QUERY_KEYS.INTENT }=${ INTENT.AUTHORIZE } to use client-side authorize`);
         }
 
+        if (experiments?.upgradeLSATWithIgnoreCache) {
+            // $FlowFixMe
+            return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
+                .then((upgradedFacilitatorAccessToken) => {
+                    return authorizeOrder(orderID, { facilitatorAccessToken: upgradedFacilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments })
+                        .finally(get.reset)
+                        .finally(authorize.reset)
+                        .catch(err => handleProcessorError<OrderResponse>(err, restart, onError));
+            });
+        }
+
         return authorizeOrder(orderID, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments })
             .finally(get.reset)
             .finally(authorize.reset)
@@ -176,6 +206,15 @@ function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, b
     });
 
     const patch = (data = {}) => {
+        if (experiments?.upgradeLSATWithIgnoreCache) {
+            // $FlowFixMe
+            return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
+            .then((upgradedFacilitatorAccessToken) => {
+                return patchOrder(orderID, data, { facilitatorAccessToken: upgradedFacilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments }).catch(() => {
+                    throw new Error('Order could not be patched');
+                });
+            })
+        }
         return patchOrder(orderID, data, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments }).catch(() => {
             throw new Error('Order could not be patched');
         });
@@ -253,7 +292,7 @@ type ApproveOrderActionOptions = {|
     experiments: Experiments
 |};
 
-function buildXApproveOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments } : ApproveOrderActionOptions) : XOnApproveOrderActionsType {
+export function buildXApproveOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments } : ApproveOrderActionOptions) : XOnApproveOrderActionsType {
     const order = buildOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments });
     const payment = buildPaymentActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError });
 

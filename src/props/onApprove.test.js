@@ -148,6 +148,42 @@ describe("onApprove", () => {
         expect.anything()
       );
     });
+
+    test("invoke upgradeFacilitatorAccessTokenWithIgnoreCache call if treatment is present", async () => {
+      const getOnApproveOrderResult = getOnApproveOrder({
+        ...getOnApproveOrderOptions,
+        experiments: {
+          upgradeLSATWithIgnoreCache: true,
+        },
+      });
+      await getOnApproveOrderResult({}, { restart });
+      expect(merchantOnApprove).toHaveBeenCalledWith(
+        expect.objectContaining({
+          facilitatorAccessToken: "",
+          orderID: "EC-abc123",
+          paymentSource: "paypal",
+        }),
+        expect.anything()
+      );
+    });
+
+    test("invoke upgradeFacilitatorAccessTokenWithIgnoreCache call if treatment is not present", async () => {
+      const getOnApproveOrderResult = getOnApproveOrder({
+        ...getOnApproveOrderOptions,
+        experiments: {
+          upgradeLSATWithIgnoreCache: false,
+        },
+      });
+      await getOnApproveOrderResult({}, { restart });
+      expect(merchantOnApprove).toHaveBeenCalledWith(
+        expect.objectContaining({
+          facilitatorAccessToken: "",
+          orderID: "EC-abc123",
+          paymentSource: "paypal",
+        }),
+        expect.anything()
+      );
+    });
   });
 
   describe("getOnApproveVaultWithoutPurchase()", () => {

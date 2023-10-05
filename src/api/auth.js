@@ -128,6 +128,43 @@ export function upgradeFacilitatorAccessToken(facilitatorAccessToken : string, {
     });
 }
 
+export function upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken : string, buyerAccessToken : string, orderID : string) : ZalgoPromise<string> {
+    return inlineMemoize(upgradeFacilitatorAccessTokenWithIgnoreCache, () => {
+        clearLsatState();
+        onLsatUpgradeCalled();
+
+        return callGraphQL({
+            name: 'CreateUpgradedLowScopeAccessToken',
+            headers: {
+                [ HEADERS.ACCESS_TOKEN ]:   buyerAccessToken,
+                [ HEADERS.CLIENT_CONTEXT ]: orderID
+            },
+            query: `
+            mutation CreateUpgradedLowScopeAccessToken(
+                $orderID: String!
+                $buyerAccessToken: String!
+                $facilitatorAccessToken: String!
+            ) {
+                createUpgradedLowScopeAccessToken(
+                    token: $orderID
+                    buyerAccessToken: $buyerAccessToken
+                    merchantLSAT: $facilitatorAccessToken
+                )
+            }
+        `,
+            variables: { facilitatorAccessToken, buyerAccessToken, orderID }
+        })
+        .then(res => {
+            return res?.createUpgradedLowScopeAccessToken;
+        })
+        .catch(err => {
+            getLogger().warn('rest_api_upgrade_facilitator_access_token_with_ignore_cache_error');
+            onLsatUpgradeError(err);
+            return facilitatorAccessToken;
+        });
+    }, [ facilitatorAccessToken, buyerAccessToken, orderID ]);
+}
+
 export function exchangeAccessTokenForAuthCode(buyerAccessToken : string) : ZalgoPromise<string> {
     return callGraphQL({
         name:  'ExchangeAuthCode',

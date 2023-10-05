@@ -3,7 +3,7 @@
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 import { COUNTRY, FPTI_KEY } from '@paypal/sdk-constants/src';
 
-import { patchShipping, patchOrder, type OrderResponse } from '../api';
+import { patchShipping, patchOrder, type OrderResponse, upgradeFacilitatorAccessTokenWithIgnoreCache } from '../api';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY } from '../constants';
 import { getLogger } from '../lib';
 import type { OrderAmount, Experiments, FeatureFlags, ShippingOption } from '../types';
@@ -169,6 +169,16 @@ export function buildXShippingChangeActions({ orderID, actions, facilitatorAcces
             return patchShipping({ clientID, data, orderID }).catch(() => {
                 throw new Error('Order could not be patched');
             });
+        }
+
+        if (experiments?.upgradeLSATWithIgnoreCache) {
+            // $FlowFixMe
+            return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
+                .then((upgradedFacilitatorAccessToken) => {
+                    return patchOrder(orderID, data, { facilitatorAccessToken: upgradedFacilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments }).catch(() => {
+                        throw new Error('Order could not be patched');
+                    });            
+                });
         }
         return patchOrder(orderID, data, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, experiments }).catch(() => {
             throw new Error('Order could not be patched');
