@@ -17,15 +17,6 @@ import type { OnInit, XOnInit, OnClick, XOnClick, XOnError, OnError, XGetPopupBr
 // export something to force webpack to see this as an ES module
 export const TYPES = true;
 
-export type XOnSmartWalletEligibleDataType = {|
-    accessToken : string,
-    eligibilityReason : string,
-    locale : LocaleType,
-    orderID : string
-|};
-
-export type onSmartWalletEligible = (params : XOnSmartWalletEligibleDataType) => ZalgoPromise<{| smartWalletRendered : boolean, buyerIntent : string |}>;
-
 export type PrerenderDetailsType = {|
     win ? : ? ProxyWindow,
     fundingSource : $Values<typeof FUNDING>,
@@ -143,8 +134,6 @@ export type Props = {|
     onClick : ?OnClick,
     connect : ?ConnectOptions,
 
-    onSmartWalletEligible? : onSmartWalletEligible,
-
     paymentMethodToken : ?string,
 
     applePay : XApplePaySessionConfigRequest,
@@ -155,19 +144,13 @@ export type Props = {|
 
     paymentRequest: ?PaymentRequest,
     merchantID : $ReadOnlyArray<string>,
-    enableOrdersApprovalSmartWallet : boolean | void,
-    smartWalletOrderID : string | void,
     disableSetCookie : boolean
 |};
 
 export function getProps({
-    branded,
-    enableOrdersApprovalSmartWallet,
-    smartWalletOrderID
+    branded
 } : {|
-    branded : boolean | null,
-    enableOrdersApprovalSmartWallet? : boolean | void,
-    smartWalletOrderID? : string | void
+    branded : boolean | null
 |}) : Props {
     const xprops : XProps = window.xprops;
 
@@ -293,8 +276,6 @@ export function getProps({
         paymentRequest,
         merchantID,
 
-        enableOrdersApprovalSmartWallet,
-        smartWalletOrderID,
         disableSetCookie
     };
 }

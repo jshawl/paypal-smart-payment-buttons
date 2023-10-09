@@ -4,7 +4,7 @@ import { isIEIntranet, getPageRenderTime, querySelectorAll } from '@krakenjs/bel
 import { FPTI_KEY, ENV, FUNDING, FPTI_USER_ACTION, COUNTRY } from '@paypal/sdk-constants/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
-import type { LocaleType, Wallet } from '../types';
+import type { LocaleType } from '../types';
 import {
     getLogger,
     setupLogger,
@@ -57,14 +57,11 @@ type ButtonLoggerOptions = {|
     stickinessID : string,
     buyerCountry : $Values<typeof COUNTRY>,
     onShippingChange : ?OnShippingChange,
-    wallet? : ?Wallet,
-    smartWalletOrderID? : string,
-    enableOrdersApprovalSmartWallet? : boolean,
     product? : string
 |};
 
 export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, partnerAttributionID, commit, sdkCorrelationID, buttonCorrelationID, locale,
-    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, wallet, smartWalletOrderID, product } : ButtonLoggerOptions) : ZalgoPromise<void> {
+    merchantID, merchantDomain, sdkVersion, style, fundingSource, getQueriedEligibleFunding, stickinessID, buyerCountry, onShippingChange, product } : ButtonLoggerOptions) : ZalgoPromise<void> {
 
     const logger = getLogger();
 
@@ -91,7 +88,6 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             [FPTI_KEY.MERCHANT_DOMAIN]:              merchantDomain,
             [FPTI_KEY.CHOSEN_FUNDING]:               fundingSource,
             [FPTI_KEY.PRODUCT]:                      product,
-            [FPTI_KEY.TOKEN]:                        smartWalletOrderID,
             [FPTI_KEY.TIMESTAMP]:                    Date.now().toString()
         };
     });
@@ -176,14 +172,6 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             logger.info(`button_render_CPL_instrumentation_not_executed`);
         }
 
-        const getFundingInstrumentId = function (): ?string {
-            if (wallet?.paypal?.instruments[0]?.secondaryInstruments && wallet.paypal.instruments[0].instrumentID) {
-                return `${ wallet.paypal.instruments[0].instrumentID },${ wallet.paypal.instruments[0].secondaryInstruments[0].instrumentID }`;
-            } else if (wallet?.paypal?.instruments[0]?.instrumentID) {
-                return `${ wallet.paypal.instruments[0].instrumentID }`;
-            }
-        }
-
         const tracking = {
             [FPTI_KEY.STATE]:                           FPTI_STATE.BUTTON,
             [FPTI_KEY.TRANSITION]:                      FPTI_TRANSITION.BUTTON_LOAD,
@@ -204,12 +192,6 @@ export function setupButtonLogger({ env, sessionID, buttonSessionID, clientID, p
             [FPTI_BUTTON_KEY.BUTTON_TYPE]:              FPTI_BUTTON_TYPE.IFRAME,
             [FPTI_BUTTON_KEY.BUTTON_TAGLINE_ENABLED]:   tagline ? '1' : '0',
             [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_PASSED]: onShippingChange ? '1' : '0'
-        }
-
-        const fundingInstrumentId = getFundingInstrumentId();
-
-        if (fundingInstrumentId) {
-            tracking[`${ FPTI_KEY.FI_ID }`] = fundingInstrumentId;
         }
 
         logger.track(tracking);

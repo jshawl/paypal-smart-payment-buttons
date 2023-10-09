@@ -172,12 +172,10 @@ type CreateOrderProps = {|
     createBillingAgreement?: ?CreateBillingAgreement,
     createSubscription?: ?CreateSubscription,
     createVaultSetupToken?: ?CreateVaultSetupToken,
-    enableOrdersApprovalSmartWallet?: boolean,
-    flow: ?string,
-    smartWalletOrderID?: string,
+    flow: ?string
   |};
 
-export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource, experiments } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, enableOrdersApprovalSmartWallet, smartWalletOrderID, createVaultSetupToken, flow } : CreateOrderProps) : CreateOrder {
+export function getCreateOrder({ createOrder, intent, currency, merchantID, partnerAttributionID, paymentSource, experiments } : CreateOrderXProps, { facilitatorAccessToken, createBillingAgreement, createSubscription, createVaultSetupToken, flow } : CreateOrderProps) : CreateOrder {
     
     const isVaultWithoutPurchase = (flow === "vault_without_purchase" && createVaultSetupToken);
     
@@ -192,10 +190,6 @@ export function getCreateOrder({ createOrder, intent, currency, merchantID, part
         const queryOrderID = getQueryParam('orderID');
         if (queryOrderID) {
             return ZalgoPromise.resolve(queryOrderID);
-        }
-
-        if(enableOrdersApprovalSmartWallet && smartWalletOrderID) {
-            return ZalgoPromise.resolve(smartWalletOrderID);
         }
 
         const startTime = Date.now();

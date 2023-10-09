@@ -28,8 +28,6 @@ describe("callbackProps", () => {
       clientID: "client-id-is-me",
       facilitatorAccessToken: "facilitator-access-token",
       currency: "USD",
-      enableOrdersApprovalSmartWallet: false, // uhh is this correct?
-      smartWalletOrderID: "some-smart-wallet-id",
       intent: INTENT.CAPTURE,
       branded: false,
       vault: false,

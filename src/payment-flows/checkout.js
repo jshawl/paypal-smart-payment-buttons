@@ -1,7 +1,7 @@
 /* @flow */
 
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { memoize, noop, supportsPopups, stringifyError, extendUrl, PopupOpenError, parseQuery, submitForm, isWebView } from '@krakenjs/belter/src';
+import { memoize, noop, supportsPopups, stringifyError, extendUrl, PopupOpenError, parseQuery, isWebView } from '@krakenjs/belter/src';
 import { FUNDING, FPTI_KEY, APM_LIST } from '@paypal/sdk-constants/src';
 import { getParent, getTop, type CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
 
@@ -12,7 +12,6 @@ import { CONTEXT, TARGET_ELEMENT, BUYER_INTENT, FPTI_TRANSITION, FPTI_CONTEXT_TY
 import { unresolvedPromise, getLogger, setBuyerAccessToken, sendCountMetric } from '../lib';
 import { openPopup } from '../ui';
 import { FUNDING_SKIP_LOGIN } from '../config';
-import { enableLoadingSpinner, getButtons } from "../button/dom";
 
 import type { PaymentFlow, PaymentFlowInstance, SetupOptions, InitOptions } from './types';
 
@@ -312,64 +311,6 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                     // eslint-disable-next-line no-use-before-define
                     .finally(() => close().then(noop))
                     .catch(noop);
-            },
-
-            onSmartWalletEligible: ({ accessToken, eligibilityReason, locale: smartWalletLocale, orderID }) : ZalgoPromise<{| smartWalletRendered : boolean, buyerIntent : string |}> => {
-                const { country, lang } = smartWalletLocale || locale;
-                const access_token = accessToken || buyerAccessToken || "";
-                const PPOF_MIN_WIDTH = 250;
-                
-                if (window.innerWidth < PPOF_MIN_WIDTH || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_FUNDING_SHIPPING || buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT) {
-                    getLogger().info(`checkout_smart_wallet_not_eligible `, {
-                        buyerIntent,
-                        width: window.innerWidth
-                    }).track({
-                        [FPTI_KEY.STATE]:        FPTI_STATE.BUTTON,
-                        [FPTI_KEY.STATE]:        FPTI_STATE.ELIGIBILITY_CHECK,
-                        [FPTI_KEY.TRANSITION]:   `${eligibilityReason}_ineligible`,
-                        [FPTI_KEY.CONTEXT_ID]:   orderID,
-                        [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID
-                    }).flush();
-                    return ZalgoPromise.resolve({
-                        smartWalletRendered: false,
-                        buyerIntent
-                    });
-                }
-
-                createOrder().then(walletOrderID => {
-                    getLogger().info(`checkout_smart_wallet_eligible `, {
-                        buyerIntent,
-                        eligibilityReason
-                    }).track({
-                        [FPTI_KEY.STATE]:        FPTI_STATE.BUTTON,
-                        [FPTI_KEY.STATE]:        FPTI_STATE.ELIGIBILITY_CHECK,
-                        [FPTI_KEY.TRANSITION]:   `${eligibilityReason}_eligible`,
-                        [FPTI_KEY.CONTEXT_ID]:   walletOrderID,
-                        [FPTI_KEY.CONTEXT_TYPE]: FPTI_CONTEXT_TYPE.ORDER_ID
-                    }).flush().then(() => {
-                        // eslint-disable-next-line no-use-before-define
-                        close().then(() => {
-                            getButtons().forEach(smartButton => enableLoadingSpinner(smartButton));
-                            submitForm({
-                                url: document.location.href,
-                                target: '_self',
-                                body: {
-                                    buyerAccessToken: access_token,
-                                    smartWalletOrderID: walletOrderID,
-                                    enableOrdersApprovalSmartWallet: true,
-                                    'locale.country': country,
-                                    'locale.lang': lang,
-                                    product: eligibilityReason
-                                }
-                            });
-                        });
-                    });
-                });
-
-                return ZalgoPromise.resolve({
-                    smartWalletRendered: true,
-                    buyerIntent
-                });
             },
 
             onAuth: ({ accessToken }) => {

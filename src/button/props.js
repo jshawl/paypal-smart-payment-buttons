@@ -47,17 +47,13 @@ export function getButtonProps({
     brandedDefault,
     paymentSource,
     experiments,
-    featureFlags,
-    enableOrdersApprovalSmartWallet,
-    smartWalletOrderID
+    featureFlags
 } : {|
     facilitatorAccessToken : string,
     brandedDefault : boolean | null,
     paymentSource : $Values<typeof FUNDING> | null,
     experiments: Experiments;
-    featureFlags: FeatureFlags,
-    enableOrdersApprovalSmartWallet? : boolean,
-    smartWalletOrderID? : string
+    featureFlags: FeatureFlags
 |}) : ButtonProps {
     const xprops : ButtonXProps = window.xprops;
 
@@ -131,7 +127,7 @@ export function getButtonProps({
         }
     }
 
-    const props = getProps({ branded, enableOrdersApprovalSmartWallet, smartWalletOrderID })
+    const props = getProps({ branded })
 
     // TODO: This is a lot...maybe we consider just passing in `xprops` and having the function handle splitting things off.
     const callbackProps = getCallbackProps({
@@ -142,8 +138,6 @@ export function getButtonProps({
       facilitatorAccessToken,
       currency,
       intent,
-      enableOrdersApprovalSmartWallet,
-      smartWalletOrderID,
       branded,
       clientAccessToken,
       vault,

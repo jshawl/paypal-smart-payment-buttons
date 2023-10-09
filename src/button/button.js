@@ -1,11 +1,11 @@
 /* @flow */
 
 import { onClick as onElementClick, querySelectorAll, noop, stringifyErrorMessage, stringifyError, preventClickFocus } from '@krakenjs/belter/src';
-import { FUNDING, COUNTRY, FPTI_KEY, type FundingEligibilityType } from '@paypal/sdk-constants/src';
+import { COUNTRY, FPTI_KEY, type FundingEligibilityType } from '@paypal/sdk-constants/src';
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
 
 import type { ContentType, Wallet, PersonalizationType, Experiments, FeatureFlags, InlinePaymentFieldsEligibility } from '../types';
-import { sendCountMetric, getLogger, getSmartFieldsByFundingSource, setBuyerAccessToken, registerServiceWorker, unregisterServiceWorker } from '../lib';
+import { sendCountMetric, getLogger, getSmartFieldsByFundingSource, registerServiceWorker, unregisterServiceWorker } from '../lib';
 import { type FirebaseConfig } from '../api';
 import { DATA_ATTRIBUTES, BUYER_INTENT, FPTI_STATE, FPTI_CUSTOM_KEY, ORDER_CREATED_BY } from '../constants';
 import { type Payment } from '../payment-flows';
@@ -42,8 +42,6 @@ export type SetupButtonOptions = {|
     brandedDefault? : boolean | null,
     experiments?: Experiments;
     featureFlags: FeatureFlags,
-    smartWalletOrderID? : string,
-    enableOrdersApprovalSmartWallet? : boolean,
     product? : string,
     dumbledoreCurrentReleaseHash? : string,
     dumbledoreServiceWorker? : string,
@@ -79,8 +77,6 @@ export function setupButton({
     brandedDefault = null,
     experiments = {},
     featureFlags,
-    smartWalletOrderID,
-    enableOrdersApprovalSmartWallet,
     product,
     dumbledoreCurrentReleaseHash,
     dumbledoreServiceWorker
@@ -90,10 +86,6 @@ export function setupButton({
     }
 
     const clientID = window.xprops.clientID;
-
-    if (buyerAccessToken && smartWalletOrderID) {
-        setBuyerAccessToken(buyerAccessToken);
-    }
 
     const serviceData = getServiceData({
         eligibility,
@@ -112,9 +104,7 @@ export function setupButton({
 
     const { merchantID, buyerCountry } = serviceData;
 
-    const paymentSource = enableOrdersApprovalSmartWallet ? FUNDING.PAYPAL : null;
-
-    const props = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource, featureFlags, enableOrdersApprovalSmartWallet, smartWalletOrderID, experiments});
+    const props = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: null, featureFlags, experiments});
     const { env, sessionID, partnerAttributionID, commit, sdkCorrelationID, locale, onShippingChange,
         buttonSessionID, merchantDomain, onInit,
         getPrerenderDetails, rememberFunding, getQueriedEligibleFunding, style, fundingSource,
@@ -226,7 +216,7 @@ export function setupButton({
                 unregisterServiceWorker();
             }
 
-            const paymentProps = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: paymentFundingSource, featureFlags, enableOrdersApprovalSmartWallet, smartWalletOrderID, experiments });
+            const paymentProps = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: paymentFundingSource, featureFlags, experiments });
 
             const payPromise = initiatePayment({ payment, props: paymentProps });
             const { onError } = paymentProps;
@@ -284,7 +274,7 @@ export function setupButton({
                 throw new Error(`Can not find button element`);
             }
 
-            const paymentProps = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: paymentFundingSource, featureFlags, enableOrdersApprovalSmartWallet, smartWalletOrderID, experiments });
+            const paymentProps = getButtonProps({ facilitatorAccessToken, brandedDefault, paymentSource: paymentFundingSource, featureFlags, experiments });
             const payment = { win, button, fundingSource: paymentFundingSource, card, buyerIntent: BUYER_INTENT.PAY };
             const payPromise = initiatePayment({ payment, props: paymentProps });
             const { onError } = paymentProps;
@@ -319,7 +309,7 @@ export function setupButton({
     const setupButtonLogsTask = setupButtonLogger({
         style, env, sdkVersion, sessionID, clientID, partnerAttributionID, commit, sdkCorrelationID,
         stickinessID, buttonCorrelationID, locale, merchantID, buttonSessionID, merchantDomain,
-        fundingSource, getQueriedEligibleFunding, buyerCountry, onShippingChange, wallet, smartWalletOrderID, enableOrdersApprovalSmartWallet, product });
+        fundingSource, getQueriedEligibleFunding, buyerCountry, onShippingChange, product });
     const setupPaymentFlowsTask = setupPaymentFlows({ props, config, serviceData, components });
     const setupExportsTask = setupExports({ props, isEnabled, facilitatorAccessToken, fundingEligibility, merchantID });
 

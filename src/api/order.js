@@ -701,17 +701,10 @@ type OneClickApproveOrderOptions = {|
     instrumentType : $Values<typeof WALLET_INSTRUMENT>,
     instrumentID : string,
     buyerAccessToken : string,
-    clientMetadataID : ?string,
-    planID? : ?string,
-    useExistingPlanning? : boolean,
-    enableOrdersApprovalSmartWallet? : boolean
+    clientMetadataID : ?string
 |};
 
-export function oneClickApproveOrder({ orderID, instrumentType, instrumentID, buyerAccessToken, clientMetadataID, planID, useExistingPlanning = false, enableOrdersApprovalSmartWallet } : OneClickApproveOrderOptions) : ZalgoPromise<ApproveData> {
-    const accessTokenQuery = `auth {
-        accessToken
-    }`;
-
+export function oneClickApproveOrder({ orderID, instrumentType, instrumentID, buyerAccessToken, clientMetadataID } : OneClickApproveOrderOptions) : ZalgoPromise<ApproveData> {
     return callGraphQL({
         name:  'OneClickApproveOrder',
         query: `
@@ -719,22 +712,21 @@ export function oneClickApproveOrder({ orderID, instrumentType, instrumentID, bu
                 $orderID : String!
                 $instrumentType : String!
                 $instrumentID : String!
-                $planID: String
-                $useExistingPlanning: Boolean
             ) {
                 oneClickPayment(
                     token: $orderID
                     selectedInstrumentType : $instrumentType
                     selectedInstrumentId : $instrumentID
                     selectedPlanId: $planID
-                    useExistingPlanning: $useExistingPlanning
                 ) {
                     userId
-                    ${ !enableOrdersApprovalSmartWallet ? accessTokenQuery : '' }
+                    auth {
+                        accessToken
+                    }
                 }
             }
         `,
-        variables: { orderID, instrumentType, instrumentID, planID, useExistingPlanning },
+        variables: { orderID, instrumentType, instrumentID },
         headers:   {
             [HEADERS.ACCESS_TOKEN]:       buyerAccessToken,
             [HEADERS.CLIENT_CONTEXT]:     orderID,

@@ -142,15 +142,4 @@ describe("getButtonProps", () => {
       "Do not pass both createSubscription and createBillingAgreement"
     );
   });
-
-  it("passes through enableOrdersApprovalSmartWallet and smartWalletOrderID to props", () => {
-    window.xprops.intent = INTENT.CAPTURE;
-    const props = getButtonProps({
-      ...defaultArgs,
-      enableOrdersApprovalSmartWallet: true,
-      smartWalletOrderID: "abc",
-    });
-    expect(props.enableOrdersApprovalSmartWallet).toBe(true);
-    expect(props.smartWalletOrderID).toEqual("abc");
-  });
 });
