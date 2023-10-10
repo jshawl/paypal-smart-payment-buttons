@@ -10108,7 +10108,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.158", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.159", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -12956,6 +12956,7 @@ window.spb = function(modules) {
                 return (_ref9 = {})["3ds_auth_status"] = authStatus, _ref9;
             }));
         };
+        var lib_logger = __webpack_require__("./src/lib/logger.js");
         function handleThreeDomainSecureRedirect(_ref) {
             var ThreeDomainSecure = _ref.ThreeDomainSecure, vaultToken = _ref.vaultToken, createOrder = _ref.createOrder, action = _ref.action, getParent = _ref.getParent;
             var promise = new zalgo_promise_src.ZalgoPromise;
@@ -13035,7 +13036,7 @@ window.spb = function(modules) {
                     click: function() {},
                     start: function() {
                         return function(_ref) {
-                            var facilitatorAccessToken = _ref.facilitatorAccessToken, extraFields = _ref.extraFields;
+                            var facilitatorAccessToken = _ref.facilitatorAccessToken, extraFields = _ref.extraFields, experiments = _ref.experiments;
                             var cardProps = function(_ref2) {
                                 var _fundingEligibility$c, _fundingEligibility$c2;
                                 var facilitatorAccessToken = _ref2.facilitatorAccessToken;
@@ -13083,8 +13084,9 @@ window.spb = function(modules) {
                             }({
                                 facilitatorAccessToken: facilitatorAccessToken,
                                 featureFlags: _ref.featureFlags,
-                                experiments: _ref.experiments
+                                experiments: experiments
                             });
+                            experiments.useIDToken && (cardProps.userIDToken ? facilitatorAccessToken = cardProps.userIDToken : Object(lib_logger.getLogger)().info("hcf_userIDToken_present_false"));
                             !function(_ref10) {
                                 var _getLogger$track5;
                                 var cardFlowType = _ref10.cardFlowType, hcfSessionID = _ref10.hcfSessionID;
@@ -13327,7 +13329,8 @@ window.spb = function(modules) {
                             facilitatorAccessToken: facilitatorAccessToken,
                             featureFlags: serviceData.featureFlags,
                             experiments: {
-                                hostedCardFields: !0
+                                hostedCardFields: !0,
+                                useIDToken: !0
                             }
                         });
                     },
@@ -15671,7 +15674,6 @@ window.spb = function(modules) {
             spinner: !0
         };
         var confirmOrder = __webpack_require__("./src/props/confirmOrder.js");
-        var lib_logger = __webpack_require__("./src/lib/logger.js");
         function isValidMerchantIDs(merchantIDs, payees) {
             if (merchantIDs.length !== payees.length) return !1;
             var merchantEmails = [];
@@ -16582,7 +16584,7 @@ window.spb = function(modules) {
                     var _ref2;
                     return (_ref2 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref2[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.158", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.159", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref2[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref2[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref2[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 

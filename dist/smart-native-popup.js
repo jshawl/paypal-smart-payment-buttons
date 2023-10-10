@@ -5059,7 +5059,7 @@
                 logger.addTrackingBuilder((function() {
                     var _ref2;
                     return (_ref2 = {}).state_name = "smart_button", _ref2.context_type = "button_session_id", 
-                    _ref2.context_id = buttonSessionID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.158", 
+                    _ref2.context_id = buttonSessionID, _ref2.button_session_id = buttonSessionID, _ref2.button_version = "5.0.159", 
                     _ref2.selected_payment_method = fundingSource, _ref2;
                 }));
                 (function() {

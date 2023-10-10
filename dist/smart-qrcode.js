@@ -3186,7 +3186,7 @@
             logger.addTrackingBuilder((function() {
                 var _ref;
                 return (_ref = {}).state_name = "smart_button", _ref.context_type = "EC-Token", 
-                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.158", 
+                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.159", 
                 _ref.selected_payment_method = fundingSource, _ref;
             }));
             (function() {

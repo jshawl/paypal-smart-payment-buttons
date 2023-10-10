@@ -9882,6 +9882,7 @@ window.smartCard = function(modules) {
             return (_ref9 = {})["3ds_auth_status"] = authStatus, _ref9;
         }));
     };
+    var lib_logger = __webpack_require__(12);
     function handleThreeDomainSecureContingency(_ref2) {
         var status = _ref2.status, links = _ref2.links, ThreeDomainSecure = _ref2.ThreeDomainSecure, createOrder = _ref2.createOrder, getParent = _ref2.getParent;
         return zalgo_promise_src.a.try((function() {
@@ -10010,12 +10011,13 @@ window.smartCard = function(modules) {
         }));
     };
     function submitCardFields(_ref) {
-        var facilitatorAccessToken = _ref.facilitatorAccessToken, extraFields = _ref.extraFields;
+        var facilitatorAccessToken = _ref.facilitatorAccessToken, extraFields = _ref.extraFields, experiments = _ref.experiments;
         var cardProps = getCardProps({
             facilitatorAccessToken: facilitatorAccessToken,
             featureFlags: _ref.featureFlags,
-            experiments: _ref.experiments
+            experiments: experiments
         });
+        experiments.useIDToken && (cardProps.userIDToken ? facilitatorAccessToken = cardProps.userIDToken : Object(lib_logger.a)().info("hcf_userIDToken_present_false"));
         !function(_ref10) {
             var _getLogger$track5;
             var cardFlowType = _ref10.cardFlowType, hcfSessionID = _ref10.hcfSessionID;
@@ -11618,7 +11620,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.158", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.159", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 
