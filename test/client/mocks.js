@@ -333,7 +333,7 @@ export function setupMocks() {
                     };
                 },
                 submit: () => {
-                    return submitCardFields({ facilitatorAccessToken: 'ABCDEF12345', featureFlags: {}, experiments: {hostedCardFields: true} });
+                    return submitCardFields({ facilitatorAccessToken: 'ABCDEF12345', featureFlags: {}, experiments: {hostedCardFields: true, useIDToken: true} });
                 }
             };
         },
@@ -1701,7 +1701,8 @@ export async function mockSetupCardFields() : Promise<void> {
             spbVersion: 'v3'
         },
         experiments: {
-            hostedCardFields: true
+            hostedCardFields: true,
+            useIDToken: true
         }
     });
 }

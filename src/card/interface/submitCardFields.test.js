@@ -1,5 +1,5 @@
 /* @flow */
-import { describe, test, expect, beforeEach, vi } from "vitest";
+import { describe, test, expect, afterEach, vi } from "vitest";
 import { INTENT } from "@paypal/sdk-constants";
 
 import { getCardProps } from "../props";
@@ -8,6 +8,7 @@ import { PAYMENT_FLOWS } from "../../constants";
 import { hcfTransactionSuccess, hcfTransactionError } from "../logger";
 import { SUBMIT_ERRORS } from "../constants";
 import { handleThreeDomainSecureContingency } from "../../lib/3ds";
+import { getLogger } from "../../lib/logger";
 
 import { savePaymentSource } from "./vault-without-purchase";
 import { resetGQLErrors } from "./gql";
@@ -24,6 +25,19 @@ vi.mock("../props", () => {
 
 vi.mock("../../lib/3ds");
 
+vi.mock("../logger");
+vi.mock("../../lib/logger", async () => {
+  const actual = await vi.importActual("../../lib/logger");
+  return {
+    ...actual,
+    getLogger: vi.fn(() => {
+      return {
+        info: vi.fn().mockReturnThis(),
+      };
+    }),
+  };
+});
+
 vi.mock("./hasCardFields", () => {
   return {
     hasCardFields: vi.fn(() => true),
@@ -38,7 +52,6 @@ const mockGetCardFieldsReturn = {
   postalCode: "91210",
 };
 
-vi.mock("../logger");
 vi.mock("./getCardFields", () => {
   return {
     getCardFields: vi.fn(() => mockGetCardFieldsReturn),
@@ -64,7 +77,7 @@ vi.mock("../../api", () => ({
 }));
 
 describe("submitCardFields", () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
@@ -74,6 +87,7 @@ describe("submitCardFields", () => {
     featureFlags: {},
     experiments: {
       hostedCardFields: true,
+      useIDToken: false,
     },
   };
 
@@ -249,6 +263,72 @@ describe("submitCardFields", () => {
   });
 
   describe("handlePurchaseFlow()", () => {
+    test("uses id token for the bearer token if experiment is enabled", async () => {
+      const mockOrderId = "12345";
+      const mockIdToken = "13orqiehfknwjs";
+      const options = {
+        ...defaultOptions,
+        experiments: {
+          hostedCardFields: true,
+          useIDToken: true,
+        },
+      };
+      const mockCardProps = {
+        // eslint-disable-next-line compat/compat, promise/no-native, no-restricted-globals
+        createOrder: vi.fn(() => Promise.resolve(mockOrderId)),
+        // eslint-disable-next-line compat/compat, promise/no-native, no-restricted-globals
+        onApprove: vi.fn(() => Promise.resolve()),
+        // eslint-disable-next-line no-empty-function
+        getParent: () => {},
+        productAction: PAYMENT_FLOWS.WITH_PURCHASE,
+        userIDToken: mockIdToken,
+      };
+      // $FlowIssue
+      getCardProps.mockReturnValue(mockCardProps);
+
+      await submitCardFields(options);
+
+      expect(confirmOrderAPI).toBeCalledWith(
+        expect.any(String),
+        expect.any(Object),
+        expect.objectContaining({ facilitatorAccessToken: mockIdToken })
+      );
+    });
+
+    test("uses id token for the bearer token if experiment is enabled && userIDToken is present", async () => {
+      const mockOrderId = "12345";
+      const options = {
+        ...defaultOptions,
+        experiments: {
+          hostedCardFields: true,
+          useIDToken: true,
+        },
+      };
+      const mockCardProps = {
+        // eslint-disable-next-line compat/compat, promise/no-native, no-restricted-globals
+        createOrder: vi.fn(() => Promise.resolve(mockOrderId)),
+        // eslint-disable-next-line compat/compat, promise/no-native, no-restricted-globals
+        onApprove: vi.fn(() => Promise.resolve()),
+        // eslint-disable-next-line no-empty-function
+        getParent: () => {},
+        productAction: PAYMENT_FLOWS.WITH_PURCHASE,
+      };
+      const infoMock = vi.fn().mockReturnThis();
+      // $FlowIssue
+      getLogger.mockReturnValue({ info: infoMock });
+      // $FlowIssue
+      getCardProps.mockReturnValue(mockCardProps);
+
+      await submitCardFields(options);
+
+      expect(confirmOrderAPI).toBeCalledWith(
+        expect.any(String),
+        expect.any(Object),
+        expect.any(Object)
+      );
+      expect(infoMock).toHaveBeenCalledWith("hcf_userIDToken_present_false");
+    });
+
     test("should handle 3DS contingency for vault with purchase", async () => {
       const mockOrderId = "12345";
       const mock3dsResponse = { liability_shift: "some-value" };
@@ -263,6 +343,7 @@ describe("submitCardFields", () => {
         featureFlags: {},
         experiments: {
           hostedCardFields: true,
+          useIDToken: false,
         },
       };
       const mockCardProps = {

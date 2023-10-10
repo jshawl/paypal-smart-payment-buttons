@@ -141,6 +141,7 @@ type GetCardPropsOptions = {|
   featureFlags: FeatureFlags,
   experiments: {
     hostedCardFields: boolean,
+    useIDToken: boolean,
   },
 |};
 

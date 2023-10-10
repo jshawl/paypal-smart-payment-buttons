@@ -51,7 +51,7 @@ function initCardField({ serviceData } : InitOptions) : PaymentFlowInstance {
     
     const start = () => {
         // need to delete this whole file, its unused. will do in a follow-up PR
-        return submitCardFields({ facilitatorAccessToken, featureFlags: serviceData.featureFlags, experiments: {hostedCardFields: true} });
+        return submitCardFields({ facilitatorAccessToken, featureFlags: serviceData.featureFlags, experiments: {hostedCardFields: true, useIDToken: true} });
     };
 
     const close = promiseNoop;

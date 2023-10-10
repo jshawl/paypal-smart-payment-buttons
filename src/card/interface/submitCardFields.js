@@ -7,7 +7,8 @@ import { confirmOrderAPI } from "../../api"
 import { hcfTransactionError, hcfTransactionSuccess, hcfFieldsSubmit } from "../logger"
 import type { FeatureFlags } from "../../types"
 import type { BillingAddress, Card, ExtraFields } from '../types'
-import {convertCardToPaymentSource, reformatPaymentSource} from '../lib'
+import { convertCardToPaymentSource, reformatPaymentSource} from '../lib'
+import { getLogger } from "../../lib/logger";
 import { SUBMIT_ERRORS } from "../constants"
 import { handleThreeDomainSecureContingency } from "../../lib/3ds"
 import { PAYMENT_FLOWS } from "../../constants";
@@ -25,6 +26,7 @@ type SubmitCardFieldsOptions = {|
   |},
   experiments: {|
     hostedCardFields: boolean,
+    useIDToken: boolean,
   |},
 |};
 
@@ -111,6 +113,16 @@ export function submitCardFields({
     experiments,
   });
 
+  if (experiments.useIDToken) {
+    // CP4 merchants will use the `userIDToken` to auth to associate the transaction with a merchant
+    if (cardProps.userIDToken) {
+      facilitatorAccessToken = cardProps.userIDToken;
+    } else {
+      getLogger().info(`hcf_userIDToken_present_false`)
+    }
+      
+
+  }
   hcfFieldsSubmit({
     cardFlowType: cardProps.productAction,
     hcfSessionID: cardProps.hcfSessionID,

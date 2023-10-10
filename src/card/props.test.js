@@ -17,6 +17,7 @@ describe("getCardProps", () => {
     featureFlags: {},
     experiments: {
       hostedCardFields: true,
+      useIDToken: true,
     },
   };
 
@@ -33,7 +34,7 @@ describe("getCardProps", () => {
     expect(() =>
       getCardProps({
         ...inputs,
-        experiments: { hostedCardFields: false },
+        experiments: { hostedCardFields: false, useIDToken: false },
       })
     ).toThrowError(SUBMIT_ERRORS.NOT_FEATURE_FLAGGED);
   });

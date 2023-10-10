@@ -15,7 +15,8 @@ export type SetupCardOptions = {|
         spbVersion: string
     |},
     experiments: {|
-        hostedCardFields: boolean
+        hostedCardFields: boolean,
+        useIDToken: boolean
     |}
 |};
 

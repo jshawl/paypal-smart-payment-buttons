@@ -28,6 +28,7 @@ const mockSetupCardOptions = {
   },
   experiments: {
     hostedCardFields: true,
+    useIDToken: true,
   },
 };
 

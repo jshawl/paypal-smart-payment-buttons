@@ -22,7 +22,8 @@ type PageProps = {|
     props : CardProps,
     featureFlags: FeatureFlags,
     experiments: {|
-        hostedCardFields: boolean
+        hostedCardFields: boolean,
+        useIDToken: boolean
     |}
 |};
 
