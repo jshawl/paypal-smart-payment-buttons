@@ -2186,6 +2186,16 @@
                 });
             }));
         }
+        var sendCountMetric = function(_ref) {
+            var dimensions = _ref.dimensions, _ref$event = _ref.event, event = void 0 === _ref$event ? "unused" : _ref$event, name = _ref.name, _ref$value = _ref.value, value = void 0 === _ref$value ? 1 : _ref$value;
+            return getLogger().metric({
+                dimensions: dimensions,
+                metricEventName: event,
+                metricNamespace: name,
+                metricValue: value,
+                metricType: "counter"
+            });
+        };
         function util_getBody() {
             var body = document.body;
             if (!body) throw new Error("Document body not found");
@@ -2477,12 +2487,26 @@
                         err: message
                     });
                     if (returnErrorObject) throw errors[0];
+                    sendCountMetric({
+                        name: "pp.app.paypal_sdk.buttons.graphql_" + name + ".error.count",
+                        dimensions: {}
+                    });
                     throw new Error(message);
                 }
                 if (200 !== status) {
                     getLogger().warn("graphql_" + name + "_status_" + status + "_error");
+                    sendCountMetric({
+                        name: "pp.app.paypal_sdk.buttons.graphql_" + name + ".error.count",
+                        dimensions: {
+                            status: status
+                        }
+                    });
                     throw new Error("/graphql returned status " + status + "\n\n" + JSON.stringify(body));
                 }
+                sendCountMetric({
+                    name: "pp.app.paypal_sdk.buttons.graphql_" + name + ".success.count",
+                    dimensions: {}
+                });
                 return body.data;
             }));
         }
@@ -3136,22 +3160,13 @@
                     logger.error("unhandled_error", {
                         err: stringifyError(err)
                     });
-                    dimensions = (_ref = {
+                    sendCountMetric({
                         event: "error",
                         name: "pp.app.paypal_sdk.buttons.unhandled_exception.count",
                         dimensions: {
                             errorType: "payments_sdk_error"
                         }
-                    }).dimensions, event = void 0 === (_ref$event = _ref.event) ? "unused" : _ref$event, 
-                    name = _ref.name, value = void 0 === (_ref$value = _ref.value) ? 1 : _ref$value, 
-                    getLogger().metric({
-                        dimensions: dimensions,
-                        metricEventName: event,
-                        metricNamespace: name,
-                        metricValue: value,
-                        metricType: "counter"
                     });
-                    var _ref, dimensions, _ref$event, event, name, _ref$value, value;
                     logger.flush().catch(src_util_noop);
                 }));
             }({
@@ -3171,7 +3186,7 @@
             logger.addTrackingBuilder((function() {
                 var _ref;
                 return (_ref = {}).state_name = "smart_button", _ref.context_type = "EC-Token", 
-                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.157", 
+                _ref.context_id = orderID, _ref.button_session_id = buttonSessionID, _ref.button_version = "5.0.158", 
                 _ref.selected_payment_method = fundingSource, _ref;
             }));
             (function() {

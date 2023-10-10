@@ -1762,7 +1762,7 @@ window.smartCard = function(modules) {
     var _lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(2);
     function callRestAPI(_ref) {
         var _extends2;
-        var accessToken = _ref.accessToken, method = _ref.method, url = _ref.url, data = _ref.data, headers = _ref.headers, eventName = _ref.eventName;
+        var accessToken = _ref.accessToken, method = _ref.method, url = _ref.url, data = _ref.data, headers = _ref.headers, eventName = _ref.eventName, _ref$metricDimensions = _ref.metricDimensions, metricDimensions = void 0 === _ref$metricDimensions ? {} : _ref$metricDimensions;
         if (!accessToken) throw new Error("No access token passed to " + url);
         var requestHeaders = Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.a)(((_extends2 = {})[_constants__WEBPACK_IMPORTED_MODULE_5__.i.AUTHORIZATION] = "Bearer " + accessToken, 
         _extends2[_constants__WEBPACK_IMPORTED_MODULE_5__.i.CONTENT_TYPE] = "application/json", 
@@ -1788,14 +1788,22 @@ window.smartCard = function(modules) {
                     _getLogger$track[_constants__WEBPACK_IMPORTED_MODULE_5__.e.INFO_MSG] = "URL: " + url, 
                     _getLogger$track));
                 }
-                eventName && Object(_lib__WEBPACK_IMPORTED_MODULE_6__.c)().warn("rest_api_" + eventName + "_status_" + status + "_error");
+                Object(_lib__WEBPACK_IMPORTED_MODULE_6__.c)().warn("rest_api_" + eventName + "_status_" + status + "_error");
+                Object(_lib__WEBPACK_IMPORTED_MODULE_6__.i)({
+                    name: "pp.app.paypal_sdk.buttons.rest_api_" + eventName + ".error.count",
+                    dimensions: metricDimensions
+                });
                 throw error;
             }
+            Object(_lib__WEBPACK_IMPORTED_MODULE_6__.i)({
+                name: "pp.app.paypal_sdk.buttons.rest_api_" + eventName + ".success.count",
+                dimensions: metricDimensions
+            });
             return body;
         }));
     }
     function callSmartAPI(_ref3) {
-        var accessToken = _ref3.accessToken, url = _ref3.url, _ref3$method = _ref3.method, method = void 0 === _ref3$method ? "get" : _ref3$method, _ref3$headers = _ref3.headers, reqHeaders = void 0 === _ref3$headers ? {} : _ref3$headers, json = _ref3.json, _ref3$authenticated = _ref3.authenticated, authenticated = void 0 === _ref3$authenticated || _ref3$authenticated, eventName = _ref3.eventName;
+        var accessToken = _ref3.accessToken, url = _ref3.url, _ref3$method = _ref3.method, method = void 0 === _ref3$method ? "get" : _ref3$method, _ref3$headers = _ref3.headers, reqHeaders = void 0 === _ref3$headers ? {} : _ref3$headers, json = _ref3.json, _ref3$authenticated = _ref3.authenticated, authenticated = void 0 === _ref3$authenticated || _ref3$authenticated, eventName = _ref3.eventName, _ref3$metricDimension = _ref3.metricDimensions, metricDimensions = void 0 === _ref3$metricDimension ? {} : _ref3$metricDimension;
         reqHeaders[_constants__WEBPACK_IMPORTED_MODULE_5__.i.REQUESTED_BY] = _constants__WEBPACK_IMPORTED_MODULE_5__.p;
         if (authenticated && !accessToken) throw new Error("Buyer access token not present - can not call smart api: " + url);
         accessToken && (reqHeaders[_constants__WEBPACK_IMPORTED_MODULE_5__.i.ACCESS_TOKEN] = accessToken);
@@ -1827,12 +1835,26 @@ window.smartCard = function(modules) {
             }
             if (status > 400) {
                 Object(_lib__WEBPACK_IMPORTED_MODULE_6__.c)().warn("smart_api_" + eventName + "_status_" + status + "_error");
+                Object(_lib__WEBPACK_IMPORTED_MODULE_6__.i)({
+                    name: "pp.app.paypal_sdk.buttons.smart_api_" + eventName + ".error.count",
+                    dimensions: Object(_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__.a)({
+                        status: status
+                    }, metricDimensions)
+                });
                 throw new Error("Api: " + url + " returned status code: " + status + " (Corr ID: " + headers[_constants__WEBPACK_IMPORTED_MODULE_5__.i.PAYPAL_DEBUG_ID] + ")\n\n" + JSON.stringify(body));
             }
             if ("success" !== body.ack) {
                 Object(_lib__WEBPACK_IMPORTED_MODULE_6__.c)().warn("smart_api_" + eventName + "_ack_error");
+                Object(_lib__WEBPACK_IMPORTED_MODULE_6__.i)({
+                    name: "pp.app.paypal_sdk.buttons.smart_api_" + eventName + ".error.count",
+                    dimensions: metricDimensions
+                });
                 throw new Error("Api: " + url + " returned ack: " + body.ack + " (Corr ID: " + headers[_constants__WEBPACK_IMPORTED_MODULE_5__.i.PAYPAL_DEBUG_ID] + ")\n\n" + JSON.stringify(body));
             }
+            Object(_lib__WEBPACK_IMPORTED_MODULE_6__.i)({
+                name: "pp.app.paypal_sdk.buttons.smart_api_" + eventName + ".success.count",
+                dimensions: metricDimensions
+            });
             return {
                 data: body.data,
                 headers: headers
@@ -1860,12 +1882,26 @@ window.smartCard = function(modules) {
                     err: message
                 });
                 if (returnErrorObject) throw errors[0];
+                Object(_lib__WEBPACK_IMPORTED_MODULE_6__.i)({
+                    name: "pp.app.paypal_sdk.buttons.graphql_" + name + ".error.count",
+                    dimensions: {}
+                });
                 throw new Error(message);
             }
             if (200 !== status) {
                 Object(_lib__WEBPACK_IMPORTED_MODULE_6__.c)().warn("graphql_" + name + "_status_" + status + "_error");
+                Object(_lib__WEBPACK_IMPORTED_MODULE_6__.i)({
+                    name: "pp.app.paypal_sdk.buttons.graphql_" + name + ".error.count",
+                    dimensions: {
+                        status: status
+                    }
+                });
                 throw new Error(_config__WEBPACK_IMPORTED_MODULE_4__.e + " returned status " + status + "\n\n" + JSON.stringify(body));
             }
+            Object(_lib__WEBPACK_IMPORTED_MODULE_6__.i)({
+                name: "pp.app.paypal_sdk.buttons.graphql_" + name + ".success.count",
+                dimensions: {}
+            });
             return body.data;
         }));
     }
@@ -1994,8 +2030,12 @@ window.smartCard = function(modules) {
     }
     var lsatUpgradeCalled = !1;
     var lsatUpgradeError;
+    var lsatUpgradeWithIgnoreCache = !1;
     var onLsatUpgradeCalled = function() {
         lsatUpgradeCalled = !0;
+    };
+    var getLsatUpgradeWithIgnoreCache = function() {
+        return lsatUpgradeWithIgnoreCache;
     };
     var getLsatUpgradeCalled = function() {
         return lsatUpgradeCalled;
@@ -2009,6 +2049,7 @@ window.smartCard = function(modules) {
     var clearLsatState = function() {
         lsatUpgradeCalled = !1;
         lsatUpgradeError = null;
+        lsatUpgradeWithIgnoreCache = !1;
     };
     function upgradeFacilitatorAccessToken(facilitatorAccessToken, _ref3) {
         var _headers;
@@ -2035,6 +2076,7 @@ window.smartCard = function(modules) {
             var _headers2;
             clearLsatState();
             onLsatUpgradeCalled();
+            lsatUpgradeWithIgnoreCache = !0;
             return Object(api.a)({
                 name: "CreateUpgradedLowScopeAccessToken",
                 headers: (_headers2 = {}, _headers2[constants.i.ACCESS_TOKEN] = buyerAccessToken, 
@@ -2046,9 +2088,14 @@ window.smartCard = function(modules) {
                     orderID: orderID
                 }
             }).then((function(res) {
+                Object(lib.c)().info("create_upgraded_low_scope_access_token_success", {
+                    orderID: orderID
+                });
                 return null == res ? void 0 : res.createUpgradedLowScopeAccessToken;
             })).catch((function(err) {
-                Object(lib.c)().warn("rest_api_upgrade_facilitator_access_token_with_ignore_cache_error");
+                Object(lib.c)().warn("create_upgraded_low_scope_access_token_error", {
+                    orderID: orderID
+                });
                 onLsatUpgradeError(err);
                 return facilitatorAccessToken;
             }));
@@ -2083,11 +2130,17 @@ window.smartCard = function(modules) {
             return detail.issue === constants.k.INVALID_RESOURCE_ID;
         })));
     }
+    function lsatUpgradeType() {
+        return getLsatUpgradeWithIgnoreCache() ? "with_ignore_cache_lsat_upgrade" : "without_ignore_cache_lsat_upgrade";
+    }
     function getOrder(orderID, _ref2) {
         var _headers4;
         var facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, _ref2$forceRestAPI = _ref2.forceRestAPI, forceRestAPI = void 0 !== _ref2$forceRestAPI && _ref2$forceRestAPI, experiments = _ref2.experiments;
-        Object(lib.c)().info("get_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
-        Object(lib.c)().info("get_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
+        Object(lib.c)().info("get_order_" + lsatUpgradeType() + "_" + (getLsatUpgradeCalled() ? "called" : "not_called"), {
+            orderID: orderID
+        });
+        Object(lib.c)().info("get_order_" + lsatUpgradeType() + "_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
+            orderID: orderID,
             err: Object(belter_src.v)(getLsatUpgradeError())
         });
         if (forceRestAPI && !getLsatUpgradeError()) {
@@ -2097,16 +2150,21 @@ window.smartCard = function(modules) {
                 url: src_config.g + "/" + orderID,
                 eventName: "v2_checkout_orders_get",
                 headers: (_headers2 = {}, _headers2[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
-                _headers2[constants.i.PREFER] = constants.m.REPRESENTATION, _headers2)
+                _headers2[constants.i.PREFER] = constants.m.REPRESENTATION, _headers2),
+                metricDimensions: {
+                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                    lsatUpgradeError: Boolean(getLsatUpgradeError())
+                }
             }).catch((function(err) {
                 var _headers3;
                 var restCorrID = Object(api.d)(err);
-                Object(lib.c)().warn("get_order_call_rest_api_error", {
+                Object(lib.c)().warn("get_order_" + lsatUpgradeType() + "_call_rest_api_error", {
                     restCorrID: restCorrID,
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
                 });
-                isInvalidResourceIDError(err) && Object(lib.c)().warn("get_order_invalid_resource_id_error", {
+                isInvalidResourceIDError(err) && Object(lib.c)().warn("get_order_" + lsatUpgradeType() + "_invalid_resource_id_error", {
                     restCorrID: restCorrID,
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
@@ -2116,10 +2174,16 @@ window.smartCard = function(modules) {
                     accessToken: buyerAccessToken,
                     url: src_config.i.ORDER + "/" + orderID,
                     eventName: "order_get",
-                    headers: (_headers3 = {}, _headers3[constants.i.CLIENT_CONTEXT] = orderID, _headers3)
+                    headers: (_headers3 = {}, _headers3[constants.i.CLIENT_CONTEXT] = orderID, _headers3),
+                    metricDimensions: {
+                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                        lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                        smartApiType: "fallback"
+                    }
                 }).then((function(res) {
                     var smartCorrID = Object(api.e)(res);
-                    Object(lib.c)().info("get_order_smart_fallback_success", {
+                    Object(lib.c)().info("get_order_" + lsatUpgradeType() + "_smart_fallback_success", {
                         smartCorrID: smartCorrID,
                         restCorrID: restCorrID,
                         orderID: orderID
@@ -2127,7 +2191,7 @@ window.smartCard = function(modules) {
                     return res.data;
                 })).catch((function(smartErr) {
                     var smartCorrID = Object(api.d)(err);
-                    Object(lib.c)().error("get_order_smart_fallback_error", {
+                    Object(lib.c)().error("get_order_" + lsatUpgradeType() + "_smart_fallback_error", {
                         smartCorrID: smartCorrID,
                         restCorrID: restCorrID,
                         orderID: orderID,
@@ -2141,7 +2205,13 @@ window.smartCard = function(modules) {
             accessToken: buyerAccessToken,
             url: src_config.i.ORDER + "/" + orderID,
             eventName: "order_get",
-            headers: (_headers4 = {}, _headers4[constants.i.CLIENT_CONTEXT] = orderID, _headers4)
+            headers: (_headers4 = {}, _headers4[constants.i.CLIENT_CONTEXT] = orderID, _headers4),
+            metricDimensions: {
+                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                smartApiType: "default"
+            }
         }).then((function(_ref3) {
             return _ref3.data;
         }));
@@ -2162,8 +2232,11 @@ window.smartCard = function(modules) {
     function captureOrder(orderID, _ref4) {
         var _headers7;
         var facilitatorAccessToken = _ref4.facilitatorAccessToken, buyerAccessToken = _ref4.buyerAccessToken, partnerAttributionID = _ref4.partnerAttributionID, _ref4$forceRestAPI = _ref4.forceRestAPI, forceRestAPI = void 0 !== _ref4$forceRestAPI && _ref4$forceRestAPI, experiments = _ref4.experiments;
-        Object(lib.c)().info("capture_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
-        Object(lib.c)().info("capture_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
+        Object(lib.c)().info("capture_order_" + lsatUpgradeType() + "_" + (getLsatUpgradeCalled() ? "called" : "not_called"), {
+            orderID: orderID
+        });
+        Object(lib.c)().info("capture_order_" + lsatUpgradeType() + "_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
+            orderID: orderID,
             err: Object(belter_src.v)(getLsatUpgradeError())
         });
         if (forceRestAPI && !getLsatUpgradeError()) {
@@ -2175,16 +2248,21 @@ window.smartCard = function(modules) {
                 url: src_config.g + "/" + orderID + "/capture",
                 headers: (_headers5 = {}, _headers5[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                 _headers5[constants.i.PREFER] = constants.m.REPRESENTATION, _headers5[constants.i.PAYPAL_REQUEST_ID] = orderID, 
-                _headers5)
+                _headers5),
+                metricDimensions: {
+                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                    lsatUpgradeError: Boolean(getLsatUpgradeError())
+                }
             }).catch((function(err) {
                 var _headers6;
                 var restCorrID = Object(api.d)(err);
-                Object(lib.c)().warn("capture_order_call_rest_api_error", {
+                Object(lib.c)().warn("capture_order_" + lsatUpgradeType() + "_call_rest_api_error", {
                     restCorrID: restCorrID,
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
                 });
-                isInvalidResourceIDError(err) && Object(lib.c)().warn("capture_order_invalid_resource_id_error", {
+                isInvalidResourceIDError(err) && Object(lib.c)().warn("capture_order_" + lsatUpgradeType() + "_invalid_resource_id_error", {
                     restCorrID: restCorrID,
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
@@ -2201,10 +2279,16 @@ window.smartCard = function(modules) {
                             facilitatorAccessToken: facilitatorAccessToken
                         }
                     },
-                    headers: (_headers6 = {}, _headers6[constants.i.CLIENT_CONTEXT] = orderID, _headers6)
+                    headers: (_headers6 = {}, _headers6[constants.i.CLIENT_CONTEXT] = orderID, _headers6),
+                    metricDimensions: {
+                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                        lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                        smartApiType: "fallback"
+                    }
                 }).then((function(res) {
                     var smartCorrID = Object(api.e)(res);
-                    Object(lib.c)().info("capture_order_smart_fallback_success", {
+                    Object(lib.c)().info("capture_order_" + lsatUpgradeType() + "_smart_fallback_success", {
                         smartCorrID: smartCorrID,
                         restCorrID: restCorrID,
                         orderID: orderID
@@ -2212,7 +2296,7 @@ window.smartCard = function(modules) {
                     return res.data;
                 })).catch((function(smartErr) {
                     var smartCorrID = Object(api.d)(err);
-                    Object(lib.c)().info("capture_order_smart_fallback_error", {
+                    Object(lib.c)().info("capture_order_" + lsatUpgradeType() + "_smart_fallback_error", {
                         smartCorrID: smartCorrID,
                         restCorrID: restCorrID,
                         orderID: orderID,
@@ -2232,7 +2316,13 @@ window.smartCard = function(modules) {
                     facilitatorAccessToken: facilitatorAccessToken
                 }
             },
-            headers: (_headers7 = {}, _headers7[constants.i.CLIENT_CONTEXT] = orderID, _headers7)
+            headers: (_headers7 = {}, _headers7[constants.i.CLIENT_CONTEXT] = orderID, _headers7),
+            metricDimensions: {
+                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                smartApiType: "default"
+            }
         }).then((function(_ref5) {
             return _ref5.data;
         }));
@@ -2240,8 +2330,11 @@ window.smartCard = function(modules) {
     function authorizeOrder(orderID, _ref6) {
         var _headers10;
         var facilitatorAccessToken = _ref6.facilitatorAccessToken, buyerAccessToken = _ref6.buyerAccessToken, partnerAttributionID = _ref6.partnerAttributionID, _ref6$forceRestAPI = _ref6.forceRestAPI, forceRestAPI = void 0 !== _ref6$forceRestAPI && _ref6$forceRestAPI, experiments = _ref6.experiments;
-        Object(lib.c)().info("authorize_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
-        Object(lib.c)().info("authorize_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
+        Object(lib.c)().info("authorize_order_" + lsatUpgradeType() + "_" + (getLsatUpgradeCalled() ? "called" : "not_called"), {
+            orderID: orderID
+        });
+        Object(lib.c)().info("authorize_order_" + lsatUpgradeType() + "_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
+            orderID: orderID,
             err: Object(belter_src.v)(getLsatUpgradeError())
         });
         if (forceRestAPI && !getLsatUpgradeError()) {
@@ -2252,16 +2345,21 @@ window.smartCard = function(modules) {
                 eventName: "v2_checkout_orders_authorize",
                 url: src_config.g + "/" + orderID + "/authorize",
                 headers: (_headers8 = {}, _headers8[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
-                _headers8[constants.i.PREFER] = constants.m.REPRESENTATION, _headers8)
+                _headers8[constants.i.PREFER] = constants.m.REPRESENTATION, _headers8),
+                metricDimensions: {
+                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                    lsatUpgradeError: Boolean(getLsatUpgradeError())
+                }
             }).catch((function(err) {
                 var _headers9;
                 var restCorrID = Object(api.d)(err);
-                Object(lib.c)().warn("authorize_order_call_rest_api_error", {
+                Object(lib.c)().warn("authorize_order_" + lsatUpgradeType() + "_call_rest_api_error", {
                     restCorrID: restCorrID,
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
                 });
-                isInvalidResourceIDError(err) && Object(lib.c)().warn("authorize_order_invalid_resource_id_error", {
+                isInvalidResourceIDError(err) && Object(lib.c)().warn("authorize_order_" + lsatUpgradeType() + "_invalid_resource_id_error", {
                     restCorrID: restCorrID,
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
@@ -2278,10 +2376,16 @@ window.smartCard = function(modules) {
                             facilitatorAccessToken: facilitatorAccessToken
                         }
                     },
-                    headers: (_headers9 = {}, _headers9[constants.i.CLIENT_CONTEXT] = orderID, _headers9)
+                    headers: (_headers9 = {}, _headers9[constants.i.CLIENT_CONTEXT] = orderID, _headers9),
+                    metricDimensions: {
+                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                        lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                        smartApiType: "fallback"
+                    }
                 }).then((function(res) {
                     var smartCorrID = Object(api.e)(res);
-                    Object(lib.c)().info("authorize_order_smart_fallback_success", {
+                    Object(lib.c)().info("authorize_order_" + lsatUpgradeType() + "_smart_fallback_success", {
                         smartCorrID: smartCorrID,
                         restCorrID: restCorrID,
                         orderID: orderID
@@ -2289,7 +2393,7 @@ window.smartCard = function(modules) {
                     return res.data;
                 })).catch((function(smartErr) {
                     var smartCorrID = Object(api.d)(err);
-                    Object(lib.c)().info("authorize_order_smart_fallback_error", {
+                    Object(lib.c)().info("authorize_order_" + lsatUpgradeType() + "_smart_fallback_error", {
                         smartCorrID: smartCorrID,
                         restCorrID: restCorrID,
                         orderID: orderID,
@@ -2310,7 +2414,13 @@ window.smartCard = function(modules) {
                     facilitatorAccessToken: facilitatorAccessToken
                 }
             },
-            headers: (_headers10 = {}, _headers10[constants.i.CLIENT_CONTEXT] = orderID, _headers10)
+            headers: (_headers10 = {}, _headers10[constants.i.CLIENT_CONTEXT] = orderID, _headers10),
+            metricDimensions: {
+                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                smartApiType: "default"
+            }
         }).then((function(_ref7) {
             return _ref7.data;
         }));
@@ -2318,8 +2428,11 @@ window.smartCard = function(modules) {
     function patchOrder(orderID, data, _ref8) {
         var _headers13;
         var facilitatorAccessToken = _ref8.facilitatorAccessToken, buyerAccessToken = _ref8.buyerAccessToken, partnerAttributionID = _ref8.partnerAttributionID, _ref8$forceRestAPI = _ref8.forceRestAPI, forceRestAPI = void 0 !== _ref8$forceRestAPI && _ref8$forceRestAPI, experiments = _ref8.experiments;
-        Object(lib.c)().info("patch_order_lsat_upgrade_" + (getLsatUpgradeCalled() ? "called" : "not_called"));
-        Object(lib.c)().info("patch_order_lsat_upgrade_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
+        Object(lib.c)().info("patch_order_" + lsatUpgradeType() + "_" + (getLsatUpgradeCalled() ? "called" : "not_called"), {
+            orderID: orderID
+        });
+        Object(lib.c)().info("patch_order_" + lsatUpgradeType() + "_" + (getLsatUpgradeError() ? "errored" : "did_not_error"), {
+            orderID: orderID,
             err: Object(belter_src.v)(getLsatUpgradeError())
         });
         if (forceRestAPI && !getLsatUpgradeError()) {
@@ -2331,16 +2444,21 @@ window.smartCard = function(modules) {
                 url: src_config.g + "/" + orderID,
                 data: data,
                 headers: (_headers11 = {}, _headers11[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
-                _headers11[constants.i.PREFER] = constants.m.REPRESENTATION, _headers11)
+                _headers11[constants.i.PREFER] = constants.m.REPRESENTATION, _headers11),
+                metricDimensions: {
+                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                    lsatUpgradeError: Boolean(getLsatUpgradeError())
+                }
             }).catch((function(err) {
                 var _headers12;
                 var restCorrID = Object(api.d)(err);
-                Object(lib.c)().warn("patch_order_call_rest_api_error", {
+                Object(lib.c)().warn("patch_order_" + lsatUpgradeType() + "_call_rest_api_error", {
                     restCorrID: restCorrID,
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
                 });
-                isInvalidResourceIDError(err) && Object(lib.c)().warn("patch_order_invalid_resource_id_error", {
+                isInvalidResourceIDError(err) && Object(lib.c)().warn("patch_order_" + lsatUpgradeType() + "_invalid_resource_id_error", {
                     restCorrID: restCorrID,
                     orderID: orderID,
                     err: Object(belter_src.v)(err)
@@ -2361,10 +2479,16 @@ window.smartCard = function(modules) {
                     json: {
                         data: requestData
                     },
-                    headers: (_headers12 = {}, _headers12[constants.i.CLIENT_CONTEXT] = orderID, _headers12)
+                    headers: (_headers12 = {}, _headers12[constants.i.CLIENT_CONTEXT] = orderID, _headers12),
+                    metricDimensions: {
+                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                        lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                        smartApiType: "fallback"
+                    }
                 }).then((function(res) {
                     var smartCorrID = Object(api.e)(res);
-                    Object(lib.c)().info("patch_order_smart_fallback_success", {
+                    Object(lib.c)().info("patch_order_" + lsatUpgradeType() + "_smart_fallback_success", {
                         smartCorrID: smartCorrID,
                         restCorrID: restCorrID,
                         orderID: orderID
@@ -2372,7 +2496,7 @@ window.smartCard = function(modules) {
                     return res.data;
                 })).catch((function(smartErr) {
                     var smartCorrID = Object(api.d)(err);
-                    Object(lib.c)().info("patch_order_smart_fallback_error", {
+                    Object(lib.c)().info("patch_order_" + lsatUpgradeType() + "_smart_fallback_error", {
                         smartCorrID: smartCorrID,
                         restCorrID: restCorrID,
                         orderID: orderID,
@@ -2398,7 +2522,13 @@ window.smartCard = function(modules) {
             json: {
                 data: requestData
             },
-            headers: (_headers13 = {}, _headers13[constants.i.CLIENT_CONTEXT] = orderID, _headers13)
+            headers: (_headers13 = {}, _headers13[constants.i.CLIENT_CONTEXT] = orderID, _headers13),
+            metricDimensions: {
+                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
+                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
+                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                smartApiType: "default"
+            }
         }).then((function(_ref9) {
             return _ref9.data;
         }));
@@ -4146,7 +4276,7 @@ window.smartCard = function(modules) {
     var _onClick__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(21);
     var _onError__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(22);
     function getProps(_ref) {
-        var branded = _ref.branded, enableOrdersApprovalSmartWallet = _ref.enableOrdersApprovalSmartWallet, smartWalletOrderID = _ref.smartWalletOrderID;
+        var branded = _ref.branded;
         var xprops = window.xprops;
         var uid = xprops.uid, env = xprops.env, _xprops$vault = xprops.vault, vault = void 0 !== _xprops$vault && _xprops$vault, commit = xprops.commit, locale = xprops.locale, platform = xprops.platform, sessionID = xprops.sessionID, clientID = xprops.clientID, partnerAttributionID = xprops.partnerAttributionID, merchantRequestedPopupsDisabled = xprops.merchantRequestedPopupsDisabled, clientMetadataID = xprops.clientMetadataID, sdkCorrelationID = xprops.sdkCorrelationID, getParentDomain = xprops.getParentDomain, clientAccessToken = xprops.clientAccessToken, getPopupBridge = xprops.getPopupBridge, getPrerenderDetails = xprops.getPrerenderDetails, getPageUrl = xprops.getPageUrl, enableThreeDomainSecure = xprops.enableThreeDomainSecure, enableVaultInstallments = xprops.enableVaultInstallments, _xprops$enableNativeC = xprops.enableNativeCheckout, enableNativeCheckout = void 0 !== _xprops$enableNativeC && _xprops$enableNativeC, rememberFunding = xprops.remember, stageHost = xprops.stageHost, apiStageHost = xprops.apiStageHost, getParent = xprops.getParent, fundingSource = xprops.fundingSource, currency = xprops.currency, connect = xprops.connect, intent = xprops.intent, merchantID = xprops.merchantID, amount = xprops.amount, userIDToken = xprops.userIDToken, enableFunding = xprops.enableFunding, disableFunding = xprops.disableFunding, disableCard = xprops.disableCard, disableAutocomplete = xprops.disableAutocomplete, wallet = xprops.wallet, _xprops$paymentMethod = xprops.paymentMethodToken, paymentMethodToken = void 0 === _xprops$paymentMethod ? xprops.paymentMethodNonce : _xprops$paymentMethod, _xprops$getQueriedEli = xprops.getQueriedEligibleFunding, getQueriedEligibleFunding = void 0 === _xprops$getQueriedEli ? function() {
             return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.a.resolve([]);
@@ -4212,8 +4342,6 @@ window.smartCard = function(modules) {
             allowBillingPayments: allowBillingPayments,
             paymentRequest: paymentRequest,
             merchantID: merchantID,
-            enableOrdersApprovalSmartWallet: enableOrdersApprovalSmartWallet,
-            smartWalletOrderID: smartWalletOrderID,
             disableSetCookie: disableSetCookie
         };
     }
@@ -11490,7 +11618,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.157", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.158", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 
