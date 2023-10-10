@@ -317,8 +317,6 @@ function initCheckout({ props, components, serviceData, payment, config, restart
                 buyerAccessTokenReceivedOnAuth = accessToken ? accessToken : buyerAccessToken;
 
                 return onAuth({ accessToken: buyerAccessTokenReceivedOnAuth }).then(token => {
-                    setBuyerAccessToken(token);
-
                     // this seems dead code. the return value is not always buyerAccessToken
                     buyerAccessToken = token;
                 });

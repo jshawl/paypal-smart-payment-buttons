@@ -59,7 +59,12 @@ describe("getOnAuth", () => {
     await onAuth({ accessToken: onAuthOptions.facilitatorAccessToken });
 
     expect(upgradeFacilitatorAccessToken).not.toHaveBeenCalled();
-    expect(logger.info).toHaveBeenNthCalledWith(2, "upgrade_lsat_success");
+    expect(logger.info).toHaveBeenNthCalledWith(2, "ignore_lsat_upgrade", {
+      "accessToken": true,
+      "createSubscription": false,
+      "isLsatUpgradable": true,
+      "upgradeLSATWithIgnoreCache": true,
+    });
 
     expect.assertions(2);
   });

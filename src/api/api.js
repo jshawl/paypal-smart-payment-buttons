@@ -6,7 +6,8 @@ import { request } from '@krakenjs/belter/src';
 
 import { GRAPHQL_URI } from '../config';
 import { FPTI_CUSTOM_KEY, FPTI_TRANSITION, HEADERS, SMART_PAYMENT_BUTTONS, STATUS_CODES } from '../constants';
-import { getLogger } from '../lib';
+import { getLogger, sendCountMetric } from '../lib';
+
 
 type RESTAPIParams<D> = {|
     accessToken : string,
@@ -14,10 +15,13 @@ type RESTAPIParams<D> = {|
     url : string,
     data? : D,
     headers? : { [string] : string },
-    eventName? : string
+    eventName : string,
+    metricDimensions?: {
+        [string]: mixed
+    },
 |};
 
-export function callRestAPI<D, T>({ accessToken, method, url, data, headers, eventName } : RESTAPIParams<D>) : ZalgoPromise<T> {
+export function callRestAPI<D, T>({ accessToken, method, url, data, headers, eventName, metricDimensions = {} } : RESTAPIParams<D>) : ZalgoPromise<T> {
 
     if (!accessToken) {
         throw new Error(`No access token passed to ${ url }`);
@@ -50,11 +54,19 @@ export function callRestAPI<D, T>({ accessToken, method, url, data, headers, eve
                 });
             }
 
-            if (eventName) {
-                getLogger().warn(`rest_api_${ eventName }_status_${ status }_error`);
-            }
+
+            getLogger().warn(`rest_api_${ eventName }_status_${ status }_error`);
+            sendCountMetric({
+                name : `pp.app.paypal_sdk.buttons.rest_api_${ eventName }.error.count`,
+                dimensions : metricDimensions
+            });
             throw error;
         }
+
+        sendCountMetric({
+            name: `pp.app.paypal_sdk.buttons.rest_api_${ eventName }.success.count`,
+            dimensions: metricDimensions
+        });
 
         return body;
     });
@@ -67,7 +79,10 @@ type SmartAPIRequest = {|
     method? : string,
     json? : $ReadOnlyArray<mixed> | Object,
     headers? : { [string] : string },
-    eventName : string
+    eventName : string,
+    metricDimensions? : {
+        [string]: mixed
+    },
 |};
 
 export type APIResponse = {|
@@ -75,7 +90,7 @@ export type APIResponse = {|
     headers : {| [$Values<typeof HEADERS>] : string |}
 |};
 
-export function callSmartAPI({ accessToken, url, method = 'get', headers: reqHeaders = {}, json, authenticated = true, eventName } : SmartAPIRequest) : ZalgoPromise<APIResponse> {
+export function callSmartAPI({ accessToken, url, method = 'get', headers: reqHeaders = {}, json, authenticated = true, eventName, metricDimensions = {} } : SmartAPIRequest) : ZalgoPromise<APIResponse> {
 
     reqHeaders[HEADERS.REQUESTED_BY] = SMART_PAYMENT_BUTTONS;
 
@@ -86,7 +101,7 @@ export function callSmartAPI({ accessToken, url, method = 'get', headers: reqHea
     if (accessToken) {
         reqHeaders[HEADERS.ACCESS_TOKEN] = accessToken;
     }
-    
+
     return request({ url, method, headers: reqHeaders, json })
         .then(({ status, body, headers }) => {
             if (body.ack === 'contingency') {
@@ -110,13 +125,30 @@ export function callSmartAPI({ accessToken, url, method = 'get', headers: reqHea
 
             if (status > 400) {
                 getLogger().warn(`smart_api_${ eventName }_status_${ status }_error`);
+                sendCountMetric({
+                    name: `pp.app.paypal_sdk.buttons.smart_api_${ eventName }.error.count`,
+                    dimensions: {
+                        status,
+                        ...metricDimensions
+                    }
+                });
                 throw new Error(`Api: ${ url } returned status code: ${ status } (Corr ID: ${ headers[HEADERS.PAYPAL_DEBUG_ID] })\n\n${ JSON.stringify(body) }`);
             }
 
             if (body.ack !== 'success') {
                 getLogger().warn(`smart_api_${ eventName }_ack_error`);
+                sendCountMetric({
+                    name: `pp.app.paypal_sdk.buttons.smart_api_${ eventName }.error.count`,
+                    dimensions: metricDimensions
+                });
                 throw new Error(`Api: ${ url } returned ack: ${ body.ack } (Corr ID: ${ headers[HEADERS.PAYPAL_DEBUG_ID] })\n\n${ JSON.stringify(body) }`);
             }
+
+
+            sendCountMetric({
+                name: `pp.app.paypal_sdk.buttons.smart_api_${ eventName }.success.count`,
+                dimensions: metricDimensions
+            });
 
             return { data: body.data, headers };
         });
@@ -146,14 +178,29 @@ export function callGraphQL<T>({ name, query, variables = {}, headers = {}, retu
                 throw errors[0];
             }
 
+            sendCountMetric({
+                name: `pp.app.paypal_sdk.buttons.graphql_${ name }.error.count`,
+                dimensions: {}
+            });
+
             throw new Error(message);
         }
 
         if (status !== 200) {
             getLogger().warn(`graphql_${ name }_status_${ status }_error`);
+            sendCountMetric({
+                name: `pp.app.paypal_sdk.buttons.graphql_${ name }.error.count`,
+                dimensions: {
+                    status
+                }
+            });
             throw new Error(`${ GRAPHQL_URI } returned status ${ status }\n\n${ JSON.stringify(body) }`);
         }
 
+        sendCountMetric({
+            name: `pp.app.paypal_sdk.buttons.graphql_${ name }.success.count`,
+            dimensions: {}
+        });
         return body.data;
     });
 }

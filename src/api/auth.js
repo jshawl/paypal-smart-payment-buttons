@@ -76,9 +76,18 @@ export function getFirebaseSessionToken(sessionUID : string) : ZalgoPromise<stri
 
 let lsatUpgradeCalled : boolean = false;
 let lsatUpgradeError : ?mixed;
+let lsatUpgradeWithIgnoreCache : boolean = false;
 
 export const onLsatUpgradeCalled = () => {
     lsatUpgradeCalled = true;
+};
+
+export const getLsatUpgradeWithIgnoreCache = () : boolean => {
+    return lsatUpgradeWithIgnoreCache;
+};
+
+const onLsatUpgradeWithIgnoreCacheCalled = () => {
+    lsatUpgradeWithIgnoreCache = true;
 };
 
 export const getLsatUpgradeCalled = () : boolean => {
@@ -96,6 +105,7 @@ export const getLsatUpgradeError = () : ?mixed => {
 export const clearLsatState = () => {
     lsatUpgradeCalled = false;
     lsatUpgradeError = null;
+    lsatUpgradeWithIgnoreCache = false;
 };
 
 export function upgradeFacilitatorAccessToken(facilitatorAccessToken : string, { buyerAccessToken, orderID } : {| buyerAccessToken : string, orderID : string |}) : ZalgoPromise<void> {
@@ -132,6 +142,7 @@ export function upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessTo
     return inlineMemoize(upgradeFacilitatorAccessTokenWithIgnoreCache, () => {
         clearLsatState();
         onLsatUpgradeCalled();
+        onLsatUpgradeWithIgnoreCacheCalled();
 
         return callGraphQL({
             name: 'CreateUpgradedLowScopeAccessToken',
@@ -155,10 +166,11 @@ export function upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessTo
             variables: { facilitatorAccessToken, buyerAccessToken, orderID }
         })
         .then(res => {
+            getLogger().info('create_upgraded_low_scope_access_token_success', { orderID });
             return res?.createUpgradedLowScopeAccessToken;
         })
         .catch(err => {
-            getLogger().warn('rest_api_upgrade_facilitator_access_token_with_ignore_cache_error');
+            getLogger().warn('create_upgraded_low_scope_access_token_error', { orderID });
             onLsatUpgradeError(err);
             return facilitatorAccessToken;
         });

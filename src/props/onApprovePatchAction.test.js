@@ -97,6 +97,11 @@ describe("getOnApproveOrder patch action", () => {
         [HEADERS.PARTNER_ATTRIBUTION_ID]: partnerAttributionID || "",
         [HEADERS.PREFER]: PREFER.REPRESENTATION,
       },
+      metricDimensions: {
+        lsatUpgradeCalled: true,
+        lsatUpgradeError: false,
+        lsatUpgradeIgnoreCache: true
+      },
     });
   });
 
@@ -123,6 +128,11 @@ describe("getOnApproveOrder patch action", () => {
         [HEADERS.PARTNER_ATTRIBUTION_ID]: partnerAttributionID || "",
         [HEADERS.PREFER]: PREFER.REPRESENTATION,
       },
-    });
+      metricDimensions: {
+        lsatUpgradeCalled: true,
+        lsatUpgradeError: false,
+        lsatUpgradeIgnoreCache: true
+      },
+  });
   });
 });
