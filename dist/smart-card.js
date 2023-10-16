@@ -2028,27 +2028,27 @@ window.smartCard = function(modules) {
             }));
         }), [ clientID, targetSubject ]);
     }
-    var lsatUpgradeCalled = !1;
-    var lsatUpgradeError;
+    var auth_lsatUpgradeCalled = !1;
+    var auth_lsatUpgradeError;
     var lsatUpgradeWithIgnoreCache = !1;
     var onLsatUpgradeCalled = function() {
-        lsatUpgradeCalled = !0;
+        auth_lsatUpgradeCalled = !0;
     };
     var getLsatUpgradeWithIgnoreCache = function() {
         return lsatUpgradeWithIgnoreCache;
     };
     var getLsatUpgradeCalled = function() {
-        return lsatUpgradeCalled;
+        return auth_lsatUpgradeCalled;
     };
     var onLsatUpgradeError = function(err) {
-        lsatUpgradeError = err;
+        auth_lsatUpgradeError = err;
     };
     var getLsatUpgradeError = function() {
-        return lsatUpgradeError;
+        return auth_lsatUpgradeError;
     };
     var clearLsatState = function() {
-        lsatUpgradeCalled = !1;
-        lsatUpgradeError = null;
+        auth_lsatUpgradeCalled = !1;
+        auth_lsatUpgradeError = null;
         lsatUpgradeWithIgnoreCache = !1;
     };
     function upgradeFacilitatorAccessToken(facilitatorAccessToken, _ref3) {
@@ -2133,6 +2133,29 @@ window.smartCard = function(modules) {
     function lsatUpgradeType() {
         return getLsatUpgradeWithIgnoreCache() ? "with_ignore_cache_lsat_upgrade" : "without_ignore_cache_lsat_upgrade";
     }
+    function lsatUpgradeMetricValue() {
+        var lsatUpgradeCalled = Boolean(getLsatUpgradeCalled());
+        var lsatUpgradeIgnoreCache = Boolean(getLsatUpgradeWithIgnoreCache());
+        var lsatUpgradeError = Boolean(getLsatUpgradeError());
+        var cacheType = lsatUpgradeIgnoreCache ? "with_ignore_cache" : "without_ignore_cache";
+        return lsatUpgradeCalled ? lsatUpgradeError ? cacheType + "_error" : cacheType + "_success" : cacheType + "_not_called";
+    }
+    function logPayeeInfoForClientSideHelpers(orderID, method) {
+        getSupplementalOrderInfo(orderID).then((function(order) {
+            var merchantIds = (order.checkoutSession.payees || []).map((function(p) {
+                return p.merchantId;
+            }));
+            Object(lib.c)().info("using_client_side_helper_" + method, {
+                payee: merchantIds.join(),
+                orderID: orderID
+            });
+        })).catch((function(err) {
+            Object(lib.c)().warn("err_getting_payee_client_side_helper_" + method, {
+                orderID: orderID,
+                err: Object(belter_src.v)(err)
+            });
+        }));
+    }
     function getOrder(orderID, _ref2) {
         var _headers4;
         var facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, _ref2$forceRestAPI = _ref2.forceRestAPI, forceRestAPI = void 0 !== _ref2$forceRestAPI && _ref2$forceRestAPI, experiments = _ref2.experiments;
@@ -2143,6 +2166,7 @@ window.smartCard = function(modules) {
             orderID: orderID,
             err: Object(belter_src.v)(getLsatUpgradeError())
         });
+        logPayeeInfoForClientSideHelpers(orderID, "get");
         if (forceRestAPI && !getLsatUpgradeError()) {
             var _headers2;
             return Object(api.b)({
@@ -2152,9 +2176,7 @@ window.smartCard = function(modules) {
                 headers: (_headers2 = {}, _headers2[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                 _headers2[constants.i.PREFER] = constants.m.REPRESENTATION, _headers2),
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError())
+                    lsatUpgrade: lsatUpgradeMetricValue()
                 }
             }).catch((function(err) {
                 var _headers3;
@@ -2176,9 +2198,7 @@ window.smartCard = function(modules) {
                     eventName: "order_get",
                     headers: (_headers3 = {}, _headers3[constants.i.CLIENT_CONTEXT] = orderID, _headers3),
                     metricDimensions: {
-                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                        lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                        lsatUpgrade: lsatUpgradeMetricValue(),
                         smartApiType: "fallback"
                     }
                 }).then((function(res) {
@@ -2199,6 +2219,8 @@ window.smartCard = function(modules) {
                     });
                     throw smartErr;
                 }));
+            })).finally((function() {
+                Object(lib.c)().flush();
             }));
         }
         return Object(api.c)({
@@ -2207,13 +2229,13 @@ window.smartCard = function(modules) {
             eventName: "order_get",
             headers: (_headers4 = {}, _headers4[constants.i.CLIENT_CONTEXT] = orderID, _headers4),
             metricDimensions: {
-                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                lsatUpgrade: lsatUpgradeMetricValue(),
                 smartApiType: "default"
             }
         }).then((function(_ref3) {
             return _ref3.data;
+        })).finally((function() {
+            Object(lib.c)().flush();
         }));
     }
     function isProcessorDeclineError(err) {
@@ -2239,6 +2261,7 @@ window.smartCard = function(modules) {
             orderID: orderID,
             err: Object(belter_src.v)(getLsatUpgradeError())
         });
+        logPayeeInfoForClientSideHelpers(orderID, "capture");
         if (forceRestAPI && !getLsatUpgradeError()) {
             var _headers5;
             return Object(api.b)({
@@ -2250,9 +2273,7 @@ window.smartCard = function(modules) {
                 _headers5[constants.i.PREFER] = constants.m.REPRESENTATION, _headers5[constants.i.PAYPAL_REQUEST_ID] = orderID, 
                 _headers5),
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError())
+                    lsatUpgrade: lsatUpgradeMetricValue()
                 }
             }).catch((function(err) {
                 var _headers6;
@@ -2281,9 +2302,7 @@ window.smartCard = function(modules) {
                     },
                     headers: (_headers6 = {}, _headers6[constants.i.CLIENT_CONTEXT] = orderID, _headers6),
                     metricDimensions: {
-                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                        lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                        lsatUpgrade: lsatUpgradeMetricValue(),
                         smartApiType: "fallback"
                     }
                 }).then((function(res) {
@@ -2304,6 +2323,8 @@ window.smartCard = function(modules) {
                     });
                     throw smartErr;
                 }));
+            })).finally((function() {
+                Object(lib.c)().flush();
             }));
         }
         return Object(api.c)({
@@ -2318,13 +2339,13 @@ window.smartCard = function(modules) {
             },
             headers: (_headers7 = {}, _headers7[constants.i.CLIENT_CONTEXT] = orderID, _headers7),
             metricDimensions: {
-                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                lsatUpgrade: lsatUpgradeMetricValue(),
                 smartApiType: "default"
             }
         }).then((function(_ref5) {
             return _ref5.data;
+        })).finally((function() {
+            Object(lib.c)().flush();
         }));
     }
     function authorizeOrder(orderID, _ref6) {
@@ -2337,6 +2358,7 @@ window.smartCard = function(modules) {
             orderID: orderID,
             err: Object(belter_src.v)(getLsatUpgradeError())
         });
+        logPayeeInfoForClientSideHelpers(orderID, "authorize");
         if (forceRestAPI && !getLsatUpgradeError()) {
             var _headers8;
             return Object(api.b)({
@@ -2347,9 +2369,7 @@ window.smartCard = function(modules) {
                 headers: (_headers8 = {}, _headers8[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                 _headers8[constants.i.PREFER] = constants.m.REPRESENTATION, _headers8),
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError())
+                    lsatUpgrade: lsatUpgradeMetricValue()
                 }
             }).catch((function(err) {
                 var _headers9;
@@ -2378,9 +2398,7 @@ window.smartCard = function(modules) {
                     },
                     headers: (_headers9 = {}, _headers9[constants.i.CLIENT_CONTEXT] = orderID, _headers9),
                     metricDimensions: {
-                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                        lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                        lsatUpgrade: lsatUpgradeMetricValue(),
                         smartApiType: "fallback"
                     }
                 }).then((function(res) {
@@ -2401,6 +2419,8 @@ window.smartCard = function(modules) {
                     });
                     throw smartErr;
                 }));
+            })).finally((function() {
+                Object(lib.c)().flush();
             }));
         }
         Object(lib.c)().info("lsat_upgrade_false");
@@ -2416,13 +2436,13 @@ window.smartCard = function(modules) {
             },
             headers: (_headers10 = {}, _headers10[constants.i.CLIENT_CONTEXT] = orderID, _headers10),
             metricDimensions: {
-                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                lsatUpgrade: lsatUpgradeMetricValue(),
                 smartApiType: "default"
             }
         }).then((function(_ref7) {
             return _ref7.data;
+        })).finally((function() {
+            Object(lib.c)().flush();
         }));
     }
     function patchOrder(orderID, data, _ref8) {
@@ -2435,6 +2455,7 @@ window.smartCard = function(modules) {
             orderID: orderID,
             err: Object(belter_src.v)(getLsatUpgradeError())
         });
+        logPayeeInfoForClientSideHelpers(orderID, "patch");
         if (forceRestAPI && !getLsatUpgradeError()) {
             var _headers11;
             return Object(api.b)({
@@ -2446,9 +2467,7 @@ window.smartCard = function(modules) {
                 headers: (_headers11 = {}, _headers11[constants.i.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                 _headers11[constants.i.PREFER] = constants.m.REPRESENTATION, _headers11),
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError())
+                    lsatUpgrade: lsatUpgradeMetricValue()
                 }
             }).catch((function(err) {
                 var _headers12;
@@ -2481,9 +2500,7 @@ window.smartCard = function(modules) {
                     },
                     headers: (_headers12 = {}, _headers12[constants.i.CLIENT_CONTEXT] = orderID, _headers12),
                     metricDimensions: {
-                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                        lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                        lsatUpgrade: lsatUpgradeMetricValue(),
                         smartApiType: "fallback"
                     }
                 }).then((function(res) {
@@ -2504,6 +2521,8 @@ window.smartCard = function(modules) {
                     });
                     throw smartErr;
                 }));
+            })).finally((function() {
+                Object(lib.c)().flush();
             }));
         }
         Object(lib.c)().info("lsat_upgrade_false");
@@ -2524,13 +2543,13 @@ window.smartCard = function(modules) {
             },
             headers: (_headers13 = {}, _headers13[constants.i.CLIENT_CONTEXT] = orderID, _headers13),
             metricDimensions: {
-                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                lsatUpgrade: lsatUpgradeMetricValue(),
                 smartApiType: "default"
             }
         }).then((function(_ref9) {
             return _ref9.data;
+        })).finally((function() {
+            Object(lib.c)().flush();
         }));
     }
     function patchShipping(_ref10) {
@@ -11620,7 +11639,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.159", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.160", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 

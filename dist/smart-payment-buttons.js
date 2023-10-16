@@ -7668,6 +7668,9 @@ window.spb = function(modules) {
         __webpack_require__.d(__webpack_exports__, "MERCHANT_ID_MAX", (function() {
             return MERCHANT_ID_MAX;
         }));
+        __webpack_require__.d(__webpack_exports__, "DISPLAY_ONLY_VALUES", (function() {
+            return DISPLAY_ONLY_VALUES;
+        }));
         __webpack_require__.d(__webpack_exports__, "PLATFORM", (function() {
             return PLATFORM;
         }));
@@ -8314,6 +8317,9 @@ window.spb = function(modules) {
             MINI_CART: "mini-cart"
         };
         var MERCHANT_ID_MAX = 10;
+        var DISPLAY_ONLY_VALUES = {
+            VAULTABLE: "vaultable"
+        };
         var DEFAULT_COUNTRY = COUNTRY.US;
         var DEFAULT_CURRENCY = CURRENCY.USD;
         var DEFAULT_INTENT = INTENT.CAPTURE;
@@ -9524,27 +9530,27 @@ window.spb = function(modules) {
                 return res.firebase.auth.sessionToken;
             }));
         }
-        var lsatUpgradeCalled = !1;
-        var lsatUpgradeError;
+        var auth_lsatUpgradeCalled = !1;
+        var auth_lsatUpgradeError;
         var lsatUpgradeWithIgnoreCache = !1;
         var onLsatUpgradeCalled = function() {
-            lsatUpgradeCalled = !0;
+            auth_lsatUpgradeCalled = !0;
         };
         var getLsatUpgradeWithIgnoreCache = function() {
             return lsatUpgradeWithIgnoreCache;
         };
         var getLsatUpgradeCalled = function() {
-            return lsatUpgradeCalled;
+            return auth_lsatUpgradeCalled;
         };
         var onLsatUpgradeError = function(err) {
-            lsatUpgradeError = err;
+            auth_lsatUpgradeError = err;
         };
         var getLsatUpgradeError = function() {
-            return lsatUpgradeError;
+            return auth_lsatUpgradeError;
         };
         var clearLsatState = function() {
-            lsatUpgradeCalled = !1;
-            lsatUpgradeError = null;
+            auth_lsatUpgradeCalled = !1;
+            auth_lsatUpgradeError = null;
             lsatUpgradeWithIgnoreCache = !1;
         };
         function upgradeFacilitatorAccessToken(facilitatorAccessToken, _ref3) {
@@ -9658,6 +9664,29 @@ window.spb = function(modules) {
         function lsatUpgradeType() {
             return getLsatUpgradeWithIgnoreCache() ? "with_ignore_cache_lsat_upgrade" : "without_ignore_cache_lsat_upgrade";
         }
+        function lsatUpgradeMetricValue() {
+            var lsatUpgradeCalled = Boolean(getLsatUpgradeCalled());
+            var lsatUpgradeIgnoreCache = Boolean(getLsatUpgradeWithIgnoreCache());
+            var lsatUpgradeError = Boolean(getLsatUpgradeError());
+            var cacheType = lsatUpgradeIgnoreCache ? "with_ignore_cache" : "without_ignore_cache";
+            return lsatUpgradeCalled ? lsatUpgradeError ? cacheType + "_error" : cacheType + "_success" : cacheType + "_not_called";
+        }
+        function logPayeeInfoForClientSideHelpers(orderID, method) {
+            getSupplementalOrderInfo(orderID).then((function(order) {
+                var merchantIds = (order.checkoutSession.payees || []).map((function(p) {
+                    return p.merchantId;
+                }));
+                Object(lib.getLogger)().info("using_client_side_helper_" + method, {
+                    payee: merchantIds.join(),
+                    orderID: orderID
+                });
+            })).catch((function(err) {
+                Object(lib.getLogger)().warn("err_getting_payee_client_side_helper_" + method, {
+                    orderID: orderID,
+                    err: Object(belter_src.stringifyError)(err)
+                });
+            }));
+        }
         function getOrder(orderID, _ref2) {
             var _headers4;
             var facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, _ref2$forceRestAPI = _ref2.forceRestAPI, forceRestAPI = void 0 !== _ref2$forceRestAPI && _ref2$forceRestAPI, experiments = _ref2.experiments;
@@ -9668,6 +9697,7 @@ window.spb = function(modules) {
                 orderID: orderID,
                 err: Object(belter_src.stringifyError)(getLsatUpgradeError())
             });
+            logPayeeInfoForClientSideHelpers(orderID, "get");
             if (forceRestAPI && !getLsatUpgradeError()) {
                 var _headers2;
                 return Object(api.callRestAPI)({
@@ -9677,9 +9707,7 @@ window.spb = function(modules) {
                     headers: (_headers2 = {}, _headers2[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                     _headers2[constants.HEADERS.PREFER] = constants.PREFER.REPRESENTATION, _headers2),
                     metricDimensions: {
-                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                        lsatUpgradeError: Boolean(getLsatUpgradeError())
+                        lsatUpgrade: lsatUpgradeMetricValue()
                     }
                 }).catch((function(err) {
                     var _headers3;
@@ -9702,9 +9730,7 @@ window.spb = function(modules) {
                         headers: (_headers3 = {}, _headers3[constants.HEADERS.CLIENT_CONTEXT] = orderID, 
                         _headers3),
                         metricDimensions: {
-                            lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                            lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                            lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                            lsatUpgrade: lsatUpgradeMetricValue(),
                             smartApiType: "fallback"
                         }
                     }).then((function(res) {
@@ -9725,6 +9751,8 @@ window.spb = function(modules) {
                         });
                         throw smartErr;
                     }));
+                })).finally((function() {
+                    Object(lib.getLogger)().flush();
                 }));
             }
             return Object(api.callSmartAPI)({
@@ -9734,13 +9762,13 @@ window.spb = function(modules) {
                 headers: (_headers4 = {}, _headers4[constants.HEADERS.CLIENT_CONTEXT] = orderID, 
                 _headers4),
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                    lsatUpgrade: lsatUpgradeMetricValue(),
                     smartApiType: "default"
                 }
             }).then((function(_ref3) {
                 return _ref3.data;
+            })).finally((function() {
+                Object(lib.getLogger)().flush();
             }));
         }
         function isProcessorDeclineError(err) {
@@ -9766,6 +9794,7 @@ window.spb = function(modules) {
                 orderID: orderID,
                 err: Object(belter_src.stringifyError)(getLsatUpgradeError())
             });
+            logPayeeInfoForClientSideHelpers(orderID, "capture");
             if (forceRestAPI && !getLsatUpgradeError()) {
                 var _headers5;
                 return Object(api.callRestAPI)({
@@ -9777,9 +9806,7 @@ window.spb = function(modules) {
                     _headers5[constants.HEADERS.PREFER] = constants.PREFER.REPRESENTATION, _headers5[constants.HEADERS.PAYPAL_REQUEST_ID] = orderID, 
                     _headers5),
                     metricDimensions: {
-                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                        lsatUpgradeError: Boolean(getLsatUpgradeError())
+                        lsatUpgrade: lsatUpgradeMetricValue()
                     }
                 }).catch((function(err) {
                     var _headers6;
@@ -9809,9 +9836,7 @@ window.spb = function(modules) {
                         headers: (_headers6 = {}, _headers6[constants.HEADERS.CLIENT_CONTEXT] = orderID, 
                         _headers6),
                         metricDimensions: {
-                            lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                            lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                            lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                            lsatUpgrade: lsatUpgradeMetricValue(),
                             smartApiType: "fallback"
                         }
                     }).then((function(res) {
@@ -9832,6 +9857,8 @@ window.spb = function(modules) {
                         });
                         throw smartErr;
                     }));
+                })).finally((function() {
+                    Object(lib.getLogger)().flush();
                 }));
             }
             return Object(api.callSmartAPI)({
@@ -9847,13 +9874,13 @@ window.spb = function(modules) {
                 headers: (_headers7 = {}, _headers7[constants.HEADERS.CLIENT_CONTEXT] = orderID, 
                 _headers7),
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                    lsatUpgrade: lsatUpgradeMetricValue(),
                     smartApiType: "default"
                 }
             }).then((function(_ref5) {
                 return _ref5.data;
+            })).finally((function() {
+                Object(lib.getLogger)().flush();
             }));
         }
         function authorizeOrder(orderID, _ref6) {
@@ -9866,6 +9893,7 @@ window.spb = function(modules) {
                 orderID: orderID,
                 err: Object(belter_src.stringifyError)(getLsatUpgradeError())
             });
+            logPayeeInfoForClientSideHelpers(orderID, "authorize");
             if (forceRestAPI && !getLsatUpgradeError()) {
                 var _headers8;
                 return Object(api.callRestAPI)({
@@ -9876,9 +9904,7 @@ window.spb = function(modules) {
                     headers: (_headers8 = {}, _headers8[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                     _headers8[constants.HEADERS.PREFER] = constants.PREFER.REPRESENTATION, _headers8),
                     metricDimensions: {
-                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                        lsatUpgradeError: Boolean(getLsatUpgradeError())
+                        lsatUpgrade: lsatUpgradeMetricValue()
                     }
                 }).catch((function(err) {
                     var _headers9;
@@ -9908,9 +9934,7 @@ window.spb = function(modules) {
                         headers: (_headers9 = {}, _headers9[constants.HEADERS.CLIENT_CONTEXT] = orderID, 
                         _headers9),
                         metricDimensions: {
-                            lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                            lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                            lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                            lsatUpgrade: lsatUpgradeMetricValue(),
                             smartApiType: "fallback"
                         }
                     }).then((function(res) {
@@ -9931,6 +9955,8 @@ window.spb = function(modules) {
                         });
                         throw smartErr;
                     }));
+                })).finally((function() {
+                    Object(lib.getLogger)().flush();
                 }));
             }
             Object(lib.getLogger)().info("lsat_upgrade_false");
@@ -9947,13 +9973,13 @@ window.spb = function(modules) {
                 headers: (_headers10 = {}, _headers10[constants.HEADERS.CLIENT_CONTEXT] = orderID, 
                 _headers10),
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                    lsatUpgrade: lsatUpgradeMetricValue(),
                     smartApiType: "default"
                 }
             }).then((function(_ref7) {
                 return _ref7.data;
+            })).finally((function() {
+                Object(lib.getLogger)().flush();
             }));
         }
         function patchOrder(orderID, data, _ref8) {
@@ -9966,6 +9992,7 @@ window.spb = function(modules) {
                 orderID: orderID,
                 err: Object(belter_src.stringifyError)(getLsatUpgradeError())
             });
+            logPayeeInfoForClientSideHelpers(orderID, "patch");
             if (forceRestAPI && !getLsatUpgradeError()) {
                 var _headers11;
                 return Object(api.callRestAPI)({
@@ -9977,9 +10004,7 @@ window.spb = function(modules) {
                     headers: (_headers11 = {}, _headers11[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID || "", 
                     _headers11[constants.HEADERS.PREFER] = constants.PREFER.REPRESENTATION, _headers11),
                     metricDimensions: {
-                        lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                        lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                        lsatUpgradeError: Boolean(getLsatUpgradeError())
+                        lsatUpgrade: lsatUpgradeMetricValue()
                     }
                 }).catch((function(err) {
                     var _headers12;
@@ -10013,9 +10038,7 @@ window.spb = function(modules) {
                         headers: (_headers12 = {}, _headers12[constants.HEADERS.CLIENT_CONTEXT] = orderID, 
                         _headers12),
                         metricDimensions: {
-                            lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                            lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                            lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                            lsatUpgrade: lsatUpgradeMetricValue(),
                             smartApiType: "fallback"
                         }
                     }).then((function(res) {
@@ -10036,6 +10059,8 @@ window.spb = function(modules) {
                         });
                         throw smartErr;
                     }));
+                })).finally((function() {
+                    Object(lib.getLogger)().flush();
                 }));
             }
             Object(lib.getLogger)().info("lsat_upgrade_false");
@@ -10057,13 +10082,13 @@ window.spb = function(modules) {
                 headers: (_headers13 = {}, _headers13[constants.HEADERS.CLIENT_CONTEXT] = orderID, 
                 _headers13),
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                    lsatUpgrade: lsatUpgradeMetricValue(),
                     smartApiType: "default"
                 }
             }).then((function(_ref9) {
                 return _ref9.data;
+            })).finally((function() {
+                Object(lib.getLogger)().flush();
             }));
         }
         function patchShipping(_ref10) {
@@ -10108,7 +10133,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.159", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.160", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -14121,7 +14146,7 @@ window.spb = function(modules) {
         _NATIVE_CHECKOUT_FALL);
         var VENMO_WEB_URL = ((_VENMO_WEB_URL = {})[sdk_constants_src.ENV.TEST] = "https://account.dev.venmo.com/go/web/paypal", 
         _VENMO_WEB_URL[sdk_constants_src.ENV.LOCAL] = "https://account.dev.venmo.com/go/web/paypal", 
-        _VENMO_WEB_URL[sdk_constants_src.ENV.STAGE] = Object(cross_domain_utils_src.getDomain)().includes("cibns") ? "https://account.dev.venmo.com/go/web/paypal" : "https://account.qa.venmo.com/go/web/paypal", 
+        _VENMO_WEB_URL[sdk_constants_src.ENV.STAGE] = Object(cross_domain_utils_src.getDomain)().includes("cibns") ? "https://account.qa.venmo.com/go/web/paypal" : "https://account.dev.venmo.com/go/web/paypal", 
         _VENMO_WEB_URL[sdk_constants_src.ENV.SANDBOX] = "https://account.qa.venmo.com/go/web/paypal", 
         _VENMO_WEB_URL[sdk_constants_src.ENV.PRODUCTION] = "https://account.venmo.com/go/web/paypal", 
         _VENMO_WEB_URL);
@@ -16584,7 +16609,7 @@ window.spb = function(modules) {
                     var _ref2;
                     return (_ref2 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref2[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.159", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.160", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref2[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref2[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref2[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
