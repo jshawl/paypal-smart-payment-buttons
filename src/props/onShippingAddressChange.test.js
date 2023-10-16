@@ -3,7 +3,10 @@
 import { vi, test, describe, expect, beforeEach } from "vitest";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { buildXOnShippingAddressChangeActions } from "./onShippingAddressChange";
+import {
+  buildXOnShippingAddressChangeActions,
+  buildXOnShippingAddressChangeData,
+} from "./onShippingAddressChange";
 
 vi.mock("../api", () => ({
   getShippingOrderInfo: vi.fn(() => ZalgoPromise.resolve({})),
@@ -11,7 +14,8 @@ vi.mock("../api", () => ({
 
 describe("onShippingAddressChange", () => {
   let actions;
-  describe("buildXOnShippingAddressChangeActions", () => {
+  let data;
+  describe("build onShippingAddressChange actions and data", () => {
     beforeEach(() => {
       const rypData = {
         amount: {
@@ -55,6 +59,22 @@ describe("onShippingAddressChange", () => {
         data: rypData,
         orderID: "",
       });
+      data = buildXOnShippingAddressChangeData(rypData);
+    });
+
+    test("returns undefined when passing data.errors to actions.reject()", async () => {
+      expect(await actions.reject(data.errors.ADDRESS_ERROR)).toEqual(
+        ZalgoPromise.resolve().value
+      );
+      expect(await actions.reject(data.errors.COUNTRY_ERROR)).toEqual(
+        ZalgoPromise.resolve().value
+      );
+      expect(await actions.reject(data.errors.STATE_ERROR)).toEqual(
+        ZalgoPromise.resolve().value
+      );
+      expect(await actions.reject(data.errors.ZIP_ERROR)).toEqual(
+        ZalgoPromise.resolve().value
+      );
     });
 
     test("returns queries as an empty array", async () => {

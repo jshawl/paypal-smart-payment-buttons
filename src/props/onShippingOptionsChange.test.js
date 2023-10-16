@@ -3,7 +3,10 @@
 import { vi, test, describe, expect, beforeEach } from "vitest";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { buildXOnShippingOptionsChangeActions } from "./onShippingOptionsChange";
+import {
+  buildXOnShippingOptionsChangeActions,
+  buildXOnShippingOptionsChangeData,
+} from "./onShippingOptionsChange";
 
 vi.mock("../api", () => ({
   getShippingOrderInfo: vi.fn(() =>
@@ -50,7 +53,8 @@ vi.mock("../api", () => ({
 
 describe("onShippingOptionsChange", () => {
   let actions;
-  describe("buildXOnShippingOptionsChangeActions", () => {
+  let data;
+  describe("build onShippingOptionsChange actions and data", () => {
     beforeEach(() => {
       const rypData = {
         amount: {
@@ -111,6 +115,16 @@ describe("onShippingOptionsChange", () => {
             },
           },
         ],
+        selectedShippingOption: {
+          id: "SHIP_1234",
+          label: "Free Shipping",
+          type: "SHIPPING",
+          selected: true,
+          amount: {
+            value: "0.00",
+            currencyCode: "USD",
+          },
+        },
       };
       actions = buildXOnShippingOptionsChangeActions({
         actions: {
@@ -120,6 +134,16 @@ describe("onShippingOptionsChange", () => {
         data: rypData,
         orderID: "",
       });
+      data = buildXOnShippingOptionsChangeData(rypData);
+    });
+
+    test("returns undefined when passing data.errors to actions.reject()", async () => {
+      expect(await actions.reject(data.errors.STORE_UNAVAILABLE)).toEqual(
+        ZalgoPromise.resolve().value
+      );
+      expect(await actions.reject(data.errors.METHOD_UNAVAILABLE)).toEqual(
+        ZalgoPromise.resolve().value
+      );
     });
 
     test("returns queries as an empty array", async () => {
@@ -287,18 +311,19 @@ describe("onShippingOptionsChange", () => {
     });
 
     test("transforms queries for shippingOption", async () => {
+      data.selectedShippingOption = {
+        id: "SHIP_123",
+        label: "Shipping",
+        selected: true,
+        type: "SHIPPING",
+        amount: {
+          currencyCode: "USD",
+          value: "27.00",
+        },
+      };
       expect(
         await actions.buildOrderPatchPayload({
-          shippingOption: {
-            id: "SHIP_123",
-            label: "Shipping",
-            selected: true,
-            type: "SHIPPING",
-            amount: {
-              currencyCode: "USD",
-              value: "27.00",
-            },
-          },
+          shippingOption: data.selectedShippingOption,
         })
       ).toEqual([
         {
@@ -453,22 +478,23 @@ describe("onShippingOptionsChange", () => {
     });
 
     test("transforms queries for discount, handling, insurance, itemTotal, shippingOption, shippingDiscount, taxTotal", async () => {
+      data.selectedShippingOption = {
+        id: "SHIP_123",
+        label: "Shipping",
+        selected: true,
+        type: "SHIPPING",
+        amount: {
+          currencyCode: "USD",
+          value: "27.00",
+        },
+      };
       expect(
         await actions.buildOrderPatchPayload({
           discount: "1.00",
           handling: "6.50",
           insurance: "14.00",
           itemTotal: "145.00",
-          shippingOption: {
-            id: "SHIP_123",
-            label: "Shipping",
-            selected: true,
-            type: "SHIPPING",
-            amount: {
-              currencyCode: "USD",
-              value: "27.00",
-            },
-          },
+          shippingOption: data.selectedShippingOption,
           shippingDiscount: "5.00",
           taxTotal: "37.00",
         })
