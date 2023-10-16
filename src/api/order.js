@@ -82,9 +82,34 @@ export function isInvalidResourceIDError(err: mixed) : boolean {
 function lsatUpgradeType() : string {
     return  getLsatUpgradeWithIgnoreCache() ? 'with_ignore_cache_lsat_upgrade' : 'without_ignore_cache_lsat_upgrade';
 }
+function lsatUpgradeMetricValue() : string {
+    const lsatUpgradeCalled = Boolean(getLsatUpgradeCalled());
+    const lsatUpgradeIgnoreCache = Boolean(getLsatUpgradeWithIgnoreCache())
+    const lsatUpgradeError = Boolean(getLsatUpgradeError());
+    const cacheType = lsatUpgradeIgnoreCache ? 'with_ignore_cache' : 'without_ignore_cache';
+
+    if (lsatUpgradeCalled) {
+        return lsatUpgradeError ? `${cacheType}_error` : `${cacheType}_success`;
+    } else {
+        return `${cacheType}_not_called`
+    }
+}
+function logPayeeInfoForClientSideHelpers(orderID: string, method: "get" | "patch" | "capture" | "authorize") : void {
+    // eslint-disable-next-line no-use-before-define
+    getSupplementalOrderInfo(orderID).then(order => {
+        const payees = order.checkoutSession.payees || [];
+        const merchantIds = payees.map(p => p.merchantId);
+        getLogger().info(`using_client_side_helper_${ method }`, { payee: merchantIds.join(), orderID });
+    }).catch((err) => {
+        // no-op
+        getLogger().warn(`err_getting_payee_client_side_helper_${ method }`, { orderID, err: stringifyError(err) });
+    });
+}
+
 export function getOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false, experiments } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`get_order_${ lsatUpgradeType() }_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`, { orderID });
     getLogger().info(`get_order_${ lsatUpgradeType() }_${ getLsatUpgradeError() ? 'errored' : 'did_not_error' }`, { orderID, err: stringifyError(getLsatUpgradeError()) });
+    logPayeeInfoForClientSideHelpers(orderID, "get");
 
     if (forceRestAPI && !getLsatUpgradeError()) {
         return callRestAPI({
@@ -96,9 +121,7 @@ export function getOrder(orderID : string, { facilitatorAccessToken, buyerAccess
                 [ HEADERS.PREFER ]:                 PREFER.REPRESENTATION
             },
             metricDimensions: {
-                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                lsatUpgrade: lsatUpgradeMetricValue(),
             }
         }).catch(err => {
             const restCorrID = getErrorResponseCorrelationID(err);
@@ -120,9 +143,7 @@ export function getOrder(orderID : string, { facilitatorAccessToken, buyerAccess
                     [HEADERS.CLIENT_CONTEXT]: orderID
                 },
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                    lsatUpgrade: lsatUpgradeMetricValue(),
                     smartApiType: "fallback"
                 }
             }).then((res) => {
@@ -134,6 +155,8 @@ export function getOrder(orderID : string, { facilitatorAccessToken, buyerAccess
                 getLogger().error(`get_order_${ lsatUpgradeType() }_smart_fallback_error`, { smartCorrID, restCorrID, orderID, err: stringifyError(smartErr) });
                 throw smartErr;
             });
+        }).finally(() => {
+            getLogger().flush();
         });
     }
 
@@ -145,13 +168,13 @@ export function getOrder(orderID : string, { facilitatorAccessToken, buyerAccess
             [HEADERS.CLIENT_CONTEXT]:         orderID
         },
         metricDimensions: {
-            lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-            lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-            lsatUpgradeError: Boolean(getLsatUpgradeError()),
+            lsatUpgrade: lsatUpgradeMetricValue(),
             smartApiType: "default"
         }
     }).then(({ data }) => {
         return data;
+    }).finally(() => {
+        getLogger().flush();
     });
 }
 
@@ -173,6 +196,7 @@ export function isUnprocessableEntityError(err : mixed) : boolean {
 export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false, experiments } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`capture_order_${ lsatUpgradeType() }_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`, { orderID });
     getLogger().info(`capture_order_${ lsatUpgradeType() }_${ getLsatUpgradeError() ? 'errored' : 'did_not_error' }`, { orderID, err: stringifyError(getLsatUpgradeError()) });
+    logPayeeInfoForClientSideHelpers(orderID, "capture");
 
     if (forceRestAPI && !getLsatUpgradeError()) {
         return callRestAPI({
@@ -186,9 +210,7 @@ export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAc
                 [ HEADERS.PAYPAL_REQUEST_ID ]:      orderID
             },
             metricDimensions: {
-                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                lsatUpgrade: lsatUpgradeMetricValue(),
             }
         }).catch(err => {
             const restCorrID = getErrorResponseCorrelationID(err);
@@ -216,9 +238,7 @@ export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAc
                     [HEADERS.CLIENT_CONTEXT]: orderID
                 },
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                    lsatUpgrade: lsatUpgradeMetricValue(),
                     smartApiType: "fallback"
                 }
             }).then((res) => {
@@ -230,6 +250,8 @@ export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAc
                 getLogger().info(`capture_order_${ lsatUpgradeType() }_smart_fallback_error`, { smartCorrID, restCorrID, orderID, err: stringifyError(smartErr) });
                 throw smartErr;
             });
+        }).finally(() => {
+            getLogger().flush();
         });
     }
 
@@ -243,19 +265,20 @@ export function captureOrder(orderID : string, { facilitatorAccessToken, buyerAc
             [HEADERS.CLIENT_CONTEXT]: orderID
         },
         metricDimensions: {
-            lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-            lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-            lsatUpgradeError: Boolean(getLsatUpgradeError()),
+            lsatUpgrade: lsatUpgradeMetricValue(),
             smartApiType: "default"
         }
     }).then(({ data }) => {
         return data;
+    }).finally(() => {
+        getLogger().flush();
     });
 }
 
 export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false, experiments } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`authorize_order_${ lsatUpgradeType() }_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`, { orderID });
     getLogger().info(`authorize_order_${ lsatUpgradeType() }_${ getLsatUpgradeError() ? 'errored' : 'did_not_error' }`, { orderID, err: stringifyError(getLsatUpgradeError()) });
+    logPayeeInfoForClientSideHelpers(orderID, "authorize");
 
     if (forceRestAPI && !getLsatUpgradeError()) {
         return callRestAPI({
@@ -268,9 +291,7 @@ export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyer
                 [ HEADERS.PREFER ]:                 PREFER.REPRESENTATION
             },
             metricDimensions: {
-                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                lsatUpgrade: lsatUpgradeMetricValue(),
             }
         }).catch(err => {
             const restCorrID = getErrorResponseCorrelationID(err);
@@ -298,9 +319,7 @@ export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyer
                     [HEADERS.CLIENT_CONTEXT]: orderID
                 },
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                    lsatUpgrade: lsatUpgradeMetricValue(),
                     smartApiType: "fallback"
                 }
             }).then((res) => {
@@ -312,6 +331,8 @@ export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyer
                 getLogger().info(`authorize_order_${ lsatUpgradeType() }_smart_fallback_error`, { smartCorrID, restCorrID, orderID, err: stringifyError(smartErr) });
                 throw smartErr;
             });
+        }).finally(() => {
+            getLogger().flush();
         });
     }
 
@@ -326,13 +347,13 @@ export function authorizeOrder(orderID : string, { facilitatorAccessToken, buyer
             [HEADERS.CLIENT_CONTEXT]: orderID
         },
         metricDimensions: {
-            lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-            lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-            lsatUpgradeError: Boolean(getLsatUpgradeError()),
+            lsatUpgrade: lsatUpgradeMetricValue(),
             smartApiType: "default"
         }
     }).then(({ data }) => {
         return data;
+    }).finally(() => {
+        getLogger().flush();
     });
 }
 
@@ -341,6 +362,7 @@ export type PatchData = mixed;
 export function patchOrder(orderID : string, data : PatchData, { facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI = false, experiments } : OrderAPIOptions) : ZalgoPromise<OrderResponse> {
     getLogger().info(`patch_order_${ lsatUpgradeType() }_${ getLsatUpgradeCalled() ? 'called' : 'not_called' }`, { orderID });
     getLogger().info(`patch_order_${ lsatUpgradeType() }_${ getLsatUpgradeError() ? 'errored' : 'did_not_error' }`, { orderID, err: stringifyError(getLsatUpgradeError()) });
+    logPayeeInfoForClientSideHelpers(orderID, "patch");
 
     if (forceRestAPI && !getLsatUpgradeError()) {
         return callRestAPI({
@@ -354,9 +376,7 @@ export function patchOrder(orderID : string, data : PatchData, { facilitatorAcce
                 [ HEADERS.PREFER ]:                 PREFER.REPRESENTATION
             },
             metricDimensions: {
-                lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                lsatUpgrade: lsatUpgradeMetricValue(),
             }
         }).catch(err => {
             const restCorrID = getErrorResponseCorrelationID(err);
@@ -388,9 +408,7 @@ export function patchOrder(orderID : string, data : PatchData, { facilitatorAcce
                     [HEADERS.CLIENT_CONTEXT]: orderID
                 },
                 metricDimensions: {
-                    lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-                    lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-                    lsatUpgradeError: Boolean(getLsatUpgradeError()),
+                    lsatUpgrade: lsatUpgradeMetricValue(),
                     smartApiType: "fallback"
                 }
             }).then((res) => {
@@ -402,6 +420,8 @@ export function patchOrder(orderID : string, data : PatchData, { facilitatorAcce
                 getLogger().info(`patch_order_${ lsatUpgradeType() }_smart_fallback_error`, { smartCorrID, restCorrID, orderID, err: stringifyError(smartErr) });
                 throw smartErr;
             });
+        }).finally(() => {
+            getLogger().flush();
         });
     }
 
@@ -425,13 +445,13 @@ export function patchOrder(orderID : string, data : PatchData, { facilitatorAcce
             [HEADERS.CLIENT_CONTEXT]: orderID
         },
         metricDimensions: {
-            lsatUpgradeCalled: Boolean(getLsatUpgradeCalled()),
-            lsatUpgradeIgnoreCache: Boolean(getLsatUpgradeWithIgnoreCache()),
-            lsatUpgradeError: Boolean(getLsatUpgradeError()),
+            lsatUpgrade: lsatUpgradeMetricValue(),
             smartApiType: "default"
         }
     }).then(({ data: patchData }) => {
         return patchData;
+    }).finally(() => {
+        getLogger().flush();
     });
 }
 export type PatchShippingArgs = {|

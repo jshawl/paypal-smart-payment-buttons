@@ -98,9 +98,7 @@ describe("getOnApproveOrder patch action", () => {
         [HEADERS.PREFER]: PREFER.REPRESENTATION,
       },
       metricDimensions: {
-        lsatUpgradeCalled: true,
-        lsatUpgradeError: false,
-        lsatUpgradeIgnoreCache: true
+        lsatUpgrade: "with_ignore_cache_success"
       },
     });
   });
@@ -129,9 +127,7 @@ describe("getOnApproveOrder patch action", () => {
         [HEADERS.PREFER]: PREFER.REPRESENTATION,
       },
       metricDimensions: {
-        lsatUpgradeCalled: true,
-        lsatUpgradeError: false,
-        lsatUpgradeIgnoreCache: true
+        lsatUpgrade: "with_ignore_cache_success"
       },
   });
   });
