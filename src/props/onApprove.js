@@ -292,7 +292,7 @@ type ApproveOrderActionOptions = {|
     experiments: Experiments
 |};
 
-export function buildXApproveOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments } : ApproveOrderActionOptions) : XOnApproveOrderActionsType {
+function buildXApproveOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments } : ApproveOrderActionOptions) : XOnApproveOrderActionsType {
     const order = buildOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments });
     const payment = buildPaymentActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError });
 

@@ -6,7 +6,11 @@ import { callGraphQL } from "../api/api";
 import { getOrder } from "../api/order";
 import { HEADERS } from "../constants";
 
-import { buildXApproveOrderActions } from "./onApprove";
+import { getOnApproveOrder } from "./onApprove";
+
+const onApprove = async (data, actions) => {
+  return await actions.order.get();
+};
 
 const restart = () => ZalgoPromise.try(vi.fn());
 
@@ -32,38 +36,88 @@ vi.mock("../api/order", async () => {
     getOrder: vi.fn(() => ZalgoPromise.resolve()),
   };
 });
+
 const buyerAccessToken = "S23_A.AA";
 const orderID = "EC-abc123";
 const facilitatorAccessToken = "A21_A.AA";
 
 const commonOptions = {
-  intent: "capture",
-  orderID,
-  paymentID: "abc123",
-  payerID: "",
-  restart,
-  facilitatorAccessToken,
-  buyerAccessToken,
-  partnerAttributionID: "",
-  forceRestAPI: true,
-  onError: () => ZalgoPromise.try(() => undefined),
+  branded: false,
+  clientAccessToken: "",
+  createOrder: () => ZalgoPromise.try(() => orderID),
   experiments: {
-    btSdkOrdersV2Migration: true,
     upgradeLSATWithIgnoreCache: false,
   },
+  intent: "capture",
+  facilitatorAccessToken,
+  featureFlags: { isLsatUpgradable: true },
+  onApprove,
+  onError: () => ZalgoPromise.try(() => undefined),
+  paymentSource: "paypal",
+  vault: false,
+  beforeOnApprove: vi.fn(),
+  partnerAttributionID: "",
+  orderID,
+  paymentID: "",
+  payerID: "",
+  restart,
+  buyerAccessToken,
+  forceRestAPI: true,
 };
 
 describe("getOnApproveOrder get action", () => {
   test("invoke callGraphQL from onApprove get action if treatment is present", async () => {
-    const buildXApproveOrderActionsResult = buildXApproveOrderActions({
+    const newOptions = {
       ...commonOptions,
-      experiments: { upgradeLSATWithIgnoreCache: true },
+      experiments: {
+        upgradeLSATWithIgnoreCache: true,
+      },
+    };
+    // $FlowFixMe
+    const getOnApproveOrderResult = getOnApproveOrder(newOptions);
+    await getOnApproveOrderResult({ buyerAccessToken }, { restart });
+
+    expect(callGraphQL).toHaveBeenNthCalledWith(1, {
+      name: "GetCheckoutDetails",
+      query: `
+        query GetCheckoutDetails($orderID: String!) {
+            checkoutSession(token: $orderID) {
+                cart {
+                    billingType
+                    intent
+                    paymentId
+                    billingToken
+                    amounts {
+                        total {
+                            currencyValue
+                            currencyCode
+                            currencyFormatSymbolISOCurrency
+                        }
+                    }
+                    supplementary {
+                        initiationIntent
+                    }
+                    category
+                }
+                flags {
+                    isChangeShippingAddressAllowed
+                }
+                payees {
+                    merchantId
+                    email {
+                        stringValue
+                    }
+                }
+            }
+        }
+        `,
+      variables: { orderID },
+      headers: {
+        [HEADERS.CLIENT_CONTEXT]: orderID,
+      },
     });
-    const { order } = buildXApproveOrderActionsResult;
 
-    await order.get();
-
-    expect(callGraphQL).toHaveBeenCalledWith({
+    expect(callGraphQL).toHaveBeenNthCalledWith(2, {
       name: "CreateUpgradedLowScopeAccessToken",
       headers: {
         [HEADERS.ACCESS_TOKEN]: buyerAccessToken,
@@ -88,14 +142,9 @@ describe("getOnApproveOrder get action", () => {
 
   test("invoke getOrder from onApprove get action if treatment is not present", async () => {
     // $FlowFixMe
-    const buildXApproveOrderActionsResult = buildXApproveOrderActions({
-      commonOptions,
-    });
-    const { order } = buildXApproveOrderActionsResult;
+    const getOnApproveOrderResult = getOnApproveOrder(commonOptions);
+    await getOnApproveOrderResult({}, { restart });
 
-    await order.get();
-
-    expect(callGraphQL).not.toHaveBeenCalled();
     expect(getOrder).toHaveBeenCalled();
   });
 });

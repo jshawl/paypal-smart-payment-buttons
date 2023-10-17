@@ -4,9 +4,13 @@ import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
 import { callGraphQL } from "../api/api";
 import { captureOrder } from "../api/order";
+import { HEADERS } from "../constants";
 
-import { buildXApproveOrderActions } from "./onApprove";
+import { getOnApproveOrder } from "./onApprove";
 
+const onApprove = async (data, actions) => {
+  return await actions.order.capture();
+};
 const restart = () => ZalgoPromise.try(vi.fn());
 
 vi.mock("../api/api", async () => {
@@ -32,46 +36,114 @@ vi.mock("../api/order", async () => {
   };
 });
 
+const buyerAccessToken = "S23_A.AA";
+const orderID = "EC-abc123";
+const facilitatorAccessToken = "A21_A.AA";
+
 const commonOptions = {
-  intent: "capture",
-  orderID: "EC-abc123",
-  paymentID: "abc123",
-  payerID: "",
-  restart,
-  facilitatorAccessToken: "A21_A.AA",
-  buyerAccessToken: "S23_A.AA",
-  partnerAttributionID: "",
-  forceRestAPI: true,
-  onError: () => ZalgoPromise.try(() => undefined),
+  branded: false,
+  clientAccessToken: "",
+  createOrder: () => ZalgoPromise.try(() => orderID),
   experiments: {
-    btSdkOrdersV2Migration: true,
     upgradeLSATWithIgnoreCache: false,
   },
+  intent: "capture",
+  facilitatorAccessToken,
+  featureFlags: { isLsatUpgradable: true },
+  onApprove,
+  onError: () => ZalgoPromise.try(() => undefined),
+  paymentSource: "paypal",
+  vault: false,
+  beforeOnApprove: vi.fn(),
+  partnerAttributionID: "",
+  orderID,
+  paymentID: "",
+  payerID: "",
+  restart,
+  buyerAccessToken,
+  forceRestAPI: true,
 };
 
 describe("getOnApproveOrder capture action", () => {
   test("invoke callGraphQL from onApprove capture action if treatment is present", async () => {
-    const buildXApproveOrderActionsResult = buildXApproveOrderActions({
+    const newOptions = {
       ...commonOptions,
-      experiments: { upgradeLSATWithIgnoreCache: true },
+      experiments: {
+        upgradeLSATWithIgnoreCache: true,
+      },
+    };
+    // $FlowFixMe
+    const getOnApproveOrderResult = getOnApproveOrder(newOptions);
+    await getOnApproveOrderResult({ buyerAccessToken }, { restart });
+
+    expect(callGraphQL).toHaveBeenNthCalledWith(1, {
+      name: "GetCheckoutDetails",
+      query: `
+        query GetCheckoutDetails($orderID: String!) {
+            checkoutSession(token: $orderID) {
+                cart {
+                    billingType
+                    intent
+                    paymentId
+                    billingToken
+                    amounts {
+                        total {
+                            currencyValue
+                            currencyCode
+                            currencyFormatSymbolISOCurrency
+                        }
+                    }
+                    supplementary {
+                        initiationIntent
+                    }
+                    category
+                }
+                flags {
+                    isChangeShippingAddressAllowed
+                }
+                payees {
+                    merchantId
+                    email {
+                        stringValue
+                    }
+                }
+            }
+        }
+        `,
+      variables: { orderID },
+      headers: {
+        [HEADERS.CLIENT_CONTEXT]: orderID,
+      },
     });
-    const { order } = buildXApproveOrderActionsResult;
 
-    await order.capture();
-
-    expect(callGraphQL).toHaveBeenCalled();
+    expect(callGraphQL).toHaveBeenNthCalledWith(2, {
+      name: "CreateUpgradedLowScopeAccessToken",
+      headers: {
+        [HEADERS.ACCESS_TOKEN]: buyerAccessToken,
+        [HEADERS.CLIENT_CONTEXT]: orderID,
+      },
+      query: `
+            mutation CreateUpgradedLowScopeAccessToken(
+                $orderID: String!
+                $buyerAccessToken: String!
+                $facilitatorAccessToken: String!
+            ) {
+                createUpgradedLowScopeAccessToken(
+                    token: $orderID
+                    buyerAccessToken: $buyerAccessToken
+                    merchantLSAT: $facilitatorAccessToken
+                )
+            }
+        `,
+      variables: { facilitatorAccessToken, buyerAccessToken, orderID },
+    });
   });
 
   test("invoke captureOrder from onApprove capture action if treatment is not present", async () => {
-    const buildXApproveOrderActionsResult = buildXApproveOrderActions({
-      ...commonOptions,
-      intent: "capture",
-    });
-    const { order } = buildXApproveOrderActionsResult;
+    // $FlowFixMe
+    const getOnApproveOrderResult = getOnApproveOrder(commonOptions);
+    await getOnApproveOrderResult({}, { restart });
 
-    await order.capture();
-
-    expect(callGraphQL).not.toHaveBeenCalled();
     expect(captureOrder).toHaveBeenCalled();
   });
 });
