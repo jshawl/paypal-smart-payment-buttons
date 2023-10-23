@@ -16,7 +16,7 @@ import {
     SHIPPING_ADDRESS_ERROR_MESSAGES,
     GENERIC_REJECT_ADDRESS_MESSAGE
 } from './onShippingChange';
-import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions, breakdownKeyChanges, optionsKeyChanges } from './utils';
+import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions, breakdownKeyChanges, optionsKeyChanges } from './shippingChangeUtils';
         
 export type XOnShippingAddressChangeDataType = {|
     orderID? : string,

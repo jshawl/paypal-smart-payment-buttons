@@ -54,6 +54,7 @@ describe("onShippingChange", () => {
     test("should invoke onShippingChange with a paymentID aliased to orderID", () => {
       const merchantOnShippingChange = vi.fn();
       const fn = getOnShippingChange(
+        // $FlowFixMe
         {
           clientID,
           experiments: {
@@ -95,6 +96,7 @@ describe("onShippingChange", () => {
         const buyerAccessToken = uniqueID();
 
         const fn = getOnShippingChange(
+          // $FlowFixMe
           {
             onShippingChange,
             partnerAttributionID,
@@ -135,6 +137,7 @@ describe("onShippingChange", () => {
         const buyerAccessToken = uniqueID();
 
         const fn = getOnShippingChange(
+          // $FlowFixMe
           {
             onShippingChange,
             partnerAttributionID,
@@ -174,6 +177,7 @@ describe("onShippingChange", () => {
 
         const buyerAccessToken = uniqueID();
         const fn = getOnShippingChange(
+          // $FlowFixMe
           {
             onShippingChange,
             partnerAttributionID,
@@ -209,6 +213,7 @@ describe("onShippingChange", () => {
         const experiments = { useShippingChangeCallbackMutation: true };
 
         const fn = getOnShippingChange(
+          // $FlowFixMe
           {
             onShippingChange,
             partnerAttributionID,
@@ -245,6 +250,7 @@ describe("onShippingChange", () => {
         const experiments = { useShippingChangeCallbackMutation: true };
 
         const fn = getOnShippingChange(
+          // $FlowFixMe
           {
             onShippingChange,
             partnerAttributionID,

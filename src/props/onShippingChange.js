@@ -1,13 +1,14 @@
 /* @flow */
 
 import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { COUNTRY, FPTI_KEY } from '@paypal/sdk-constants/src';
+import { COUNTRY, FPTI_KEY, FUNDING } from '@paypal/sdk-constants/src';
 
 import { patchShipping, patchOrder, type OrderResponse, upgradeFacilitatorAccessTokenWithIgnoreCache } from '../api';
 import { FPTI_TRANSITION, FPTI_CONTEXT_TYPE, FPTI_CUSTOM_KEY } from '../constants';
 import { getLogger } from '../lib';
 import type { OrderAmount, Experiments, FeatureFlags, ShippingOption } from '../types';
 
+import { checkUlsatNotRequired } from './utils';
 import type { CreateOrder } from './createOrder';
 
 export type ON_SHIPPING_CHANGE_EVENT = 'add' | 'replace';
@@ -157,7 +158,7 @@ export const logInvalidShippingChangePatches = ({ appName, buyerAccessToken, dat
     }
 }
 
-export function buildXShippingChangeActions({ orderID, actions, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, clientID, experiments, appName } : {| orderID : string, actions : OnShippingChangeActionsType, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean, experiments: Experiments; clientID: string; appName: string; |}) : XOnShippingChangeActionsType {
+export function buildXShippingChangeActions({ orderID, actions, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, clientID, experiments, appName, paymentSource } : {| orderID : string, actions : OnShippingChangeActionsType, facilitatorAccessToken : string, buyerAccessToken : ?string, partnerAttributionID : ?string, forceRestAPI : boolean, experiments: Experiments; clientID: string; appName: string; paymentSource : $Values<typeof FUNDING> | null |}) : XOnShippingChangeActionsType {
     const { useShippingChangeCallbackMutation } = experiments;
 
     const patch = (data = {}) => {
@@ -171,7 +172,11 @@ export function buildXShippingChangeActions({ orderID, actions, facilitatorAcces
             });
         }
 
-        if (experiments?.upgradeLSATWithIgnoreCache) {
+        // Does not create a new access token if Venmo native
+        // venmo native handles upgrading LSAT so if we upgrade
+        // it in the SDK the upgrade will fail when we switch to venmo
+        const isUlsatNotRequired = checkUlsatNotRequired(paymentSource, buyerAccessToken);
+        if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ) {
             // $FlowFixMe
             return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
                 .then((upgradedFacilitatorAccessToken) => {
@@ -205,9 +210,10 @@ type OnShippingChangeXProps = {|
     experiments: Experiments,
     featureFlags : FeatureFlags,
     clientID: string,
+    paymentSource: $Values<typeof FUNDING> | null
 |};
 
-export function getOnShippingChange({ onShippingChange, partnerAttributionID, featureFlags,experiments, clientID } : OnShippingChangeXProps, { facilitatorAccessToken, createOrder } : {| facilitatorAccessToken : string, createOrder : CreateOrder |}) : ?OnShippingChange {
+export function getOnShippingChange({ onShippingChange, partnerAttributionID, featureFlags,experiments, clientID, paymentSource } : OnShippingChangeXProps, { facilitatorAccessToken, createOrder } : {| facilitatorAccessToken : string, createOrder : CreateOrder |}) : ?OnShippingChange {
     if (onShippingChange) {
         return ({
             buyerAccessToken,
@@ -243,7 +249,7 @@ export function getOnShippingChange({ onShippingChange, partnerAttributionID, fe
                     // $FlowExpectedError
                     data.paymentId = data.paymentID;
                 }
-                return onShippingChange(buildXOnShippingChangeData(data), buildXShippingChangeActions({ orderID, facilitatorAccessToken, buyerAccessToken, actions, partnerAttributionID, forceRestAPI, clientID, experiments, appName }));
+                return onShippingChange(buildXOnShippingChangeData(data), buildXShippingChangeActions({ orderID, facilitatorAccessToken, buyerAccessToken, actions, partnerAttributionID, forceRestAPI, clientID, experiments, appName, paymentSource }));
             });
         };
     }

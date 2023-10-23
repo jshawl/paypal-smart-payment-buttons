@@ -1,6 +1,6 @@
 /* @flow */
 
-import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions, updateShippingOptions, breakdownKeyChanges, optionsKeyChanges } from '../../src/props/utils';
+import { buildBreakdown, calculateTotalFromShippingBreakdownAmounts, convertQueriesToArray, updateOperationForShippingOptions, updateShippingOptions, breakdownKeyChanges, optionsKeyChanges } from '../../src/props/shippingChangeUtils';
 import { ON_SHIPPING_CHANGE_PATHS } from '../../src/props/onShippingChange';
 
 import { areObjectsIdentical } from './util';

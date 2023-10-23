@@ -13,6 +13,7 @@ import { unresolvedPromise, getLogger, sendCountMetric } from '../lib';
 import { ENABLE_PAYMENT_API } from '../config';
 import type { FeatureFlags, Experiments} from '../types'
 
+import { checkUlsatNotRequired } from './utils';
 import type { CreateOrder } from './createOrder';
 import type { CreateVaultSetupToken } from './createVaultSetupToken';
 import type { CreateBillingAgreement } from './createBillingAgreement';
@@ -142,12 +143,17 @@ type OrderActionOptions = {|
     partnerAttributionID : ?string,
     forceRestAPI : boolean,
     onError : OnError,
-    experiments: Experiments
+    experiments: Experiments,
+    paymentSource: $Values<typeof FUNDING> | null
 |};
 
-function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments } : OrderActionOptions) : OrderActions {
+function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments, paymentSource } : OrderActionOptions) : OrderActions {
     const get = memoize(() => {
-        if (experiments?.upgradeLSATWithIgnoreCache) {
+        // Does not create a new access token if Venmo native
+        // venmo native handles upgrading LSAT so if we upgrade
+        // it in the SDK the upgrade will fail when we switch to venmo
+        const isUlsatNotRequired = checkUlsatNotRequired(paymentSource, buyerAccessToken);
+        if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ) {
             // $FlowFixMe
             return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
                 .then((upgradedFacilitatorAccessToken) => {
@@ -161,8 +167,11 @@ function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, b
         if (intent !== INTENT.CAPTURE) {
             throw new Error(`Use ${ SDK_QUERY_KEYS.INTENT }=${ INTENT.CAPTURE } to use client-side capture`);
         }
-
-        if (experiments?.upgradeLSATWithIgnoreCache) {
+        // Does not create a new access token if Venmo native
+        // venmo native handles upgrading LSAT so if we upgrade
+        // it in the SDK the upgrade will fail when we switch to venmo
+        const isUlsatNotRequired = checkUlsatNotRequired(paymentSource, buyerAccessToken);
+        if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ) {
             // $FlowFixMe
             return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
                 .then((upgradedFacilitatorAccessToken) => {
@@ -187,8 +196,11 @@ function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, b
         if (intent !== INTENT.AUTHORIZE) {
             throw new Error(`Use ${ SDK_QUERY_KEYS.INTENT }=${ INTENT.AUTHORIZE } to use client-side authorize`);
         }
-
-        if (experiments?.upgradeLSATWithIgnoreCache) {
+        // Does not create a new access token if Venmo native
+        // venmo native handles upgrading LSAT so if we upgrade
+        // it in the SDK the upgrade will fail when we switch to venmo
+        const isUlsatNotRequired = checkUlsatNotRequired(paymentSource, buyerAccessToken);
+        if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ) {
             // $FlowFixMe
             return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
                 .then((upgradedFacilitatorAccessToken) => {
@@ -206,7 +218,11 @@ function buildOrderActions({ intent, orderID, restart, facilitatorAccessToken, b
     });
 
     const patch = (data = {}) => {
-        if (experiments?.upgradeLSATWithIgnoreCache) {
+        // Does not create a new access token if Venmo native
+        // venmo native handles upgrading LSAT so if we upgrade
+        // it in the SDK the upgrade will fail when we switch to venmo
+        const isUlsatNotRequired = checkUlsatNotRequired(paymentSource, buyerAccessToken);
+        if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ) {
             // $FlowFixMe
             return upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken, buyerAccessToken, orderID)
             .then((upgradedFacilitatorAccessToken) => {
@@ -289,11 +305,12 @@ type ApproveOrderActionOptions = {|
     partnerAttributionID : ?string,
     forceRestAPI : boolean,
     onError : OnError,
-    experiments: Experiments
+    experiments: Experiments,
+    paymentSource: $Values<typeof FUNDING> | null
 |};
 
-function buildXApproveOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments } : ApproveOrderActionOptions) : XOnApproveOrderActionsType {
-    const order = buildOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments });
+function buildXApproveOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments, paymentSource } : ApproveOrderActionOptions) : XOnApproveOrderActionsType {
+    const order = buildOrderActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError, experiments, paymentSource });
     const payment = buildPaymentActions({ intent, orderID, paymentID, payerID, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, forceRestAPI, onError });
 
     return {
@@ -442,7 +459,7 @@ export function getOnApproveOrder({ intent, onApprove = getDefaultOnApproveOrder
                     paymentID = orderID.replace(/EC-/, '');
                 }
                 const data = { orderID, payerID, paymentID, billingToken, facilitatorAccessToken, authCode, paymentSource };
-                const actions = buildXApproveOrderActions({ orderID, paymentID, payerID, intent, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, onError, forceRestAPI, experiments });
+                const actions = buildXApproveOrderActions({ orderID, paymentID, payerID, intent, restart, facilitatorAccessToken, buyerAccessToken, partnerAttributionID, onError, forceRestAPI, experiments, paymentSource });
 
                 beforeOnApprove();
                 return onApprove(data, actions).catch(err => {
