@@ -55,7 +55,7 @@ window.smartCard = function(modules) {
         return {}.hasOwnProperty.call(object, property);
     };
     __webpack_require__.p = "";
-    return __webpack_require__(__webpack_require__.s = 82);
+    return __webpack_require__(__webpack_require__.s = 83);
 }([ function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.d(__webpack_exports__, "b", (function() {
@@ -546,10 +546,10 @@ window.smartCard = function(modules) {
     __webpack_require__.d(__webpack_exports__, "d", (function() {
         return getPostRobot;
     }));
-    var util = __webpack_require__(16);
-    var logger = __webpack_require__(12);
+    var util = __webpack_require__(17);
+    var logger = __webpack_require__(9);
     __webpack_require__(1);
-    __webpack_require__(9);
+    __webpack_require__(10);
     var belter_src = __webpack_require__(3);
     function getSDKStorage() {
         return Object(belter_src.f)({
@@ -679,7 +679,7 @@ window.smartCard = function(modules) {
     }
     __webpack_require__(5);
     var zalgo_promise_src = __webpack_require__(4);
-    var cross_domain_utils_src = __webpack_require__(9);
+    var cross_domain_utils_src = __webpack_require__(10);
     function safeIndexOf(collection, item) {
         for (var i = 0; i < collection.length; i++) try {
             if (collection[i] === item) return i;
@@ -2784,7 +2784,7 @@ window.smartCard = function(modules) {
             return _ref8.data;
         }));
     }
-    var util = __webpack_require__(16);
+    var util = __webpack_require__(17);
     Object(belter_src.o)((function(config) {
         return src.a.try((function() {
             if (!window.firebase || !window.firebase.auth || !window.firebase.database) return Object(util.d)(src_config.d.APP).then((function() {
@@ -2920,6 +2920,286 @@ window.smartCard = function(modules) {
         DATABASE: "https://www.paypalobjects.com/checkout/js/lib/firebase-database.js"
     };
     var ENABLE_PAYMENT_API = !1;
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__.d(__webpack_exports__, "a", (function() {
+        return getLogger;
+    }));
+    __webpack_require__.d(__webpack_exports__, "b", (function() {
+        return sendCountMetric;
+    }));
+    __webpack_require__.d(__webpack_exports__, "c", (function() {
+        return setupLogger;
+    }));
+    var esm_extends = __webpack_require__(5);
+    var src = __webpack_require__(4);
+    var belter_src = __webpack_require__(3);
+    var AUTO_FLUSH_LEVEL = [ "warn", "error" ];
+    var LOG_LEVEL_PRIORITY = [ "error", "warn", "info", "debug" ];
+    var extendIfDefined = function(target, source) {
+        for (var key in source) source.hasOwnProperty(key) && (target[key] = source[key]);
+    };
+    var cross_domain_utils_src = __webpack_require__(10);
+    var sdk_constants_src = __webpack_require__(0);
+    var config = __webpack_require__(8);
+    function getLogger() {
+        var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? config.f + "?disableSetCookie=true" : config.f;
+        return Object(belter_src.i)(getLogger, (function() {
+            return function(_ref) {
+                var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? "warn" : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? function(_ref) {
+                    var url = _ref.url, method = _ref.method, headers = _ref.headers, json = _ref.json, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
+                    return src.a.try((function() {
+                        var httpWindow = window;
+                        var win = Object(cross_domain_utils_src.d)(httpWindow) ? Object(cross_domain_utils_src.a)(httpWindow) : window;
+                        var beaconResult = !1;
+                        (function(_ref) {
+                            var headers = _ref.headers, enableSendBeacon = _ref.enableSendBeacon;
+                            var hasHeaders = headers && Object.keys(headers).length;
+                            return !!(window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob);
+                        })({
+                            headers: headers,
+                            enableSendBeacon: enableSendBeacon
+                        }) && (beaconResult = function(_ref2) {
+                            var _ref2$win = _ref2.win, win = void 0 === _ref2$win ? window : _ref2$win, url = _ref2.url, data = _ref2.data, _ref2$useBlob = _ref2.useBlob, useBlob = void 0 === _ref2$useBlob || _ref2$useBlob;
+                            try {
+                                var json = JSON.stringify(data);
+                                if (!win.navigator.sendBeacon) throw new Error("No sendBeacon available");
+                                if (useBlob) {
+                                    var blob = new Blob([ json ], {
+                                        type: "application/json"
+                                    });
+                                    return win.navigator.sendBeacon(url, blob);
+                                }
+                                return win.navigator.sendBeacon(url, json);
+                            } catch (e) {
+                                return !1;
+                            }
+                        }({
+                            win: win,
+                            url: url,
+                            data: json,
+                            useBlob: !0
+                        }));
+                        return beaconResult || Object(belter_src.t)({
+                            win: win,
+                            url: url,
+                            method: method,
+                            headers: headers,
+                            json: json
+                        });
+                    })).then(belter_src.p);
+                } : _ref$transport, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
+                var events = [];
+                var tracking = [];
+                var metrics = [];
+                var payloadBuilders = [];
+                var metaBuilders = [];
+                var trackingBuilders = [];
+                var headerBuilders = [];
+                function print(level, event, payload) {
+                    if (Object(belter_src.k)() && window.console && window.console.log && !(LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(logLevel))) {
+                        var args = [ event ];
+                        args.push(payload);
+                        (payload.error || payload.warning) && args.push("\n\n", payload.error || payload.warning);
+                        try {
+                            window.console[level] && window.console[level].apply ? window.console[level].apply(window.console, args) : window.console.log && window.console.log.apply && window.console.log.apply(window.console, args);
+                        } catch (err) {}
+                    }
+                }
+                function immediateFlush() {
+                    return src.a.try((function() {
+                        if (Object(belter_src.k)() && "file:" !== window.location.protocol && (events.length || tracking.length || metrics.length)) {
+                            var meta = {};
+                            for (var _i2 = 0; _i2 < metaBuilders.length; _i2++) extendIfDefined(meta, (0, metaBuilders[_i2])(meta));
+                            var headers = {};
+                            for (var _i4 = 0; _i4 < headerBuilders.length; _i4++) extendIfDefined(headers, (0, 
+                            headerBuilders[_i4])(headers));
+                            var res;
+                            url && (res = transport({
+                                method: "POST",
+                                url: url,
+                                headers: headers,
+                                json: {
+                                    events: events,
+                                    meta: meta,
+                                    tracking: tracking,
+                                    metrics: metrics
+                                },
+                                enableSendBeacon: enableSendBeacon
+                            }).catch(belter_src.p));
+                            events = [];
+                            tracking = [];
+                            metrics = [];
+                            return src.a.resolve(res).then(belter_src.p);
+                        }
+                    }));
+                }
+                var flush = Object(belter_src.r)(immediateFlush);
+                function log(level, event, payload) {
+                    void 0 === payload && (payload = {});
+                    if (!Object(belter_src.k)()) return logger;
+                    prefix && (event = prefix + "_" + event);
+                    var logPayload = Object(esm_extends.a)({}, Object(belter_src.q)(payload), {
+                        timestamp: Date.now().toString()
+                    });
+                    for (var _i6 = 0; _i6 < payloadBuilders.length; _i6++) extendIfDefined(logPayload, (0, 
+                    payloadBuilders[_i6])(logPayload));
+                    !function(level, event, payload) {
+                        events.push({
+                            level: level,
+                            event: event,
+                            payload: payload
+                        });
+                        -1 !== AUTO_FLUSH_LEVEL.indexOf(level) && flush();
+                    }(level, event, logPayload);
+                    print(level, event, logPayload);
+                    return logger;
+                }
+                function addBuilder(builders, builder) {
+                    builders.push(builder);
+                    return logger;
+                }
+                Object(belter_src.k)() && Object(belter_src.u)(flush, flushInterval);
+                if ("object" == typeof window) {
+                    window.addEventListener("beforeunload", (function() {
+                        immediateFlush();
+                    }));
+                    window.addEventListener("unload", (function() {
+                        immediateFlush();
+                    }));
+                    window.addEventListener("pagehide", (function() {
+                        immediateFlush();
+                    }));
+                }
+                var logger = {
+                    debug: function(event, payload) {
+                        return log("debug", event, payload);
+                    },
+                    info: function(event, payload) {
+                        return log("info", event, payload);
+                    },
+                    warn: function(event, payload) {
+                        return log("warn", event, payload);
+                    },
+                    error: function(event, payload) {
+                        return log("error", event, payload);
+                    },
+                    track: function(payload) {
+                        void 0 === payload && (payload = {});
+                        if (!Object(belter_src.k)()) return logger;
+                        var trackingPayload = Object(belter_src.q)(payload);
+                        for (var _i8 = 0; _i8 < trackingBuilders.length; _i8++) extendIfDefined(trackingPayload, (0, 
+                        trackingBuilders[_i8])(trackingPayload));
+                        print("debug", "track", trackingPayload);
+                        tracking.push(trackingPayload);
+                        return logger;
+                    },
+                    metric: function(metricPayload) {
+                        if (!Object(belter_src.k)()) return logger;
+                        print("debug", "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
+                        metrics.push(metricPayload);
+                        return logger;
+                    },
+                    flush: flush,
+                    immediateFlush: immediateFlush,
+                    addPayloadBuilder: function(builder) {
+                        return addBuilder(payloadBuilders, builder);
+                    },
+                    addMetaBuilder: function(builder) {
+                        return addBuilder(metaBuilders, builder);
+                    },
+                    addTrackingBuilder: function(builder) {
+                        return addBuilder(trackingBuilders, builder);
+                    },
+                    addHeaderBuilder: function(builder) {
+                        return addBuilder(headerBuilders, builder);
+                    },
+                    setTransport: function(newTransport) {
+                        transport = newTransport;
+                        return logger;
+                    },
+                    configure: function(opts) {
+                        opts.url && (url = opts.url);
+                        opts.prefix && (prefix = opts.prefix);
+                        opts.logLevel && (logLevel = opts.logLevel);
+                        opts.transport && (transport = opts.transport);
+                        opts.flushInterval && (flushInterval = opts.flushInterval);
+                        opts.enableSendBeacon && (enableSendBeacon = opts.enableSendBeacon);
+                        return logger;
+                    },
+                    __buffer__: {
+                        get events() {
+                            return events;
+                        },
+                        get tracking() {
+                            return tracking;
+                        },
+                        get metrics() {
+                            return metrics;
+                        }
+                    }
+                };
+                Object.defineProperty(logger, "__buffer__", {
+                    writable: !1
+                });
+                return logger;
+            }({
+                url: loggerUrl,
+                enableSendBeacon: !0
+            });
+        }));
+    }
+    var sendCountMetric = function(_ref) {
+        var dimensions = _ref.dimensions, _ref$event = _ref.event, event = void 0 === _ref$event ? "unused" : _ref$event, name = _ref.name, _ref$value = _ref.value, value = void 0 === _ref$value ? 1 : _ref$value;
+        return getLogger().metric({
+            dimensions: dimensions,
+            metricEventName: event,
+            metricNamespace: name,
+            metricValue: value,
+            metricType: "counter"
+        });
+    };
+    function setupLogger(_ref3) {
+        var env = _ref3.env, sessionID = _ref3.sessionID, clientID = _ref3.clientID, sdkCorrelationID = _ref3.sdkCorrelationID, buyerCountry = _ref3.buyerCountry, locale = _ref3.locale, _ref3$sdkVersion = _ref3.sdkVersion, sdkVersion = void 0 === _ref3$sdkVersion ? window.paypal.version : _ref3$sdkVersion;
+        var logger = getLogger();
+        logger.addPayloadBuilder((function() {
+            return {
+                referer: window.location.host,
+                sdkCorrelationID: sdkCorrelationID,
+                sessionID: sessionID,
+                clientID: clientID,
+                env: env
+            };
+        }));
+        logger.addTrackingBuilder((function() {
+            var _ref4;
+            return (_ref4 = {})[sdk_constants_src.e.FEED] = sdk_constants_src.d.PAYMENTS_SDK, 
+            _ref4[sdk_constants_src.e.DATA_SOURCE] = sdk_constants_src.c.PAYMENTS_SDK, _ref4[sdk_constants_src.e.CLIENT_ID] = clientID, 
+            _ref4[sdk_constants_src.e.SESSION_UID] = sessionID, _ref4[sdk_constants_src.e.REFERER] = window.location.host, 
+            _ref4[sdk_constants_src.e.BUYER_COUNTRY] = buyerCountry, _ref4[sdk_constants_src.e.LOCALE] = locale.lang + "_" + locale.country, 
+            _ref4[sdk_constants_src.e.INTEGRATION_IDENTIFIER] = clientID, _ref4[sdk_constants_src.e.SDK_ENVIRONMENT] = Object(belter_src.m)() ? sdk_constants_src.i.IOS : Object(belter_src.j)() ? sdk_constants_src.i.ANDROID : null, 
+            _ref4[sdk_constants_src.e.SDK_NAME] = sdk_constants_src.f.PAYMENTS_SDK, _ref4[sdk_constants_src.e.SDK_VERSION] = sdkVersion, 
+            _ref4[sdk_constants_src.e.USER_AGENT] = window.navigator && window.navigator.userAgent, 
+            _ref4[sdk_constants_src.e.CONTEXT_CORRID] = sdkCorrelationID, _ref4[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
+            _ref4;
+        }));
+        src.a.onPossiblyUnhandledException((function(err) {
+            var _logger$track;
+            logger.track(((_logger$track = {})[sdk_constants_src.e.ERROR_CODE] = "payments_sdk_error", 
+            _logger$track[sdk_constants_src.e.ERROR_DESC] = Object(belter_src.w)(err), _logger$track));
+            logger.error("unhandled_error", {
+                err: Object(belter_src.v)(err)
+            });
+            sendCountMetric({
+                event: "error",
+                name: "pp.app.paypal_sdk.buttons.unhandled_exception.count",
+                dimensions: {
+                    errorType: "payments_sdk_error"
+                }
+            });
+            logger.flush().catch(belter_src.p);
+        }));
+    }
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.d(__webpack_exports__, "c", (function() {
@@ -3254,13 +3534,14 @@ window.smartCard = function(modules) {
     __webpack_require__.d(__webpack_exports__, "a", (function() {
         return GENERIC_REJECT_ADDRESS_MESSAGE;
     }));
-    __webpack_require__(17);
+    __webpack_require__(18);
     __webpack_require__(5);
     __webpack_require__(4);
     __webpack_require__(0);
     __webpack_require__(7);
     __webpack_require__(1);
     __webpack_require__(2);
+    __webpack_require__(16);
     var ON_SHIPPING_CHANGE_PATHS = {
         AMOUNT: "/purchase_units/@reference_id=='default'/amount",
         OPTIONS: "/purchase_units/@reference_id=='default'/shipping/options"
@@ -3305,14 +3586,14 @@ window.smartCard = function(modules) {
         if (null != mod) for (var k in mod) "default" !== k && {}.hasOwnProperty.call(mod, k) && __createBinding(result, mod, k);
         __setModuleDefault(result, mod);
         return result;
-    })(__webpack_require__(26));
-    var cardholder_name_1 = __webpack_require__(56);
-    var card_number_1 = __webpack_require__(57);
-    var expiration_date_1 = __webpack_require__(59);
-    var expiration_month_1 = __webpack_require__(28);
-    var expiration_year_1 = __webpack_require__(25);
-    var cvv_1 = __webpack_require__(62);
-    var postal_code_1 = __webpack_require__(63);
+    })(__webpack_require__(27));
+    var cardholder_name_1 = __webpack_require__(57);
+    var card_number_1 = __webpack_require__(58);
+    var expiration_date_1 = __webpack_require__(60);
+    var expiration_month_1 = __webpack_require__(29);
+    var expiration_year_1 = __webpack_require__(26);
+    var cvv_1 = __webpack_require__(63);
+    var postal_code_1 = __webpack_require__(64);
     module.exports = {
         creditCardType: creditCardType,
         cardholderName: cardholder_name_1.cardholderName,
@@ -3323,286 +3604,6 @@ window.smartCard = function(modules) {
         cvv: cvv_1.cvv,
         postalCode: postal_code_1.postalCode
     };
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__.d(__webpack_exports__, "a", (function() {
-        return getLogger;
-    }));
-    __webpack_require__.d(__webpack_exports__, "b", (function() {
-        return sendCountMetric;
-    }));
-    __webpack_require__.d(__webpack_exports__, "c", (function() {
-        return setupLogger;
-    }));
-    var esm_extends = __webpack_require__(5);
-    var src = __webpack_require__(4);
-    var belter_src = __webpack_require__(3);
-    var AUTO_FLUSH_LEVEL = [ "warn", "error" ];
-    var LOG_LEVEL_PRIORITY = [ "error", "warn", "info", "debug" ];
-    var extendIfDefined = function(target, source) {
-        for (var key in source) source.hasOwnProperty(key) && (target[key] = source[key]);
-    };
-    var cross_domain_utils_src = __webpack_require__(9);
-    var sdk_constants_src = __webpack_require__(0);
-    var config = __webpack_require__(8);
-    function getLogger() {
-        var loggerUrl = window && "object" == typeof window.xprops && window.xprops.disableSetCookie ? config.f + "?disableSetCookie=true" : config.f;
-        return Object(belter_src.i)(getLogger, (function() {
-            return function(_ref) {
-                var url = _ref.url, prefix = _ref.prefix, _ref$logLevel = _ref.logLevel, logLevel = void 0 === _ref$logLevel ? "warn" : _ref$logLevel, _ref$transport = _ref.transport, transport = void 0 === _ref$transport ? function(_ref) {
-                    var url = _ref.url, method = _ref.method, headers = _ref.headers, json = _ref.json, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
-                    return src.a.try((function() {
-                        var httpWindow = window;
-                        var win = Object(cross_domain_utils_src.d)(httpWindow) ? Object(cross_domain_utils_src.a)(httpWindow) : window;
-                        var beaconResult = !1;
-                        (function(_ref) {
-                            var headers = _ref.headers, enableSendBeacon = _ref.enableSendBeacon;
-                            var hasHeaders = headers && Object.keys(headers).length;
-                            return !!(window && window.navigator.sendBeacon && !hasHeaders && enableSendBeacon && window.Blob);
-                        })({
-                            headers: headers,
-                            enableSendBeacon: enableSendBeacon
-                        }) && (beaconResult = function(_ref2) {
-                            var _ref2$win = _ref2.win, win = void 0 === _ref2$win ? window : _ref2$win, url = _ref2.url, data = _ref2.data, _ref2$useBlob = _ref2.useBlob, useBlob = void 0 === _ref2$useBlob || _ref2$useBlob;
-                            try {
-                                var json = JSON.stringify(data);
-                                if (!win.navigator.sendBeacon) throw new Error("No sendBeacon available");
-                                if (useBlob) {
-                                    var blob = new Blob([ json ], {
-                                        type: "application/json"
-                                    });
-                                    return win.navigator.sendBeacon(url, blob);
-                                }
-                                return win.navigator.sendBeacon(url, json);
-                            } catch (e) {
-                                return !1;
-                            }
-                        }({
-                            win: win,
-                            url: url,
-                            data: json,
-                            useBlob: !0
-                        }));
-                        return beaconResult || Object(belter_src.t)({
-                            win: win,
-                            url: url,
-                            method: method,
-                            headers: headers,
-                            json: json
-                        });
-                    })).then(belter_src.p);
-                } : _ref$transport, _ref$flushInterval = _ref.flushInterval, flushInterval = void 0 === _ref$flushInterval ? 6e4 : _ref$flushInterval, _ref$enableSendBeacon = _ref.enableSendBeacon, enableSendBeacon = void 0 !== _ref$enableSendBeacon && _ref$enableSendBeacon;
-                var events = [];
-                var tracking = [];
-                var metrics = [];
-                var payloadBuilders = [];
-                var metaBuilders = [];
-                var trackingBuilders = [];
-                var headerBuilders = [];
-                function print(level, event, payload) {
-                    if (Object(belter_src.k)() && window.console && window.console.log && !(LOG_LEVEL_PRIORITY.indexOf(level) > LOG_LEVEL_PRIORITY.indexOf(logLevel))) {
-                        var args = [ event ];
-                        args.push(payload);
-                        (payload.error || payload.warning) && args.push("\n\n", payload.error || payload.warning);
-                        try {
-                            window.console[level] && window.console[level].apply ? window.console[level].apply(window.console, args) : window.console.log && window.console.log.apply && window.console.log.apply(window.console, args);
-                        } catch (err) {}
-                    }
-                }
-                function immediateFlush() {
-                    return src.a.try((function() {
-                        if (Object(belter_src.k)() && "file:" !== window.location.protocol && (events.length || tracking.length || metrics.length)) {
-                            var meta = {};
-                            for (var _i2 = 0; _i2 < metaBuilders.length; _i2++) extendIfDefined(meta, (0, metaBuilders[_i2])(meta));
-                            var headers = {};
-                            for (var _i4 = 0; _i4 < headerBuilders.length; _i4++) extendIfDefined(headers, (0, 
-                            headerBuilders[_i4])(headers));
-                            var res;
-                            url && (res = transport({
-                                method: "POST",
-                                url: url,
-                                headers: headers,
-                                json: {
-                                    events: events,
-                                    meta: meta,
-                                    tracking: tracking,
-                                    metrics: metrics
-                                },
-                                enableSendBeacon: enableSendBeacon
-                            }).catch(belter_src.p));
-                            events = [];
-                            tracking = [];
-                            metrics = [];
-                            return src.a.resolve(res).then(belter_src.p);
-                        }
-                    }));
-                }
-                var flush = Object(belter_src.r)(immediateFlush);
-                function log(level, event, payload) {
-                    void 0 === payload && (payload = {});
-                    if (!Object(belter_src.k)()) return logger;
-                    prefix && (event = prefix + "_" + event);
-                    var logPayload = Object(esm_extends.a)({}, Object(belter_src.q)(payload), {
-                        timestamp: Date.now().toString()
-                    });
-                    for (var _i6 = 0; _i6 < payloadBuilders.length; _i6++) extendIfDefined(logPayload, (0, 
-                    payloadBuilders[_i6])(logPayload));
-                    !function(level, event, payload) {
-                        events.push({
-                            level: level,
-                            event: event,
-                            payload: payload
-                        });
-                        -1 !== AUTO_FLUSH_LEVEL.indexOf(level) && flush();
-                    }(level, event, logPayload);
-                    print(level, event, logPayload);
-                    return logger;
-                }
-                function addBuilder(builders, builder) {
-                    builders.push(builder);
-                    return logger;
-                }
-                Object(belter_src.k)() && Object(belter_src.u)(flush, flushInterval);
-                if ("object" == typeof window) {
-                    window.addEventListener("beforeunload", (function() {
-                        immediateFlush();
-                    }));
-                    window.addEventListener("unload", (function() {
-                        immediateFlush();
-                    }));
-                    window.addEventListener("pagehide", (function() {
-                        immediateFlush();
-                    }));
-                }
-                var logger = {
-                    debug: function(event, payload) {
-                        return log("debug", event, payload);
-                    },
-                    info: function(event, payload) {
-                        return log("info", event, payload);
-                    },
-                    warn: function(event, payload) {
-                        return log("warn", event, payload);
-                    },
-                    error: function(event, payload) {
-                        return log("error", event, payload);
-                    },
-                    track: function(payload) {
-                        void 0 === payload && (payload = {});
-                        if (!Object(belter_src.k)()) return logger;
-                        var trackingPayload = Object(belter_src.q)(payload);
-                        for (var _i8 = 0; _i8 < trackingBuilders.length; _i8++) extendIfDefined(trackingPayload, (0, 
-                        trackingBuilders[_i8])(trackingPayload));
-                        print("debug", "track", trackingPayload);
-                        tracking.push(trackingPayload);
-                        return logger;
-                    },
-                    metric: function(metricPayload) {
-                        if (!Object(belter_src.k)()) return logger;
-                        print("debug", "metric." + metricPayload.metricNamespace, metricPayload.dimensions || {});
-                        metrics.push(metricPayload);
-                        return logger;
-                    },
-                    flush: flush,
-                    immediateFlush: immediateFlush,
-                    addPayloadBuilder: function(builder) {
-                        return addBuilder(payloadBuilders, builder);
-                    },
-                    addMetaBuilder: function(builder) {
-                        return addBuilder(metaBuilders, builder);
-                    },
-                    addTrackingBuilder: function(builder) {
-                        return addBuilder(trackingBuilders, builder);
-                    },
-                    addHeaderBuilder: function(builder) {
-                        return addBuilder(headerBuilders, builder);
-                    },
-                    setTransport: function(newTransport) {
-                        transport = newTransport;
-                        return logger;
-                    },
-                    configure: function(opts) {
-                        opts.url && (url = opts.url);
-                        opts.prefix && (prefix = opts.prefix);
-                        opts.logLevel && (logLevel = opts.logLevel);
-                        opts.transport && (transport = opts.transport);
-                        opts.flushInterval && (flushInterval = opts.flushInterval);
-                        opts.enableSendBeacon && (enableSendBeacon = opts.enableSendBeacon);
-                        return logger;
-                    },
-                    __buffer__: {
-                        get events() {
-                            return events;
-                        },
-                        get tracking() {
-                            return tracking;
-                        },
-                        get metrics() {
-                            return metrics;
-                        }
-                    }
-                };
-                Object.defineProperty(logger, "__buffer__", {
-                    writable: !1
-                });
-                return logger;
-            }({
-                url: loggerUrl,
-                enableSendBeacon: !0
-            });
-        }));
-    }
-    var sendCountMetric = function(_ref) {
-        var dimensions = _ref.dimensions, _ref$event = _ref.event, event = void 0 === _ref$event ? "unused" : _ref$event, name = _ref.name, _ref$value = _ref.value, value = void 0 === _ref$value ? 1 : _ref$value;
-        return getLogger().metric({
-            dimensions: dimensions,
-            metricEventName: event,
-            metricNamespace: name,
-            metricValue: value,
-            metricType: "counter"
-        });
-    };
-    function setupLogger(_ref3) {
-        var env = _ref3.env, sessionID = _ref3.sessionID, clientID = _ref3.clientID, sdkCorrelationID = _ref3.sdkCorrelationID, buyerCountry = _ref3.buyerCountry, locale = _ref3.locale, _ref3$sdkVersion = _ref3.sdkVersion, sdkVersion = void 0 === _ref3$sdkVersion ? window.paypal.version : _ref3$sdkVersion;
-        var logger = getLogger();
-        logger.addPayloadBuilder((function() {
-            return {
-                referer: window.location.host,
-                sdkCorrelationID: sdkCorrelationID,
-                sessionID: sessionID,
-                clientID: clientID,
-                env: env
-            };
-        }));
-        logger.addTrackingBuilder((function() {
-            var _ref4;
-            return (_ref4 = {})[sdk_constants_src.e.FEED] = sdk_constants_src.d.PAYMENTS_SDK, 
-            _ref4[sdk_constants_src.e.DATA_SOURCE] = sdk_constants_src.c.PAYMENTS_SDK, _ref4[sdk_constants_src.e.CLIENT_ID] = clientID, 
-            _ref4[sdk_constants_src.e.SESSION_UID] = sessionID, _ref4[sdk_constants_src.e.REFERER] = window.location.host, 
-            _ref4[sdk_constants_src.e.BUYER_COUNTRY] = buyerCountry, _ref4[sdk_constants_src.e.LOCALE] = locale.lang + "_" + locale.country, 
-            _ref4[sdk_constants_src.e.INTEGRATION_IDENTIFIER] = clientID, _ref4[sdk_constants_src.e.SDK_ENVIRONMENT] = Object(belter_src.m)() ? sdk_constants_src.i.IOS : Object(belter_src.j)() ? sdk_constants_src.i.ANDROID : null, 
-            _ref4[sdk_constants_src.e.SDK_NAME] = sdk_constants_src.f.PAYMENTS_SDK, _ref4[sdk_constants_src.e.SDK_VERSION] = sdkVersion, 
-            _ref4[sdk_constants_src.e.USER_AGENT] = window.navigator && window.navigator.userAgent, 
-            _ref4[sdk_constants_src.e.CONTEXT_CORRID] = sdkCorrelationID, _ref4[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
-            _ref4;
-        }));
-        src.a.onPossiblyUnhandledException((function(err) {
-            var _logger$track;
-            logger.track(((_logger$track = {})[sdk_constants_src.e.ERROR_CODE] = "payments_sdk_error", 
-            _logger$track[sdk_constants_src.e.ERROR_DESC] = Object(belter_src.w)(err), _logger$track));
-            logger.error("unhandled_error", {
-                err: Object(belter_src.v)(err)
-            });
-            sendCountMetric({
-                event: "error",
-                name: "pp.app.paypal_sdk.buttons.unhandled_exception.count",
-                dimensions: {
-                    errorType: "payments_sdk_error"
-                }
-            });
-            logger.flush().catch(belter_src.p);
-        }));
-    }
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.d(__webpack_exports__, "c", (function() {
@@ -3627,7 +3628,7 @@ window.smartCard = function(modules) {
         return updateOperationForShippingOptions;
     }));
     var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(5);
-    var _onShippingChange__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(10);
+    var _onShippingChange__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(11);
     var calculateTotalFromShippingBreakdownAmounts = function(_ref) {
         var breakdown = _ref.breakdown, updatedAmounts = _ref.updatedAmounts;
         var newAmount = 0;
@@ -3753,7 +3754,16 @@ window.smartCard = function(modules) {
         }
     };
 }, function(module, exports, __webpack_require__) {
-    module.exports = __webpack_require__(64);
+    module.exports = __webpack_require__(65);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__.d(__webpack_exports__, "a", (function() {
+        return checkUlsatNotRequired;
+    }));
+    var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
+    var checkUlsatNotRequired = function(paymentSource, buyerAccessToken) {
+        return paymentSource === _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.g.VENMO && !buyerAccessToken;
+    };
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
     __webpack_require__.d(__webpack_exports__, "f", (function() {
@@ -3778,9 +3788,9 @@ window.smartCard = function(modules) {
     var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
     var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
     __webpack_require__(0);
-    __webpack_require__(9);
+    __webpack_require__(10);
     __webpack_require__(1);
-    __webpack_require__(12);
+    __webpack_require__(9);
     function unresolvedPromise() {
         return new _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__.a(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.p);
     }
@@ -3832,12 +3842,12 @@ window.smartCard = function(modules) {
     }
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var keyCannotMutateValue = __webpack_require__(19);
+    var keyCannotMutateValue = __webpack_require__(20);
     var getSelection = __webpack_require__(14).get;
     var setSelection = __webpack_require__(14).set;
-    var isBackspace = __webpack_require__(47);
-    var isDelete = __webpack_require__(76);
-    var Formatter = __webpack_require__(77);
+    var isBackspace = __webpack_require__(48);
+    var isDelete = __webpack_require__(77);
+    var Formatter = __webpack_require__(78);
     function BaseStrategy(options) {
         this.isFormatted = !1;
         this.inputElement = options.element;
@@ -4176,11 +4186,11 @@ window.smartCard = function(modules) {
             return t;
         }).apply(this, arguments);
     };
-    var cardTypes = __webpack_require__(51);
-    var add_matching_cards_to_results_1 = __webpack_require__(52);
-    var is_valid_input_type_1 = __webpack_require__(54);
-    var find_best_match_1 = __webpack_require__(55);
-    var clone_1 = __webpack_require__(27);
+    var cardTypes = __webpack_require__(52);
+    var add_matching_cards_to_results_1 = __webpack_require__(53);
+    var is_valid_input_type_1 = __webpack_require__(55);
+    var find_best_match_1 = __webpack_require__(56);
+    var clone_1 = __webpack_require__(28);
     var customCards = {};
     var cardNames = {
         VISA: "visa",
@@ -4291,9 +4301,9 @@ window.smartCard = function(modules) {
     __webpack_require__(0);
     var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
     var _lib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
-    var _onInit__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(20);
-    var _onClick__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(21);
-    var _onError__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(22);
+    var _onInit__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(21);
+    var _onClick__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(22);
+    var _onError__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(23);
     function getProps(_ref) {
         var branded = _ref.branded;
         var xprops = window.xprops;
@@ -4370,83 +4380,84 @@ window.smartCard = function(modules) {
     __webpack_require__(4);
     __webpack_require__(3);
     __webpack_require__(0);
-    __webpack_require__(9);
-    __webpack_require__(7);
-    __webpack_require__(1);
-    __webpack_require__(2);
-    __webpack_require__(8);
-    __webpack_require__(23);
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__(4);
-    __webpack_require__(3);
-    __webpack_require__(0);
-    __webpack_require__(7);
-    __webpack_require__(1);
-    __webpack_require__(2);
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__(0);
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__(0);
-    __webpack_require__(7);
-    __webpack_require__(2);
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__(3);
-    __webpack_require__(4);
-    __webpack_require__(0);
-    __webpack_require__(1);
-    __webpack_require__(2);
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__(5);
-    __webpack_require__(4);
-    __webpack_require__(3);
-    __webpack_require__(0);
-    __webpack_require__(7);
-    __webpack_require__(1);
-    __webpack_require__(2);
-    __webpack_require__(8);
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__(4);
-    __webpack_require__(3);
-    __webpack_require__(0);
-    __webpack_require__(2);
-    __webpack_require__(1);
-    __webpack_require__(7);
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__(3);
-    __webpack_require__(4);
-    __webpack_require__(0);
-    __webpack_require__(2);
-    __webpack_require__(1);
-}, function(module, __webpack_exports__, __webpack_require__) {
-    "use strict";
-    __webpack_require__(24);
-    __webpack_require__(5);
-    __webpack_require__(17);
-    __webpack_require__(4);
-    __webpack_require__(0);
-    __webpack_require__(7);
-    __webpack_require__(1);
-    __webpack_require__(2);
     __webpack_require__(10);
+    __webpack_require__(7);
+    __webpack_require__(1);
+    __webpack_require__(2);
+    __webpack_require__(8);
+    __webpack_require__(24);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__(4);
+    __webpack_require__(3);
+    __webpack_require__(0);
+    __webpack_require__(7);
+    __webpack_require__(1);
+    __webpack_require__(2);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__(0);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__(0);
+    __webpack_require__(7);
+    __webpack_require__(2);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__(3);
+    __webpack_require__(4);
+    __webpack_require__(0);
+    __webpack_require__(1);
+    __webpack_require__(2);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__(5);
+    __webpack_require__(4);
+    __webpack_require__(3);
+    __webpack_require__(0);
+    __webpack_require__(7);
+    __webpack_require__(1);
+    __webpack_require__(2);
+    __webpack_require__(8);
+    __webpack_require__(16);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__(4);
+    __webpack_require__(3);
+    __webpack_require__(0);
+    __webpack_require__(2);
+    __webpack_require__(1);
+    __webpack_require__(7);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__(3);
+    __webpack_require__(4);
+    __webpack_require__(0);
+    __webpack_require__(2);
+    __webpack_require__(1);
+}, function(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+    __webpack_require__(25);
+    __webpack_require__(5);
+    __webpack_require__(18);
+    __webpack_require__(4);
+    __webpack_require__(0);
+    __webpack_require__(7);
+    __webpack_require__(1);
+    __webpack_require__(2);
+    __webpack_require__(11);
     __webpack_require__(13);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    __webpack_require__(24);
+    __webpack_require__(25);
     __webpack_require__(5);
-    __webpack_require__(17);
+    __webpack_require__(18);
     __webpack_require__(4);
     __webpack_require__(0);
     __webpack_require__(7);
     __webpack_require__(1);
     __webpack_require__(2);
-    __webpack_require__(10);
+    __webpack_require__(11);
     __webpack_require__(13);
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
@@ -4471,10 +4482,10 @@ window.smartCard = function(modules) {
 }, function(module, exports) {}, function(module, exports, __webpack_require__) {
     "use strict";
     var UA = window.navigator && window.navigator.userAgent;
-    var isAndroid = __webpack_require__(66);
-    var isChrome = __webpack_require__(67);
-    var isIos = __webpack_require__(70);
-    var isIE9 = __webpack_require__(71);
+    var isAndroid = __webpack_require__(67);
+    var isChrome = __webpack_require__(68);
+    var isIos = __webpack_require__(71);
+    var isIE9 = __webpack_require__(72);
     var KITKAT_WEBVIEW_REGEX = /Version\/\d\.\d* Chrome\/\d*\.0\.0\.0/;
     module.exports = {
         isIE9: isIE9,
@@ -4500,8 +4511,8 @@ window.smartCard = function(modules) {
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var keyCannotMutateValue = __webpack_require__(19);
-    var BaseStrategy = __webpack_require__(18);
+    var keyCannotMutateValue = __webpack_require__(20);
+    var BaseStrategy = __webpack_require__(19);
     var setSelection = __webpack_require__(14).set;
     function AndroidChromeStrategy(options) {
         BaseStrategy.call(this, options);
@@ -4537,32 +4548,32 @@ window.smartCard = function(modules) {
     module.exports = AndroidChromeStrategy;
 }, function(module, __webpack_exports__, __webpack_require__) {
     "use strict";
-    var _props__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(29);
+    var _props__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(30);
     __webpack_require__.d(__webpack_exports__, "getProps", (function() {
         return _props__WEBPACK_IMPORTED_MODULE_0__.a;
     }));
-    __webpack_require__(30);
     __webpack_require__(31);
     __webpack_require__(32);
     __webpack_require__(33);
     __webpack_require__(34);
     __webpack_require__(35);
     __webpack_require__(36);
-    __webpack_require__(20);
     __webpack_require__(37);
-    __webpack_require__(10);
-    __webpack_require__(38);
-    __webpack_require__(39);
     __webpack_require__(21);
-    __webpack_require__(22);
+    __webpack_require__(38);
+    __webpack_require__(11);
+    __webpack_require__(39);
     __webpack_require__(40);
+    __webpack_require__(22);
+    __webpack_require__(23);
     __webpack_require__(41);
     __webpack_require__(42);
     __webpack_require__(43);
     __webpack_require__(44);
     __webpack_require__(45);
+    __webpack_require__(46);
 }, function(module, exports, __webpack_require__) {
-    module.exports = __webpack_require__(65);
+    module.exports = __webpack_require__(66);
 }, function(module, exports, __webpack_require__) {
     "use strict";
     module.exports = {
@@ -4705,8 +4716,8 @@ window.smartCard = function(modules) {
         value: !0
     });
     exports.addMatchingCardsToResults = void 0;
-    var clone_1 = __webpack_require__(27);
-    var matches_1 = __webpack_require__(53);
+    var clone_1 = __webpack_require__(28);
+    var matches_1 = __webpack_require__(54);
     exports.addMatchingCardsToResults = function(cardNumber, cardConfiguration, results) {
         var i, patternLength;
         for (i = 0; i < cardConfiguration.patterns.length; i++) {
@@ -4785,8 +4796,8 @@ window.smartCard = function(modules) {
         value: !0
     });
     exports.cardNumber = void 0;
-    var luhn10 = __webpack_require__(58);
-    var getCardTypes = __webpack_require__(26);
+    var luhn10 = __webpack_require__(59);
+    var getCardTypes = __webpack_require__(27);
     function verification(card, isPotentiallyValid, isValid) {
         return {
             card: card,
@@ -4842,9 +4853,9 @@ window.smartCard = function(modules) {
         value: !0
     });
     exports.expirationDate = void 0;
-    var parse_date_1 = __webpack_require__(60);
-    var expiration_month_1 = __webpack_require__(28);
-    var expiration_year_1 = __webpack_require__(25);
+    var parse_date_1 = __webpack_require__(61);
+    var expiration_month_1 = __webpack_require__(29);
+    var expiration_year_1 = __webpack_require__(26);
     function verification(isValid, isPotentiallyValid, month, year) {
         return {
             isValid: isValid,
@@ -4883,8 +4894,8 @@ window.smartCard = function(modules) {
         value: !0
     });
     exports.parseDate = void 0;
-    var expiration_year_1 = __webpack_require__(25);
-    var is_array_1 = __webpack_require__(61);
+    var expiration_year_1 = __webpack_require__(26);
+    var is_array_1 = __webpack_require__(62);
     exports.parseDate = function(datestring) {
         var date;
         /^\d{4}-\d{1,2}$/.test(datestring) ? date = datestring.split("-").reverse() : /\//.test(datestring) ? date = datestring.split(/\s*\/\s*/g) : /\s/.test(datestring) && (date = datestring.split(/ +/g));
@@ -8339,16 +8350,16 @@ window.smartCard = function(modules) {
     } ]);
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var device = __webpack_require__(46);
-    var supportsInputFormatting = __webpack_require__(72);
-    var constants = __webpack_require__(73);
-    var isValidElement = __webpack_require__(74);
-    var IosStrategy = __webpack_require__(75);
-    var AndroidChromeStrategy = __webpack_require__(48);
-    var KitKatChromiumBasedWebViewStrategy = __webpack_require__(79);
-    var IE9Strategy = __webpack_require__(80);
-    var BaseStrategy = __webpack_require__(18);
-    var NoopStrategy = __webpack_require__(81);
+    var device = __webpack_require__(47);
+    var supportsInputFormatting = __webpack_require__(73);
+    var constants = __webpack_require__(74);
+    var isValidElement = __webpack_require__(75);
+    var IosStrategy = __webpack_require__(76);
+    var AndroidChromeStrategy = __webpack_require__(49);
+    var KitKatChromiumBasedWebViewStrategy = __webpack_require__(80);
+    var IE9Strategy = __webpack_require__(81);
+    var BaseStrategy = __webpack_require__(19);
+    var NoopStrategy = __webpack_require__(82);
     function RestrictedInput(options) {
         if (!isValidElement((options = options || {}).element)) throw new Error(constants.errors.INVALID_ELEMENT);
         if (!options.pattern) throw new Error(constants.errors.PATTERN_MISSING);
@@ -8372,8 +8383,8 @@ window.smartCard = function(modules) {
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var isEdge = __webpack_require__(68);
-    var isSamsung = __webpack_require__(69);
+    var isEdge = __webpack_require__(69);
+    var isSamsung = __webpack_require__(70);
     module.exports = function(ua) {
         return !(-1 === (ua = ua || navigator.userAgent).indexOf("Chrome") && -1 === ua.indexOf("CriOS") || isEdge(ua) || isSamsung(ua));
     };
@@ -8401,7 +8412,7 @@ window.smartCard = function(modules) {
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var device = __webpack_require__(46);
+    var device = __webpack_require__(47);
     module.exports = function() {
         return !device.isSamsungBrowser();
     };
@@ -8420,8 +8431,8 @@ window.smartCard = function(modules) {
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var BaseStrategy = __webpack_require__(18);
-    var keyCannotMutateValue = __webpack_require__(19);
+    var BaseStrategy = __webpack_require__(19);
+    var keyCannotMutateValue = __webpack_require__(20);
     var getSelection = __webpack_require__(14).get;
     var setSelection = __webpack_require__(14).set;
     function IosStrategy(options) {
@@ -8477,8 +8488,8 @@ window.smartCard = function(modules) {
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var parsePattern = __webpack_require__(78);
-    var isBackspace = __webpack_require__(47);
+    var parsePattern = __webpack_require__(79);
+    var isBackspace = __webpack_require__(48);
     function Formatter(pattern) {
         this.setPattern(pattern);
     }
@@ -8604,7 +8615,7 @@ window.smartCard = function(modules) {
     };
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var AndroidChromeStrategy = __webpack_require__(48);
+    var AndroidChromeStrategy = __webpack_require__(49);
     function KitKatChromiumBasedWebViewStrategy(options) {
         AndroidChromeStrategy.call(this, options);
     }
@@ -8622,8 +8633,8 @@ window.smartCard = function(modules) {
     module.exports = KitKatChromiumBasedWebViewStrategy;
 }, function(module, exports, __webpack_require__) {
     "use strict";
-    var BaseStrategy = __webpack_require__(18);
-    var keyCannotMutateValue = __webpack_require__(19);
+    var BaseStrategy = __webpack_require__(19);
+    var keyCannotMutateValue = __webpack_require__(20);
     var getSelection = __webpack_require__(14).get;
     var setSelection = __webpack_require__(14).set;
     function IE9Strategy(options) {
@@ -9146,7 +9157,7 @@ window.smartCard = function(modules) {
     }
     var src = __webpack_require__(3);
     var lib = __webpack_require__(2);
-    var dist = __webpack_require__(11);
+    var dist = __webpack_require__(12);
     var dist_default = __webpack_require__.n(dist);
     var constants = __webpack_require__(1);
     var sdk_constants_src = __webpack_require__(0);
@@ -9664,7 +9675,7 @@ window.smartCard = function(modules) {
             }
         });
     }
-    var cross_domain_utils_src = __webpack_require__(9);
+    var cross_domain_utils_src = __webpack_require__(10);
     function getExportsByFrameName(name) {
         try {
             for (var _i2 = 0, _getAllFramesInWindow2 = Object(cross_domain_utils_src.b)(window); _i2 < _getAllFramesInWindow2.length; _i2++) {
@@ -9817,7 +9828,7 @@ window.smartCard = function(modules) {
         return Boolean(_getCardFrames.cardFrame || _getCardFrames.cardNumberFrame && _getCardFrames.cardCVVFrame && _getCardFrames.cardExpiryFrame);
     }
     var zalgo_promise_src = __webpack_require__(4);
-    var src_props = __webpack_require__(49);
+    var src_props = __webpack_require__(50);
     var createVaultSetupToken_getCreateVaultSetupToken = function(_ref) {
         var createVaultSetupToken = _ref.createVaultSetupToken;
         if (createVaultSetupToken) return Object(src.o)((function() {
@@ -9901,9 +9912,9 @@ window.smartCard = function(modules) {
             return (_ref9 = {})["3ds_auth_status"] = authStatus, _ref9;
         }));
     };
-    var lib_logger = __webpack_require__(12);
+    var lib_logger = __webpack_require__(9);
     function handleThreeDomainSecureContingency(_ref2) {
-        var status = _ref2.status, links = _ref2.links, ThreeDomainSecure = _ref2.ThreeDomainSecure, createOrder = _ref2.createOrder, getParent = _ref2.getParent;
+        var status = _ref2.status, links = _ref2.links, ThreeDomainSecure = _ref2.ThreeDomainSecure, createOrder = _ref2.createOrder, getParent = _ref2.getParent, paymentFlow = _ref2.paymentFlow, fundingSource = _ref2.fundingSource;
         return zalgo_promise_src.a.try((function() {
             if ("PAYER_ACTION_REQUIRED" === status && links.some((function(link) {
                 return function(link) {
@@ -9912,6 +9923,20 @@ window.smartCard = function(modules) {
                     return "approve" === link.rel && link.href.includes("helios");
                 }(link);
             }))) {
+                var contingency = "confirm_payment_source_three_ds_contingency";
+                "vault-capture" === paymentFlow ? Object(lib_logger.b)({
+                    name: "pp.app.paypal_sdk.buttons.vault_capture.contingency.count",
+                    dimensions: {
+                        fundingSource: fundingSource,
+                        contingency: contingency
+                    }
+                }) : Object(lib_logger.b)({
+                    name: "pp.app.paypal_sdk.card_fields.submit.contingency.count",
+                    dimensions: {
+                        paymentFlow: paymentFlow,
+                        contingency: contingency
+                    }
+                });
                 var _getThreeDSParams = function(links) {
                     var helioslink = links.find((function(link) {
                         return link.href.includes("helios");
@@ -9961,9 +9986,9 @@ window.smartCard = function(modules) {
             }
         }));
     }
-    var vault = __webpack_require__(23);
+    var vault = __webpack_require__(24);
     var vault_without_purchase_savePaymentSource = function(_ref) {
-        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, getParent = _ref.getParent, ThreeDomainSecure = _ref.ThreeDomainSecure, idToken = _ref.idToken;
+        var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, getParent = _ref.getParent, ThreeDomainSecure = _ref.ThreeDomainSecure, idToken = _ref.idToken, productAction = _ref.productAction;
         var vaultToken;
         return (0, _ref.createVaultSetupToken)().then((function(vaultSetupToken) {
             if ("string" != typeof vaultSetupToken) throw new TypeError("Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string");
@@ -9980,7 +10005,8 @@ window.smartCard = function(modules) {
                 status: _ref2.status,
                 links: _ref2.links,
                 getParent: getParent,
-                ThreeDomainSecure: ThreeDomainSecure
+                ThreeDomainSecure: ThreeDomainSecure,
+                paymentFlow: productAction
             });
         })).then((function(threeDsResponse) {
             return onApprove({
@@ -10063,7 +10089,7 @@ window.smartCard = function(modules) {
                 return function(cardProps, card, extraFields, facilitatorAccessToken) {
                     var orderID;
                     var ThreeDomainSecure = getComponents().ThreeDomainSecure;
-                    var createOrder = cardProps.createOrder, getParent = cardProps.getParent;
+                    var createOrder = cardProps.createOrder, getParent = cardProps.getParent, productAction = cardProps.productAction;
                     return cardProps.createOrder().then((function(id) {
                         var payment_source = convertCardToPaymentSource(card, extraFields);
                         var data = {
@@ -10096,7 +10122,8 @@ window.smartCard = function(modules) {
                             links: res.links,
                             ThreeDomainSecure: ThreeDomainSecure,
                             createOrder: createOrder,
-                            getParent: getParent
+                            getParent: getParent,
+                            paymentFlow: productAction
                         });
                     })).then((function(threeDsResponse) {
                         return cardProps.onApprove({
@@ -10149,7 +10176,7 @@ window.smartCard = function(modules) {
               case constants.l.VAULT_WITHOUT_PURCHASE:
                 return function(cardProps, card, extraFields) {
                     var _getComponents = getComponents();
-                    var userIDToken = cardProps.userIDToken;
+                    var userIDToken = cardProps.userIDToken, productAction = cardProps.productAction;
                     return vault_without_purchase_savePaymentSource({
                         onApprove: cardProps.onApprove,
                         createVaultSetupToken: cardProps.createVaultSetupToken,
@@ -10158,7 +10185,8 @@ window.smartCard = function(modules) {
                         ThreeDomainSecure: _getComponents.ThreeDomainSecure,
                         clientID: cardProps.clientID,
                         paymentSource: convertCardToPaymentSource(card, extraFields),
-                        idToken: userIDToken
+                        idToken: userIDToken,
+                        productAction: productAction
                     });
                 }(cardProps, card, extraFields);
 
@@ -10511,7 +10539,7 @@ window.smartCard = function(modules) {
             ariaMessageRef: ariaMessageRef
         }));
     }
-    var main = __webpack_require__(50);
+    var main = __webpack_require__(51);
     var main_default = __webpack_require__.n(main);
     function CardExpiry(_ref) {
         var _ref$name = _ref.name, name = void 0 === _ref$name ? "expiry" : _ref$name, _ref$autocomplete = _ref.autocomplete, autocomplete = void 0 === _ref$autocomplete ? "cc-exp" : _ref$autocomplete, _ref$navigation = _ref.navigation, navigation = void 0 === _ref$navigation ? defaultNavigation : _ref$navigation, state = _ref.state, type = _ref.type, style = _ref.style, maxLength = _ref.maxLength, onChange = _ref.onChange, onFocus = _ref.onFocus, onBlur = _ref.onBlur, onKeyDown = _ref.onKeyDown, onValidityChange = _ref.onValidityChange, _ref$allowNavigation = _ref.allowNavigation, allowNavigation = void 0 !== _ref$allowNavigation && _ref$allowNavigation;
@@ -11639,7 +11667,7 @@ window.smartCard = function(modules) {
             });
             logger.addTrackingBuilder((function() {
                 var _ref2;
-                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.160", _ref2.hcf_session_id = hcfSessionID, 
+                return (_ref2 = {})[sdk_constants_src.e.BUTTON_VERSION] = "5.0.161", _ref2.hcf_session_id = hcfSessionID, 
                 _ref2.hcf_correlation_id = cardCorrelationID, _ref2[sdk_constants_src.e.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                 _ref2[sdk_constants_src.e.MERCHANT_DOMAIN] = merchantDomain, _ref2[sdk_constants_src.e.TIMESTAMP] = Date.now().toString(), 
                 _ref2.sdk_correlation_id = sdkCorrelationID, _ref2[sdk_constants_src.c.PAYMENTS_SDK] = clientID, 

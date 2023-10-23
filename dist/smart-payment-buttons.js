@@ -10133,7 +10133,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.160", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.161", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -10438,13 +10438,14 @@ window.spb = function(modules) {
             var token = applePayPayment.token, billingContact = applePayPayment.billingContact, shippingContact = applePayPayment.shippingContact;
             return Object(api.callGraphQL)({
                 name: "ApproveApplePayPayment",
-                query: "\n            mutation ApproveApplePayPayment(\n                $token: ApplePayPaymentToken!\n                $orderID: String!\n                $clientID : String!\n                $billingContact: ApplePayPaymentContact!\n                $shippingContact: ApplePayPaymentContact\n            ) {\n                approveApplePayPayment(\n                    token: $token\n                    orderID: $orderID\n                    clientID: $clientID\n                    billingContact: $billingContact\n                    shippingContact: $shippingContact\n                )\n            }\n        ",
+                query: "\n            mutation ApproveApplePayPayment(\n                $token: ApplePayPaymentToken!\n                $orderID: String!\n                $clientID : String!\n                $billingContact: ApplePayPaymentContact!\n                $shippingContact: ApplePayPaymentContact\n                $productFlow: String\n            ) {\n                approveApplePayPayment(\n                    token: $token\n                    orderID: $orderID\n                    clientID: $clientID\n                    billingContact: $billingContact\n                    shippingContact: $shippingContact\n                    productFlow: $productFlow\n                )\n            }\n        ",
                 variables: {
                     token: token,
                     orderID: orderID,
                     clientID: clientID,
                     billingContact: billingContact,
-                    shippingContact: shippingContact
+                    shippingContact: shippingContact,
+                    productFlow: constants.PRODUCT_FLOW.SMART_PAYMENT_BUTTONS
                 }
             }).then((function(gqlResult) {
                 if (!gqlResult || !gqlResult.approveApplePayPayment) throw new Error("GraphQL GetApplePayPayment returned no applePayment object");
@@ -11244,7 +11245,8 @@ window.spb = function(modules) {
                         partnerAttributionID: partnerAttributionID,
                         experiments: experiments,
                         featureFlags: featureFlags,
-                        clientID: clientID
+                        clientID: clientID,
+                        paymentSource: paymentSource
                     }, {
                         facilitatorAccessToken: facilitatorAccessToken,
                         createOrder: createOrder
@@ -13013,7 +13015,7 @@ window.spb = function(modules) {
             })).finally(instance.close);
         }
         function handleThreeDomainSecureContingency(_ref2) {
-            var status = _ref2.status, links = _ref2.links, ThreeDomainSecure = _ref2.ThreeDomainSecure, createOrder = _ref2.createOrder, getParent = _ref2.getParent;
+            var status = _ref2.status, links = _ref2.links, ThreeDomainSecure = _ref2.ThreeDomainSecure, createOrder = _ref2.createOrder, getParent = _ref2.getParent, paymentFlow = _ref2.paymentFlow, fundingSource = _ref2.fundingSource;
             return zalgo_promise_src.ZalgoPromise.try((function() {
                 if ("PAYER_ACTION_REQUIRED" === status && links.some((function(link) {
                     return function(link) {
@@ -13022,6 +13024,20 @@ window.spb = function(modules) {
                         return "approve" === link.rel && link.href.includes("helios");
                     }(link);
                 }))) {
+                    var contingency = "confirm_payment_source_three_ds_contingency";
+                    "vault-capture" === paymentFlow ? Object(lib_logger.sendCountMetric)({
+                        name: "pp.app.paypal_sdk.buttons.vault_capture.contingency.count",
+                        dimensions: {
+                            fundingSource: fundingSource,
+                            contingency: contingency
+                        }
+                    }) : Object(lib_logger.sendCountMetric)({
+                        name: "pp.app.paypal_sdk.card_fields.submit.contingency.count",
+                        dimensions: {
+                            paymentFlow: paymentFlow,
+                            contingency: contingency
+                        }
+                    });
                     var _getThreeDSParams = function(links) {
                         var helioslink = links.find((function(link) {
                             return link.href.includes("helios");
@@ -13179,7 +13195,7 @@ window.spb = function(modules) {
                                     return function(cardProps, card, extraFields, facilitatorAccessToken) {
                                         var orderID;
                                         var ThreeDomainSecure = props_getComponents().ThreeDomainSecure;
-                                        var createOrder = cardProps.createOrder, getParent = cardProps.getParent;
+                                        var createOrder = cardProps.createOrder, getParent = cardProps.getParent, productAction = cardProps.productAction;
                                         return cardProps.createOrder().then((function(id) {
                                             var payment_source = convertCardToPaymentSource(card, extraFields);
                                             var data = {
@@ -13212,7 +13228,8 @@ window.spb = function(modules) {
                                                 links: res.links,
                                                 ThreeDomainSecure: ThreeDomainSecure,
                                                 createOrder: createOrder,
-                                                getParent: getParent
+                                                getParent: getParent,
+                                                paymentFlow: productAction
                                             });
                                         })).then((function(threeDsResponse) {
                                             return cardProps.onApprove({
@@ -13266,9 +13283,9 @@ window.spb = function(modules) {
                                   case constants.PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE:
                                     return function(cardProps, card, extraFields) {
                                         var _getComponents = props_getComponents();
-                                        var userIDToken = cardProps.userIDToken;
+                                        var userIDToken = cardProps.userIDToken, productAction = cardProps.productAction;
                                         return function(_ref) {
-                                            var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, getParent = _ref.getParent, ThreeDomainSecure = _ref.ThreeDomainSecure, idToken = _ref.idToken;
+                                            var onApprove = _ref.onApprove, onError = _ref.onError, clientID = _ref.clientID, paymentSource = _ref.paymentSource, getParent = _ref.getParent, ThreeDomainSecure = _ref.ThreeDomainSecure, idToken = _ref.idToken, productAction = _ref.productAction;
                                             var vaultToken;
                                             return (0, _ref.createVaultSetupToken)().then((function(vaultSetupToken) {
                                                 if ("string" != typeof vaultSetupToken) throw new TypeError("Expected createVaultSetupToken to return a promise that resolves with vaultSetupToken as a string");
@@ -13285,7 +13302,8 @@ window.spb = function(modules) {
                                                     status: _ref2.status,
                                                     links: _ref2.links,
                                                     getParent: getParent,
-                                                    ThreeDomainSecure: ThreeDomainSecure
+                                                    ThreeDomainSecure: ThreeDomainSecure,
+                                                    paymentFlow: productAction
                                                 });
                                             })).then((function(threeDsResponse) {
                                                 return onApprove({
@@ -13342,7 +13360,8 @@ window.spb = function(modules) {
                                             ThreeDomainSecure: _getComponents.ThreeDomainSecure,
                                             clientID: cardProps.clientID,
                                             paymentSource: convertCardToPaymentSource(card, extraFields),
-                                            idToken: userIDToken
+                                            idToken: userIDToken,
+                                            productAction: productAction
                                         });
                                     }(cardProps, card, extraFields);
 
@@ -13439,10 +13458,15 @@ window.spb = function(modules) {
                     }).then((function(_ref6) {
                         var validate = _ref6.validate;
                         if (_ref6.requireShipping) {
-                            if (fundingSource !== sdk_constants_src.FUNDING.PAYPAL) {
-                                Object(lib.getLogger)().error("vault_shipping_required");
-                                throw new Error("Shipping address requested for " + fundingSource + " payment");
-                            }
+                            Object(lib.sendCountMetric)({
+                                name: "pp.app.paypal_sdk.buttons.vault_capture.error.count",
+                                event: "error",
+                                dimensions: {
+                                    errorName: "shipping_required_failure_or_fallback",
+                                    fundingSource: fundingSource
+                                }
+                            });
+                            if (fundingSource !== sdk_constants_src.FUNDING.PAYPAL) throw new Error("Shipping address requested for " + fundingSource + " payment");
                             return fallbackToWebCheckout();
                         }
                         return function(_ref3) {
@@ -13450,12 +13474,27 @@ window.spb = function(modules) {
                             return zalgo_promise_src.ZalgoPromise.try((function() {
                                 if (422 === status && body.links && body.links.some((function(link) {
                                     return "3ds-contingency-resolution" === link.rel;
-                                }))) return handleThreeDomainSecureRedirect({
-                                    ThreeDomainSecure: ThreeDomainSecure,
-                                    createOrder: createOrder,
-                                    getParent: getParent
-                                });
+                                }))) {
+                                    Object(lib_logger.sendCountMetric)({
+                                        name: "pp.app.paypal_sdk.buttons.vault_capture.contingency.count",
+                                        dimensions: {
+                                            contingency: "validate_payment_method_three_ds_contingency"
+                                        }
+                                    });
+                                    return handleThreeDomainSecureRedirect({
+                                        ThreeDomainSecure: ThreeDomainSecure,
+                                        createOrder: createOrder,
+                                        getParent: getParent
+                                    });
+                                }
                                 if (200 !== status) {
+                                    Object(lib_logger.sendCountMetric)({
+                                        name: "pp.app.paypal_sdk.buttons.vault_capture.error.count",
+                                        event: "error",
+                                        dimensions: {
+                                            errorName: "validate_payment_method_failure"
+                                        }
+                                    });
                                     if (Array.isArray(body.details)) {
                                         var _ref4$issue = (body.details && body.details[0] || {}).issue, issue = void 0 === _ref4$issue ? "" : _ref4$issue;
                                         if (0 !== issue.trim().length) throw new Error("Validate payment failed with issue: " + issue);
@@ -13480,6 +13519,14 @@ window.spb = function(modules) {
                                 partnerAttributionID: partnerAttributionID,
                                 experiments: {}
                             }).then((function() {
+                                Object(lib.sendCountMetric)({
+                                    name: "pp.app.paypal_sdk.buttons.vault_capture.success.count",
+                                    event: "success",
+                                    dimensions: {
+                                        fundingSource: fundingSource,
+                                        experimentInUse: "none"
+                                    }
+                                });
                                 return onApprove({}, {
                                     restart: restart
                                 });
@@ -13673,10 +13720,15 @@ window.spb = function(modules) {
                                     zalgo_promise_src.ZalgoPromise.try((function() {
                                         return shippingRequired(orderID).then((function(shippingRequiredFlag) {
                                             if (shippingRequiredFlag) {
-                                                if (fundingSource !== sdk_constants_src.FUNDING.PAYPAL) {
-                                                    Object(lib.getLogger)().error("vault_shipping_required");
-                                                    throw new Error("Shipping address requested for " + fundingSource + " payment");
-                                                }
+                                                Object(lib.sendCountMetric)({
+                                                    name: "pp.app.paypal_sdk.buttons.vault_capture.error.count",
+                                                    event: "error",
+                                                    dimensions: {
+                                                        errorName: "shipping_required_failure_or_fallback",
+                                                        fundingSource: fundingSource
+                                                    }
+                                                });
+                                                if (fundingSource !== sdk_constants_src.FUNDING.PAYPAL) throw new Error("Shipping address requested for " + fundingSource + " payment");
                                                 return fallbackToWebCheckout();
                                             }
                                             return Object(api.confirmOrderAPI)(orderID, {
@@ -13695,9 +13747,19 @@ window.spb = function(modules) {
                                                     links: res.links,
                                                     ThreeDomainSecure: ThreeDomainSecure,
                                                     createOrder: createOrder,
-                                                    getParent: getParent
+                                                    getParent: getParent,
+                                                    paymentFlow: "vault_capture",
+                                                    fundingSource: fundingSource
                                                 });
                                             })).then((function() {
+                                                Object(lib.sendCountMetric)({
+                                                    name: "pp.app.paypal_sdk.buttons.vault_capture.success.count",
+                                                    event: "success",
+                                                    dimensions: {
+                                                        fundingSource: fundingSource,
+                                                        experimentInUse: "deprecated_validate_payment_method_experiment"
+                                                    }
+                                                });
                                                 return onApprove({}, {
                                                     restart: restart
                                                 });
@@ -16609,7 +16671,7 @@ window.spb = function(modules) {
                     var _ref2;
                     return (_ref2 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref2[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.160", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.161", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref2[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref2[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref2[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -18539,9 +18601,6 @@ window.spb = function(modules) {
             return _createVaultSetupToken__WEBPACK_IMPORTED_MODULE_5__.getCreateVaultSetupToken;
         }));
         var _onApprove__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("./src/props/onApprove.js");
-        __webpack_require__.d(__webpack_exports__, "buildXApproveOrderActions", (function() {
-            return _onApprove__WEBPACK_IMPORTED_MODULE_6__.buildXApproveOrderActions;
-        }));
         __webpack_require__.d(__webpack_exports__, "getOnApproveOrder", (function() {
             return _onApprove__WEBPACK_IMPORTED_MODULE_6__.getOnApproveOrder;
         }));
@@ -18667,7 +18726,7 @@ window.spb = function(modules) {
         }));
         __webpack_require__("./src/props/getQueriedEligibleFunding.js");
         var _paymentRequest__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__("./src/props/paymentRequest.js");
-        for (var __WEBPACK_IMPORT_KEY__ in _paymentRequest__WEBPACK_IMPORTED_MODULE_20__) [ "default", "TYPES", "getProps", "buildXCreateOrderData", "buildOrderActions", "buildPaymentActions", "buildXCreateOrderActions", "getCreateOrder", "getConfirmOrder", "buildXCreateBillingAgreementData", "buildXCreateBillingAgreementActions", "getCreateBillingAgreement", "buildXCreateSubscriptionData", "buildXCreateSubscriptionActions", "getCreateSubscription", "buildXCreateVaultSetupTokenData", "getCreateVaultSetupToken", "buildXApproveOrderActions", "getOnApproveOrder", "getOnApproveBilling", "getOnApproveTokenize", "getOnApproveSubscription", "getOnApproveVaultWithoutPurchase", "getOnApprove", "getOnComplete", "buildXOnInitActions", "getOnInit", "buildXOnCancelData", "buildXOnCancelActions", "getOnCancel", "ON_SHIPPING_CHANGE_PATHS", "SHIPPING_ADDRESS_ERROR_MESSAGES", "SHIPPING_OPTIONS_ERROR_MESSAGES", "GENERIC_REJECT_ADDRESS_MESSAGE", "buildXOnShippingChangeData", "sanitizePatch", "isWeasley", "logInvalidShippingChangePatches", "buildXShippingChangeActions", "getOnShippingChange", "buildXOnShippingAddressChangeData", "buildXOnShippingAddressChangeActions", "getOnShippingAddressChange", "buildXOnShippingOptionsChangeData", "buildXOnShippingOptionsChangeActions", "getOnShippingOptionsChange", "CLICK_VALID", "buildXOnClickData", "buildXOnClickActions", "getOnClick", "getOnError", "POPUP_BRIDGE_OPTYPE", "getRememberFunding", "getGetPageUrl", "getOnAuth" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
+        for (var __WEBPACK_IMPORT_KEY__ in _paymentRequest__WEBPACK_IMPORTED_MODULE_20__) [ "default", "TYPES", "getProps", "buildXCreateOrderData", "buildOrderActions", "buildPaymentActions", "buildXCreateOrderActions", "getCreateOrder", "getConfirmOrder", "buildXCreateBillingAgreementData", "buildXCreateBillingAgreementActions", "getCreateBillingAgreement", "buildXCreateSubscriptionData", "buildXCreateSubscriptionActions", "getCreateSubscription", "buildXCreateVaultSetupTokenData", "getCreateVaultSetupToken", "getOnApproveOrder", "getOnApproveBilling", "getOnApproveTokenize", "getOnApproveSubscription", "getOnApproveVaultWithoutPurchase", "getOnApprove", "getOnComplete", "buildXOnInitActions", "getOnInit", "buildXOnCancelData", "buildXOnCancelActions", "getOnCancel", "ON_SHIPPING_CHANGE_PATHS", "SHIPPING_ADDRESS_ERROR_MESSAGES", "SHIPPING_OPTIONS_ERROR_MESSAGES", "GENERIC_REJECT_ADDRESS_MESSAGE", "buildXOnShippingChangeData", "sanitizePatch", "isWeasley", "logInvalidShippingChangePatches", "buildXShippingChangeActions", "getOnShippingChange", "buildXOnShippingAddressChangeData", "buildXOnShippingAddressChangeActions", "getOnShippingAddressChange", "buildXOnShippingOptionsChangeData", "buildXOnShippingOptionsChangeActions", "getOnShippingOptionsChange", "CLICK_VALID", "buildXOnClickData", "buildXOnClickActions", "getOnClick", "getOnError", "POPUP_BRIDGE_OPTYPE", "getRememberFunding", "getGetPageUrl", "getOnAuth" ].indexOf(__WEBPACK_IMPORT_KEY__) < 0 && function(key) {
             __webpack_require__.d(__webpack_exports__, key, (function() {
                 return _paymentRequest__WEBPACK_IMPORTED_MODULE_20__[key];
             }));
@@ -18676,9 +18735,6 @@ window.spb = function(modules) {
     "./src/props/onApprove.js": function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         __webpack_require__.r(__webpack_exports__);
-        __webpack_require__.d(__webpack_exports__, "buildXApproveOrderActions", (function() {
-            return buildXApproveOrderActions;
-        }));
         __webpack_require__.d(__webpack_exports__, "getOnApproveOrder", (function() {
             return getOnApproveOrder;
         }));
@@ -18705,6 +18761,7 @@ window.spb = function(modules) {
         var _constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__("./src/constants.js");
         var _lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("./src/lib/index.js");
         var _config__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("./src/config.js");
+        var _utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__("./src/props/utils.js");
         var redirect = function(url) {
             if (!url) throw new Error("Expected redirect url");
             if (-1 === url.indexOf("://")) {
@@ -18726,166 +18783,6 @@ window.spb = function(modules) {
             if (Object(_api__WEBPACK_IMPORTED_MODULE_4__.isProcessorDeclineError)(err)) return restart().then(_lib__WEBPACK_IMPORTED_MODULE_6__.unresolvedPromise);
             throw err;
         };
-        function buildXApproveOrderActions(_ref3) {
-            var intent = _ref3.intent, orderID = _ref3.orderID, paymentID = _ref3.paymentID, payerID = _ref3.payerID, restart = _ref3.restart, facilitatorAccessToken = _ref3.facilitatorAccessToken, buyerAccessToken = _ref3.buyerAccessToken, partnerAttributionID = _ref3.partnerAttributionID, forceRestAPI = _ref3.forceRestAPI, onError = _ref3.onError;
-            var order = function(_ref) {
-                var intent = _ref.intent, orderID = _ref.orderID, restart = _ref.restart, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI, onError = _ref.onError, experiments = _ref.experiments;
-                var get = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
-                    return null != experiments && experiments.upgradeLSATWithIgnoreCache ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
-                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.getOrder)(orderID, {
-                            facilitatorAccessToken: upgradedFacilitatorAccessToken,
-                            buyerAccessToken: buyerAccessToken,
-                            partnerAttributionID: partnerAttributionID,
-                            forceRestAPI: forceRestAPI,
-                            experiments: experiments
-                        });
-                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.getOrder)(orderID, {
-                        facilitatorAccessToken: facilitatorAccessToken,
-                        buyerAccessToken: buyerAccessToken,
-                        partnerAttributionID: partnerAttributionID,
-                        forceRestAPI: forceRestAPI,
-                        experiments: experiments
-                    });
-                }));
-                var capture = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
-                    if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE + " to use client-side capture");
-                    return null != experiments && experiments.upgradeLSATWithIgnoreCache ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
-                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.captureOrder)(orderID, {
-                            facilitatorAccessToken: upgradedFacilitatorAccessToken,
-                            buyerAccessToken: buyerAccessToken,
-                            partnerAttributionID: partnerAttributionID,
-                            forceRestAPI: forceRestAPI,
-                            experiments: experiments
-                        }).finally(get.reset).finally(capture.reset).catch((function(err) {
-                            return handleProcessorError(err, restart, onError);
-                        }));
-                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.captureOrder)(orderID, {
-                        facilitatorAccessToken: facilitatorAccessToken,
-                        buyerAccessToken: buyerAccessToken,
-                        partnerAttributionID: partnerAttributionID,
-                        forceRestAPI: forceRestAPI,
-                        experiments: experiments
-                    }).finally(get.reset).finally(capture.reset).catch((function(err) {
-                        return handleProcessorError(err, restart, onError);
-                    }));
-                }));
-                var authorize = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
-                    if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.AUTHORIZE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.AUTHORIZE + " to use client-side authorize");
-                    return null != experiments && experiments.upgradeLSATWithIgnoreCache ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
-                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.authorizeOrder)(orderID, {
-                            facilitatorAccessToken: upgradedFacilitatorAccessToken,
-                            buyerAccessToken: buyerAccessToken,
-                            partnerAttributionID: partnerAttributionID,
-                            forceRestAPI: forceRestAPI,
-                            experiments: experiments
-                        }).finally(get.reset).finally(authorize.reset).catch((function(err) {
-                            return handleProcessorError(err, restart, onError);
-                        }));
-                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.authorizeOrder)(orderID, {
-                        facilitatorAccessToken: facilitatorAccessToken,
-                        buyerAccessToken: buyerAccessToken,
-                        partnerAttributionID: partnerAttributionID,
-                        forceRestAPI: forceRestAPI,
-                        experiments: experiments
-                    }).finally(get.reset).finally(authorize.reset).catch((function(err) {
-                        return handleProcessorError(err, restart, onError);
-                    }));
-                }));
-                return {
-                    capture: capture,
-                    authorize: authorize,
-                    patch: function(data) {
-                        void 0 === data && (data = {});
-                        return null != experiments && experiments.upgradeLSATWithIgnoreCache ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
-                            return Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
-                                facilitatorAccessToken: upgradedFacilitatorAccessToken,
-                                buyerAccessToken: buyerAccessToken,
-                                partnerAttributionID: partnerAttributionID,
-                                forceRestAPI: forceRestAPI,
-                                experiments: experiments
-                            }).catch((function() {
-                                throw new Error("Order could not be patched");
-                            }));
-                        })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
-                            facilitatorAccessToken: facilitatorAccessToken,
-                            buyerAccessToken: buyerAccessToken,
-                            partnerAttributionID: partnerAttributionID,
-                            forceRestAPI: forceRestAPI,
-                            experiments: experiments
-                        }).catch((function() {
-                            throw new Error("Order could not be patched");
-                        }));
-                    },
-                    get: get
-                };
-            }({
-                intent: intent,
-                orderID: orderID,
-                paymentID: paymentID,
-                payerID: payerID,
-                restart: restart,
-                facilitatorAccessToken: facilitatorAccessToken,
-                buyerAccessToken: buyerAccessToken,
-                partnerAttributionID: partnerAttributionID,
-                forceRestAPI: forceRestAPI,
-                onError: onError,
-                experiments: _ref3.experiments
-            });
-            var payment = function(_ref2) {
-                var intent = _ref2.intent, paymentID = _ref2.paymentID, payerID = _ref2.payerID, restart = _ref2.restart, facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, onError = _ref2.onError;
-                if (paymentID) {
-                    var get = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
-                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.getPayment)(paymentID, {
-                            facilitatorAccessToken: facilitatorAccessToken,
-                            buyerAccessToken: buyerAccessToken,
-                            partnerAttributionID: partnerAttributionID
-                        });
-                    }));
-                    var execute = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
-                        if (!payerID) throw new Error("payerID required for payment execute");
-                        if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE + " to use client-side capture");
-                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.executePayment)(paymentID, payerID, {
-                            facilitatorAccessToken: facilitatorAccessToken,
-                            buyerAccessToken: buyerAccessToken,
-                            partnerAttributionID: partnerAttributionID
-                        }).finally(get.reset).finally(execute.reset).catch((function(err) {
-                            return handleProcessorError(err, restart, onError);
-                        }));
-                    }));
-                    return {
-                        execute: execute,
-                        patch: function(data) {
-                            void 0 === data && (data = {});
-                            return Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchPayment)(paymentID, data, {
-                                facilitatorAccessToken: facilitatorAccessToken,
-                                buyerAccessToken: buyerAccessToken,
-                                partnerAttributionID: partnerAttributionID
-                            }).catch((function() {
-                                throw new Error("Order could not be patched");
-                            }));
-                        },
-                        get: get
-                    };
-                }
-            }({
-                intent: intent,
-                orderID: orderID,
-                paymentID: paymentID,
-                payerID: payerID,
-                restart: restart,
-                facilitatorAccessToken: facilitatorAccessToken,
-                buyerAccessToken: buyerAccessToken,
-                partnerAttributionID: partnerAttributionID,
-                forceRestAPI: forceRestAPI,
-                onError: onError
-            });
-            return {
-                order: order,
-                payment: _config__WEBPACK_IMPORTED_MODULE_7__.ENABLE_PAYMENT_API ? payment : null,
-                restart: restart,
-                redirect: redirect
-            };
-        }
         function getOnApproveOrder(_ref7) {
             var intent = _ref7.intent, _ref7$onApprove = _ref7.onApprove, onApprove = void 0 === _ref7$onApprove ? function(intent) {
                 return function(data, actions) {
@@ -18923,7 +18820,171 @@ window.spb = function(modules) {
                             authCode: authCode,
                             paymentSource: paymentSource
                         };
-                        var actions = buildXApproveOrderActions({
+                        var actions = function(_ref3) {
+                            var intent = _ref3.intent, orderID = _ref3.orderID, paymentID = _ref3.paymentID, payerID = _ref3.payerID, restart = _ref3.restart, facilitatorAccessToken = _ref3.facilitatorAccessToken, buyerAccessToken = _ref3.buyerAccessToken, partnerAttributionID = _ref3.partnerAttributionID, forceRestAPI = _ref3.forceRestAPI, onError = _ref3.onError;
+                            var order = function(_ref) {
+                                var intent = _ref.intent, orderID = _ref.orderID, restart = _ref.restart, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI, onError = _ref.onError, experiments = _ref.experiments, paymentSource = _ref.paymentSource;
+                                var get = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
+                                    var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
+                                    return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.getOrder)(orderID, {
+                                            facilitatorAccessToken: upgradedFacilitatorAccessToken,
+                                            buyerAccessToken: buyerAccessToken,
+                                            partnerAttributionID: partnerAttributionID,
+                                            forceRestAPI: forceRestAPI,
+                                            experiments: experiments
+                                        });
+                                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.getOrder)(orderID, {
+                                        facilitatorAccessToken: facilitatorAccessToken,
+                                        buyerAccessToken: buyerAccessToken,
+                                        partnerAttributionID: partnerAttributionID,
+                                        forceRestAPI: forceRestAPI,
+                                        experiments: experiments
+                                    });
+                                }));
+                                var capture = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
+                                    if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE + " to use client-side capture");
+                                    var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
+                                    return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.captureOrder)(orderID, {
+                                            facilitatorAccessToken: upgradedFacilitatorAccessToken,
+                                            buyerAccessToken: buyerAccessToken,
+                                            partnerAttributionID: partnerAttributionID,
+                                            forceRestAPI: forceRestAPI,
+                                            experiments: experiments
+                                        }).finally(get.reset).finally(capture.reset).catch((function(err) {
+                                            return handleProcessorError(err, restart, onError);
+                                        }));
+                                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.captureOrder)(orderID, {
+                                        facilitatorAccessToken: facilitatorAccessToken,
+                                        buyerAccessToken: buyerAccessToken,
+                                        partnerAttributionID: partnerAttributionID,
+                                        forceRestAPI: forceRestAPI,
+                                        experiments: experiments
+                                    }).finally(get.reset).finally(capture.reset).catch((function(err) {
+                                        return handleProcessorError(err, restart, onError);
+                                    }));
+                                }));
+                                var authorize = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
+                                    if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.AUTHORIZE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.AUTHORIZE + " to use client-side authorize");
+                                    var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
+                                    return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.authorizeOrder)(orderID, {
+                                            facilitatorAccessToken: upgradedFacilitatorAccessToken,
+                                            buyerAccessToken: buyerAccessToken,
+                                            partnerAttributionID: partnerAttributionID,
+                                            forceRestAPI: forceRestAPI,
+                                            experiments: experiments
+                                        }).finally(get.reset).finally(authorize.reset).catch((function(err) {
+                                            return handleProcessorError(err, restart, onError);
+                                        }));
+                                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.authorizeOrder)(orderID, {
+                                        facilitatorAccessToken: facilitatorAccessToken,
+                                        buyerAccessToken: buyerAccessToken,
+                                        partnerAttributionID: partnerAttributionID,
+                                        forceRestAPI: forceRestAPI,
+                                        experiments: experiments
+                                    }).finally(get.reset).finally(authorize.reset).catch((function(err) {
+                                        return handleProcessorError(err, restart, onError);
+                                    }));
+                                }));
+                                return {
+                                    capture: capture,
+                                    authorize: authorize,
+                                    patch: function(data) {
+                                        void 0 === data && (data = {});
+                                        var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
+                                        return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                                            return Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
+                                                facilitatorAccessToken: upgradedFacilitatorAccessToken,
+                                                buyerAccessToken: buyerAccessToken,
+                                                partnerAttributionID: partnerAttributionID,
+                                                forceRestAPI: forceRestAPI,
+                                                experiments: experiments
+                                            }).catch((function() {
+                                                throw new Error("Order could not be patched");
+                                            }));
+                                        })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
+                                            facilitatorAccessToken: facilitatorAccessToken,
+                                            buyerAccessToken: buyerAccessToken,
+                                            partnerAttributionID: partnerAttributionID,
+                                            forceRestAPI: forceRestAPI,
+                                            experiments: experiments
+                                        }).catch((function() {
+                                            throw new Error("Order could not be patched");
+                                        }));
+                                    },
+                                    get: get
+                                };
+                            }({
+                                intent: intent,
+                                orderID: orderID,
+                                paymentID: paymentID,
+                                payerID: payerID,
+                                restart: restart,
+                                facilitatorAccessToken: facilitatorAccessToken,
+                                buyerAccessToken: buyerAccessToken,
+                                partnerAttributionID: partnerAttributionID,
+                                forceRestAPI: forceRestAPI,
+                                onError: onError,
+                                experiments: _ref3.experiments,
+                                paymentSource: _ref3.paymentSource
+                            });
+                            var payment = function(_ref2) {
+                                var intent = _ref2.intent, paymentID = _ref2.paymentID, payerID = _ref2.payerID, restart = _ref2.restart, facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, onError = _ref2.onError;
+                                if (paymentID) {
+                                    var get = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
+                                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.getPayment)(paymentID, {
+                                            facilitatorAccessToken: facilitatorAccessToken,
+                                            buyerAccessToken: buyerAccessToken,
+                                            partnerAttributionID: partnerAttributionID
+                                        });
+                                    }));
+                                    var execute = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
+                                        if (!payerID) throw new Error("payerID required for payment execute");
+                                        if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE + " to use client-side capture");
+                                        return Object(_api__WEBPACK_IMPORTED_MODULE_4__.executePayment)(paymentID, payerID, {
+                                            facilitatorAccessToken: facilitatorAccessToken,
+                                            buyerAccessToken: buyerAccessToken,
+                                            partnerAttributionID: partnerAttributionID
+                                        }).finally(get.reset).finally(execute.reset).catch((function(err) {
+                                            return handleProcessorError(err, restart, onError);
+                                        }));
+                                    }));
+                                    return {
+                                        execute: execute,
+                                        patch: function(data) {
+                                            void 0 === data && (data = {});
+                                            return Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchPayment)(paymentID, data, {
+                                                facilitatorAccessToken: facilitatorAccessToken,
+                                                buyerAccessToken: buyerAccessToken,
+                                                partnerAttributionID: partnerAttributionID
+                                            }).catch((function() {
+                                                throw new Error("Order could not be patched");
+                                            }));
+                                        },
+                                        get: get
+                                    };
+                                }
+                            }({
+                                intent: intent,
+                                orderID: orderID,
+                                paymentID: paymentID,
+                                payerID: payerID,
+                                restart: restart,
+                                facilitatorAccessToken: facilitatorAccessToken,
+                                buyerAccessToken: buyerAccessToken,
+                                partnerAttributionID: partnerAttributionID,
+                                forceRestAPI: forceRestAPI,
+                                onError: onError
+                            });
+                            return {
+                                order: order,
+                                payment: _config__WEBPACK_IMPORTED_MODULE_7__.ENABLE_PAYMENT_API ? payment : null,
+                                restart: restart,
+                                redirect: redirect
+                            };
+                        }({
                             orderID: orderID,
                             paymentID: paymentID,
                             payerID: payerID,
@@ -18934,7 +18995,8 @@ window.spb = function(modules) {
                             partnerAttributionID: partnerAttributionID,
                             onError: onError,
                             forceRestAPI: forceRestAPI,
-                            experiments: experiments
+                            experiments: experiments,
+                            paymentSource: paymentSource
                         });
                         beforeOnApprove();
                         return onApprove(data, actions).catch((function(err) {
@@ -19503,7 +19565,7 @@ window.spb = function(modules) {
         var _constants__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("./src/constants.js");
         var _lib__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("./src/lib/index.js");
         var _onShippingChange__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__("./src/props/onShippingChange.js");
-        var _utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__("./src/props/utils.js");
+        var _shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__("./src/props/shippingChangeUtils.js");
         var _excluded = [ "amount", "buyerAccessToken", "event", "forceRestAPI", "shippingAddress" ];
         function buildXOnShippingAddressChangeData(data) {
             var shippingAddress = data.shippingAddress, rest = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_2__.default)(data, _excluded);
@@ -19516,7 +19578,7 @@ window.spb = function(modules) {
             var _data$amount;
             var data = _ref.data, passedActions = _ref.actions, orderID = _ref.orderID;
             var patchQueries = {};
-            var breakdown = null != (_data$amount = data.amount) && _data$amount.breakdown ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.breakdownKeyChanges)(data.amount.breakdown) : {};
+            var breakdown = null != (_data$amount = data.amount) && _data$amount.breakdown ? Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.breakdownKeyChanges)(data.amount.breakdown) : {};
             if (0 === Object.keys(breakdown).length) throw new Error("Must pass amount with breakdown into data attribute for onShippingAddressChange callback.");
             return {
                 reject: passedActions.reject ? function(message) {
@@ -19539,11 +19601,11 @@ window.spb = function(modules) {
                     selectedShippingOption && (updatedAmounts.shipping = selectedShippingOptionAmount);
                     shippingDiscount && (updatedAmounts.shipping_discount = shippingDiscount);
                     taxTotal && (updatedAmounts.tax_total = taxTotal);
-                    breakdown = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.buildBreakdown)({
+                    breakdown = Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.buildBreakdown)({
                         breakdown: breakdown,
                         updatedAmounts: updatedAmounts
                     });
-                    var newAmount = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.calculateTotalFromShippingBreakdownAmounts)({
+                    var newAmount = Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.calculateTotalFromShippingBreakdownAmounts)({
                         breakdown: breakdown,
                         updatedAmounts: updatedAmounts
                     });
@@ -19564,16 +19626,16 @@ window.spb = function(modules) {
                         var shippingMethods = (null == sessionData || null == (_sessionData$checkout = sessionData.checkoutSession) || null == (_sessionData$checkout = _sessionData$checkout.cart) ? void 0 : _sessionData$checkout.shippingMethods) || [];
                         var hasShippingMethods = Boolean(shippingMethods.length > 0);
                         if (null != shippingOptions && shippingOptions.length) {
-                            var ordersV2Options = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.optionsKeyChanges)(shippingOptions);
+                            var ordersV2Options = Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.optionsKeyChanges)(shippingOptions);
                             patchQueries[_onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.OPTIONS] = {
                                 op: hasShippingMethods ? "replace" : "add",
                                 path: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.OPTIONS,
                                 value: ordersV2Options
                             };
                         }
-                        return hasShippingMethods ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
+                        return hasShippingMethods ? Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
                             queries: patchQueries
-                        }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
+                        }) : Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
                             queries: patchQueries
                         });
                     }));
@@ -19645,6 +19707,7 @@ window.spb = function(modules) {
         var _api__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__("./src/api/index.js");
         var _constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__("./src/constants.js");
         var _lib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("./src/lib/index.js");
+        var _utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("./src/props/utils.js");
         var _excluded = [ "buyerAccessToken", "forceRestAPI", "appName" ];
         var ON_SHIPPING_CHANGE_PATHS = {
             AMOUNT: "/purchase_units/@reference_id=='default'/amount",
@@ -19694,7 +19757,7 @@ window.spb = function(modules) {
             }
         };
         function buildXShippingChangeActions(_ref2) {
-            var orderID = _ref2.orderID, facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, forceRestAPI = _ref2.forceRestAPI, clientID = _ref2.clientID, experiments = _ref2.experiments, appName = _ref2.appName;
+            var orderID = _ref2.orderID, facilitatorAccessToken = _ref2.facilitatorAccessToken, buyerAccessToken = _ref2.buyerAccessToken, partnerAttributionID = _ref2.partnerAttributionID, forceRestAPI = _ref2.forceRestAPI, clientID = _ref2.clientID, experiments = _ref2.experiments, appName = _ref2.appName, paymentSource = _ref2.paymentSource;
             var useShippingChangeCallbackMutation = experiments.useShippingChangeCallbackMutation;
             return {
                 resolve: function() {
@@ -19713,13 +19776,15 @@ window.spb = function(modules) {
                             data: data,
                             shouldUsePatchShipping: shouldUsePatchShipping
                         });
-                        return shouldUsePatchShipping ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchShipping)({
+                        if (shouldUsePatchShipping) return Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchShipping)({
                             clientID: clientID,
                             data: data,
                             orderID: orderID
                         }).catch((function() {
                             throw new Error("Order could not be patched");
-                        })) : null != experiments && experiments.upgradeLSATWithIgnoreCache ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                        }));
+                        var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_7__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
+                        return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
                             return Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
                                 facilitatorAccessToken: upgradedFacilitatorAccessToken,
                                 buyerAccessToken: buyerAccessToken,
@@ -19743,7 +19808,7 @@ window.spb = function(modules) {
             };
         }
         function getOnShippingChange(_ref3, _ref4) {
-            var onShippingChange = _ref3.onShippingChange, partnerAttributionID = _ref3.partnerAttributionID, featureFlags = _ref3.featureFlags, experiments = _ref3.experiments, clientID = _ref3.clientID;
+            var onShippingChange = _ref3.onShippingChange, partnerAttributionID = _ref3.partnerAttributionID, featureFlags = _ref3.featureFlags, experiments = _ref3.experiments, clientID = _ref3.clientID, paymentSource = _ref3.paymentSource;
             var facilitatorAccessToken = _ref4.facilitatorAccessToken, createOrder = _ref4.createOrder;
             if (onShippingChange) return function(_ref5, actions) {
                 var buyerAccessToken = _ref5.buyerAccessToken, _ref5$forceRestAPI = _ref5.forceRestAPI, forceRestAPI = void 0 === _ref5$forceRestAPI ? featureFlags.isLsatUpgradable : _ref5$forceRestAPI, _ref5$appName = _ref5.appName, appName = void 0 === _ref5$appName ? "not_available" : _ref5$appName, data = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_0__.default)(_ref5, _excluded);
@@ -19771,7 +19836,8 @@ window.spb = function(modules) {
                         forceRestAPI: forceRestAPI,
                         clientID: clientID,
                         experiments: experiments,
-                        appName: appName
+                        appName: appName,
+                        paymentSource: paymentSource
                     }));
                 }));
             };
@@ -19798,7 +19864,7 @@ window.spb = function(modules) {
         var _constants__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__("./src/constants.js");
         var _lib__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__("./src/lib/index.js");
         var _onShippingChange__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__("./src/props/onShippingChange.js");
-        var _utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__("./src/props/utils.js");
+        var _shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__("./src/props/shippingChangeUtils.js");
         var _excluded = [ "amount", "buyerAccessToken", "event", "forceRestAPI", "options", "selectedShippingOption" ];
         function buildXOnShippingOptionsChangeData(data) {
             var selectedShippingOption = data.selectedShippingOption, rest = Object(_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_2__.default)(data, _excluded);
@@ -19811,7 +19877,7 @@ window.spb = function(modules) {
             var _data$amount;
             var data = _ref.data, passedActions = _ref.actions, orderID = _ref.orderID;
             var patchQueries = {};
-            var breakdown = null != (_data$amount = data.amount) && _data$amount.breakdown ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.breakdownKeyChanges)(data.amount.breakdown) : {};
+            var breakdown = null != (_data$amount = data.amount) && _data$amount.breakdown ? Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.breakdownKeyChanges)(data.amount.breakdown) : {};
             if (0 === Object.keys(breakdown).length) throw new Error("Must pass breakdown into data attribute for onShippingAddressChange callback.");
             return {
                 reject: passedActions.reject ? function(message) {
@@ -19823,7 +19889,7 @@ window.spb = function(modules) {
                     var _shippingOption$amoun;
                     var _ref2 = void 0 === _temp ? {} : _temp, discount = _ref2.discount, handling = _ref2.handling, insurance = _ref2.insurance, itemTotal = _ref2.itemTotal, shippingOption = _ref2.shippingOption, shippingDiscount = _ref2.shippingDiscount, taxTotal = _ref2.taxTotal;
                     var selectedShippingOptionAmount = null == shippingOption || null == (_shippingOption$amoun = shippingOption.amount) ? void 0 : _shippingOption$amoun.value;
-                    var options = shippingOption && data.options ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.optionsKeyChanges)(Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateShippingOptions)({
+                    var options = shippingOption && data.options ? Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.optionsKeyChanges)(Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.updateShippingOptions)({
                         option: shippingOption,
                         options: data.options
                     })) : void 0;
@@ -19835,11 +19901,11 @@ window.spb = function(modules) {
                     selectedShippingOptionAmount && (updatedAmounts.shipping = selectedShippingOptionAmount);
                     shippingDiscount && (updatedAmounts.shipping_discount = shippingDiscount);
                     taxTotal && (updatedAmounts.tax_total = taxTotal);
-                    var newAmount = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.calculateTotalFromShippingBreakdownAmounts)({
+                    var newAmount = Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.calculateTotalFromShippingBreakdownAmounts)({
                         breakdown: breakdown,
                         updatedAmounts: updatedAmounts
                     });
-                    breakdown = Object(_utils__WEBPACK_IMPORTED_MODULE_9__.buildBreakdown)({
+                    breakdown = Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.buildBreakdown)({
                         breakdown: breakdown,
                         updatedAmounts: updatedAmounts
                     });
@@ -19864,9 +19930,9 @@ window.spb = function(modules) {
                             path: _onShippingChange__WEBPACK_IMPORTED_MODULE_8__.ON_SHIPPING_CHANGE_PATHS.OPTIONS,
                             value: options
                         });
-                        return hasShippingMethods ? Object(_utils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
+                        return hasShippingMethods ? Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.updateOperationForShippingOptions)({
                             queries: patchQueries
-                        }) : Object(_utils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
+                        }) : Object(_shippingChangeUtils__WEBPACK_IMPORTED_MODULE_9__.convertQueriesToArray)({
                             queries: patchQueries
                         });
                     }));
@@ -19998,7 +20064,7 @@ window.spb = function(modules) {
             return _ref.remember;
         }
     },
-    "./src/props/utils.js": function(module, __webpack_exports__, __webpack_require__) {
+    "./src/props/shippingChangeUtils.js": function(module, __webpack_exports__, __webpack_require__) {
         "use strict";
         __webpack_require__.r(__webpack_exports__);
         __webpack_require__.d(__webpack_exports__, "calculateTotalFromShippingBreakdownAmounts", (function() {
@@ -20132,6 +20198,17 @@ window.spb = function(modules) {
             return convertQueriesToArray({
                 queries: queries
             });
+        };
+    },
+    "./src/props/utils.js": function(module, __webpack_exports__, __webpack_require__) {
+        "use strict";
+        __webpack_require__.r(__webpack_exports__);
+        __webpack_require__.d(__webpack_exports__, "checkUlsatNotRequired", (function() {
+            return checkUlsatNotRequired;
+        }));
+        var _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@paypal/sdk-constants/src/index.js");
+        var checkUlsatNotRequired = function(paymentSource, buyerAccessToken) {
+            return paymentSource === _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_0__.FUNDING.VENMO && !buyerAccessToken;
         };
     }
 });
