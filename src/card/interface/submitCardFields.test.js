@@ -113,11 +113,11 @@ describe("submitCardFields", () => {
       getParent: vi.fn(),
       ThreeDomainSecure: {},
       clientID: "client-id",
+      productAction: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
     };
     // $FlowIssue
     getCardProps.mockReturnValue({
       ...mockGetCardPropsReturn,
-      productAction: PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
     });
 
     await submitCardFields(defaultOptions);
@@ -371,6 +371,7 @@ describe("submitCardFields", () => {
         ThreeDomainSecure: mockThreeDomainSecure,
         createOrder: mockCardProps.createOrder,
         getParent: mockCardProps.getParent,
+        paymentFlow: PAYMENT_FLOWS.WITH_PURCHASE,
       });
       expect(mockCardProps.onApprove).toBeCalledWith(
         {

@@ -115,8 +115,16 @@ function initVaultCapture({ props, components, payment, serviceData, config, exp
         ZalgoPromise.try(() => {
             return shippingRequired(orderID).then((shippingRequiredFlag) => {
                 if (shippingRequiredFlag) {
+                    sendCountMetric({
+                        name: 'pp.app.paypal_sdk.buttons.vault_capture.error.count',
+                        event: 'error',
+                        dimensions: {
+                            errorName: 'shipping_required_failure_or_fallback',
+                            fundingSource,
+                        }
+                    });
+
                     if (fundingSource !== FUNDING.PAYPAL) {
-                        getLogger().error('vault_shipping_required');
                         throw new Error(`Shipping address requested for ${fundingSource} payment`);
                     }
 
@@ -134,9 +142,17 @@ function initVaultCapture({ props, components, payment, serviceData, config, exp
                     .then((res) => {
                         // $FlowFixMe
                         const { status, links } = res;
-                        return handleThreeDomainSecureContingency({ status, links, ThreeDomainSecure, createOrder, getParent });
+                        return handleThreeDomainSecureContingency({ status, links, ThreeDomainSecure, createOrder, getParent, paymentFlow: "vault_capture", fundingSource });
                     })
                     .then(() => {
+                        sendCountMetric({
+                            name: 'pp.app.paypal_sdk.buttons.vault_capture.success.count',
+                            event: 'success',
+                            dimensions: {
+                                fundingSource,
+                                experimentInUse: 'deprecated_validate_payment_method_experiment',
+                            }
+                        });
                         return onApprove({}, { restart });
                     }
                 );
@@ -150,8 +166,16 @@ function initVaultCapture({ props, components, payment, serviceData, config, exp
             requireShipping: shippingRequired(orderID)
         }).then(({ validate, requireShipping }) => {
             if (requireShipping) {
+                sendCountMetric({
+                    name: 'pp.app.paypal_sdk.buttons.vault_capture.error.count',
+                    event: 'error',
+                    dimensions: {
+                        errorName: 'shipping_required_failure_or_fallback',
+                        fundingSource,
+                    }
+                });
+
                 if (fundingSource !== FUNDING.PAYPAL) {
-                    getLogger().error('vault_shipping_required');
                     throw new Error(`Shipping address requested for ${ fundingSource } payment`);
                 }
 
@@ -162,7 +186,16 @@ function initVaultCapture({ props, components, payment, serviceData, config, exp
             return handleValidatePaymentMethodResponse({ ThreeDomainSecure, status, body, createOrder, getParent }).then(() => {
                 return confirmOrderAPI(orderID, { payment_source: buildPaymentSource({ paymentMethodID, fundingSource }) }, { facilitatorAccessToken: accessToken, partnerAttributionID, experiments: {} })
                 .then(() => {
-                  return onApprove({}, { restart });
+                    sendCountMetric({
+                        name: 'pp.app.paypal_sdk.buttons.vault_capture.success.count',
+                        event: 'success',
+                        dimensions: {
+                            fundingSource,
+                            experimentInUse: 'none',
+                        }
+                    });
+
+                    return onApprove({}, { restart });
                 });
             });
         });

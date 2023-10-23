@@ -8,6 +8,8 @@ import type { ThreeDomainSecureFlowType } from '../types';
 import { TARGET_ELEMENT } from '../constants';
 import { threeDsAuthStatus } from '../card/logger'
 
+import { sendCountMetric } from './logger';
+
 type CreateOrder = () => ZalgoPromise<string>;
 type ThreeDomainSecureProps = {|
     ThreeDomainSecure : ThreeDomainSecureFlowType,
@@ -25,7 +27,9 @@ type ThreeDomainSecureContingencyProps = {|
         method : string,
         rel : string,
         href : string
-    |}>
+    |}>,
+    paymentFlow : string,
+    fundingSource? : string,
 |};
 
 function handleThreeDomainSecureRedirect({ ThreeDomainSecure, vaultToken, createOrder, action, getParent }: ThreeDomainSecureProps): ZalgoPromise<void> {
@@ -61,16 +65,34 @@ const getThreeDSParams = (links) => {
     return { vaultToken, action };
 }
 
-export function handleThreeDomainSecureContingency({ status, links, ThreeDomainSecure, createOrder, getParent }: ThreeDomainSecureContingencyProps): ZalgoPromise<void> | void {
+export function handleThreeDomainSecureContingency({ status, links, ThreeDomainSecure, createOrder, getParent, paymentFlow, fundingSource }: ThreeDomainSecureContingencyProps): ZalgoPromise<void> | void {
     const isWithPurchase = (link) => link.rel === "payer-action" && link.href && link.href.includes("flow=3ds");
     const isWithoutPurchase = (link) => (link.rel === "approve" && link.href.includes("helios"));
 
     return ZalgoPromise.try(() => {
-        if (status === "PAYER_ACTION_REQUIRED" && links.some(link => isWithPurchase(link) || isWithoutPurchase(link)))
-        {
-            const {vaultToken, action } = getThreeDSParams(links);
+        if (status === "PAYER_ACTION_REQUIRED" && links.some(link => isWithPurchase(link) || isWithoutPurchase(link))){
+            const contingency = 'confirm_payment_source_three_ds_contingency';
 
-        return handleThreeDomainSecureRedirect({ ThreeDomainSecure, createOrder, vaultToken, getParent, action});
+            if (paymentFlow === "vault-capture") {
+                sendCountMetric({
+                    name: `pp.app.paypal_sdk.buttons.vault_capture.contingency.count`,
+                    dimensions: {
+                        fundingSource,
+                        contingency,
+                    }
+                });
+            } else {
+                sendCountMetric({
+                    name: `pp.app.paypal_sdk.card_fields.submit.contingency.count`,
+                    dimensions: {
+                        paymentFlow,
+                        contingency,
+                    }
+                });
+            }
+
+            const {vaultToken, action } = getThreeDSParams(links);
+            return handleThreeDomainSecureRedirect({ ThreeDomainSecure, createOrder, vaultToken, getParent, action});
         } 
     });
 }
@@ -86,10 +108,24 @@ type HandleValidatePaymentMethodResponse = {|
 export function handleValidatePaymentMethodResponse({ ThreeDomainSecure, status, body, createOrder, getParent }: HandleValidatePaymentMethodResponse): ZalgoPromise<void> {
     return ZalgoPromise.try(() => {
         if (status === 422 && body.links && body.links.some(link => link.rel === '3ds-contingency-resolution')) {
+            sendCountMetric({
+                name: 'pp.app.paypal_sdk.buttons.vault_capture.contingency.count',
+                dimensions: {
+                    contingency: 'validate_payment_method_three_ds_contingency'
+                }
+            });
+
             return handleThreeDomainSecureRedirect({ ThreeDomainSecure, createOrder, getParent });
         }
 
         if (status !== 200) {
+            sendCountMetric({
+                name: 'pp.app.paypal_sdk.buttons.vault_capture.error.count',
+                event: 'error',
+                dimensions: {
+                    errorName: 'validate_payment_method_failure'
+                }
+            });
 
             const hasDescriptiveErrorCode = Array.isArray(body.details);
             if (hasDescriptiveErrorCode) {

@@ -32,7 +32,7 @@ type SubmitCardFieldsOptions = {|
 
 function handleVaultWithoutPurchaseFlow(cardProps: VaultWithoutPurchaseFlowCardProps, card: Card, extraFields?: ExtraFields): ZalgoPromise<void> {
   const { ThreeDomainSecure } = getComponents();
-  const { getParent, createVaultSetupToken, onError,clientID, onApprove, userIDToken } = cardProps;
+  const { getParent, createVaultSetupToken, onError,clientID, onApprove, userIDToken, productAction } = cardProps;
 
   return savePaymentSource({
     onApprove,
@@ -44,6 +44,7 @@ function handleVaultWithoutPurchaseFlow(cardProps: VaultWithoutPurchaseFlowCardP
     clientID,
     paymentSource: convertCardToPaymentSource(card, extraFields),
     idToken: userIDToken,
+    productAction,
   });
 }
 
@@ -55,7 +56,7 @@ function handlePurchaseFlow(
 ): ZalgoPromise<void> {
   let orderID;
   const { ThreeDomainSecure } = getComponents();
-  const { createOrder, getParent } = cardProps;
+  const { createOrder, getParent, productAction} = cardProps;
 
   return cardProps
   // $FlowFixMe need to rethink how to pass down these props
@@ -79,7 +80,7 @@ function handlePurchaseFlow(
     .then((res) => {
       // $FlowFixMe
       const { status, links } = res;
-      return handleThreeDomainSecureContingency({status, links, ThreeDomainSecure, createOrder, getParent });
+      return handleThreeDomainSecureContingency({status, links, ThreeDomainSecure, createOrder, getParent, paymentFlow: productAction });
     })
     .then((threeDsResponse) => {
       // $FlowFixMe

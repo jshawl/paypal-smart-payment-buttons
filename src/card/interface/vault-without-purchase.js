@@ -29,6 +29,7 @@ type VaultPaymenSourceOptions = {|
   getParent : () => CrossDomainWindowType,
   ThreeDomainSecure : ThreeDomainSecureFlowType,
   idToken: string,
+  productAction: string,
 |};
 
 export const savePaymentSource = ({
@@ -40,6 +41,7 @@ export const savePaymentSource = ({
   getParent,
   ThreeDomainSecure,
   idToken,
+  productAction,
 }: VaultPaymenSourceOptions): ZalgoPromise<void> => {
   let vaultToken;
   return createVaultSetupToken()
@@ -59,10 +61,13 @@ export const savePaymentSource = ({
       // $FlowFixMe
       const { status, links } = res?.updateVaultSetupToken || {};
 
-      return handleThreeDomainSecureContingency({ status, links,
+      return handleThreeDomainSecureContingency({
+        status,
+        links,
         getParent,
         ThreeDomainSecure,
-    })
+        paymentFlow: productAction,
+      })
     })
     .then((threeDsResponse) => onApprove({ vaultSetupToken: vaultToken, liabilityShift: threeDsResponse?.liability_shift }))
     .then(() => vaultWithoutPurchaseSuccess({ vaultToken }))
