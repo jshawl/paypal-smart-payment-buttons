@@ -807,7 +807,6 @@ export function oneClickApproveOrder({ orderID, instrumentType, instrumentID, bu
                     token: $orderID
                     selectedInstrumentType : $instrumentType
                     selectedInstrumentId : $instrumentID
-                    selectedPlanId: $planID
                 ) {
                     userId
                     auth {
