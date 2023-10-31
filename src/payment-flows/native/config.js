@@ -60,6 +60,6 @@ export const VENMO_WEB_URL : EnvConfig = {
     [ ENV.TEST ]:       'https://account.dev.venmo.com/go/web/paypal',
     [ ENV.LOCAL ]:      'https://account.dev.venmo.com/go/web/paypal',
     [ ENV.STAGE ]:      getDomain().includes('cibns') ? 'https://account.qa.venmo.com/go/web/paypal' : 'https://account.dev.venmo.com/go/web/paypal',
-    [ ENV.SANDBOX ]:    'https://account.qa.venmo.com/go/web/paypal',
+    [ ENV.SANDBOX ]:    'https://account.venmo.com/go/web/paypal',
     [ ENV.PRODUCTION ]: 'https://account.venmo.com/go/web/paypal'
 };
