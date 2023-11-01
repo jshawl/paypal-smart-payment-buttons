@@ -186,11 +186,12 @@ export const DEFAULT_STYLE = {
         'height':         '24px',
         'pointer-events': 'none',
         'position':       'absolute',
-        'top':            '1.6875rem', // calc(0.375rem + 0.0625rem + 1.25rem)
+        'top':            '50%',
+        'transform':      'translateY(-50%)',
         'left':           '1.1875rem' // calc(0.375rem + 0.0625rem + 0.75rem)
     },
     'input.card-field-number.display-icon': {
-        'padding-left': 'calc(1.2rem + 40px)' // calc(0.75rem + 40px + 0.375rem)' 
+        'padding-left': 'calc(1.2rem + 40px) !important' // calc(0.75rem + 40px + 0.375rem)' 
     },
     'input.card-field-number.display-icon + .card-icon': {
         'display': 'block'
