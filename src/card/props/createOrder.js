@@ -26,7 +26,7 @@ export function getCreateOrder({
 
   return memoize(() => {
     return ZalgoPromise.try(() => {
-      return createOrder({paymentSource: FUNDING.CARD});
+      return createOrder({ paymentSource: FUNDING.CARD });
     }).then((orderID) => {
       if (!orderID || typeof orderID !== "string") {
         throw new Error(`Expected an order id to be passed`);
@@ -34,7 +34,7 @@ export function getCreateOrder({
 
       if (orderID.includes("PAY-") || orderID.includes("PAYID-")) {
         throw new Error(
-          `Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead`
+          `Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead`,
         );
       }
 

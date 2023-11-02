@@ -46,11 +46,11 @@ describe("autoFocusOnFirstInput", () => {
     expect(window.addEventListener).toBeCalledTimes(2);
     expect(window.addEventListener).toBeCalledWith(
       "focus",
-      expect.any(Function)
+      expect.any(Function),
     );
     expect(window.addEventListener).toBeCalledWith(
       "focusin",
-      expect.any(Function)
+      expect.any(Function),
     );
   });
 

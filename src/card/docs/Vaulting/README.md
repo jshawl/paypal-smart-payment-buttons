@@ -1,9 +1,13 @@
 # Vaulting with HCF
-* [Vault with Purchase](#vault-with-purchase)
-* [Vault without Purchase](#vault-without-purchase)
-* [Error states](#error-states)
+
+- [Vault with Purchase](#vault-with-purchase)
+- [Vault without Purchase](#vault-without-purchase)
+- [Error states](#error-states)
+
 ## Vault with Purchase
+
 ### General Flow
+
 1. Define the `CardFields` `createOrder` callback to pass relevant payment information (excluding card details) and desire to vault payment method to server-side API.
 2. API calls `POST v2/checkout/orders` with `vault` field.
 3. The order is successfully created and the `orderId` is returned.
@@ -15,6 +19,7 @@
 In order to vault the card, an indicator needs to be set inside of `createOrder` to pass through to the `POST v2/checkout/orders` call; for example, a checkbox on a page that, when checked, includes the vault parameter in the body passed to the server-side API. (A general overview of the `createOrder` function can be found in the [Multi Card Fields documentation](../MultiCardFields/README.md#createOrder).)
 
 `vault.store_in_vault`: indicates desire to vault purchase method. A value of `"ON_SUCCESS"` indicates the vault will occur only upon successful order capture.
+
 ```js
 let vaulting = vaultCheckbox.checked;
 if (vaulting) {
@@ -31,9 +36,11 @@ if (vaulting) {
 ```
 
 ### Modifications to `onApprove`
+
 After the order is successfully created via `createOrder`, the order needs to be captured. This is done by defining the `CardFields.onApprove` callback to pass the orderId to a server-side API that calls `POST v2/checkout/orders/${orderId}/capture`. No vault specific data is required in the body of the call. Once the order is successfully captured, the response will include the vaulting data. (A general overview of the `onApprove` callback can be found in the [Multi Card Fields documentation](../MultiCardFields/README.md#onApprove).)
 
 Depending on the type of card being used, several different responses may be returned to indicate the vaulting status. Generally, if vaulting occurred successfully, you will see the `payment_source.card.attributes.vault` field populated with an `id` field. This is the id of the vaulted payment method that can be stored and used to retrieve the vaulted payment method for subsequent transactions. Additionally, a `customer.id` will be generated if this is a first time buyer. The merchant will need to store this `customer.id` to use for future calls to retrieve existing vaulted payment methods. Example response:
+
 ```json
 {
   "id": "5O190127TN364715T",
@@ -75,15 +82,19 @@ Depending on the type of card being used, several different responses may be ret
 ### Card Specific Requirements
 
 #### Visa & Mastercard
+
 No special considerations required for Visa or Mastercard vault implementation.
 
 #### American Express
+
 Vaulting with American Express requires the merchant to be subscribed to the American Express OptBlue feature.
 
 ### Examples of vaulting modifications:
+
 In this example you can see the `createOrder` callback defining a payload to include a customer id and the vault command, and then included in the `fetch()` call.
 
 #### First Time Buyer
+
 ```js
 const cardField = paypal.CardFields({
     style: styleObject,
@@ -145,10 +156,15 @@ const cardField = paypal.CardFields({
     },
 });
 ```
+
 #### Return Buyer
+
 // todo
+
 ## Vault without Purchase
+
 // todo
 
 ## Error States
+
 // todo

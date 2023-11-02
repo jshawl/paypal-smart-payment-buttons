@@ -153,7 +153,7 @@ describe("card-checks", () => {
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
       expect(
-        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE),
       ).toBe(true);
     });
 
@@ -171,7 +171,7 @@ describe("card-checks", () => {
       const cardNumber = "4111111111111111";
       const cardType = detectCardType(cardNumber)[0];
       expect(
-        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE),
       ).toBe(false);
     });
 
@@ -193,8 +193,8 @@ describe("card-checks", () => {
         checkCardEligibility(
           cardNumber,
           cardType,
-          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
-        )
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+        ),
       ).toBe(true);
     });
 
@@ -216,8 +216,8 @@ describe("card-checks", () => {
         checkCardEligibility(
           cardNumber,
           cardType,
-          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
-        )
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+        ),
       ).toBe(false);
     });
 
@@ -238,8 +238,8 @@ describe("card-checks", () => {
         checkCardEligibility(
           cardNumber,
           cardType,
-          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
-        )
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+        ),
       ).toBe(false);
     });
 
@@ -255,11 +255,11 @@ describe("card-checks", () => {
         checkCardEligibility(
           cardNumber,
           cardType,
-          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
-        )
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+        ),
       ).toBe(false);
       expect(
-        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE),
       ).toBe(false);
     });
 
@@ -275,11 +275,11 @@ describe("card-checks", () => {
         checkCardEligibility(
           cardNumber,
           cardType,
-          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
-        )
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+        ),
       ).toBe(false);
       expect(
-        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE),
       ).toBe(false);
     });
 
@@ -290,11 +290,11 @@ describe("card-checks", () => {
         checkCardEligibility(
           cardNumber,
           cardType,
-          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
-        )
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+        ),
       ).toBe(false);
       expect(
-        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE),
       ).toBe(false);
     });
 
@@ -305,11 +305,11 @@ describe("card-checks", () => {
         checkCardEligibility(
           cardNumber,
           cardType,
-          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE
-        )
+          PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE,
+        ),
       ).toBe(true);
       expect(
-        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE)
+        checkCardEligibility(cardNumber, cardType, PAYMENT_FLOWS.WITH_PURCHASE),
       ).toBe(true);
     });
   });

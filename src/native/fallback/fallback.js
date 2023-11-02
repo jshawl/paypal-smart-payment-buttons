@@ -1,38 +1,41 @@
 /* @flow */
 
-import { cleanup } from '@krakenjs/belter/src';
-import type { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
+import { cleanup } from "@krakenjs/belter/src";
+import type { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { getPostRobot } from '../../lib';
+import { getPostRobot } from "../../lib";
 
-import { MESSAGE } from './constants';
+import { MESSAGE } from "./constants";
 
 type SetupNativeFallbackOptions = {|
-    parentDomain : string
+  parentDomain: string,
 |};
 
 type NativeFallback = {|
-    destroy : () => ZalgoPromise<void>
+  destroy: () => ZalgoPromise<void>,
 |};
 
-export function setupNativeFallback({ parentDomain = window.location.origin } : SetupNativeFallbackOptions) : NativeFallback {
-    if (!window.opener) {
-        throw new Error(`Expected window to have opener`);
-    }
+export function setupNativeFallback({
+  parentDomain = window.location.origin,
+}: SetupNativeFallbackOptions): NativeFallback {
+  if (!window.opener) {
+    throw new Error(`Expected window to have opener`);
+  }
 
-    const clean = cleanup();
-    const destroy = () => clean.all();
+  const clean = cleanup();
+  const destroy = () => clean.all();
 
-    const postRobot = getPostRobot();
+  const postRobot = getPostRobot();
 
-    const sendToParent = (event, payload = {}) => {
-        return postRobot.send(window.opener, event, payload, { domain: parentDomain })
-            .then(({ data }) => data);
-    };
+  const sendToParent = (event, payload = {}) => {
+    return postRobot
+      .send(window.opener, event, payload, { domain: parentDomain })
+      .then(({ data }) => data);
+  };
 
-    sendToParent(MESSAGE.DETECT_WEB_SWITCH);
+  sendToParent(MESSAGE.DETECT_WEB_SWITCH);
 
-    return {
-        destroy
-    };
+  return {
+    destroy,
+  };
 }

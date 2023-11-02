@@ -1,4 +1,4 @@
 /* @flow */
 
-export * from './fallback';
-export * from './template';
+export * from "./fallback";
+export * from "./template";

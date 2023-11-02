@@ -1,30 +1,52 @@
 /* @flow */
 
-import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { CURRENCY, COUNTRY, INTENT, FUNDING, CARD, PLATFORM, type FundingEligibilityType } from '@paypal/sdk-constants/src';
-import { getUserAgent } from '@krakenjs/belter/src';
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import {
+  CURRENCY,
+  COUNTRY,
+  INTENT,
+  FUNDING,
+  CARD,
+  PLATFORM,
+  type FundingEligibilityType,
+} from "@paypal/sdk-constants/src";
+import { getUserAgent } from "@krakenjs/belter/src";
 
-import { HEADERS } from '../constants';
+import { HEADERS } from "../constants";
 
-import { callGraphQL } from './api';
+import { callGraphQL } from "./api";
 
 type GetFundingEligibilityOptions = {|
-    accessToken? : string,
-    clientID : string,
-    merchantID : ?$ReadOnlyArray<string>,
-    currency : $Values<typeof CURRENCY>,
-    buyerCountry : $Values<typeof COUNTRY>,
-    intent : $Values<typeof INTENT>,
-    commit : boolean,
-    vault : boolean,
-    disableFunding : ?$ReadOnlyArray<$Values<typeof FUNDING>>,
-    disableCard : ?$ReadOnlyArray<$Values<typeof CARD>>
+  accessToken?: string,
+  clientID: string,
+  merchantID: ?$ReadOnlyArray<string>,
+  currency: $Values<typeof CURRENCY>,
+  buyerCountry: $Values<typeof COUNTRY>,
+  intent: $Values<typeof INTENT>,
+  commit: boolean,
+  vault: boolean,
+  disableFunding: ?$ReadOnlyArray<$Values<typeof FUNDING>>,
+  disableCard: ?$ReadOnlyArray<$Values<typeof CARD>>,
 |};
 
-export function getFundingEligibility(query : string, { accessToken, clientID, merchantID, currency, buyerCountry, intent, commit, vault, disableFunding, disableCard } : GetFundingEligibilityOptions) : ZalgoPromise<FundingEligibilityType> {
-    return callGraphQL({
-        name:  'GetFundingEligibility',
-        query: `
+export function getFundingEligibility(
+  query: string,
+  {
+    accessToken,
+    clientID,
+    merchantID,
+    currency,
+    buyerCountry,
+    intent,
+    commit,
+    vault,
+    disableFunding,
+    disableCard,
+  }: GetFundingEligibilityOptions,
+): ZalgoPromise<FundingEligibilityType> {
+  return callGraphQL({
+    name: "GetFundingEligibility",
+    query: `
             query GetFundingEligibility(
                 $clientID:String,
                 $merchantID:[ String ],
@@ -47,36 +69,44 @@ export function getFundingEligibility(query : string, { accessToken, clientID, m
                 disableCard: $disableCard,
                 merchantId: $merchantID
             ) {
-                ${ query }
+                ${query}
             }
           }
         `,
-        variables: {
-            clientID,
-            merchantID,
-            buyerCountry,
-            currency,
-            commit,
-            vault,
-            intent:         intent ? intent.toUpperCase() : intent,
-            disableFunding: disableFunding ? disableFunding.map(f => f && f.toUpperCase()) : disableFunding,
-            disableCard:    disableCard ? disableCard.map(f => f && f.toUpperCase()) : disableCard
-        },
-        headers: {
-            [ HEADERS.ACCESS_TOKEN ]: accessToken || ''
-        }
-    }).then((gqlResult) => {
-        if (!gqlResult || !gqlResult.fundingEligibility) {
-            throw new Error(`GraphQL fundingEligibility returned no fundingEligibility object`);
-        }
-        return gqlResult && gqlResult.fundingEligibility;
-    });
+    variables: {
+      clientID,
+      merchantID,
+      buyerCountry,
+      currency,
+      commit,
+      vault,
+      intent: intent ? intent.toUpperCase() : intent,
+      disableFunding: disableFunding
+        ? disableFunding.map((f) => f && f.toUpperCase())
+        : disableFunding,
+      disableCard: disableCard
+        ? disableCard.map((f) => f && f.toUpperCase())
+        : disableCard,
+    },
+    headers: {
+      [HEADERS.ACCESS_TOKEN]: accessToken || "",
+    },
+  }).then((gqlResult) => {
+    if (!gqlResult || !gqlResult.fundingEligibility) {
+      throw new Error(
+        `GraphQL fundingEligibility returned no fundingEligibility object`,
+      );
+    }
+    return gqlResult && gqlResult.fundingEligibility;
+  });
 }
 
-export function getGuestEnabledStatus(merchantID : $ReadOnlyArray<string>) : ZalgoPromise<FundingEligibilityType> {
-    return callGraphQL({
-        name:  'GetFundingEligibility',
-        query: `
+export function getGuestEnabledStatus(
+  merchantID: $ReadOnlyArray<string>,
+): ZalgoPromise<FundingEligibilityType> {
+  return callGraphQL({
+    name: "GetFundingEligibility",
+    query: `
             query GetFundingEligibility(
                 $merchantID:[ String ]
             ) {
@@ -89,48 +119,70 @@ export function getGuestEnabledStatus(merchantID : $ReadOnlyArray<string>) : Zal
             }
           }
         `,
-        variables: {
-            merchantID
-        }
-    }).then((gqlResult) => {
-        if (!gqlResult || !gqlResult.fundingEligibility) {
-            throw new Error(`GraphQL fundingEligibility returned no fundingEligibility object`);
-        }
-        return gqlResult && gqlResult.fundingEligibility && gqlResult.fundingEligibility.card && gqlResult.fundingEligibility.card.guestEnabled;
-    });
+    variables: {
+      merchantID,
+    },
+  }).then((gqlResult) => {
+    if (!gqlResult || !gqlResult.fundingEligibility) {
+      throw new Error(
+        `GraphQL fundingEligibility returned no fundingEligibility object`,
+      );
+    }
+    return (
+      gqlResult &&
+      gqlResult.fundingEligibility &&
+      gqlResult.fundingEligibility.card &&
+      gqlResult.fundingEligibility.card.guestEnabled
+    );
+  });
 }
 
 type NativeEligibilityOptions = {|
-    clientID : string,
-    buyerCountry : ?$Values<typeof COUNTRY>,
-    currency : $Values<typeof CURRENCY>,
-    vault : boolean,
-    merchantID : string,
-    buttonSessionID : string,
-    shippingCallbackEnabled : boolean,
-    platform : $Values<typeof PLATFORM>,
-    cookies : string,
-    orderID? : ?string,
-    enableFunding : ?$ReadOnlyArray<$Values<typeof FUNDING>>,
-    stickinessID? : ?string,
-    domain : string,
-    skipElmo? : boolean,
-    headers? : { [string] : string }
+  clientID: string,
+  buyerCountry: ?$Values<typeof COUNTRY>,
+  currency: $Values<typeof CURRENCY>,
+  vault: boolean,
+  merchantID: string,
+  buttonSessionID: string,
+  shippingCallbackEnabled: boolean,
+  platform: $Values<typeof PLATFORM>,
+  cookies: string,
+  orderID?: ?string,
+  enableFunding: ?$ReadOnlyArray<$Values<typeof FUNDING>>,
+  stickinessID?: ?string,
+  domain: string,
+  skipElmo?: boolean,
+  headers?: { [string]: string },
 |};
 
 export type NativeEligibility = {|
-    [ $Values<typeof FUNDING> ] : ?{|
-        eligibility : boolean,
-        ineligibilityReason : string
-    |}
+  [$Values<typeof FUNDING>]: ?{|
+    eligibility: boolean,
+    ineligibilityReason: string,
+  |},
 |};
 
-export function getNativeEligibility({ vault, shippingCallbackEnabled, merchantID, clientID, buyerCountry, currency, buttonSessionID, cookies, orderID, enableFunding, stickinessID, domain, headers = {}, skipElmo = false } : NativeEligibilityOptions) : ZalgoPromise<NativeEligibility> {
-    const userAgent = getUserAgent();
+export function getNativeEligibility({
+  vault,
+  shippingCallbackEnabled,
+  merchantID,
+  clientID,
+  buyerCountry,
+  currency,
+  buttonSessionID,
+  cookies,
+  orderID,
+  enableFunding,
+  stickinessID,
+  domain,
+  headers = {},
+  skipElmo = false,
+}: NativeEligibilityOptions): ZalgoPromise<NativeEligibility> {
+  const userAgent = getUserAgent();
 
-    return callGraphQL({
-        name:  'GetNativeEligibility',
-        query: `
+  return callGraphQL({
+    name: "GetNativeEligibility",
+    query: `
             query GetNativeEligibility(
                 $vault : Boolean,
                 $shippingCallbackEnabled : Boolean,
@@ -174,38 +226,59 @@ export function getNativeEligibility({ vault, shippingCallbackEnabled, merchantI
                 }
             }
         `,
-        variables: {
-            vault, shippingCallbackEnabled, merchantID, clientID,
-            buyerCountry, currency, userAgent, buttonSessionID,
-            cookies, orderID, enableFunding, stickinessID, domain, skipElmo
-        },
-        headers
-    }).then((gqlResult) => {
-        if (!gqlResult || !gqlResult.mobileSDKEligibility) {
-            throw new Error(`GraphQL GetNativeEligibility returned no mobileSDKEligibility object`);
-        }
+    variables: {
+      vault,
+      shippingCallbackEnabled,
+      merchantID,
+      clientID,
+      buyerCountry,
+      currency,
+      userAgent,
+      buttonSessionID,
+      cookies,
+      orderID,
+      enableFunding,
+      stickinessID,
+      domain,
+      skipElmo,
+    },
+    headers,
+  }).then((gqlResult) => {
+    if (!gqlResult || !gqlResult.mobileSDKEligibility) {
+      throw new Error(
+        `GraphQL GetNativeEligibility returned no mobileSDKEligibility object`,
+      );
+    }
 
-        return gqlResult.mobileSDKEligibility;
-    });
+    return gqlResult.mobileSDKEligibility;
+  });
 }
 
 type ApplePaySession = {|
-    session : string
+  session: string,
 |};
 
 type ValidateMerchantOptions = {|
-    url : string,
-    clientID : string,
-    orderID : string,
-    merchantDomain : string
+  url: string,
+  clientID: string,
+  orderID: string,
+  merchantDomain: string,
 |};
 
-export function getApplePayMerchantSession({ url, clientID, orderID, merchantDomain } : ValidateMerchantOptions) : ZalgoPromise<ApplePaySession> {
-    const domain = merchantDomain.indexOf('://') !== -1 ? merchantDomain.split('://')[1] : merchantDomain;
+export function getApplePayMerchantSession({
+  url,
+  clientID,
+  orderID,
+  merchantDomain,
+}: ValidateMerchantOptions): ZalgoPromise<ApplePaySession> {
+  const domain =
+    merchantDomain.indexOf("://") !== -1
+      ? merchantDomain.split("://")[1]
+      : merchantDomain;
 
-    return callGraphQL({
-        name:  'GetApplePayMerchantSession',
-        query: `
+  return callGraphQL({
+    name: "GetApplePayMerchantSession",
+    query: `
             query GetApplePayMerchantSession(
                 $url : String!
                 $orderID : String!
@@ -222,13 +295,18 @@ export function getApplePayMerchantSession({ url, clientID, orderID, merchantDom
                 }
             }
         `,
-        variables: {
-            url, clientID, orderID, merchantDomain: domain
-        }
-    }).then((gqlResult) => {
-        if (!gqlResult || !gqlResult.applePayMerchantSession) {
-            throw new Error(`GraphQL GetApplePayMerchantSession returned no applePayMerchantSession object`);
-        }
-        return gqlResult.applePayMerchantSession;
-    });
+    variables: {
+      url,
+      clientID,
+      orderID,
+      merchantDomain: domain,
+    },
+  }).then((gqlResult) => {
+    if (!gqlResult || !gqlResult.applePayMerchantSession) {
+      throw new Error(
+        `GraphQL GetApplePayMerchantSession returned no applePayMerchantSession object`,
+      );
+    }
+    return gqlResult.applePayMerchantSession;
+  });
 }

@@ -29,7 +29,7 @@ describe("validateShippingContact", () => {
         postalCode: "95131",
         subAdministrativeArea: "",
         subLocality: "",
-      })
+      }),
     ).toEqual({
       errors: [],
       shipping_address: {
@@ -55,7 +55,7 @@ describe("validateShippingContact", () => {
         postalCode: "95131",
         subAdministrativeArea: "",
         subLocality: "",
-      })
+      }),
     ).toEqual({
       errors: [
         {
@@ -87,7 +87,7 @@ describe("validateShippingContact", () => {
         postalCode: "",
         subAdministrativeArea: "",
         subLocality: "",
-      })
+      }),
     ).toEqual({
       errors: [
         {
@@ -150,7 +150,7 @@ describe("getApplePayShippingMethods", () => {
           selected: false,
           type: "PICKUP",
         },
-      ])
+      ]),
     ).toEqual([
       {
         identifier: "2",

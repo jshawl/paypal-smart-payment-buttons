@@ -1,172 +1,196 @@
 /* @flow */
 
-import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { noop, experiment, isAndroid, isIos, isChrome, isSafari, type Experiment } from '@krakenjs/belter/src';
-import { FPTI_KEY } from '@paypal/sdk-constants/src';
-import type { ProxyWindow } from '@krakenjs/post-robot/src';
-import { onCloseWindow } from '@krakenjs/cross-domain-utils/src';
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import {
+  noop,
+  experiment,
+  isAndroid,
+  isIos,
+  isChrome,
+  isSafari,
+  type Experiment,
+} from "@krakenjs/belter/src";
+import { FPTI_KEY } from "@paypal/sdk-constants/src";
+import type { ProxyWindow } from "@krakenjs/post-robot/src";
+import { onCloseWindow } from "@krakenjs/cross-domain-utils/src";
 
-import { FPTI_STATE, FPTI_TRANSITION } from '../constants';
+import { FPTI_STATE, FPTI_TRANSITION } from "../constants";
 
-import { getLogger } from './logger';
+import { getLogger } from "./logger";
 
-
-export function unresolvedPromise<T>() : ZalgoPromise<T> {
-    return new ZalgoPromise(noop);
+export function unresolvedPromise<T>(): ZalgoPromise<T> {
+  return new ZalgoPromise(noop);
 }
 
-export function promiseNoop<T>(...args : $ReadOnlyArray<T>) : ZalgoPromise<void> { // eslint-disable-line no-unused-vars
-    return ZalgoPromise.resolve();
+export function promiseNoop<T>(...args: $ReadOnlyArray<T>): ZalgoPromise<void> {
+  // eslint-disable-line no-unused-vars
+  return ZalgoPromise.resolve();
 }
 
-export function getBody() : HTMLBodyElement {
-    const body = document.body;
+export function getBody(): HTMLBodyElement {
+  const body = document.body;
 
-    if (!body) {
-        throw new Error(`Document body not found`);
+  if (!body) {
+    throw new Error(`Document body not found`);
+  }
+
+  return body;
+}
+
+export function sendBeacon(url: string) {
+  const img = document.createElement("img");
+  img.src = url;
+  img.style.visibility = "hidden";
+  img.style.position = "absolute";
+  if (document.body) {
+    document.body.appendChild(img);
+  }
+}
+
+export function sleep(time: number): ZalgoPromise<void> {
+  return new ZalgoPromise((resolve) => {
+    setTimeout(resolve, time);
+  });
+}
+
+export function redirectTop(url: string) {
+  if (__TEST__) {
+    window.location.hash = url;
+  } else {
+    window.top.location = url;
+  }
+}
+
+export function loadScript(url: string): ZalgoPromise<HTMLScriptElement> {
+  return new ZalgoPromise((resolve, reject) => {
+    const container = document.body || document.head;
+
+    if (!container) {
+      return reject(new Error(`Can not find container for script: ${url}`));
     }
 
-    return body;
+    const script = document.createElement("script");
+    script.setAttribute("src", url);
+    script.addEventListener("load", () => resolve(script));
+    // $FlowFixMe
+    script.addEventListener("error", (err) => reject(err));
+    container.appendChild(script);
+  });
 }
 
-export function sendBeacon(url : string) {
-    const img = document.createElement('img');
-    img.src = url;
-    img.style.visibility = 'hidden';
-    img.style.position = 'absolute';
-    if (document.body) {
-        document.body.appendChild(img);
+export function promiseOne<T>(
+  promises: $ReadOnlyArray<ZalgoPromise<T>>,
+): ZalgoPromise<T> {
+  return new ZalgoPromise((resolve, reject) => {
+    for (const promise of promises) {
+      promise.then(resolve, reject);
     }
+  });
 }
 
-export function sleep(time : number) : ZalgoPromise<void> {
-    return new ZalgoPromise(resolve => {
-        setTimeout(resolve, time);
-    });
+export function isServer(): boolean {
+  return typeof window === "undefined";
 }
 
-export function redirectTop(url : string) {
-    if (__TEST__) {
-        window.location.hash = url;
-    } else {
-        window.top.location = url;
-    }
+export function isClient(): boolean {
+  return typeof window !== "undefined";
 }
 
-export function loadScript(url : string) : ZalgoPromise<HTMLScriptElement> {
-    return new ZalgoPromise((resolve, reject) => {
-        const container = document.body || document.head;
-
-        if (!container) {
-            return reject(new Error(`Can not find container for script: ${ url }`));
-        }
-
-        const script = document.createElement('script');
-        script.setAttribute('src', url);
-        script.addEventListener('load', () => resolve(script));
-        // $FlowFixMe
-        script.addEventListener('error', (err) => reject(err));
-        container.appendChild(script);
-    });
-}
-
-export function promiseOne<T>(promises : $ReadOnlyArray<ZalgoPromise<T>>) : ZalgoPromise<T> {
-    return new ZalgoPromise((resolve, reject) => {
-        for (const promise of promises) {
-            promise.then(resolve, reject);
-        }
-    });
-}
-
-export function isServer() : boolean {
-    return (typeof window === 'undefined');
-}
-
-export function isClient() : boolean {
-    return (typeof window !== 'undefined');
-}
-
-export function isEmailAddress(str : string) : boolean {
-    return Boolean(str.match(/^.+@.+\..+$/));
+export function isEmailAddress(str: string): boolean {
+  return Boolean(str.match(/^.+@.+\..+$/));
 }
 
 type CreateExperimentOptions = {|
-    sample : number,
-    sticky? : boolean
+  sample: number,
+  sticky?: boolean,
 |};
 
-export function createExperiment(name : string, { sample, sticky = true } : CreateExperimentOptions) : Experiment {
-    const logger = getLogger();
+export function createExperiment(
+  name: string,
+  { sample, sticky = true }: CreateExperimentOptions,
+): Experiment {
+  const logger = getLogger();
 
-    return experiment({
-        name,
-        sample,
+  return experiment({
+    name,
+    sample,
 
-        logTreatment({ treatment, payload }) {
+    logTreatment({ treatment, payload }) {
+      // $FlowFixMe
+      const fullPayload = {
+        [FPTI_KEY.STATE]: FPTI_STATE.PXP,
+        [FPTI_KEY.TRANSITION]: FPTI_TRANSITION.PXP,
+        [FPTI_KEY.EXPERIMENT_NAME]: name,
+        [FPTI_KEY.TREATMENT_NAME]: treatment,
+        ...payload,
+      };
 
-            // $FlowFixMe
-            const fullPayload = {
-                [FPTI_KEY.STATE]:           FPTI_STATE.PXP,
-                [FPTI_KEY.TRANSITION]:      FPTI_TRANSITION.PXP,
-                [FPTI_KEY.EXPERIMENT_NAME]: name,
-                [FPTI_KEY.TREATMENT_NAME]:  treatment,
-                ...payload
-            };
+      logger.track(fullPayload);
+      logger.flush();
+    },
 
-            logger.track(fullPayload);
-            logger.flush();
-        },
+    logCheckpoint({ treatment, checkpoint, payload, throttle }) {
+      // $FlowIssue payload type mismatch
+      logger.info(`${treatment}_${checkpoint}`, {
+        ...payload,
+        throttle: throttle.toString(),
+      });
+      logger.flush();
+    },
 
-        logCheckpoint({ treatment, checkpoint, payload, throttle }) {
-            // $FlowIssue payload type mismatch
-            logger.info(`${ treatment }_${ checkpoint }`, { ...payload, throttle: throttle.toString() });
-            logger.flush();
-        },
-
-        sticky
-    });
+    sticky,
+  });
 }
 
-export function isIOSSafari() : boolean {
-    return isIos() && isSafari();
+export function isIOSSafari(): boolean {
+  return isIos() && isSafari();
 }
 
-export function isAndroidChrome() : boolean {
-    return isAndroid() && isChrome();
+export function isAndroidChrome(): boolean {
+  return isAndroid() && isChrome();
 }
 
-export function onCloseProxyWindow(proxyWin : ProxyWindow, callback : Function, delay : number = 1000, maxtime : number = Infinity) : {| cancel : () => void |} {
-    let cancelled = false;
+export function onCloseProxyWindow(
+  proxyWin: ProxyWindow,
+  callback: Function,
+  delay: number = 1000,
+  maxtime: number = Infinity,
+): {| cancel: () => void |} {
+  let cancelled = false;
 
-    let cancel = () => {
-        cancelled = true;
-    };
+  let cancel = () => {
+    cancelled = true;
+  };
 
-    proxyWin.awaitWindow().then(win => {
-        if (!cancelled) {
-            cancel = onCloseWindow(win, callback, delay, maxtime).cancel;
-        }
-    });
-
-    return {
-        cancel
-    };
-}
-
-export function getNavigationTimeOrigin() : number {
-    if (window.performance) {
-        const hrSyncPoint = window.performance.now();
-        const unixSyncPoint = new Date().getTime();
-        return window.performance.timeOrigin || window.performance.timing.navigationStart || (unixSyncPoint - hrSyncPoint);
-    } else {
-        throw new Error('window.performance not supported');
+  proxyWin.awaitWindow().then((win) => {
+    if (!cancelled) {
+      cancel = onCloseWindow(win, callback, delay, maxtime).cancel;
     }
+  });
+
+  return {
+    cancel,
+  };
 }
 
-export function getClientsideTimestamp() : string {
+export function getNavigationTimeOrigin(): number {
+  if (window.performance) {
+    const hrSyncPoint = window.performance.now();
+    const unixSyncPoint = new Date().getTime();
+    return (
+      window.performance.timeOrigin ||
+      window.performance.timing.navigationStart ||
+      unixSyncPoint - hrSyncPoint
+    );
+  } else {
+    throw new Error("window.performance not supported");
+  }
+}
+
+export function getClientsideTimestamp(): string {
   try {
     return String(new Date().getTime());
   } catch {
-    return "invalid_timestamp"
+    return "invalid_timestamp";
   }
 }

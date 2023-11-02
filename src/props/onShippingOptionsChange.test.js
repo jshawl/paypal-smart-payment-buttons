@@ -47,7 +47,7 @@ vi.mock("../api", () => ({
           ],
         },
       },
-    })
+    }),
   ),
 }));
 
@@ -139,10 +139,10 @@ describe("onShippingOptionsChange", () => {
 
     test("returns undefined when passing data.errors to actions.reject()", async () => {
       expect(await actions.reject(data.errors.STORE_UNAVAILABLE)).toEqual(
-        ZalgoPromise.resolve().value
+        ZalgoPromise.resolve().value,
       );
       expect(await actions.reject(data.errors.METHOD_UNAVAILABLE)).toEqual(
-        ZalgoPromise.resolve().value
+        ZalgoPromise.resolve().value,
       );
     });
 
@@ -154,7 +154,7 @@ describe("onShippingOptionsChange", () => {
       expect(
         await actions.buildOrderPatchPayload({
           discount: "1.00",
-        })
+        }),
       ).toEqual([
         {
           op: "replace",
@@ -193,7 +193,7 @@ describe("onShippingOptionsChange", () => {
       expect(
         await actions.buildOrderPatchPayload({
           handling: "7.50",
-        })
+        }),
       ).toEqual([
         {
           op: "replace",
@@ -232,7 +232,7 @@ describe("onShippingOptionsChange", () => {
       expect(
         await actions.buildOrderPatchPayload({
           insurance: "13.00",
-        })
+        }),
       ).toEqual([
         {
           op: "replace",
@@ -275,7 +275,7 @@ describe("onShippingOptionsChange", () => {
       expect(
         await actions.buildOrderPatchPayload({
           itemTotal: "130.00",
-        })
+        }),
       ).toEqual([
         {
           op: "replace",
@@ -324,7 +324,7 @@ describe("onShippingOptionsChange", () => {
       expect(
         await actions.buildOrderPatchPayload({
           shippingOption: data.selectedShippingOption,
-        })
+        }),
       ).toEqual([
         {
           op: "replace",
@@ -399,7 +399,7 @@ describe("onShippingOptionsChange", () => {
       expect(
         await actions.buildOrderPatchPayload({
           shippingDiscount: "11.00",
-        })
+        }),
       ).toEqual([
         {
           op: "replace",
@@ -442,7 +442,7 @@ describe("onShippingOptionsChange", () => {
       expect(
         await actions.buildOrderPatchPayload({
           taxTotal: "25.00",
-        })
+        }),
       ).toEqual([
         {
           op: "replace",
@@ -497,7 +497,7 @@ describe("onShippingOptionsChange", () => {
           shippingOption: data.selectedShippingOption,
           shippingDiscount: "5.00",
           taxTotal: "37.00",
-        })
+        }),
       ).toEqual([
         {
           op: "replace",

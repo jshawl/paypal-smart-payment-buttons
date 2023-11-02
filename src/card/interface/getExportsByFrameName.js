@@ -1,12 +1,15 @@
 /* @flow */
 
-import { getAllFramesInWindow, isSameDomain } from "@krakenjs/cross-domain-utils/src";
+import {
+  getAllFramesInWindow,
+  isSameDomain,
+} from "@krakenjs/cross-domain-utils/src";
 
 import { FRAME_NAME } from "../../constants";
 import type { CardExports } from "../lib";
 
 export function getExportsByFrameName<T>(
-  name: $Values<typeof FRAME_NAME>
+  name: $Values<typeof FRAME_NAME>,
 ): ?CardExports<T> {
   try {
     for (const win of getAllFramesInWindow(window)) {

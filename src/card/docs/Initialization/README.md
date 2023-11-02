@@ -2,15 +2,14 @@
 
 ## Script Tag
 
-* Load the SDK from `paypal.com/sdk/js?client-id=xyz`
-* This provides the `window.paypal` namespace
-
+- Load the SDK from `paypal.com/sdk/js?client-id=xyz`
+- This provides the `window.paypal` namespace
 
 ```html
 <script src="https://www.paypal.com/sdk/js?client-id=<YOUR_CLIENT_ID>&components=card-fields" />
 
 <script>
-    paypal.CardFields({...})
+  paypal.CardFields({...})
 </script>
 ```
 
@@ -20,8 +19,9 @@ Initialization Parameters can be passed via the script url query, and/or via dat
 
 ```html
 <script
-    src="https://www.paypal.com/sdk/js?client-id=test&components=card-fields"
-    data-user-id-token="xyz"></script>
+  src="https://www.paypal.com/sdk/js?client-id=test&components=card-fields"
+  data-user-id-token="xyz"
+></script>
 ```
 
 - **URL Query Paramers** shall be used where:
@@ -164,7 +164,10 @@ Use a different global namespace on the page to export the PayPal SDK.
 Example:
 
 ```html
-<script src="https://www.paypal.com/sdk/js?client-id=test" data-namespace="paypal_sdk"></script>
+<script
+  src="https://www.paypal.com/sdk/js?client-id=test"
+  data-namespace="paypal_sdk"
+></script>
 
 <script>
   paypal_sdk.Foo();
@@ -181,7 +184,10 @@ CSP Nonce used for script/style elements which are rendered directly onto the pa
 Example:
 
 ```html
-<script src="https://www.paypal.com/sdk/js?client-id=test" data-csp-nonce="XYZ"></script>
+<script
+  src="https://www.paypal.com/sdk/js?client-id=test"
+  data-csp-nonce="XYZ"
+></script>
 ```
 
 ##### data-user-id-token
@@ -197,7 +203,10 @@ Used to pass buyer identity through the SDK. Requires id-token in JWT format. Ca
 Example:
 
 ```html
-<script src="https://www.paypal.com/sdk/js?client-id=test" data-user-id-token="XYZ"></script>
+<script
+  src="https://www.paypal.com/sdk/js?client-id=test"
+  data-user-id-token="XYZ"
+></script>
 ```
 
 ##### data-page-type
@@ -216,7 +225,10 @@ Identify the page type the SDK is loaded on, for tracking purposes.
 Example:
 
 ```html
-<script src="https://www.paypal.com/sdk/js?client-id=test" data-page-type="product-details"></script>
+<script
+  src="https://www.paypal.com/sdk/js?client-id=test"
+  data-page-type="product-details"
+></script>
 ```
 
 ##### data-partner-attribution-id
@@ -229,7 +241,10 @@ Used to attribute transactions to a particular partner account.
 Example:
 
 ```html
-<script src="https://www.paypal.com/sdk/js?client-id=test" data-partner-attribution-id="XYZ"></script>
+<script
+  src="https://www.paypal.com/sdk/js?client-id=test"
+  data-partner-attribution-id="XYZ"
+></script>
 ```
 
 ##### data-client-metadata-id
@@ -242,7 +257,10 @@ Used for risk tracking. Unique per transaction
 Example:
 
 ```html
-<script src="https://www.paypal.com/sdk/js?client-id=test" data-client-metadata-id="XYZ"></script>
+<script
+  src="https://www.paypal.com/sdk/js?client-id=test"
+  data-client-metadata-id="XYZ"
+></script>
 ```
 
 ##### data-enable-3ds
@@ -262,12 +280,12 @@ npm install @paypal/paypal-js
 import { loadScript } from "paypal";
 
 const configuration = {
-  clientID: '<YOUR_CLIENT_ID>',
+  clientID: "<YOUR_CLIENT_ID>",
 };
 
 try {
-  await loadScript(configuration)
-} catch(error) {
+  await loadScript(configuration);
+} catch (error) {
   console.error(error);
 }
 ```

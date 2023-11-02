@@ -3,12 +3,8 @@
 import { getCardFrames } from "./getCardFrames";
 
 export function resetGQLErrors(): void {
-  const {
-    cardFrame,
-    cardNumberFrame,
-    cardExpiryFrame,
-    cardCVVFrame
-  } = getCardFrames();
+  const { cardFrame, cardNumberFrame, cardExpiryFrame, cardCVVFrame } =
+    getCardFrames();
 
   if (cardFrame) {
     cardFrame.resetGQLErrors();
@@ -28,12 +24,8 @@ export function resetGQLErrors(): void {
 }
 
 export function emitGqlErrors(errorsMap: Object): void {
-  const {
-    cardFrame,
-    cardNumberFrame,
-    cardExpiryFrame,
-    cardCVVFrame
-  } = getCardFrames();
+  const { cardFrame, cardNumberFrame, cardExpiryFrame, cardCVVFrame } =
+    getCardFrames();
 
   const { number, expiry, security_code } = errorsMap;
 

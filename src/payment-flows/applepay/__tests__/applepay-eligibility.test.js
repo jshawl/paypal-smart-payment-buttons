@@ -32,7 +32,7 @@ describe("isApplePayEligible", () => {
             },
           },
         },
-      })
+      }),
     ).toEqual(true);
   });
 
@@ -49,7 +49,7 @@ describe("isApplePayEligible", () => {
             },
           },
         },
-      })
+      }),
     ).toEqual(false);
   });
 });
@@ -64,7 +64,7 @@ describe("isApplePayPaymentEligible", () => {
           // $FlowFixMe
           fundingSource: FUNDING.APPLEPAY,
         },
-      })
+      }),
     ).toEqual(true);
   });
   test("should ineligible when funding is not APPLEPAY", () => {
@@ -75,7 +75,7 @@ describe("isApplePayPaymentEligible", () => {
         payment: {
           fundingSource: FUNDING.IDEAL,
         },
-      })
+      }),
     ).toEqual(false);
   });
 });

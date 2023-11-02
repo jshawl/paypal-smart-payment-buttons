@@ -66,7 +66,7 @@ describe("card logger", () => {
       expect.objectContaining({
         event_name: "hcf_name_field_rendered",
         transition_name: "hcf_name_field_rendered",
-      })
+      }),
     );
   });
 
@@ -78,7 +78,7 @@ describe("card logger", () => {
         hcf_version: "v2",
         seller_id: "XYZ12345",
         merchant_domain: "mock://www.paypal.com",
-      })
+      }),
     );
   });
 
@@ -89,7 +89,7 @@ describe("card logger", () => {
       expect.objectContaining({
         ext_error_code: "hcf_transaction_error",
         ext_error_desc: "testing hcf transaction error",
-      })
+      }),
     );
     expect(sendCountMetric).toBeCalledWith({
       name: "pp.app.paypal_sdk.card_fields.submit.error.count",
@@ -106,7 +106,7 @@ describe("card logger", () => {
         event_name: "hcf_transaction_success",
         transition_name: "hcf_transaction_success",
         order_id: "ABCD123",
-      })
+      }),
     );
     expect(sendCountMetric).toBeCalledWith({
       name: "pp.app.paypal_sdk.card_fields.submit.success.count",
@@ -123,7 +123,7 @@ describe("card logger", () => {
         event_name: "hcf_transaction_success",
         transition_name: "hcf_transaction_success",
         vault_token: "ABCD123efgh",
-      })
+      }),
     );
     expect(sendCountMetric).toBeCalledWith({
       name: "pp.app.paypal_sdk.card_fields.submit.success.count",
@@ -140,7 +140,7 @@ describe("card logger", () => {
       expect.objectContaining({
         ext_error_code: "hcf_transaction_error",
         ext_error_desc: "testing vault without purchase error",
-      })
+      }),
     );
     expect(sendCountMetric).toBeCalledWith({
       name: "pp.app.paypal_sdk.card_fields.submit.error.count",

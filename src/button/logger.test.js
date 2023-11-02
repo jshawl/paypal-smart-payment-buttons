@@ -43,7 +43,7 @@ const buttonLoggerProps = {
 const findEventInMockLogs = (event, mock) =>
   // mockCallback.mock.calls[0][0]
   mock.mock.calls.some((mockArgs) =>
-    mockArgs.some((mockEvent) => mockEvent === event)
+    mockArgs.some((mockEvent) => mockEvent === event),
   );
 
 describe("setupButtonLogger", () => {
@@ -92,7 +92,7 @@ describe("setupButtonLogger", () => {
     await setupButtonLogger(buttonLoggerProps);
 
     expect(
-      findEventInMockLogs("CPL_LATENCY_METRICS_SECOND_RENDER", infoMock)
+      findEventInMockLogs("CPL_LATENCY_METRICS_SECOND_RENDER", infoMock),
     ).toEqual(true);
 
     expect(trackMock).toHaveBeenNthCalledWith(1, {
@@ -109,13 +109,13 @@ describe("setupButtonLogger", () => {
     await setupButtonLogger(buttonLoggerProps);
 
     expect(
-      findEventInMockLogs("CPL_LATENCY_METRICS_SECOND_RENDER", infoMock)
+      findEventInMockLogs("CPL_LATENCY_METRICS_SECOND_RENDER", infoMock),
     ).toEqual(false);
     expect(
       findEventInMockLogs(
         "button_render_CPL_instrumentation_log_error",
-        infoMock
-      )
+        infoMock,
+      ),
     ).toEqual(true);
   });
 
@@ -124,13 +124,13 @@ describe("setupButtonLogger", () => {
     await setupButtonLogger(buttonLoggerProps);
 
     expect(
-      findEventInMockLogs("CPL_LATENCY_METRICS_SECOND_RENDER", infoMock)
+      findEventInMockLogs("CPL_LATENCY_METRICS_SECOND_RENDER", infoMock),
     ).toEqual(false);
     expect(
       findEventInMockLogs(
         "button_render_CPL_instrumentation_not_executed",
-        infoMock
-      )
+        infoMock,
+      ),
     ).toEqual(true);
   });
 });

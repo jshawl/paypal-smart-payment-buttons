@@ -43,14 +43,14 @@ describe("setupLogger", () => {
   it("logs unhandled errors", () => {
     vi.spyOn(
       ZalgoPromise,
-      "onPossiblyUnhandledException"
+      "onPossiblyUnhandledException",
     ).mockImplementationOnce((d) => d());
     const mockError = vi.fn();
     vi.spyOn(getLogger(), "error").mockImplementationOnce(mockError);
     setupLogger(loggerProps);
     expect(mockError).toHaveBeenCalledWith(
       "unhandled_error",
-      expect.any(Object)
+      expect.any(Object),
     );
   });
 });

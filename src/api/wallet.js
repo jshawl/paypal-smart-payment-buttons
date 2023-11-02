@@ -1,39 +1,52 @@
 /* @flow */
 
-import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { CURRENCY } from '@paypal/sdk-constants/src';
-import { memoize } from '@krakenjs/belter/src';
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import { CURRENCY } from "@paypal/sdk-constants/src";
+import { memoize } from "@krakenjs/belter/src";
 
-import type { Wallet } from '../types';
-import { HEADERS } from '../constants';
+import type { Wallet } from "../types";
+import { HEADERS } from "../constants";
 
-import { callGraphQL } from './api';
+import { callGraphQL } from "./api";
 
 type GetSmartWalletOptions = {|
-    clientID : string,
-    merchantID : ?$ReadOnlyArray<string>,
-    currency : $Values<typeof CURRENCY>,
-    amount : ?string,
-    clientMetadataID : string,
-    userIDToken : string,
-    vetted? : boolean,
-    paymentMethodToken? : ?string,
-    branded? : ?boolean,
-    allowBillingPayments? : ?boolean,
-    headers? : { [string] : string } 
+  clientID: string,
+  merchantID: ?$ReadOnlyArray<string>,
+  currency: $Values<typeof CURRENCY>,
+  amount: ?string,
+  clientMetadataID: string,
+  userIDToken: string,
+  vetted?: boolean,
+  paymentMethodToken?: ?string,
+  branded?: ?boolean,
+  allowBillingPayments?: ?boolean,
+  headers?: { [string]: string },
 |};
 
-const DEFAULT_AMOUNT = '0';
+const DEFAULT_AMOUNT = "0";
 
 type GetSmartWallet = (GetSmartWalletOptions) => ZalgoPromise<Wallet>;
 
-export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, currency, amount = DEFAULT_AMOUNT, clientMetadataID, userIDToken, vetted = true, paymentMethodToken, branded, allowBillingPayments = true, headers={} }) => {
+export const getSmartWallet: GetSmartWallet = memoize(
+  ({
+    clientID,
+    merchantID,
+    currency,
+    amount = DEFAULT_AMOUNT,
+    clientMetadataID,
+    userIDToken,
+    vetted = true,
+    paymentMethodToken,
+    branded,
+    allowBillingPayments = true,
+    headers = {},
+  }) => {
     if (clientMetadataID) {
-        headers[HEADERS.CLIENT_METADATA_ID] = String(clientMetadataID)
+      headers[HEADERS.CLIENT_METADATA_ID] = String(clientMetadataID);
     }
     return callGraphQL({
-        name:  'GetSmartWallet',
-        query: `
+      name: "GetSmartWallet",
+      query: `
             query GetSmartWallet(
                 $clientID: String!
                 $merchantID: [String!]
@@ -104,9 +117,20 @@ export const getSmartWallet : GetSmartWallet = memoize(({ clientID, merchantID, 
                 }
             }
         `,
-        variables: { clientID, merchantID, currency, amount, userIDToken, vetted, paymentMethodToken, branded, allowBillingPayments },
-        headers
+      variables: {
+        clientID,
+        merchantID,
+        currency,
+        amount,
+        userIDToken,
+        vetted,
+        paymentMethodToken,
+        branded,
+        allowBillingPayments,
+      },
+      headers,
     }).then(({ smartWallet }) => {
-        return smartWallet;
+      return smartWallet;
     });
-});
+  },
+);

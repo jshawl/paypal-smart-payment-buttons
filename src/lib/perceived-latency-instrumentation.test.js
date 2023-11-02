@@ -22,7 +22,10 @@ describe("customer perceived latency instrumentation utils", () => {
         },
       };
       expect(
-        prepareLatencyInstrumentationPayload(responseStartTime, responseEndTime)
+        prepareLatencyInstrumentationPayload(
+          responseStartTime,
+          responseEndTime,
+        ),
       ).toEqual(preparedPayload);
     });
   });

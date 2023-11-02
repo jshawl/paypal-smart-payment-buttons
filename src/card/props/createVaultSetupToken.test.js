@@ -49,7 +49,7 @@ describe("decorate createVaultSetupToken", () => {
 
     // $FlowIssue
     expect(decoratedCreateVaultSetupToken()).rejects.toThrowError(
-      "Expected a vault setup token to be returned from createVaultSetupToken"
+      "Expected a vault setup token to be returned from createVaultSetupToken",
     );
   });
 
@@ -63,7 +63,7 @@ describe("decorate createVaultSetupToken", () => {
 
     // $FlowIssue
     expect(decoratedCreateVaultSetupToken()).resolves.toEqual(
-      "vault_setup_token"
+      "vault_setup_token",
     );
   });
 });

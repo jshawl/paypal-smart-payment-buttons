@@ -98,7 +98,7 @@ describe("onApprove", () => {
     };
     test("invokes the merchant's onApprove call with an undefined paymentID", async () => {
       const getOnApproveOrderResult = getOnApproveOrder(
-        getOnApproveOrderOptions
+        getOnApproveOrderOptions,
       );
       await getOnApproveOrderResult({}, { restart });
       expect(merchantOnApprove).toHaveBeenCalledWith(
@@ -106,7 +106,7 @@ describe("onApprove", () => {
           orderID,
           paymentID: undefined,
         }),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -121,14 +121,14 @@ describe("onApprove", () => {
         {
           billingToken: "BA-XXXXXX",
         },
-        { restart }
+        { restart },
       );
       expect(merchantOnApprove).toHaveBeenCalledWith(
         expect.objectContaining({
           orderID,
           paymentID: undefined,
         }),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -145,7 +145,7 @@ describe("onApprove", () => {
           orderID,
           paymentID: "abc123",
         }),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -163,7 +163,7 @@ describe("onApprove", () => {
           orderID: "EC-abc123",
           paymentSource: "paypal",
         }),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -181,7 +181,7 @@ describe("onApprove", () => {
           orderID: "EC-abc123",
           paymentSource: "paypal",
         }),
-        expect.anything()
+        expect.anything(),
       );
     });
   });
@@ -215,7 +215,7 @@ describe("onApprove", () => {
 
       await onApproveVaultWithoutPurchase(
         { payerID: mockPayerID },
-        { restart: vi.fn() }
+        { restart: vi.fn() },
       );
       expect(inputArgs.createOrder).toBeCalled();
       expect(inputArgs.createVaultSetupToken).toBeCalled();

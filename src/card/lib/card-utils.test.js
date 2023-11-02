@@ -130,7 +130,7 @@ describe("card utils", () => {
       "should convert card object to payment source: %s",
       (_, card, paymentSource) => {
         expect(convertCardToPaymentSource(card)).toEqual(paymentSource);
-      }
+      },
     );
 
     test("should throw error for bad date", () => {
@@ -139,7 +139,7 @@ describe("card utils", () => {
           number: testCard,
           expiry: badDate,
           cvv: testSecurityCode,
-        })
+        }),
       ).toThrowError(`can not convert invalid expiry date: ${badDate}`);
     });
   });
@@ -371,7 +371,7 @@ describe("card utils", () => {
 
       expect(parsedErrors.length).toBe(1);
       expect(parsedErrors[0]).toBe(
-        "PERMISSION_DENIED: You do not have permission to access or perform operations on this resource."
+        "PERMISSION_DENIED: You do not have permission to access or perform operations on this resource.",
       );
 
       expect(errors.length).toBe(1);
@@ -623,7 +623,7 @@ describe("card utils", () => {
 
       expect(parsedErrors.length).toBe(1);
       expect(parsedErrors[0]).toBe(
-        "PERMISSION_DENIED: You do not have permission to access or perform operations on this resource."
+        "PERMISSION_DENIED: You do not have permission to access or perform operations on this resource.",
       );
 
       expect(errors.length).toBe(1);
@@ -725,7 +725,7 @@ describe("card utils", () => {
 
     expect(parsedErrors.length).toBe(1);
     expect(parsedErrors[0]).toBe(
-      "PERMISSION_DENIED: You do not have permission to access or perform operations on this resource."
+      "PERMISSION_DENIED: You do not have permission to access or perform operations on this resource.",
     );
 
     expect(errors.length).toBe(1);
@@ -748,7 +748,7 @@ describe("styleToString", () => {
 
     // $FlowIssue doesn't know about replaceAll
     expect(stringStyle.trim().replaceAll("\n", "")).toEqual(
-      'height: 60px; padding: 10px; fontSize: 18px; fontFamily: "Open Sans", sans-serif; transition: all 0.5s ease-out;'.trim()
+      'height: 60px; padding: 10px; fontSize: 18px; fontFamily: "Open Sans", sans-serif; transition: all 0.5s ease-out;'.trim(),
     );
   });
 });
@@ -1151,7 +1151,7 @@ describe("filterExtraFields", () => {
       };
 
       expect(reformatPaymentSource(paymentSource)).toStrictEqual(
-        reformatted_payment_source
+        reformatted_payment_source,
       );
     });
 
@@ -1172,7 +1172,7 @@ describe("filterExtraFields", () => {
       };
 
       expect(reformatPaymentSource(paymentSource)).toStrictEqual(
-        reformatted_payment_source
+        reformatted_payment_source,
       );
     });
 
@@ -1193,7 +1193,7 @@ describe("filterExtraFields", () => {
       };
       // $FlowIssue
       expect(reformatPaymentSource(paymentSource)).toStrictEqual(
-        reformatted_payment_source
+        reformatted_payment_source,
       );
     });
   });

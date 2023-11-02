@@ -1,56 +1,62 @@
 /* @flow */
 /** @jsx h */
 
-import type { CrossDomainWindowType } from '@krakenjs/cross-domain-utils/src';
-import { h, Fragment } from 'preact';
-import { stringifyError } from '@krakenjs/belter/src';
+import type { CrossDomainWindowType } from "@krakenjs/cross-domain-utils/src";
+import { h, Fragment } from "preact";
+import { stringifyError } from "@krakenjs/belter/src";
 
-import { openPopup } from '../ui';
-import { getLogger } from '../lib';
+import { openPopup } from "../ui";
+import { getLogger } from "../lib";
 
-import { useAutoFocus } from './hooks';
+import { useAutoFocus } from "./hooks";
 
 type MenuProps = {|
-    cspNonce : string,
-    verticalOffset : number,
-    choices : $ReadOnlyArray<{|
-        label : string,
-        popup? : {|
-            width : number,
-            height : number
-        |},
-        onSelect : ({| win? : ?CrossDomainWindowType |}) => void
-    |}>,
-    onBlur : () => void,
-    onFocus : () => void,
-    onFocusFail : () => void
+  cspNonce: string,
+  verticalOffset: number,
+  choices: $ReadOnlyArray<{|
+    label: string,
+    popup?: {|
+      width: number,
+      height: number,
+    |},
+    onSelect: ({| win?: ?CrossDomainWindowType |}) => void,
+  |}>,
+  onBlur: () => void,
+  onFocus: () => void,
+  onFocusFail: () => void,
 |};
 
-export function Menu({ choices, onBlur, cspNonce, verticalOffset, onFocus, onFocusFail } : MenuProps) : mixed {
+export function Menu({
+  choices,
+  onBlur,
+  cspNonce,
+  verticalOffset,
+  onFocus,
+  onFocusFail,
+}: MenuProps): mixed {
+  const autoFocus = useAutoFocus({ onFocus, onFocusFail });
 
-    const autoFocus = useAutoFocus({ onFocus, onFocusFail });
+  const selectChoice = (choice) => {
+    let win;
 
-    const selectChoice = (choice) => {
-        let win;
+    if (choice.popup) {
+      try {
+        win = openPopup({
+          width: choice.popup.width,
+          height: choice.popup.height,
+        });
+      } catch (err) {
+        getLogger().warn("menu_popup_open_error", { err: stringifyError(err) });
+      }
+    }
 
-        if (choice.popup) {
-            try {
-                win = openPopup({
-                    width:  choice.popup.width,
-                    height: choice.popup.height
-                });
-            } catch (err) {
-                getLogger().warn('menu_popup_open_error', { err: stringifyError(err) });
-            }
-        }
+    return choice.onSelect({ win });
+  };
 
-        return choice.onSelect({ win });
-    };
-
-    return (
-        <Fragment>
-            <style nonce={ cspNonce }>
-                {`
+  return (
+    <Fragment>
+      <style nonce={cspNonce}>
+        {`
                     .menu {
                         width: 100%;
                         z-index: 5000;
@@ -62,7 +68,7 @@ export function Menu({ choices, onBlur, cspNonce, verticalOffset, onFocus, onFoc
                         outline-style: none;
                         user-select: none;
                         text-align: center;
-                        margin-top: ${ verticalOffset }px;
+                        margin-top: ${verticalOffset}px;
                         overflow: hidden;
                     }
 
@@ -105,19 +111,17 @@ export function Menu({ choices, onBlur, cspNonce, verticalOffset, onFocus, onFoc
                         }
                     }
                 `}
-            </style>
+      </style>
 
-            <div class='menu' tabIndex='0' onBlur={ onBlur } ref={ autoFocus }>
-                {
-                    choices.map(choice => {
-                        return (
-                            <div class='menu-item' onClick={ () => selectChoice(choice) }>
-                                { choice.label }
-                            </div>
-                        );
-                    })
-                }
+      <div class="menu" tabIndex="0" onBlur={onBlur} ref={autoFocus}>
+        {choices.map((choice) => {
+          return (
+            <div class="menu-item" onClick={() => selectChoice(choice)}>
+              {choice.label}
             </div>
-        </Fragment>
-    );
+          );
+        })}
+      </div>
+    </Fragment>
+  );
 }

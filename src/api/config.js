@@ -1,30 +1,36 @@
 /* @flow */
 
-import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { callGraphQL } from './api';
+import { callGraphQL } from "./api";
 
 export type ApplepayConfigResponse = {|
-    applepayConfig: {|
-        merchantCountry: string,
-        supportedNetworks: $ReadOnlyArray<string>
-    |}
+  applepayConfig: {|
+    merchantCountry: string,
+    supportedNetworks: $ReadOnlyArray<string>,
+  |},
 |};
 
 type GetApplepayConfigPayload = {|
-    buyerCountry: string, 
-    clientId: string, 
-    merchantId: $ReadOnlyArray<string>,
-    headers? : { [string] : string }
-|}
+  buyerCountry: string,
+  clientId: string,
+  merchantId: $ReadOnlyArray<string>,
+  headers?: { [string]: string },
+|};
 
-export type GetApplepayConfig = (payload: GetApplepayConfigPayload) => ZalgoPromise<ApplepayConfigResponse>;
+export type GetApplepayConfig = (
+  payload: GetApplepayConfigPayload,
+) => ZalgoPromise<ApplepayConfigResponse>;
 
-export const getApplepayConfig : GetApplepayConfig = ({ buyerCountry, clientId, merchantId, headers = {} }: GetApplepayConfigPayload) => {
-
-    return callGraphQL({
-        name:  'GetApplepayConfig',
-        query: `
+export const getApplepayConfig: GetApplepayConfig = ({
+  buyerCountry,
+  clientId,
+  merchantId,
+  headers = {},
+}: GetApplepayConfigPayload) => {
+  return callGraphQL({
+    name: "GetApplepayConfig",
+    query: `
         query GetApplepayConfig(
             $buyerCountry: CountryCodes!
             $clientId: String!
@@ -40,8 +46,7 @@ export const getApplepayConfig : GetApplepayConfig = ({ buyerCountry, clientId, 
             }
           }
         `,
-        variables: { buyerCountry, clientId, merchantId },
-        headers
-    });
-    
+    variables: { buyerCountry, clientId, merchantId },
+    headers,
+  });
 };

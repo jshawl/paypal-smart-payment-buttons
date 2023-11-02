@@ -12,20 +12,20 @@ export function getCardFieldState(): CardFieldsState {
     cardNumberFrame,
     cardCVVFrame,
     cardExpiryFrame,
-    cardPostalFrame
+    cardPostalFrame,
   } = getCardFrames();
   const optionalFields = {};
 
   // Optional frames: the idea is to keep the optional frames separate and add the field
   // state as needed
   const cardFrameFields = [cardNameFrame, cardPostalFrame];
-  cardFrameFields.forEach(cardFrame => {
+  cardFrameFields.forEach((cardFrame) => {
     if (cardFrame) {
       optionalFields[kebabToCamelCase(cardFrame.name)] = {
         isEmpty: isEmpty(cardFrame?.getFieldValue()),
         isValid: cardFrame?.isFieldValid(),
         isPotentiallyValid: cardFrame.isFieldPotentiallyValid(),
-        isFocused: cardFrame.isFieldFocused()
+        isFocused: cardFrame.isFieldFocused(),
       };
     }
   });
@@ -38,21 +38,21 @@ export function getCardFieldState(): CardFieldsState {
         isEmpty: isEmpty(cardNumberFrame.getFieldValue()),
         isValid: cardNumberFrame.isFieldValid(),
         isPotentiallyValid: cardNumberFrame.isFieldPotentiallyValid(),
-        isFocused: cardNumberFrame.isFieldFocused()
+        isFocused: cardNumberFrame.isFieldFocused(),
       },
       cardExpiryField: {
         isEmpty: isEmpty(cardExpiryFrame.getFieldValue()),
         isValid: cardExpiryFrame.isFieldValid(),
         isPotentiallyValid: cardExpiryFrame.isFieldPotentiallyValid(),
-        isFocused: cardExpiryFrame.isFieldFocused()
+        isFocused: cardExpiryFrame.isFieldFocused(),
       },
       cardCvvField: {
         isEmpty: isEmpty(cardCVVFrame.getFieldValue()),
         isValid: cardCVVFrame.isFieldValid(),
         isPotentiallyValid: cardCVVFrame.isFieldPotentiallyValid(),
-        isFocused: cardCVVFrame.isFieldFocused()
-      }
-    }
+        isFocused: cardCVVFrame.isFieldFocused(),
+      },
+    },
   };
   return cardFieldsState;
 }

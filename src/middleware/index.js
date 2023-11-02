@@ -1,3 +1,3 @@
 /* @flow */
 
-export * from './vault-setup';
+export * from "./vault-setup";

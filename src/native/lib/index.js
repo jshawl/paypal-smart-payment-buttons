@@ -1,4 +1,4 @@
 /* @flow */
 
-export * from './logger';
-export * from './appDetection';
+export * from "./logger";
+export * from "./appDetection";

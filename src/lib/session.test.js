@@ -35,7 +35,7 @@ describe("getStorageState", () => {
     expect(mockFn).toHaveBeenCalledWith(
       expect.objectContaining({
         __session__: expect.any(Object),
-      })
+      }),
     );
   });
 });

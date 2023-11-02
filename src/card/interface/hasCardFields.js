@@ -3,12 +3,10 @@
 import { getCardFrames } from "./getCardFrames";
 
 export function hasCardFields(): boolean {
-  const {
-    cardFrame,
-    cardNumberFrame,
-    cardCVVFrame,
-    cardExpiryFrame,
-  } = getCardFrames();
+  const { cardFrame, cardNumberFrame, cardCVVFrame, cardExpiryFrame } =
+    getCardFrames();
 
-  return Boolean(cardFrame || (cardNumberFrame && cardCVVFrame && cardExpiryFrame))
+  return Boolean(
+    cardFrame || (cardNumberFrame && cardCVVFrame && cardExpiryFrame),
+  );
 }

@@ -16,13 +16,13 @@ vi.mock("./api", async () => {
         response: {
           headers: {},
         },
-      })
+      }),
     ),
     callSmartAPI: vi.fn(() =>
       ZalgoPromise.resolve({
         data: {},
         headers: {},
-      })
+      }),
     ),
   };
 });
@@ -42,7 +42,7 @@ describe("actions smart api fallback cases", () => {
     it("by default", async () => {
       await getOrder(orderID, orderAPIOptions);
       expect(callSmartAPI).toHaveBeenCalledWith(
-        expect.objectContaining({ eventName: "order_get" })
+        expect.objectContaining({ eventName: "order_get" }),
       );
     });
     it("when forceRestAPI is true and callRestAPI throws", async () => {
@@ -51,7 +51,7 @@ describe("actions smart api fallback cases", () => {
         forceRestAPI: true,
       });
       expect(callSmartAPI).toHaveBeenCalledWith(
-        expect.objectContaining({ eventName: "order_get" })
+        expect.objectContaining({ eventName: "order_get" }),
       );
     });
     it("unless disableSmartApi is true", async () => {
@@ -62,7 +62,7 @@ describe("actions smart api fallback cases", () => {
           experiments: {
             disableSmartAPI: true,
           },
-        })
+        }),
       ).rejects.toThrowError("*_call_rest_api_error");
       expect(callSmartAPI).not.toHaveBeenCalled();
     });
@@ -72,7 +72,7 @@ describe("actions smart api fallback cases", () => {
     it("by default", async () => {
       await captureOrder(orderID, orderAPIOptions);
       expect(callSmartAPI).toHaveBeenCalledWith(
-        expect.objectContaining({ eventName: "order_capture" })
+        expect.objectContaining({ eventName: "order_capture" }),
       );
     });
     it("when forceRestAPI is true and callRestAPI throws", async () => {
@@ -81,7 +81,7 @@ describe("actions smart api fallback cases", () => {
         forceRestAPI: true,
       });
       expect(callSmartAPI).toHaveBeenCalledWith(
-        expect.objectContaining({ eventName: "order_capture" })
+        expect.objectContaining({ eventName: "order_capture" }),
       );
     });
     it("unless disableSmartApi is true", async () => {
@@ -92,7 +92,7 @@ describe("actions smart api fallback cases", () => {
           experiments: {
             disableSmartAPI: true,
           },
-        })
+        }),
       ).rejects.toThrowError("*_call_rest_api_error");
       expect(callSmartAPI).not.toHaveBeenCalled();
     });
@@ -102,7 +102,7 @@ describe("actions smart api fallback cases", () => {
     it("by default", async () => {
       await authorizeOrder(orderID, orderAPIOptions);
       expect(callSmartAPI).toHaveBeenCalledWith(
-        expect.objectContaining({ eventName: "order_authorize" })
+        expect.objectContaining({ eventName: "order_authorize" }),
       );
     });
     it("when forceRestAPI is true and callRestAPI throws", async () => {
@@ -111,7 +111,7 @@ describe("actions smart api fallback cases", () => {
         forceRestAPI: true,
       });
       expect(callSmartAPI).toHaveBeenCalledWith(
-        expect.objectContaining({ eventName: "order_authorize" })
+        expect.objectContaining({ eventName: "order_authorize" }),
       );
     });
     it("unless disableSmartApi is true", async () => {
@@ -122,7 +122,7 @@ describe("actions smart api fallback cases", () => {
           experiments: {
             disableSmartAPI: true,
           },
-        })
+        }),
       ).rejects.toThrowError("*_call_rest_api_error");
       expect(callSmartAPI).not.toHaveBeenCalled();
     });
@@ -132,7 +132,7 @@ describe("actions smart api fallback cases", () => {
     it("by default", async () => {
       await patchOrder(orderID, {}, orderAPIOptions);
       expect(callSmartAPI).toHaveBeenCalledWith(
-        expect.objectContaining({ eventName: "order_patch" })
+        expect.objectContaining({ eventName: "order_patch" }),
       );
     });
     it("when forceRestAPI is true and callRestAPI throws", async () => {
@@ -142,10 +142,10 @@ describe("actions smart api fallback cases", () => {
         {
           ...orderAPIOptions,
           forceRestAPI: true,
-        }
+        },
       );
       expect(callSmartAPI).toHaveBeenCalledWith(
-        expect.objectContaining({ eventName: "order_patch" })
+        expect.objectContaining({ eventName: "order_patch" }),
       );
     });
     it("unless disableSmartApi is true", async () => {
@@ -159,8 +159,8 @@ describe("actions smart api fallback cases", () => {
             experiments: {
               disableSmartAPI: true,
             },
-          }
-        )
+          },
+        ),
       ).rejects.toThrowError("*_call_rest_api_error");
       expect(callSmartAPI).not.toHaveBeenCalled();
     });
