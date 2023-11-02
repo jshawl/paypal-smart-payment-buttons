@@ -214,10 +214,10 @@ export function setupMocks() {
                 .awaitWindow()
                 .then((win) => {
                   if (!isSameDomain(win)) {
-                    // $FlowFixMe
                     throw new Error(
                       `Expected window passed to renderTo to be on same domain - expected ${getDomain(
                         window,
+                        // $FlowFixMe
                       )} but got ${getDomain(win)}`,
                     );
                   }

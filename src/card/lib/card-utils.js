@@ -58,8 +58,8 @@ export function assertType(
 }
 
 export function assertString<T>(...args: T): void | TypeError {
-  // $FlowFixMe
   assertType(
+    // $FlowFixMe
     args.every((s) => typeof s === "string"),
     "Expected a string",
   );
@@ -472,8 +472,8 @@ export function reformatPaymentSource(
         newObj.billing_address = {};
         Object.keys(paymentSource.billingAddress).forEach((billingKey) => {
           const snakeCaseBillingKey = reformatBillingKeys(billingKey);
-          // $FlowIssue
           newObj.billing_address[snakeCaseBillingKey] =
+            // $FlowIssue
             paymentSource.billingAddress[billingKey];
         });
       }

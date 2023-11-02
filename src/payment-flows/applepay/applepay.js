@@ -128,8 +128,8 @@ function initApplePay({
 
   function logApplePayEvent(event, payload) {
     const data = isJSON(payload) ? payload : {};
-    // $FlowFixMe
     getLogger()
+      // $FlowFixMe
       .info(`${FPTI_TRANSITION.APPLEPAY_EVENT}_${event}`, data)
       .track({
         [FPTI_KEY.TRANSITION]: `${FPTI_TRANSITION.APPLEPAY_EVENT}_${event}`,
@@ -301,8 +301,8 @@ function initApplePay({
         },
       };
 
-      // $FlowFixMe
       return onShippingChange(
+        // $FlowFixMe
         {
           ...data,
           facilitatorAccessToken,

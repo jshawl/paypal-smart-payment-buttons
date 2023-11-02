@@ -367,8 +367,8 @@ function initCheckout({
                 });
               })
               .then((wallet) => {
-                // $FlowFixMe
                 const walletInstruments =
+                  // $FlowFixMe
                   wallet[fundingSkipLogin] &&
                   wallet[fundingSkipLogin].instruments;
 
