@@ -163,7 +163,8 @@ function initApplePay({
     shipping: ?string,
     shippingLabel: ?string,
     shippingDetail: ?string,
-  |}): $ReadOnlyArray<ApplePayLineItem> {
+    // eslint-disable-next-line flowtype/no-mutable-array
+  |}): Array<ApplePayLineItem> {
     const newLineItems: Array<ApplePayLineItem> = [];
 
     if (subtotal && !isZeroAmount(subtotal)) {
