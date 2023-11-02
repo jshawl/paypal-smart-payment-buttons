@@ -88,6 +88,7 @@
     "@vitest/ui": "^0.25.3",
     "babel-core": "^7.0.0-bridge.0",
     "cross-env": "^7.0.3",
+    "eslint-config-prettier": "^9.0.0",
     "express": "^4.16.3",
     "flow-bin": "0.155.0",
     "flow-typed": "^3.8.0",
