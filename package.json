@@ -102,7 +102,7 @@
   },
   "lint-staged": {
     "vite.config.js": "prettier --write",
-    "**/{src,tests}/**/*.test.{js,jsx,json}": "prettier --write"
+    "**/{src,tests}/**/*.test.{js,jsx,json,css,md}": "prettier --write"
   },
   "license": "Apache-2.0"
 }
