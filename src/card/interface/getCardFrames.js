@@ -10,7 +10,6 @@ import { getExportsByFrameName } from "./getExportsByFrameName";
 
 // $FlowIgnore
 export function getCardFrames(): {|
-   
   cardFrame: ?ExportsOptions,
   cardNumberFrame: ExportsOptions,
   cardCVVFrame: ExportsOptions,

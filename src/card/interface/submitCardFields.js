@@ -112,9 +112,10 @@ function handlePurchaseFlow(
         });
       })
       .then((threeDsResponse) => {
-        // $FlowFixMe
         return cardProps.onApprove(
+          // $FlowFixMe
           { orderID, liabilityShift: threeDsResponse?.liability_shift },
+          // $FlowFixMe
           {},
         );
       })

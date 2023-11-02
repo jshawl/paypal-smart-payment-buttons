@@ -151,7 +151,6 @@ function initApplePay({
     });
   }
 
-   
   function updateNewLineItems({
     subtotal,
     tax,

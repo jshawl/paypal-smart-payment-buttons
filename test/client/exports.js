@@ -74,12 +74,10 @@ describe("exports cases", () => {
     await mockSetupButton({ facilitatorAccessToken });
 
     try {
-      await window.exports
-        .paymentSession()
-        .upgradeFacilitatorAccessToken({
-          facilitatorAccessToken,
-          orderID: "asdf4321",
-        });
+      await window.exports.paymentSession().upgradeFacilitatorAccessToken({
+        facilitatorAccessToken,
+        orderID: "asdf4321",
+      });
     } catch {
       throw new Error("Failed to upgrade LSAT");
     }
@@ -120,12 +118,10 @@ describe("exports cases", () => {
     await mockSetupButton({ facilitatorAccessToken });
 
     try {
-      await window.exports
-        .paymentSession()
-        .upgradeFacilitatorAccessToken({
-          facilitatorAccessToken,
-          orderID: "asdf4321",
-        });
+      await window.exports.paymentSession().upgradeFacilitatorAccessToken({
+        facilitatorAccessToken,
+        orderID: "asdf4321",
+      });
       throw new Error(`upgradeFacilitatorAccessToken should have failed`);
     } catch {
       // no-op error is expected
@@ -136,12 +132,10 @@ describe("exports cases", () => {
 
     setBuyerAccessToken(MOCK_BUYER_ACCESS_TOKEN);
     try {
-      await window.exports
-        .paymentSession()
-        .upgradeFacilitatorAccessToken({
-          facilitatorAccessToken,
-          orderID: "asdf4321",
-        });
+      await window.exports.paymentSession().upgradeFacilitatorAccessToken({
+        facilitatorAccessToken,
+        orderID: "asdf4321",
+      });
     } catch {
       throw new Error("Failed to upgrade LSAT");
     }
@@ -159,12 +153,10 @@ describe("exports cases", () => {
     await mockSetupButton({ facilitatorAccessToken });
 
     try {
-      await window.exports
-        .paymentSession()
-        .upgradeFacilitatorAccessToken({
-          facilitatorAccessToken,
-          orderID: "asdf4321",
-        });
+      await window.exports.paymentSession().upgradeFacilitatorAccessToken({
+        facilitatorAccessToken,
+        orderID: "asdf4321",
+      });
     } catch (error) {
       const err = new Error("Buyer access token not found");
       if (error.message !== err.message) {

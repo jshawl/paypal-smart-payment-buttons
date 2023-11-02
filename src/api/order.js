@@ -108,8 +108,8 @@ export function createOrderID(
 }
 
 export function isInvalidResourceIDError(err: mixed): boolean {
-  // $FlowFixMe
   return Boolean(
+    // $FlowFixMe
     err?.response?.body?.details?.some((detail) => {
       return detail.issue === ORDER_API_ERROR.INVALID_RESOURCE_ID;
     }),
@@ -276,7 +276,8 @@ export function isProcessorDeclineError(err: mixed): boolean {
   // $FlowFixMe
   const details = err?.response?.body?.data?.details
     ? err?.response?.body?.data?.details
-    : err?.response?.body?.details;
+    : // $FlowFixMe
+      err?.response?.body?.details;
   return Boolean(
     details?.some((detail) => {
       return (
@@ -288,8 +289,8 @@ export function isProcessorDeclineError(err: mixed): boolean {
 }
 
 export function isUnprocessableEntityError(err: mixed): boolean {
-  // $FlowFixMe
   return Boolean(
+    // $FlowFixMe
     err?.response?.body?.details?.some((detail) => {
       return detail.issue === ORDER_API_ERROR.DUPLICATE_INVOICE_ID;
     }),
