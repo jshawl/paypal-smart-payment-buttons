@@ -9,15 +9,15 @@ import { getExportsByFrameName } from "./getExportsByFrameName";
  So adding a flowIgnore to pass the typecheck failures*/
 
 // $FlowIgnore
-export function getCardFrames(): {
-  // eslint-disable-line flowtype/require-exact-type
+export function getCardFrames(): {|
+   
   cardFrame: ?ExportsOptions,
   cardNumberFrame: ExportsOptions,
   cardCVVFrame: ExportsOptions,
   cardExpiryFrame: ExportsOptions,
   cardNameFrame?: ?ExportsOptions,
   cardPostalFrame?: ?ExportsOptions,
-} {
+|} {
   const cardFrame = getExportsByFrameName(FRAME_NAME.CARD_FIELD);
   const cardNumberFrame = getExportsByFrameName(FRAME_NAME.CARD_NUMBER_FIELD);
   const cardCVVFrame = getExportsByFrameName(FRAME_NAME.CARD_CVV_FIELD);

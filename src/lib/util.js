@@ -22,8 +22,8 @@ export function unresolvedPromise<T>(): ZalgoPromise<T> {
   return new ZalgoPromise(noop);
 }
 
+// eslint-disable-next-line no-unused-vars
 export function promiseNoop<T>(...args: $ReadOnlyArray<T>): ZalgoPromise<void> {
-  // eslint-disable-line no-unused-vars
   return ZalgoPromise.resolve();
 }
 

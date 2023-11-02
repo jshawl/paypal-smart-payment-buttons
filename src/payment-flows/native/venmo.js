@@ -237,7 +237,6 @@ export function initVenmoWeb({
 
         setBuyerAccessToken(buyerAccessToken);
 
-        // eslint-disable-next-line no-use-before-define
         return (
           onApprove(
             {
@@ -248,6 +247,7 @@ export function initVenmoWeb({
               buyerAccessToken,
               authCode,
             },
+            // eslint-disable-next-line no-use-before-define
             { restart },
           )
             // eslint-disable-next-line no-use-before-define

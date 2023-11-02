@@ -473,7 +473,6 @@ function initCheckout({
 
         setBuyerAccessToken(buyerAccessToken);
 
-        // eslint-disable-next-line no-use-before-define
         return (
           onApprove(
             {
@@ -484,6 +483,7 @@ function initCheckout({
               buyerAccessToken,
               authCode,
             },
+            // eslint-disable-next-line no-use-before-define
             { restart },
           )
             // eslint-disable-next-line no-use-before-define

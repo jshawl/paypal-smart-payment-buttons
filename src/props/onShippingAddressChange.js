@@ -88,13 +88,14 @@ export type OnShippingAddressChangeActionsType = {|
 export function buildXOnShippingAddressChangeData(
   data: OnShippingAddressChangeData,
 ): XOnShippingAddressChangeDataType {
-  // eslint-disable-next-line no-unused-vars
+  /* eslint-disable no-unused-vars */
   const {
     amount,
     buyerAccessToken,
     event,
     forceRestAPI,
     shippingAddress,
+    /* eslint-enable no-unused-vars */
     ...rest
   } = data;
 

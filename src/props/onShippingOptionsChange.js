@@ -80,13 +80,14 @@ export type OnShippingOptionsChangeActionsType = {|
 export function buildXOnShippingOptionsChangeData(
   data: OnShippingOptionsChangeData,
 ): XOnShippingOptionsChangeDataType {
-  // eslint-disable-next-line no-unused-vars
+  /* eslint-disable no-unused-vars */
   const {
     amount,
     buyerAccessToken,
     event,
     forceRestAPI,
     options,
+    /* eslint-enable no-unused-vars */
     selectedShippingOption,
     ...rest
   } = data;

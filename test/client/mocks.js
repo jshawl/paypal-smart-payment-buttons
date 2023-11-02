@@ -153,10 +153,10 @@ export function setupMocks() {
                 .awaitWindow()
                 .then((win) => {
                   if (!isSameDomain(win)) {
-                    // $FlowFixMe
                     throw new Error(
                       `Expected window passed to renderTo to be on same domain - expected ${getDomain(
                         window,
+                        // $FlowFixMe
                       )} but got ${getDomain(win)}`,
                     );
                   }
@@ -903,10 +903,9 @@ export function getSubscriptionIdToCartIdApiMock(
   });
 }
 
-// eslint-disable-next-line default-param-last
 export function getGetSubscriptionApiMock(
   options: Object = {},
-  subscriptionID: string,
+  subscriptionID: string = "I-SUBSCRIPTIONID",
 ): MockEndpoint {
   return $mockEndpoint.register({
     method: "GET",
@@ -955,10 +954,9 @@ export function getReviseSubscriptionIdApiMock(
   });
 }
 
-// eslint-disable-next-line default-param-last
 export function getActivateSubscriptionIdApiMock(
   options: Object = {},
-  subscriptionID: string,
+  subscriptionID: string = "I-SUBSCRIPTIONID",
 ): MockEndpoint {
   return $mockEndpoint.register({
     method: "POST",
@@ -2039,16 +2037,17 @@ export function setCardFieldsValues({
   }
 }
 
+/* eslint-disable no-undef */
 type PostRobotMock = {|
   receive: <T>({|
-    // eslint-disable-line no-undef
     name: string,
     win?: CrossDomainWindowType,
     domain?: string,
     data?: mixed,
-  |}) => ZalgoPromise<T>, // eslint-disable-line no-undef
+  |}) => ZalgoPromise<T>,
   done: () => void,
 |};
+/* eslint-enable no-undef */
 
 export function getPostRobotMock(): PostRobotMock {
   let active = true;
