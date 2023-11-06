@@ -65,9 +65,7 @@ export type InputEventState = {|
   isFormValid: boolean,
 |};
 
-export type OnChange = ({|
-  ...InputEventState,
-|}) => ZalgoPromise<void>;
+export type OnChange = ({| ...InputEventState |}) => ZalgoPromise<void>;
 
 export type OnBlur = (InputEventState) => ZalgoPromise<void>;
 

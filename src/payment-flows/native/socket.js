@@ -92,9 +92,7 @@ type ConnectNativeOptions = {|
     onCancel: () => ZalgoPromise<{|
       buttonSessionID: string,
     |}>,
-    onShippingChange: ({|
-      data: OnShippingChangeData,
-    |}) => ZalgoPromise<{|
+    onShippingChange: ({| data: OnShippingChangeData |}) => ZalgoPromise<{|
       resolved: boolean,
     |}>,
     onError: ({|
@@ -104,9 +102,7 @@ type ConnectNativeOptions = {|
     |}) => ZalgoPromise<{|
       buttonSessionID: string,
     |}>,
-    onFallback: ({|
-      data?: NativeFallbackOptions,
-    |}) => ZalgoPromise<{|
+    onFallback: ({| data?: NativeFallbackOptions |}) => ZalgoPromise<{|
       buttonSessionID: string,
     |}>,
   |},

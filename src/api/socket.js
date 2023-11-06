@@ -75,9 +75,7 @@ export type MessageSocketOptions = {|
 export type MessageSocket = {|
   on: (
     name: string,
-    handler: ({|
-      data: Object,
-    |}) => ZalgoPromise<Object> | Object,
+    handler: ({| data: Object |}) => ZalgoPromise<Object> | Object,
     opts?: {|
       requireSessionUID?: boolean,
     |},

@@ -152,9 +152,7 @@ type NativeQRCodeOptions = {|
     |}) => ZalgoPromise<{|
       buttonSessionID: string,
     |}>,
-    onShippingChange: ({|
-      data: OnShippingChangeData,
-    |}) => ZalgoPromise<{|
+    onShippingChange: ({| data: OnShippingChangeData |}) => ZalgoPromise<{|
       resolved: boolean,
     |}>,
     onClose: () => ZalgoPromise<void>,
