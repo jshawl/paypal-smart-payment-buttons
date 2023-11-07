@@ -692,7 +692,6 @@ export function getOnApproveOrder({
               supplementalData.checkoutSession.cart &&
               supplementalData.checkoutSession.cart.paymentId);
           if (
-            experiments.btSdkOrdersV2Migration &&
             !paymentID &&
             !billingToken
           ) {
