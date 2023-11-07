@@ -29,7 +29,7 @@ describe("auth", () => {
     await upgradeFacilitatorAccessTokenWithIgnoreCache(
       facilitatorAccessToken,
       buyerAccessToken,
-      orderID
+      orderID,
     );
 
     expect(callGraphQL).toHaveBeenCalled();

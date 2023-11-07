@@ -40,7 +40,7 @@ describe("Native fallback cases", () => {
       windowOpener,
       "detectWebSwitch",
       expect.any(Object),
-      { domain: parentDomain }
+      { domain: parentDomain },
     );
   });
 });

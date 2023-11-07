@@ -11,7 +11,7 @@ vi.mock("@krakenjs/belter/src", async () => ({
     ZalgoPromise.resolve({
       status: 403,
       headers: {},
-    })
+    }),
   ),
 }));
 
@@ -29,11 +29,11 @@ describe("API", () => {
           accessToken: "accessToken",
           url: "",
           eventName: "order_capture",
-        })
+        }),
       ).rejects.toThrow();
 
       expect(warn).toHaveBeenCalledWith(
-        "rest_api_order_capture_status_403_error"
+        "rest_api_order_capture_status_403_error",
       );
 
       expect.assertions(2);

@@ -25,22 +25,25 @@ import { LOGGER_URL } from "../config";
 
 export function getLogger(): LoggerType {
   const disableSetCookieQuery = "disableSetCookie=true";
-  
-  const loggerUrl = window && typeof window.xprops === "object" && window.xprops.disableSetCookie
-  ? `${LOGGER_URL}?${disableSetCookieQuery}`
-  : LOGGER_URL;
-  
+
+  const loggerUrl =
+    window &&
+    typeof window.xprops === "object" &&
+    window.xprops.disableSetCookie
+      ? `${LOGGER_URL}?${disableSetCookieQuery}`
+      : LOGGER_URL;
+
   return inlineMemoize(getLogger, () =>
     Logger({
       url: loggerUrl,
       enableSendBeacon: true,
-    })
+    }),
   );
 }
 
 export const sendCountMetric = ({
   dimensions,
-  event = 'unused',
+  event = "unused",
   name,
   value = 1,
 }: {|
@@ -48,37 +51,39 @@ export const sendCountMetric = ({
   name: string,
   value?: number,
   dimensions: {
-    [string]: mixed
+    [string]: mixed,
   },
   // $FlowIssue return type
-|}) => getLogger().metric({
+|}) =>
+  getLogger().metric({
     dimensions,
     metricEventName: event,
     metricNamespace: name,
     metricValue: value,
-    metricType: "counter"
-  })
+    metricType: "counter",
+  });
 
-  export const sendGaugeMetric = ({
-    dimensions,
-    event = 'unused',
-    name,
-    value,
-  }: {|
-    event?: string,
-    name: string,
-    value: number,
-    dimensions: {
-      [string]: mixed
-    },
+export const sendGaugeMetric = ({
+  dimensions,
+  event = "unused",
+  name,
+  value,
+}: {|
+  event?: string,
+  name: string,
+  value: number,
+  dimensions: {
+    [string]: mixed,
+  },
   // $FlowIssue return type
-  |}) => getLogger().metric({
-      dimensions,
-      metricEventName: event,
-      metricNamespace: name,
-      metricValue: value,
-      metricType: "gauge"
-    })
+|}) =>
+  getLogger().metric({
+    dimensions,
+    metricEventName: event,
+    metricNamespace: name,
+    metricValue: value,
+    metricType: "gauge",
+  });
 
 type MobileEnvironment = $Values<typeof MOBILE_ENV>;
 
@@ -148,11 +153,11 @@ export function setupLogger({
     });
 
     sendCountMetric({
-      event: 'error',
-      name: 'pp.app.paypal_sdk.buttons.unhandled_exception.count',
+      event: "error",
+      name: "pp.app.paypal_sdk.buttons.unhandled_exception.count",
       dimensions: {
-        errorType: "payments_sdk_error"
-      }
+        errorType: "payments_sdk_error",
+      },
     });
 
     // eslint-disable-next-line promise/no-promise-in-callback

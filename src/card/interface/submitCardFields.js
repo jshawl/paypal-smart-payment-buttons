@@ -2,15 +2,24 @@
 
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
-import { getCardProps, getComponents, type PurchaseFlowCardProps, type VaultWithoutPurchaseFlowCardProps } from "../props"
-import { confirmOrderAPI } from "../../api"
-import { hcfTransactionError, hcfTransactionSuccess, hcfFieldsSubmit } from "../logger"
-import type { FeatureFlags } from "../../types"
-import type { BillingAddress, Card, ExtraFields } from '../types'
-import { convertCardToPaymentSource, reformatPaymentSource} from '../lib'
+import {
+  getCardProps,
+  getComponents,
+  type PurchaseFlowCardProps,
+  type VaultWithoutPurchaseFlowCardProps,
+} from "../props";
+import { confirmOrderAPI } from "../../api";
+import {
+  hcfTransactionError,
+  hcfTransactionSuccess,
+  hcfFieldsSubmit,
+} from "../logger";
+import type { FeatureFlags } from "../../types";
+import type { BillingAddress, Card, ExtraFields } from "../types";
+import { convertCardToPaymentSource, reformatPaymentSource } from "../lib";
 import { getLogger } from "../../lib/logger";
-import { SUBMIT_ERRORS } from "../constants"
-import { handleThreeDomainSecureContingency } from "../../lib/3ds"
+import { SUBMIT_ERRORS } from "../constants";
+import { handleThreeDomainSecureContingency } from "../../lib/3ds";
 import { PAYMENT_FLOWS } from "../../constants";
 
 import { resetGQLErrors } from "./gql";
@@ -30,13 +39,25 @@ type SubmitCardFieldsOptions = {|
   |},
 |};
 
-function handleVaultWithoutPurchaseFlow(cardProps: VaultWithoutPurchaseFlowCardProps, card: Card, extraFields?: ExtraFields): ZalgoPromise<void> {
+function handleVaultWithoutPurchaseFlow(
+  cardProps: VaultWithoutPurchaseFlowCardProps,
+  card: Card,
+  extraFields?: ExtraFields,
+): ZalgoPromise<void> {
   const { ThreeDomainSecure } = getComponents();
-  const { getParent, createVaultSetupToken, onError,clientID, onApprove, userIDToken, productAction } = cardProps;
+  const {
+    getParent,
+    createVaultSetupToken,
+    onError,
+    clientID,
+    onApprove,
+    userIDToken,
+    productAction,
+  } = cardProps;
 
   return savePaymentSource({
     onApprove,
-  // $FlowFixMe need to rethink how to pass down these props
+    // $FlowFixMe need to rethink how to pass down these props
     createVaultSetupToken,
     onError,
     getParent,
@@ -52,54 +73,67 @@ function handlePurchaseFlow(
   cardProps: PurchaseFlowCardProps,
   card: Card,
   extraFields: ?ExtraFields,
-  facilitatorAccessToken: string
+  facilitatorAccessToken: string,
 ): ZalgoPromise<void> {
   let orderID;
   const { ThreeDomainSecure } = getComponents();
-  const { createOrder, getParent, productAction} = cardProps;
+  const { createOrder, getParent, productAction } = cardProps;
 
-  return cardProps
-  // $FlowFixMe need to rethink how to pass down these props
-    .createOrder()
-    .then((id) => {
-      const payment_source = convertCardToPaymentSource(card, extraFields);
-      // eslint-disable-next-line flowtype/no-weak-types
-      const data: any = {
-        payment_source: {
-          // $FlowIssue
-          card: reformatPaymentSource(payment_source.card),
-        },
-      };
-      orderID = id;
-      return confirmOrderAPI(orderID, data, {
-        facilitatorAccessToken,
-        partnerAttributionID: "",
-        experiments: {}
+  return (
+    cardProps
+      // $FlowFixMe need to rethink how to pass down these props
+      .createOrder()
+      .then((id) => {
+        const payment_source = convertCardToPaymentSource(card, extraFields);
+        // eslint-disable-next-line flowtype/no-weak-types
+        const data: any = {
+          payment_source: {
+            // $FlowIssue
+            card: reformatPaymentSource(payment_source.card),
+          },
+        };
+        orderID = id;
+        return confirmOrderAPI(orderID, data, {
+          facilitatorAccessToken,
+          partnerAttributionID: "",
+          experiments: {},
+        });
       })
-    })
-    .then((res) => {
-      // $FlowFixMe
-      const { status, links } = res;
-      return handleThreeDomainSecureContingency({status, links, ThreeDomainSecure, createOrder, getParent, paymentFlow: productAction });
-    })
-    .then((threeDsResponse) => {
-      // $FlowFixMe
-      return cardProps.onApprove({ orderID, liabilityShift: threeDsResponse?.liability_shift }, {});
-    })
-    .then(() => {
-      hcfTransactionSuccess({ orderID });
-    })
-    .catch((error) => {
-      if (typeof error === "string") {
-        error = new Error(error);
-      }
-      hcfTransactionError({ error, orderID });
-      if (cardProps.onError) {
-        cardProps.onError(error);
-      }
+      .then((res) => {
+        // $FlowFixMe
+        const { status, links } = res;
+        return handleThreeDomainSecureContingency({
+          status,
+          links,
+          ThreeDomainSecure,
+          createOrder,
+          getParent,
+          paymentFlow: productAction,
+        });
+      })
+      .then((threeDsResponse) => {
+        return cardProps.onApprove(
+          // $FlowFixMe
+          { orderID, liabilityShift: threeDsResponse?.liability_shift },
+          // $FlowFixMe
+          {},
+        );
+      })
+      .then(() => {
+        hcfTransactionSuccess({ orderID });
+      })
+      .catch((error) => {
+        if (typeof error === "string") {
+          error = new Error(error);
+        }
+        hcfTransactionError({ error, orderID });
+        if (cardProps.onError) {
+          cardProps.onError(error);
+        }
 
-      throw error;
-    });
+        throw error;
+      })
+  );
 }
 
 export function submitCardFields({
@@ -119,10 +153,8 @@ export function submitCardFields({
     if (cardProps.userIDToken) {
       facilitatorAccessToken = cardProps.userIDToken;
     } else {
-      getLogger().info(`hcf_userIDToken_present_false`)
+      getLogger().info(`hcf_userIDToken_present_false`);
     }
-      
-
   }
   hcfFieldsSubmit({
     cardFlowType: cardProps.productAction,
@@ -143,7 +175,7 @@ export function submitCardFields({
           cardProps,
           card,
           extraFields,
-          facilitatorAccessToken
+          facilitatorAccessToken,
         );
       }
       case PAYMENT_FLOWS.VAULT_WITHOUT_PURCHASE: {

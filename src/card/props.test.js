@@ -35,7 +35,7 @@ describe("getCardProps", () => {
       getCardProps({
         ...inputs,
         experiments: { hostedCardFields: false, useIDToken: false },
-      })
+      }),
     ).toThrowError(SUBMIT_ERRORS.NOT_FEATURE_FLAGGED);
   });
 
@@ -46,7 +46,7 @@ describe("getCardProps", () => {
     // $FlowIssue
     window.xprops.createVaultSetupToken = undefined;
     expect(() => getCardProps(inputs)).toThrowError(
-      SUBMIT_ERRORS.MISSING_BOTH_FUNCTIONS
+      SUBMIT_ERRORS.MISSING_BOTH_FUNCTIONS,
     );
   });
 
@@ -57,7 +57,7 @@ describe("getCardProps", () => {
       };
 
       expect(() => getCardProps(inputs)).toThrowError(
-        SUBMIT_ERRORS.MISSING_ONAPPROVE
+        SUBMIT_ERRORS.MISSING_ONAPPROVE,
       );
     });
 
@@ -70,7 +70,7 @@ describe("getCardProps", () => {
       };
 
       expect(() => getCardProps(inputs)).toThrow(
-        SUBMIT_ERRORS.PASSING_BOTH_FUNCTIONS
+        SUBMIT_ERRORS.PASSING_BOTH_FUNCTIONS,
       );
     });
 
@@ -83,7 +83,7 @@ describe("getCardProps", () => {
         expect.objectContaining({
           createVaultSetupToken: expect.any(Function),
           onApprove: expect.any(Function),
-        })
+        }),
       );
     });
   });

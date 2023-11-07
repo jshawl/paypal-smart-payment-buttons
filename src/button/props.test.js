@@ -41,7 +41,7 @@ describe("getButtonProps", () => {
   it("should retrieve callbackProps", () => {
     const callbackPropsSpy = vi.spyOn(
       getCallbackPropsStuff,
-      "getCallbackProps"
+      "getCallbackProps",
     );
 
     window.xprops.intent = INTENT.CAPTURE;
@@ -64,14 +64,14 @@ describe("getButtonProps", () => {
     window.xprops.createBillingAgreement = vi.fn();
     window.xprops.createOrder = vi.fn();
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Do not pass both createBillingAgreement and createOrder"
+      "Do not pass both createBillingAgreement and createOrder",
     );
   });
 
   it("should fail if createBillingAgreement is passed in but not vault", () => {
     window.xprops.createBillingAgreement = vi.fn();
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Must pass vault=true to sdk to use createBillingAgreement"
+      "Must pass vault=true to sdk to use createBillingAgreement",
     );
   });
 
@@ -79,21 +79,21 @@ describe("getButtonProps", () => {
     window.xprops.createSubscription = vi.fn();
     window.xprops.createOrder = vi.fn();
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Do not pass both createSubscription and createOrder"
+      "Do not pass both createSubscription and createOrder",
     );
   });
 
   it("should fail if createSubscription but not vault", () => {
     window.xprops.createSubscription = vi.fn();
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Must pass vault=true to sdk to use createSubscription"
+      "Must pass vault=true to sdk to use createSubscription",
     );
   });
 
   it("should fail if intent is tokenize but no createBillingAgreement", () => {
     window.xprops.intent = INTENT.TOKENIZE;
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Must pass createBillingAgreement with intent=tokenize"
+      "Must pass createBillingAgreement with intent=tokenize",
     );
   });
 
@@ -102,7 +102,7 @@ describe("getButtonProps", () => {
     window.xprops.createBillingAgreement = vi.fn();
     window.xprops.createOrder = () => "ok";
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Do not pass both createBillingAgreement and createOrder"
+      "Do not pass both createBillingAgreement and createOrder",
     );
   });
 
@@ -111,7 +111,7 @@ describe("getButtonProps", () => {
     window.xprops.createBillingAgreement = vi.fn();
     window.xprops.createSubscription = vi.fn();
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Must pass vault=true to sdk to use createBillingAgreement"
+      "Must pass vault=true to sdk to use createBillingAgreement",
     );
   });
 
@@ -119,7 +119,7 @@ describe("getButtonProps", () => {
     window.xprops.intent = INTENT.SUBSCRIPTION;
     window.xprops.vault = true;
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Must pass createSubscription with intent=subscription"
+      "Must pass createSubscription with intent=subscription",
     );
   });
 
@@ -129,7 +129,7 @@ describe("getButtonProps", () => {
     window.xprops.createSubscription = vi.fn();
     window.xprops.createOrder = vi.fn();
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Do not pass both createSubscription and createOrder"
+      "Do not pass both createSubscription and createOrder",
     );
   });
 
@@ -139,7 +139,7 @@ describe("getButtonProps", () => {
     window.xprops.createSubscription = vi.fn();
     window.xprops.createBillingAgreement = vi.fn();
     expect(() => getButtonProps(defaultArgs)).toThrowError(
-      "Do not pass both createSubscription and createBillingAgreement"
+      "Do not pass both createSubscription and createBillingAgreement",
     );
   });
 });

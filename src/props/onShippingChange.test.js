@@ -64,7 +64,7 @@ describe("onShippingChange", () => {
           onShippingChange: merchantOnShippingChange,
           partnerAttributionID,
         },
-        { facilitatorAccessToken, createOrder }
+        { facilitatorAccessToken, createOrder },
       );
 
       if (fn) {
@@ -77,7 +77,7 @@ describe("onShippingChange", () => {
           paymentID: "abc123",
           paymentId: "abc123",
         }),
-        expect.anything()
+        expect.anything(),
       );
     });
 
@@ -104,7 +104,7 @@ describe("onShippingChange", () => {
             experiments,
             clientID,
           },
-          { facilitatorAccessToken, createOrder }
+          { facilitatorAccessToken, createOrder },
         );
 
         const data = { buyerAccessToken };
@@ -145,7 +145,7 @@ describe("onShippingChange", () => {
             experiments,
             clientID,
           },
-          { facilitatorAccessToken, createOrder }
+          { facilitatorAccessToken, createOrder },
         );
 
         const data = { appName: "xoon", buyerAccessToken };
@@ -185,14 +185,14 @@ describe("onShippingChange", () => {
             experiments,
             clientID,
           },
-          { facilitatorAccessToken, createOrder }
+          { facilitatorAccessToken, createOrder },
         );
 
         const data = { buyerAccessToken };
 
         if (fn) {
           await expect(fn(data, invocationActions)).rejects.toThrow(
-            "Order could not be patched"
+            "Order could not be patched",
           );
         }
 
@@ -221,7 +221,7 @@ describe("onShippingChange", () => {
             experiments,
             clientID,
           },
-          { facilitatorAccessToken, createOrder }
+          { facilitatorAccessToken, createOrder },
         );
         const data = { appName: "weasley", buyerAccessToken: null };
 
@@ -258,12 +258,12 @@ describe("onShippingChange", () => {
             experiments,
             clientID,
           },
-          { facilitatorAccessToken, createOrder }
+          { facilitatorAccessToken, createOrder },
         );
 
         if (fn) {
           await expect(fn({}, invocationActions)).rejects.toThrow(
-            "Order could not be patched"
+            "Order could not be patched",
           );
         }
 
@@ -372,7 +372,7 @@ describe("onShippingChange", () => {
           rejected: "[\"/purchase_units/@reference_id=='default'\"]",
           hasBuyerAccessToken: "true",
           shouldUsePatchShipping: "false",
-        }
+        },
       );
     });
 
@@ -421,7 +421,7 @@ describe("onShippingChange", () => {
           appName: "weasley",
           hasBuyerAccessToken: "false",
           shouldUsePatchShipping: "true",
-        }
+        },
       );
     });
   });

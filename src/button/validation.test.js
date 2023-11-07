@@ -89,7 +89,7 @@ describe("validate order", () => {
 
       expect(logger.warn).toBeCalledWith(
         "smart_button_validation_error_vault_passed_with_create_vault_setup_token",
-        expect.any(Object)
+        expect.any(Object),
       );
     });
   });

@@ -94,7 +94,7 @@ export type PaymentSourceInput = {|
       addressLine2?: string,
       adminArea1?: string,
       adminArea2?: string,
-      countryCode: string
+      countryCode: string,
     |},
   |},
 |};
@@ -136,14 +136,13 @@ export const updateVaultSetupToken = ({
       clientID,
       vaultSetupToken,
       paymentSource,
-      idToken
+      idToken,
     },
   });
 
 export function vaultApprovalSessionIdToOrderId(
-  approvalSessionId: string
+  approvalSessionId: string,
 ): ZalgoPromise<string> {
-
   return callSmartAPI({
     authenticated: false,
     method: "post",
@@ -151,6 +150,5 @@ export function vaultApprovalSessionIdToOrderId(
     url: `${SMART_API_URI.VAULT}/${approvalSessionId}/ectoken`,
   }).then(({ data }) => {
     return data.token;
-  })
-
+  });
 }

@@ -50,7 +50,7 @@ describe("getFieldErrors", () => {
         "INVALID_EXPIRY",
         "INVALID_NAME",
         "INVALID_POSTAL",
-      ].sort()
+      ].sort(),
     );
   });
 
@@ -67,7 +67,7 @@ describe("getFieldErrors", () => {
     fields.cardCvvField.isValid = true;
     // $FlowFixMe
     expect(getFieldErrors(fields).sort()).toEqual(
-      ["INVALID_NUMBER", "INVALID_NAME", "INVALID_POSTAL"].sort()
+      ["INVALID_NUMBER", "INVALID_NAME", "INVALID_POSTAL"].sort(),
     );
   });
 });

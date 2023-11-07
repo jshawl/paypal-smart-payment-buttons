@@ -35,6 +35,8 @@
     "deploy": "npm run cdnify",
     "flow": "flow",
     "flow-typed": "rm -rf ./flow-typed && flow-typed install --ignoreDeps peer && flow-typed install jest@24 mocha@4 && flow-typed install express@4.16 && sed -i -e 's/http$IncomingMessage,/http$IncomingMessage<>,/g' ./flow-typed/npm/express_v4.16.x.js",
+    "format": "prettier --write --ignore-unknown .",
+    "format:check": "prettier --check .",
     "karma": "cross-env NODE_ENV=test babel-node --plugins=transform-es2015-modules-commonjs ./node_modules/.bin/karma start",
     "lint": "eslint --ext .js --ext .jsx src/ test/ *.js",
     "postactivate": "npm run cdnify -- --commitonly",
@@ -47,7 +49,7 @@
     "release:dry-run": "DRY_RUN=true grabthar-release",
     "setup": "npm install && npm run flow-typed",
     "start": "npm run webpack -- --progress --watch",
-    "test": "npm run coverage && npm run karma",
+    "test": "npm run format:check && npm run coverage && npm run karma",
     "typecheck": "npm run flow-typed && npm run flow -- check",
     "vitest": "vitest",
     "webpack": "babel-node --plugins=transform-es2015-modules-commonjs $(npm bin)/webpack",
@@ -88,6 +90,7 @@
     "@vitest/ui": "^0.25.3",
     "babel-core": "^7.0.0-bridge.0",
     "cross-env": "^7.0.3",
+    "eslint-config-prettier": "^9.0.0",
     "express": "^4.16.3",
     "flow-bin": "0.155.0",
     "flow-typed": "^3.8.0",
@@ -95,13 +98,13 @@
     "husky": "^8.0.2",
     "jsdom": "^22.0.0",
     "lint-staged": "^13.0.4",
-    "prettier": "^2.8.0",
+    "prettier": "^3.0.3",
     "vite": "^3.2.4",
     "vitest": "^0.32.0"
   },
   "lint-staged": {
     "vite.config.js": "prettier --write",
-    "**/{src,tests}/**/*.test.{js,jsx,json}": "prettier --write"
+    "**/{src,tests}/**/*.test.{js,jsx,json,css,md}": "prettier --write"
   },
   "license": "Apache-2.0"
 }

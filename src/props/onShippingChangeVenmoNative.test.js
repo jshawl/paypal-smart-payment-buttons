@@ -73,7 +73,7 @@ describe("onShippingChange", () => {
             experiments,
             clientID,
           },
-          { facilitatorAccessToken, createOrder }
+          { facilitatorAccessToken, createOrder },
         );
 
         const data = { buyerAccessToken };
@@ -143,7 +143,7 @@ describe("onShippingChange", () => {
             experiments,
             clientID,
           },
-          { facilitatorAccessToken, createOrder }
+          { facilitatorAccessToken, createOrder },
         );
 
         const data = { buyerAccessToken };

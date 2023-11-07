@@ -1,82 +1,117 @@
 /* @flow */
 /* eslint require-await: off, max-lines: off, max-nested-callbacks: off */
 
-import { wrapPromise } from '@krakenjs/belter/src';
-import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { FUNDING, CARD } from '@paypal/sdk-constants/src';
+import { wrapPromise } from "@krakenjs/belter/src";
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import { FUNDING, CARD } from "@paypal/sdk-constants/src";
 
-import { mockSetupButton, generateOrderID, mockAsyncProp, createButtonHTML, mockFunction, clickButton, DEFAULT_FUNDING_ELIGIBILITY } from './mocks';
+import {
+  mockSetupButton,
+  generateOrderID,
+  mockAsyncProp,
+  createButtonHTML,
+  mockFunction,
+  clickButton,
+  DEFAULT_FUNDING_ELIGIBILITY,
+} from "./mocks";
 
-describe('card field cases', () => {
+describe("card field cases", () => {
+  it("should render a button with createOrder, click the button, and render checkout", async () => {
+    return await wrapPromise(async ({ expect, avoid }) => {
+      const orderID = generateOrderID();
+      const payerID = "AAABBBCCC";
 
-    it('should render a button with createOrder, click the button, and render checkout', async () => {
-        return await wrapPromise(async ({ expect, avoid }) => {
-            const orderID = generateOrderID();
-            const payerID = 'AAABBBCCC';
+      window.xprops.createOrder = mockAsyncProp(
+        expect("createOrder", async () => {
+          return ZalgoPromise.try(() => {
+            return orderID;
+          });
+        }),
+      );
 
-            window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
-                return ZalgoPromise.try(() => {
-                    return orderID;
-                });
-            }));
+      window.xprops.onCancel = avoid("onCancel");
 
-            window.xprops.onCancel = avoid('onCancel');
+      window.xprops.onApprove = mockAsyncProp(
+        expect("onApprove", async (data) => {
+          if (data.orderID !== orderID) {
+            throw new Error(
+              `Expected orderID to be ${orderID}, got ${data.orderID}`,
+            );
+          }
 
-            window.xprops.onApprove = mockAsyncProp(expect('onApprove', async (data) => {
-                if (data.orderID !== orderID) {
-                    throw new Error(`Expected orderID to be ${ orderID }, got ${ data.orderID }`);
+          if (data.payerID !== payerID) {
+            throw new Error(
+              `Expected payerID to be ${payerID}, got ${data.payerID}`,
+            );
+          }
+        }),
+      );
+
+      mockFunction(
+        window.paypal,
+        "CardForm",
+        expect("CardForm", ({ original: CheckoutOriginal, args: [props] }) => {
+          mockFunction(
+            props,
+            "onApprove",
+            expect(
+              "onApprove",
+              ({ original: onApproveOriginal, args: [data, actions] }) => {
+                return onApproveOriginal({ ...data, payerID }, actions);
+              },
+            ),
+          );
+
+          const checkoutInstance = CheckoutOriginal(props);
+
+          mockFunction(
+            checkoutInstance,
+            "render",
+            expect("remder", async ({ original: renderToOriginal, args }) => {
+              return props.createOrder().then((id) => {
+                if (id !== orderID) {
+                  throw new Error(
+                    `Expected orderID to be ${orderID}, got ${id}`,
+                  );
                 }
 
-                if (data.payerID !== payerID) {
-                    throw new Error(`Expected payerID to be ${ payerID }, got ${ data.payerID }`);
-                }
-            }));
+                return renderToOriginal(...args);
+              });
+            }),
+          );
 
-            mockFunction(window.paypal, 'CardForm', expect('CardForm', ({ original: CheckoutOriginal, args: [ props ] }) => {
+          return checkoutInstance;
+        }),
+      );
 
-                mockFunction(props, 'onApprove', expect('onApprove', ({ original: onApproveOriginal, args: [ data, actions ] }) => {
-                    return onApproveOriginal({ ...data, payerID }, actions);
-                }));
+      const fundingEligibility = {
+        ...DEFAULT_FUNDING_ELIGIBILITY,
+        [FUNDING.CARD]: {
+          eligible: true,
+          branded: true,
+          vendors: {
+            [CARD.VISA]: {
+              eligible: true,
+            },
+            [CARD.AMEX]: {
+              eligible: true,
+            },
+            [CARD.MASTERCARD]: {
+              eligible: true,
+            },
+          },
+        },
+      };
 
-                const checkoutInstance = CheckoutOriginal(props);
+      createButtonHTML({ fundingEligibility });
 
-                mockFunction(checkoutInstance, 'render', expect('remder', async ({ original: renderToOriginal, args }) => {
-                    return props.createOrder().then(id => {
-                        if (id !== orderID) {
-                            throw new Error(`Expected orderID to be ${ orderID }, got ${ id }`);
-                        }
+      await mockSetupButton({
+        merchantID: ["XYZ12345"],
+        fundingEligibility,
+        eligibility: { cardFields: true },
+      });
 
-                        return renderToOriginal(...args);
-                    });
-                }));
-
-                return checkoutInstance;
-            }));
-
-            const fundingEligibility = {
-                ...DEFAULT_FUNDING_ELIGIBILITY,
-                [ FUNDING.CARD]: {
-                    eligible: true,
-                    branded: true,
-                    vendors:  {
-                        [ CARD.VISA ]: {
-                            eligible: true
-                        },
-                        [ CARD.AMEX ]: {
-                            eligible: true
-                        },
-                        [ CARD.MASTERCARD ]: {
-                            eligible: true
-                        }
-                    }
-                }
-            };
-
-            createButtonHTML({ fundingEligibility });
-
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility, eligibility: { cardFields: true } });
-
-            await clickButton(FUNDING.CARD);
-        });
+      await clickButton(FUNDING.CARD);
     });
+  });
 });

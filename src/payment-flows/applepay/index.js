@@ -1,3 +1,3 @@
 /* @flow */
 
-export * from './applepay';
+export * from "./applepay";

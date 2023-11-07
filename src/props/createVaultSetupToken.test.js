@@ -41,7 +41,7 @@ describe("decorate createVaultSetupToken", () => {
     });
 
     await expect(decoratedCreateVaultSetupToken()).rejects.toThrowError(
-      "Expected a vault setup token to be returned from createVaultSetupToken"
+      "Expected a vault setup token to be returned from createVaultSetupToken",
     );
   });
 
@@ -78,11 +78,11 @@ describe("decorate createVaultSetupToken", () => {
       });
 
       await expect(decoratedCreateVaultSetupToken()).rejects.toThrowError(
-        "Expected a vault setup token to be returned from createVaultSetupToken"
+        "Expected a vault setup token to be returned from createVaultSetupToken",
       );
 
       expect(trackMock).toBeCalledWith(expectedTrackPayload);
-    }
+    },
   );
 
   test("should succeed with setupToken and send success analytics", async () => {

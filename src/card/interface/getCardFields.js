@@ -1,12 +1,12 @@
 /* @flow */
 
-import { FRAME_NAME } from '../../constants';
-import { CARD_ERRORS } from '../constants';
-import type { Card, CardType } from '../types';
-import { checkCardEligibility } from '../lib';
+import { FRAME_NAME } from "../../constants";
+import { CARD_ERRORS } from "../constants";
+import type { Card, CardType } from "../types";
+import { checkCardEligibility } from "../lib";
 
-import { getExportsByFrameName } from './getExportsByFrameName';
-import { getCardFrames } from './getCardFrames';
+import { getExportsByFrameName } from "./getExportsByFrameName";
+import { getCardFrames } from "./getCardFrames";
 
 export function getCardFields(productAction: string): Card {
   const card = {};
@@ -21,7 +21,7 @@ export function getCardFields(productAction: string): Card {
     cardCVVFrame,
     cardExpiryFrame,
     cardNameFrame,
-    cardPostalFrame
+    cardPostalFrame,
   } = getCardFrames();
 
   // 3 Required fields for HCFs purchase

@@ -41,7 +41,7 @@ describe("decorate createOrder", () => {
 
     // $FlowIssue
     expect(decoratedCreateOrder()).rejects.toThrowError(
-      "Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead"
+      "Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead",
     );
   });
 
@@ -53,7 +53,7 @@ describe("decorate createOrder", () => {
 
     // $FlowIssue
     expect(decoratedCreateOrder()).rejects.toThrowError(
-      "Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead"
+      "Do not pass PAY-XXX or PAYID-XXX directly into createOrder. Pass the EC-XXX token instead",
     );
   });
 
@@ -71,7 +71,7 @@ describe("decorate createOrder", () => {
 
     // $FlowIssue
     expect(decoratedCreateOrder()).rejects.toThrowError(
-      "Expected an order id to be passed"
+      "Expected an order id to be passed",
     );
   });
 

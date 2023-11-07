@@ -16,7 +16,9 @@ export type XCreateVaultSetupTokenDataType = {|
 // Create... is the internal version of the function passed by the merchant.
 // We decorate Create... with our own config, pass through specific options needed,
 // and sometimes making additional API or logging calls.
-export type XCreateVaultSetupToken = ?(XCreateVaultSetupTokenDataType) => ZalgoPromise<string>;
+export type XCreateVaultSetupToken = ?(
+  XCreateVaultSetupTokenDataType,
+) => ZalgoPromise<string>;
 export type CreateVaultSetupToken = () => ZalgoPromise<string>;
 
 export const getCreateVaultSetupToken = ({
@@ -29,13 +31,15 @@ export const getCreateVaultSetupToken = ({
   }
 
   return memoize(() => {
-    return createVaultSetupToken({paymentSource: FUNDING.CARD}).then((vaultSetupToken) => {
-      if (!vaultSetupToken || typeof vaultSetupToken !== "string") {
-        throw new Error(
-          `Expected a vault setup token to be returned from createVaultSetupToken`
-        );
-      }
-      return vaultSetupToken;
-    });
+    return createVaultSetupToken({ paymentSource: FUNDING.CARD }).then(
+      (vaultSetupToken) => {
+        if (!vaultSetupToken || typeof vaultSetupToken !== "string") {
+          throw new Error(
+            `Expected a vault setup token to be returned from createVaultSetupToken`,
+          );
+        }
+        return vaultSetupToken;
+      },
+    );
   });
 };

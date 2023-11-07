@@ -1,4 +1,4 @@
 /* @flow */
 
-export * from './popup';
-export * from './template';
+export * from "./popup";
+export * from "./template";

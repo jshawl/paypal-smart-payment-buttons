@@ -15,7 +15,7 @@ const { SERVICE_WORKER_URL } = SERVICE_WORKER;
 const waitForExpect = function waitForExpect(
   expectation: () => void | Promise<void>,
   timeout = 4500,
-  interval = 50
+  interval = 50,
   // eslint-disable-next-line flowtype/no-weak-types
 ): Promise<any> {
   if (interval < 1) {
@@ -92,7 +92,7 @@ describe("Test service worker url generation", () => {
       "service-worker.d13e6de5a39aafd6b06bd1d18d165c8d.js";
     const sanitizedUrl = getSanitizedUrl(
       invalidReleaseHash,
-      dumbledoreServiceWorker
+      dumbledoreServiceWorker,
     );
     const expectedUrl =
       "https://www.paypal.com/checkout-sw/service-worker.d13e6de5a39aafd6b06bd1d18d165c8d.js?releaseHash=b6cc430fb82802fb9363767b8a7c38187fa4a9d7";
@@ -106,7 +106,7 @@ describe("Test service worker url generation", () => {
       "service-worker.d13e6de5a39aafd6b06bd1d18d165c8d.js";
     const sanitizedUrl = getSanitizedUrl(
       invalidReleaseHash,
-      dumbledoreServiceWorker
+      dumbledoreServiceWorker,
     );
     const expectedUrl =
       "https://www.paypal.com/checkout-sw/service-worker.d13e6de5a39aafd6b06bd1d18d165c8d.js?releaseHash=b6cc430fb82802fb9363767b8a7c38187fa4a9d7";

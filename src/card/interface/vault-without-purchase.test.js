@@ -48,7 +48,7 @@ describe("savePaymentSource", () => {
 
   test("should handle failure from merchant-supplied createVaultSetupToken", async () => {
     const createVaultSetupTokenError = new Error(
-      "error with create vault setup token"
+      "error with create vault setup token",
     );
     const rejectCreateVaultSetupToken = vi
       .fn()
@@ -59,7 +59,7 @@ describe("savePaymentSource", () => {
       savePaymentSource({
         ...defaultOptions,
         ...defaultSave({ createVaultSetupToken: rejectCreateVaultSetupToken }),
-      })
+      }),
     ).rejects.toThrow(createVaultSetupTokenError);
     expect(vaultWithoutPurchaseSuccess).not.toHaveBeenCalled();
     expect(vaultWithoutPurchaseFailure).toHaveBeenCalledWith({
@@ -70,7 +70,7 @@ describe("savePaymentSource", () => {
 
   test("should handle failure from performing POST on a setup vault token", async () => {
     const updateVaultSetupTokenError = new Error(
-      "error with update vault setup token"
+      "error with update vault setup token",
     );
 
     // $FlowIssue
@@ -78,7 +78,7 @@ describe("savePaymentSource", () => {
 
     expect.assertions(4);
     await expect(savePaymentSource(defaultOptions)).rejects.toBe(
-      updateVaultSetupTokenError
+      updateVaultSetupTokenError,
     );
     expect(vaultWithoutPurchaseSuccess).not.toHaveBeenCalled();
     expect(vaultWithoutPurchaseFailure).toHaveBeenCalledWith({
@@ -101,7 +101,7 @@ describe("savePaymentSource", () => {
       savePaymentSource({
         ...defaultOptions,
         ...defaultSave({ onApprove: rejectOnApprove }),
-      })
+      }),
     ).rejects.toThrow(onApproveError);
     expect(vaultWithoutPurchaseSuccess).not.toHaveBeenCalled();
     expect(vaultWithoutPurchaseFailure).toHaveBeenCalledWith({

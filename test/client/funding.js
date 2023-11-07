@@ -1,383 +1,467 @@
 /* @flow */
 
-import { FUNDING } from '@paypal/sdk-constants';
-import { wrapPromise } from '@krakenjs/belter/src';
+import { FUNDING } from "@paypal/sdk-constants";
+import { wrapPromise } from "@krakenjs/belter/src";
 
-import { promiseNoop } from '../../src/lib';
+import { promiseNoop } from "../../src/lib";
 
-import { mockSetupButton, createButtonHTML, DEFAULT_FUNDING_ELIGIBILITY, mockFunction, clickButton } from './mocks';
+import {
+  mockSetupButton,
+  createButtonHTML,
+  DEFAULT_FUNDING_ELIGIBILITY,
+  mockFunction,
+  clickButton,
+} from "./mocks";
 
-describe('funding source cases', () => {
+describe("funding source cases", () => {
+  it("should render a button, click the button, and render checkout with paypal funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.PAYPAL;
 
-    it('should render a button, click the button, and render checkout with paypal funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.PAYPAL;
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+      createButtonHTML();
 
-            createButtonHTML();
+      await mockSetupButton({
+        merchantID: ["XYZ12345"],
+        fundingEligibility: DEFAULT_FUNDING_ELIGIBILITY,
+      });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility: DEFAULT_FUNDING_ELIGIBILITY });
-
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with ideal funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.IDEAL;
+  it("should render a button, click the button, and render checkout with ideal funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.IDEAL;
 
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+      const fundingEligibility = {
+        ideal: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            const fundingEligibility = {
-                ideal: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      createButtonHTML({ fundingEligibility });
 
-            createButtonHTML({ fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
-
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
+  it("should render a button, click the button, and render checkout with sofort funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.SOFORT;
 
-    it('should render a button, click the button, and render checkout with sofort funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.SOFORT;
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+      const fundingEligibility = {
+        sofort: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            const fundingEligibility = {
-                sofort: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      createButtonHTML({ fundingEligibility });
 
-            createButtonHTML({ fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
-
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with p24 funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.P24;
+  it("should render a button, click the button, and render checkout with p24 funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.P24;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                p24: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        p24: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with bancontact funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.BANCONTACT;
+  it("should render a button, click the button, and render checkout with bancontact funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.BANCONTACT;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                bancontact: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        bancontact: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with blik funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.BLIK;
+  it("should render a button, click the button, and render checkout with blik funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.BLIK;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                blik: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        blik: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with eps funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.EPS;
+  it("should render a button, click the button, and render checkout with eps funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.EPS;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                eps: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        eps: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with giropay funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.GIROPAY;
+  it("should render a button, click the button, and render checkout with giropay funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.GIROPAY;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                giropay: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        giropay: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with mybank funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.MYBANK;
+  it("should render a button, click the button, and render checkout with mybank funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.MYBANK;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                mybank: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        mybank: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with trustly funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.TRUSTLY;
+  it("should render a button, click the button, and render checkout with trustly funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.TRUSTLY;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                trustly: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        trustly: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with trustly funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.MULTIBANCO;
+  it("should render a button, click the button, and render checkout with trustly funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.MULTIBANCO;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                multibanco: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        multibanco: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with satispay funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.SATISPAY;
+  it("should render a button, click the button, and render checkout with satispay funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.SATISPAY;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                satispay: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        satispay: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 
-    it('should render a button, click the button, and render checkout with paidy funding source', async () => {
-        return await wrapPromise(async ({ expect }) => {
-            const fundingSource = FUNDING.PAIDY;
+  it("should render a button, click the button, and render checkout with paidy funding source", async () => {
+    return await wrapPromise(async ({ expect }) => {
+      const fundingSource = FUNDING.PAIDY;
 
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ args: [ props ] }) => {
-                if (props.fundingSource !== fundingSource) {
-                    throw new Error(`Expected fundingSource to be ${ fundingSource }, got ${ props.fundingSource }`);
-                }
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ args: [props] }) => {
+          if (props.fundingSource !== fundingSource) {
+            throw new Error(
+              `Expected fundingSource to be ${fundingSource}, got ${props.fundingSource}`,
+            );
+          }
 
-                return {
-                    renderTo: promiseNoop
-                };
-            }));
+          return {
+            renderTo: promiseNoop,
+          };
+        }),
+      );
 
-            const fundingEligibility = {
-                paidy: {
-                    eligible: true,
-                    branded: false
-                }
-            };
+      const fundingEligibility = {
+        paidy: {
+          eligible: true,
+          branded: false,
+        },
+      };
 
-            createButtonHTML({ fundingEligibility });
+      createButtonHTML({ fundingEligibility });
 
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility });
+      await mockSetupButton({ merchantID: ["XYZ12345"], fundingEligibility });
 
-            await clickButton(fundingSource);
-        });
+      await clickButton(fundingSource);
     });
+  });
 });

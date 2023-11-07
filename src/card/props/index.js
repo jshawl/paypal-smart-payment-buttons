@@ -8,7 +8,11 @@ import {
   type FundingEligibilityType,
 } from "@paypal/sdk-constants/src";
 
-import type { ProxyWindow, FeatureFlags, ThreeDomainSecureFlowType } from "../../types";
+import type {
+  ProxyWindow,
+  FeatureFlags,
+  ThreeDomainSecureFlowType,
+} from "../../types";
 import { PAYMENT_FLOWS } from "../../constants";
 import {
   getProps,
@@ -61,9 +65,7 @@ export type InputEventState = {|
   isFormValid: boolean,
 |};
 
-export type OnChange = ({|
-  ...InputEventState,
-|}) => ZalgoPromise<void>;
+export type OnChange = ({| ...InputEventState |}) => ZalgoPromise<void>;
 
 export type OnBlur = (InputEventState) => ZalgoPromise<void>;
 
@@ -123,7 +125,7 @@ export type CardProps = {|
   onError: OnError,
   productAction: string,
   clientMetadataID: string,
-  userIDToken: string
+  userIDToken: string,
 |};
 
 export type PurchaseFlowCardProps = {|
@@ -146,10 +148,10 @@ type GetCardPropsOptions = {|
 |};
 
 export type Components = {|
-ThreeDomainSecure : ThreeDomainSecureFlowType
-|}
+  ThreeDomainSecure: ThreeDomainSecureFlowType,
+|};
 
-export function getComponents() : Components {
+export function getComponents(): Components {
   const { ThreeDomainSecure } = paypal;
   return { ThreeDomainSecure };
 }
@@ -202,7 +204,7 @@ export function getCardProps({
     sdkCorrelationID,
     partnerAttributionID,
     hcfSessionID,
-    userIDToken
+    userIDToken,
   } = xprops;
 
   const returnData = {
@@ -220,7 +222,7 @@ export function getCardProps({
     sdkCorrelationID,
     partnerAttributionID,
     hcfSessionID,
-    userIDToken
+    userIDToken,
   };
 
   const baseProps = getProps({ branded });

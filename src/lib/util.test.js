@@ -144,7 +144,7 @@ describe("utils", () => {
       value: false,
     });
     expect(() => getNavigationTimeOrigin()).toThrowError(
-      "window.performance not supported"
+      "window.performance not supported",
     );
   });
 
@@ -169,7 +169,7 @@ describe("utils", () => {
     await onCloseProxyWindow(
       // $FlowFixMe
       { awaitWindow: () => ZalgoPromise.resolve(window) },
-      mockFn
+      mockFn,
     ).cancel();
     // $FlowFixMe
     onCloseProxyWindow({

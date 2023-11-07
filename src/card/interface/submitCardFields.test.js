@@ -98,7 +98,7 @@ describe("submitCardFields", () => {
     expect.assertions(1);
 
     expect(submitCardFields(defaultOptions)).rejects.toThrowError(
-      SUBMIT_ERRORS.UNABLE_TO_SUBMIT
+      SUBMIT_ERRORS.UNABLE_TO_SUBMIT,
     );
   });
 
@@ -172,13 +172,13 @@ describe("submitCardFields", () => {
         facilitatorAccessToken: "test-access-token",
         partnerAttributionID: "",
         experiments: {},
-      }
+      },
     );
     expect(mockGetCardPropsReturn.onApprove).toHaveBeenCalledWith(
       {
         orderID: "test-order-id",
       },
-      {}
+      {},
     );
     expect(hcfTransactionSuccess).toHaveBeenCalledWith({
       orderID: "test-order-id",
@@ -197,7 +197,7 @@ describe("submitCardFields", () => {
     // $FlowIssue
     getCardProps.mockReturnValue(mockGetCardPropsReturn);
     await expect(submitCardFields(defaultOptions)).rejects.toThrow(
-      "error with on approve"
+      "error with on approve",
     );
     expect(mockGetCardPropsReturn.createOrder).toHaveBeenCalled();
     expect(mockGetCardPropsReturn.onApprove).toHaveBeenCalled();
@@ -225,7 +225,7 @@ describe("submitCardFields", () => {
     // $FlowIssue
     getCardProps.mockReturnValue(mockGetCardPropsReturn);
     await expect(submitCardFields(defaultOptions)).rejects.toThrow(
-      "confirm order api failure test"
+      "confirm order api failure test",
     );
     expect(mockGetCardPropsReturn.createOrder).toHaveBeenCalled();
     // $FlowIssue
@@ -250,7 +250,7 @@ describe("submitCardFields", () => {
     // $FlowIssue
     getCardProps.mockReturnValue(mockGetCardPropsReturn);
     await expect(submitCardFields(defaultOptions)).rejects.toThrow(
-      expectedError
+      expectedError,
     );
     expect(mockGetCardPropsReturn.createOrder).toHaveBeenCalled();
     // $FlowIssue
@@ -291,7 +291,7 @@ describe("submitCardFields", () => {
       expect(confirmOrderAPI).toBeCalledWith(
         expect.any(String),
         expect.any(Object),
-        expect.objectContaining({ facilitatorAccessToken: mockIdToken })
+        expect.objectContaining({ facilitatorAccessToken: mockIdToken }),
       );
     });
 
@@ -324,7 +324,7 @@ describe("submitCardFields", () => {
       expect(confirmOrderAPI).toBeCalledWith(
         expect.any(String),
         expect.any(Object),
-        expect.any(Object)
+        expect.any(Object),
       );
       expect(infoMock).toHaveBeenCalledWith("hcf_userIDToken_present_false");
     });
@@ -335,7 +335,7 @@ describe("submitCardFields", () => {
       // $FlowIssue
       handleThreeDomainSecureContingency.mockResolvedValue(
         // eslint-disable-next-line compat/compat, promise/no-native, no-restricted-globals
-        Promise.resolve(mock3dsResponse)
+        Promise.resolve(mock3dsResponse),
       );
       const inputOpts = {
         facilitatorAccessToken: "test-access-token",
@@ -378,7 +378,7 @@ describe("submitCardFields", () => {
           liabilityShift: mock3dsResponse.liability_shift,
           orderID: mockOrderId,
         },
-        {}
+        {},
       );
     });
   });

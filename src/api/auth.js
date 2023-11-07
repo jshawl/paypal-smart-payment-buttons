@@ -1,65 +1,88 @@
 /* @flow */
 
-import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { inlineMemoize, base64encode, request, noop } from '@krakenjs/belter/src';
-import { FUNDING } from '@paypal/sdk-constants/src';
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import {
+  inlineMemoize,
+  base64encode,
+  request,
+  noop,
+} from "@krakenjs/belter/src";
+import { FUNDING } from "@paypal/sdk-constants/src";
 
-import type { ConnectOptions } from '../types';
-import { AUTH_API_URL } from '../config';
-import { getLogger } from '../lib';
-import { HEADERS } from '../constants';
+import type { ConnectOptions } from "../types";
+import { AUTH_API_URL } from "../config";
+import { getLogger } from "../lib";
+import { HEADERS } from "../constants";
 
-import { callGraphQL } from './api';
+import { callGraphQL } from "./api";
 
 type GenerateAccessTokenOptions = {|
-    targetSubject? : string
+  targetSubject?: string,
 |};
 
-export function createAccessToken(clientID : string, { targetSubject } : GenerateAccessTokenOptions = {}) : ZalgoPromise<string> {
-    return inlineMemoize(createAccessToken, () => {
+export function createAccessToken(
+  clientID: string,
+  { targetSubject }: GenerateAccessTokenOptions = {},
+): ZalgoPromise<string> {
+  return inlineMemoize(
+    createAccessToken,
+    () => {
+      getLogger().info(`rest_api_create_access_token`);
 
-        getLogger().info(`rest_api_create_access_token`);
+      const basicAuth = base64encode(`${clientID || ""}:`);
+      const data: Object = {
+        grant_type: `client_credentials`,
+      };
 
-        const basicAuth = base64encode(`${ clientID || '' }:`);
-        const data : Object = {
-            grant_type: `client_credentials`
-        };
+      if (targetSubject) {
+        data.target_subject = targetSubject;
+      }
 
-        if (targetSubject) {
-            data.target_subject = targetSubject;
+      return request({
+        method: `post`,
+        url: AUTH_API_URL,
+        headers: {
+          Authorization: `Basic ${basicAuth}`,
+        },
+        data,
+      }).then(({ body }) => {
+        if (body && body.error === "invalid_client") {
+          const eventName = "v1_oauth2_token_create";
+
+          getLogger().warn(`rest_api_${eventName}_error`, {
+            err: "invalid client id",
+          });
+          throw new Error(
+            `Auth Api invalid client id: ${clientID || ""}:\n\n${JSON.stringify(
+              body,
+              null,
+              4,
+            )}`,
+          );
         }
 
-        return request({
-            method:  `post`,
-            url:     AUTH_API_URL,
-            headers: {
-                Authorization: `Basic ${ basicAuth }`
-            },
-            data
-        }).then(({ body }) => {
-            if (body && body.error === 'invalid_client') {
-                const eventName = 'v1_oauth2_token_create';
+        if (!body || !body.access_token) {
+          const eventName = "v1_oauth2_token_create";
 
-                getLogger().warn(`rest_api_${ eventName }_error`, { err: 'invalid client id' });
-                throw new Error(`Auth Api invalid client id: ${ clientID || '' }:\n\n${ JSON.stringify(body, null, 4) }`);
-            }
+          getLogger().warn(`rest_api_${eventName}_error`);
+          throw new Error(
+            `Auth Api response error:\n\n${JSON.stringify(body, null, 4)}`,
+          );
+        }
 
-            if (!body || !body.access_token) {
-                const eventName = 'v1_oauth2_token_create';
-
-                getLogger().warn(`rest_api_${ eventName }_error`);
-                throw new Error(`Auth Api response error:\n\n${ JSON.stringify(body, null, 4) }`);
-            }
-
-            return body.access_token;
-        });
-    }, [ clientID, targetSubject ]);
+        return body.access_token;
+      });
+    },
+    [clientID, targetSubject],
+  );
 }
 
-export function getFirebaseSessionToken(sessionUID : string) : ZalgoPromise<string> {
-    return callGraphQL({
-        name:  'GetFireBaseSessionToken',
-        query: `
+export function getFirebaseSessionToken(
+  sessionUID: string,
+): ZalgoPromise<string> {
+  return callGraphQL({
+    name: "GetFireBaseSessionToken",
+    query: `
             query GetFireBaseSessionToken($sessionUID: String!) {
                 firebase {
                     auth(sessionUID: $sessionUID) {
@@ -68,57 +91,63 @@ export function getFirebaseSessionToken(sessionUID : string) : ZalgoPromise<stri
                 }
             }
         `,
-        variables: { sessionUID }
-    }).then(res => {
-        return res.firebase.auth.sessionToken;
-    });
+    variables: { sessionUID },
+  }).then((res) => {
+    return res.firebase.auth.sessionToken;
+  });
 }
 
-let lsatUpgradeCalled : boolean = false;
-let lsatUpgradeError : ?mixed;
-let lsatUpgradeWithIgnoreCache : boolean = false;
+let lsatUpgradeCalled: boolean = false;
+let lsatUpgradeError: ?mixed;
+let lsatUpgradeWithIgnoreCache: boolean = false;
 
 export const onLsatUpgradeCalled = () => {
-    lsatUpgradeCalled = true;
+  lsatUpgradeCalled = true;
 };
 
-export const getLsatUpgradeWithIgnoreCache = () : boolean => {
-    return lsatUpgradeWithIgnoreCache;
+export const getLsatUpgradeWithIgnoreCache = (): boolean => {
+  return lsatUpgradeWithIgnoreCache;
 };
 
 const onLsatUpgradeWithIgnoreCacheCalled = () => {
-    lsatUpgradeWithIgnoreCache = true;
+  lsatUpgradeWithIgnoreCache = true;
 };
 
-export const getLsatUpgradeCalled = () : boolean => {
-    return lsatUpgradeCalled;
+export const getLsatUpgradeCalled = (): boolean => {
+  return lsatUpgradeCalled;
 };
 
-export const onLsatUpgradeError = (err : mixed) => {
-    lsatUpgradeError = err;
+export const onLsatUpgradeError = (err: mixed) => {
+  lsatUpgradeError = err;
 };
 
-export const getLsatUpgradeError = () : ?mixed => {
-    return lsatUpgradeError;
+export const getLsatUpgradeError = (): ?mixed => {
+  return lsatUpgradeError;
 };
 
 export const clearLsatState = () => {
-    lsatUpgradeCalled = false;
-    lsatUpgradeError = null;
-    lsatUpgradeWithIgnoreCache = false;
+  lsatUpgradeCalled = false;
+  lsatUpgradeError = null;
+  lsatUpgradeWithIgnoreCache = false;
 };
 
-export function upgradeFacilitatorAccessToken(facilitatorAccessToken : string, { buyerAccessToken, orderID } : {| buyerAccessToken : string, orderID : string |}) : ZalgoPromise<void> {
-    clearLsatState();
-    onLsatUpgradeCalled();
+export function upgradeFacilitatorAccessToken(
+  facilitatorAccessToken: string,
+  {
+    buyerAccessToken,
+    orderID,
+  }: {| buyerAccessToken: string, orderID: string |},
+): ZalgoPromise<void> {
+  clearLsatState();
+  onLsatUpgradeCalled();
 
-    return callGraphQL({
-        name:    'UpgradeFacilitatorAccessToken',
-        headers: {
-            [ HEADERS.ACCESS_TOKEN ]:   buyerAccessToken,
-            [ HEADERS.CLIENT_CONTEXT ]: orderID
-        },
-        query: `
+  return callGraphQL({
+    name: "UpgradeFacilitatorAccessToken",
+    headers: {
+      [HEADERS.ACCESS_TOKEN]: buyerAccessToken,
+      [HEADERS.CLIENT_CONTEXT]: orderID,
+    },
+    query: `
             mutation UpgradeFacilitatorAccessToken(
                 $orderID: String!
                 $buyerAccessToken: String!
@@ -131,26 +160,34 @@ export function upgradeFacilitatorAccessToken(facilitatorAccessToken : string, {
                 )
             }
         `,
-        variables: { facilitatorAccessToken, buyerAccessToken, orderID }
-    }).then(noop).catch(err => {
-        onLsatUpgradeError(err);
-        throw err;
+    variables: { facilitatorAccessToken, buyerAccessToken, orderID },
+  })
+    .then(noop)
+    .catch((err) => {
+      onLsatUpgradeError(err);
+      throw err;
     });
 }
 
-export function upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessToken : string, buyerAccessToken : string, orderID : string) : ZalgoPromise<string> {
-    return inlineMemoize(upgradeFacilitatorAccessTokenWithIgnoreCache, () => {
-        clearLsatState();
-        onLsatUpgradeCalled();
-        onLsatUpgradeWithIgnoreCacheCalled();
+export function upgradeFacilitatorAccessTokenWithIgnoreCache(
+  facilitatorAccessToken: string,
+  buyerAccessToken: string,
+  orderID: string,
+): ZalgoPromise<string> {
+  return inlineMemoize(
+    upgradeFacilitatorAccessTokenWithIgnoreCache,
+    () => {
+      clearLsatState();
+      onLsatUpgradeCalled();
+      onLsatUpgradeWithIgnoreCacheCalled();
 
-        return callGraphQL({
-            name: 'CreateUpgradedLowScopeAccessToken',
-            headers: {
-                [ HEADERS.ACCESS_TOKEN ]:   buyerAccessToken,
-                [ HEADERS.CLIENT_CONTEXT ]: orderID
-            },
-            query: `
+      return callGraphQL({
+        name: "CreateUpgradedLowScopeAccessToken",
+        headers: {
+          [HEADERS.ACCESS_TOKEN]: buyerAccessToken,
+          [HEADERS.CLIENT_CONTEXT]: orderID,
+        },
+        query: `
             mutation CreateUpgradedLowScopeAccessToken(
                 $orderID: String!
                 $buyerAccessToken: String!
@@ -163,24 +200,32 @@ export function upgradeFacilitatorAccessTokenWithIgnoreCache(facilitatorAccessTo
                 )
             }
         `,
-            variables: { facilitatorAccessToken, buyerAccessToken, orderID }
+        variables: { facilitatorAccessToken, buyerAccessToken, orderID },
+      })
+        .then((res) => {
+          getLogger().info("create_upgraded_low_scope_access_token_success", {
+            orderID,
+          });
+          return res?.createUpgradedLowScopeAccessToken;
         })
-        .then(res => {
-            getLogger().info('create_upgraded_low_scope_access_token_success', { orderID });
-            return res?.createUpgradedLowScopeAccessToken;
-        })
-        .catch(err => {
-            getLogger().warn('create_upgraded_low_scope_access_token_error', { orderID });
-            onLsatUpgradeError(err);
-            return facilitatorAccessToken;
+        .catch((err) => {
+          getLogger().warn("create_upgraded_low_scope_access_token_error", {
+            orderID,
+          });
+          onLsatUpgradeError(err);
+          return facilitatorAccessToken;
         });
-    }, [ facilitatorAccessToken, buyerAccessToken, orderID ]);
+    },
+    [facilitatorAccessToken, buyerAccessToken, orderID],
+  );
 }
 
-export function exchangeAccessTokenForAuthCode(buyerAccessToken : string) : ZalgoPromise<string> {
-    return callGraphQL({
-        name:  'ExchangeAuthCode',
-        query: `
+export function exchangeAccessTokenForAuthCode(
+  buyerAccessToken: string,
+): ZalgoPromise<string> {
+  return callGraphQL({
+    name: "ExchangeAuthCode",
+    query: `
             query ExchangeAuthCode(
                 $buyerAccessToken: String!
             ) {
@@ -191,26 +236,32 @@ export function exchangeAccessTokenForAuthCode(buyerAccessToken : string) : Zalg
                 }
             }
         `,
-        variables: { buyerAccessToken }
-    }).then(({ auth }) => {
-        return auth.authCode;
-    });
+    variables: { buyerAccessToken },
+  }).then(({ auth }) => {
+    return auth.authCode;
+  });
 }
 
 type ConnectURLOptions = {|
-    clientID : string,
-    orderID : string,
-    payerID : string,
-    fundingSource : $Values<typeof FUNDING>,
-    connect : ConnectOptions
+  clientID: string,
+  orderID: string,
+  payerID: string,
+  fundingSource: $Values<typeof FUNDING>,
+  connect: ConnectOptions,
 |};
 
-export function getConnectURL({ clientID, orderID, payerID, fundingSource, connect } : ConnectURLOptions) : ZalgoPromise<string> {
-    const { scopes } = connect;
+export function getConnectURL({
+  clientID,
+  orderID,
+  payerID,
+  fundingSource,
+  connect,
+}: ConnectURLOptions): ZalgoPromise<string> {
+  const { scopes } = connect;
 
-    return callGraphQL({
-        name:  'GetConnectURL',
-        query: `
+  return callGraphQL({
+    name: "GetConnectURL",
+    query: `
             query GetConnectURL(
                 $clientID: String!
                 $orderID: String!
@@ -232,8 +283,8 @@ export function getConnectURL({ clientID, orderID, payerID, fundingSource, conne
                 }
             }
         `,
-        variables: { clientID, orderID, payerID, scopes, fundingSource }
-    }).then(({ auth }) => {
-        return auth.connectUrl.href;
-    });
+    variables: { clientID, orderID, payerID, scopes, fundingSource },
+  }).then(({ auth }) => {
+    return auth.connectUrl.href;
+  });
 }

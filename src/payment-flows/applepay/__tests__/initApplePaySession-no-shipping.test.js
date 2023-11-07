@@ -290,12 +290,12 @@ describe("initApplePay - no shipping", () => {
     expect(approveApplePayPayment).toHaveBeenCalledWith(
       "mock-orderID",
       props.clientID,
-      { billingContact, shippingContact, token }
+      { billingContact, shippingContact, token },
     );
 
     expect(props.onApprove).toHaveBeenCalledWith(
       {},
-      { restart: expect.any(Function) }
+      { restart: expect.any(Function) },
     );
   });
 });

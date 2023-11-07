@@ -1,318 +1,388 @@
 /* @flow */
 /* eslint require-await: off, max-lines: off, max-nested-callbacks: off */
 
-import { wrapPromise, noop } from '@krakenjs/belter/src';
-import { ZalgoPromise } from '@krakenjs/zalgo-promise/src';
-import { FUNDING } from '@paypal/sdk-constants/src';
+import { wrapPromise, noop } from "@krakenjs/belter/src";
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import { FUNDING } from "@paypal/sdk-constants/src";
 
-import { EXPERIMENTAL_POPUP_DIMENSIONS } from '../../src/payment-flows/checkout';
-import { type SetupButtonOptions } from '../../src';
+import { EXPERIMENTAL_POPUP_DIMENSIONS } from "../../src/payment-flows/checkout";
+import { type SetupButtonOptions } from "../../src";
 
 import {
-    clickButton,
-    createButtonHTML,
-    DEFAULT_FUNDING_ELIGIBILITY,
-    generateOrderID,
-    mockAsyncProp,
-    mockFunction,
-    mockSetupButton,
-    getMockWindowOpen
-} from './mocks';
+  clickButton,
+  createButtonHTML,
+  DEFAULT_FUNDING_ELIGIBILITY,
+  generateOrderID,
+  mockAsyncProp,
+  mockFunction,
+  mockSetupButton,
+  getMockWindowOpen,
+} from "./mocks";
 
 type SetupPopupOptions = {|
-    buttonProps?: $Shape<SetupButtonOptions>,
-    fundingSource: string,
-    mockWindow: boolean,
+  buttonProps?: $Shape<SetupButtonOptions>,
+  fundingSource: string,
+  mockWindow: boolean,
 |};
 
 const setupPopup = async (options: SetupPopupOptions, callback) => {
-    options.buttonProps = {
-        merchantID: [ 'XYZ12345' ],
-        fundingEligibility: DEFAULT_FUNDING_ELIGIBILITY,
-        ...options.buttonProps
-    }
-    return await wrapPromise(async ({ expect, avoid }) => {
+  options.buttonProps = {
+    merchantID: ["XYZ12345"],
+    fundingEligibility: DEFAULT_FUNDING_ELIGIBILITY,
+    ...options.buttonProps,
+  };
+  return await wrapPromise(async ({ expect, avoid }) => {
+    const orderID = generateOrderID();
+    const payerID = "YYYYYYYYYY";
 
-        const orderID = generateOrderID();
-        const payerID = 'YYYYYYYYYY';
-
-        window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
-            return ZalgoPromise.try(() => {
-                return orderID;
-            });
-        }));
-
-        window.xprops.onCancel = avoid('onCancel');
-
-        window.xprops.onApprove = mockAsyncProp(expect('onApprove', async (data) => {
-            if (data.orderID !== orderID) {
-                throw new Error(`Expected orderID to be ${ orderID }, got ${ data.orderID }`);
-            }
-
-            if (data.payerID !== payerID) {
-                throw new Error(`Expected payerID to be ${ payerID }, got ${ data.payerID }`);
-            }
-        }));
-        let mockedWindow;
-        if(options.mockWindow){
-            mockedWindow = getMockWindowOpen({
-                expectImmediateUrl: false
-            });
-        }
-        mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ original: CheckoutOriginal, args: [ props ] }) => {
-
-            mockFunction(props, 'onApprove', expect('onApprove', ({ original: onApproveOriginal, args: [ data, actions ] }) => {
-                return onApproveOriginal({ ...data, payerID }, actions);
-            }));
-
-            const checkoutInstance = CheckoutOriginal(props);
-
-            mockFunction(checkoutInstance, 'renderTo', expect('renderTo', async ({ original: renderToOriginal, args }) => {
-                const [ win, element, context ] = args;
-
-                if (!win) {
-                    throw new Error(`Expected window to be passed to renderTo`);
-                }
-
-                if (props.win) {
-                    throw new Error(`Expected window to not be passed to props`);
-                }
-
-                if (!element || typeof element !== 'string') {
-                    throw new Error(`Expected string element to be passed to renderTo`);
-                }
-
-                let opts = {};
-                if(options.mockWindow){
-                    opts = mockedWindow.getOpts()
-                }
-
-                await callback({props, opts, element, context})
-
-                return props.createOrder().then(id => {
-                    if (id !== orderID) {
-                        throw new Error(`Expected orderID to be ${ orderID }, got ${ id }`);
-                    }
-
-                    return renderToOriginal(...args);
-                });
-            }));
-
-            return checkoutInstance;
-        }));
-
-        if(options.buttonProps?.fundingEligibility){
-            createButtonHTML({fundingEligibility: options.buttonProps.fundingEligibility});
-        } else {
-            createButtonHTML();
-        }
-
-        await mockSetupButton(options.buttonProps);
-
-        await clickButton(options.fundingSource);
-    });
-}
-describe('popup cases', () => {
-
-    it('should render a button with createOrder, click the button, fail to open a popup, and render checkout', async () => {
-        const windowOpen = window.open;
-        window.open = noop;
-        return await setupPopup(
-            {
-                fundingSource: FUNDING.PAYPAL,
-                mockWindow: false
-            },
-            ({context}) => {
-                window.open = windowOpen;
-                if (context !== 'iframe') {
-                    throw new Error(`Expected context to be iframe, got ${ context }`);
-                }
-            }
-        );
-    });
-
-    it('should render a button with popups disabled, click the button, and render checkout in iframe', async () => {
-        window.xprops.merchantRequestedPopupsDisabled = true;
-        return await setupPopup(
-            {
-                fundingSource: FUNDING.PAYPAL,
-                mockWindow: false
-            },
-            ({context}) => {
-                if (context !== 'iframe') {
-                    throw new Error(`Expected context to be iframe, got ${ context }`);
-                }
-            }
-        );
-    });
-
-    it('should render a button with createOrder, click the button, open a popup, and render checkout with default dimensions', async () => {
-        return await setupPopup(
-            {
-                fundingSource: FUNDING.PAYPAL,
-                mockWindow: true
-            },
-            ({opts, props, context}) => {
-            if (context !== 'popup') {
-                throw new Error(`Expected context to be popup, got ${ context }`);
-            }
-            if (props.dimensions.width !== 500) {
-                throw new Error(`Expected props width to be 500, got ${ props.dimensions.width }`);
-            }
-            if (props.dimensions.height !== 590) {
-                throw new Error(`Expected props height to be 590, got ${ props.dimensions.height }`);
-            }
-            if (parseInt(opts.width, 10) !== 500) {
-                throw new Error(`Expected width to be 500, got ${ opts.width }`);
-            }
-            if (parseInt(opts.height, 10) !== 590) {
-                throw new Error(`Expected height to be 590, got ${ opts.height }`);
-            }
-        })
-    });
-
-    it('should render a button with createOrder, click the button, open a popup, and render checkout with apm dimensions', async () => {
-        const fundingEligibility = {
-            ideal: {
-                eligible: true,
-                branded: false
-            }
-        };
-        return await setupPopup(
-            {
-                buttonProps: { merchantID: [ 'XYZ12345' ], fundingEligibility },
-                fundingSource: FUNDING.IDEAL,
-                mockWindow: true
-            },
-            ({props, opts, context}) => {
-                if (context !== 'popup') {
-                    throw new Error(`Expected context to be popup, got ${ context }`);
-                }
-                if (props.dimensions.width !== 1282) {
-                    throw new Error(`Expected props width to be 1282, got ${ props.dimensions.width }`);
-                }
-                if (props.dimensions.height !== 720) {
-                    throw new Error(`Expected props height to be 720, got ${ props.dimensions.height }`);
-                }
-                if (parseInt(opts.width, 10) !== 1282) {
-                    throw new Error(`Expected width to be 1282, got ${ opts.width }`);
-                }
-                if (parseInt(opts.height, 10) !== 720) {
-                    throw new Error(`Expected height to be 720, got ${ opts.height }`);
-                }
-            }
-        )
-    });
-
-    it('should render a button with createOrder, click the button, open a popup, and render checkout with experimental dimensions', async () => {
-        const experiments = {
-            popupIncreaseDimensions: true
-        }
-        return await setupPopup(
-            {
-                buttonProps: {
-                    experiments, merchantID: [ 'XYZ12345' ], fundingEligibility: DEFAULT_FUNDING_ELIGIBILITY
-                },
-                fundingSource: FUNDING.PAYPAL,
-                mockWindow: true
-            },
-            ({opts, props, context}) => {
-                if (context !== 'popup') {
-                    throw new Error(`Expected context to be popup, got ${ context }`);
-                }
-                if (props.dimensions.width !== EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH) {
-                    throw new Error(`Expected props width to be ${EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH}, got ${ props.dimensions.width }`);
-                }
-                if (props.dimensions.height !== EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT) {
-                    throw new Error(`Expected props height to be ${EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT}, got ${ props.dimensions.height }`);
-                }
-                if (parseInt(opts.width, 10) !== EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH) {
-                    throw new Error(`Expected width to be ${EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH}, got ${ opts.width }`);
-                }
-                if (parseInt(opts.height, 10) !== EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT) {
-                    throw new Error(`Expected height to be ${EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT}, got ${ opts.height }`);
-                }
-            }
-        );
-    });
-
-    it('should render a button with createOrder, click the button, fail to open a popup with an error, and render checkout', async () => {
-        const windowOpen = window.open;
-        window.open = () => {
-            throw new Error('Popup blocked!');
-        };
-        return await setupPopup(
-            {
-                fundingSource: FUNDING.PAYPAL,
-                mockWindow: false
-            },
-            ({context}) => {
-                window.open = windowOpen;
-                if (context !== 'iframe') {
-                    throw new Error(`Expected context to be iframe, got ${ context }`);
-                }
-            }
-        );
-    });
-
-
-    it('should close the popup only after onApprove and all the inner promises are resolved', async () => {
-        return await wrapPromise(async ({ expect, avoid }) => {
-
-            const orderID = generateOrderID();
-            const payerID = 'YYYYYYYYYY';
-            const timeout : ZalgoPromise<void> = new ZalgoPromise(resolve => {
-                setTimeout(resolve);
-            });
-            let previouslyExecutedMethod = '';
-
-            window.xprops.createOrder = mockAsyncProp(expect('createOrder', async () => {
-                previouslyExecutedMethod = 'createOrder';
-                return ZalgoPromise.try(() => {
-                    return orderID;
-                });
-            }));
-
-            window.xprops.onCancel = avoid('onCancel');
-
-            window.xprops.onApprove = mockAsyncProp(expect('onApprove', async () => {
-                previouslyExecutedMethod = 'onApprove';
-                return ZalgoPromise.all([ timeout, timeout ]).then(noop);
-            }));
-
-
-            mockFunction(window.paypal, 'Checkout', expect('Checkout', ({ original: CheckoutOriginal, args: [ props ] }) => {
-
-                mockFunction(props, 'onApprove', expect('onApprove', ({ original: onApproveOriginal, args: [ data, actions ] }) => {
-                    return onApproveOriginal({ ...data, payerID }, actions);
-                }));
-
-                const checkoutInstance = CheckoutOriginal(props);
-
-                mockFunction(checkoutInstance, 'renderTo', expect('renderTo', async ({ original: renderToOriginal, args }) => {
-                    return props.createOrder().then(id => {
-                        if (id !== orderID) {
-                            throw new Error(`Expected orderID to be ${ orderID }, got ${ id }`);
-                        }
-                        return renderToOriginal(...args);
-                    });
-                }));
-
-                mockFunction(checkoutInstance, 'close', expect('close', () => {
-                    if (previouslyExecutedMethod !== 'onApprove') {
-                        throw new Error('Should have called onApprove and wait for all inner promises to get resolved before closing the popup');
-                    }
-                }));
-
-                return checkoutInstance;
-            }));
-
-            createButtonHTML();
-
-            await mockSetupButton({ merchantID: [ 'XYZ12345' ], fundingEligibility: DEFAULT_FUNDING_ELIGIBILITY });
-
-            await clickButton(FUNDING.PAYPAL);
+    window.xprops.createOrder = mockAsyncProp(
+      expect("createOrder", async () => {
+        return ZalgoPromise.try(() => {
+          return orderID;
         });
-    });
+      }),
+    );
 
+    window.xprops.onCancel = avoid("onCancel");
+
+    window.xprops.onApprove = mockAsyncProp(
+      expect("onApprove", async (data) => {
+        if (data.orderID !== orderID) {
+          throw new Error(
+            `Expected orderID to be ${orderID}, got ${data.orderID}`,
+          );
+        }
+
+        if (data.payerID !== payerID) {
+          throw new Error(
+            `Expected payerID to be ${payerID}, got ${data.payerID}`,
+          );
+        }
+      }),
+    );
+    let mockedWindow;
+    if (options.mockWindow) {
+      mockedWindow = getMockWindowOpen({
+        expectImmediateUrl: false,
+      });
+    }
+    mockFunction(
+      window.paypal,
+      "Checkout",
+      expect("Checkout", ({ original: CheckoutOriginal, args: [props] }) => {
+        mockFunction(
+          props,
+          "onApprove",
+          expect(
+            "onApprove",
+            ({ original: onApproveOriginal, args: [data, actions] }) => {
+              return onApproveOriginal({ ...data, payerID }, actions);
+            },
+          ),
+        );
+
+        const checkoutInstance = CheckoutOriginal(props);
+
+        mockFunction(
+          checkoutInstance,
+          "renderTo",
+          expect("renderTo", async ({ original: renderToOriginal, args }) => {
+            const [win, element, context] = args;
+
+            if (!win) {
+              throw new Error(`Expected window to be passed to renderTo`);
+            }
+
+            if (props.win) {
+              throw new Error(`Expected window to not be passed to props`);
+            }
+
+            if (!element || typeof element !== "string") {
+              throw new Error(
+                `Expected string element to be passed to renderTo`,
+              );
+            }
+
+            let opts = {};
+            if (options.mockWindow) {
+              opts = mockedWindow.getOpts();
+            }
+
+            await callback({ props, opts, element, context });
+
+            return props.createOrder().then((id) => {
+              if (id !== orderID) {
+                throw new Error(`Expected orderID to be ${orderID}, got ${id}`);
+              }
+
+              return renderToOriginal(...args);
+            });
+          }),
+        );
+
+        return checkoutInstance;
+      }),
+    );
+
+    if (options.buttonProps?.fundingEligibility) {
+      createButtonHTML({
+        fundingEligibility: options.buttonProps.fundingEligibility,
+      });
+    } else {
+      createButtonHTML();
+    }
+
+    await mockSetupButton(options.buttonProps);
+
+    await clickButton(options.fundingSource);
+  });
+};
+describe("popup cases", () => {
+  it("should render a button with createOrder, click the button, fail to open a popup, and render checkout", async () => {
+    const windowOpen = window.open;
+    window.open = noop;
+    return await setupPopup(
+      {
+        fundingSource: FUNDING.PAYPAL,
+        mockWindow: false,
+      },
+      ({ context }) => {
+        window.open = windowOpen;
+        if (context !== "iframe") {
+          throw new Error(`Expected context to be iframe, got ${context}`);
+        }
+      },
+    );
+  });
+
+  it("should render a button with popups disabled, click the button, and render checkout in iframe", async () => {
+    window.xprops.merchantRequestedPopupsDisabled = true;
+    return await setupPopup(
+      {
+        fundingSource: FUNDING.PAYPAL,
+        mockWindow: false,
+      },
+      ({ context }) => {
+        if (context !== "iframe") {
+          throw new Error(`Expected context to be iframe, got ${context}`);
+        }
+      },
+    );
+  });
+
+  it("should render a button with createOrder, click the button, open a popup, and render checkout with default dimensions", async () => {
+    return await setupPopup(
+      {
+        fundingSource: FUNDING.PAYPAL,
+        mockWindow: true,
+      },
+      ({ opts, props, context }) => {
+        if (context !== "popup") {
+          throw new Error(`Expected context to be popup, got ${context}`);
+        }
+        if (props.dimensions.width !== 500) {
+          throw new Error(
+            `Expected props width to be 500, got ${props.dimensions.width}`,
+          );
+        }
+        if (props.dimensions.height !== 590) {
+          throw new Error(
+            `Expected props height to be 590, got ${props.dimensions.height}`,
+          );
+        }
+        if (parseInt(opts.width, 10) !== 500) {
+          throw new Error(`Expected width to be 500, got ${opts.width}`);
+        }
+        if (parseInt(opts.height, 10) !== 590) {
+          throw new Error(`Expected height to be 590, got ${opts.height}`);
+        }
+      },
+    );
+  });
+
+  it("should render a button with createOrder, click the button, open a popup, and render checkout with apm dimensions", async () => {
+    const fundingEligibility = {
+      ideal: {
+        eligible: true,
+        branded: false,
+      },
+    };
+    return await setupPopup(
+      {
+        buttonProps: { merchantID: ["XYZ12345"], fundingEligibility },
+        fundingSource: FUNDING.IDEAL,
+        mockWindow: true,
+      },
+      ({ props, opts, context }) => {
+        if (context !== "popup") {
+          throw new Error(`Expected context to be popup, got ${context}`);
+        }
+        if (props.dimensions.width !== 1282) {
+          throw new Error(
+            `Expected props width to be 1282, got ${props.dimensions.width}`,
+          );
+        }
+        if (props.dimensions.height !== 720) {
+          throw new Error(
+            `Expected props height to be 720, got ${props.dimensions.height}`,
+          );
+        }
+        if (parseInt(opts.width, 10) !== 1282) {
+          throw new Error(`Expected width to be 1282, got ${opts.width}`);
+        }
+        if (parseInt(opts.height, 10) !== 720) {
+          throw new Error(`Expected height to be 720, got ${opts.height}`);
+        }
+      },
+    );
+  });
+
+  it("should render a button with createOrder, click the button, open a popup, and render checkout with experimental dimensions", async () => {
+    const experiments = {
+      popupIncreaseDimensions: true,
+    };
+    return await setupPopup(
+      {
+        buttonProps: {
+          experiments,
+          merchantID: ["XYZ12345"],
+          fundingEligibility: DEFAULT_FUNDING_ELIGIBILITY,
+        },
+        fundingSource: FUNDING.PAYPAL,
+        mockWindow: true,
+      },
+      ({ opts, props, context }) => {
+        if (context !== "popup") {
+          throw new Error(`Expected context to be popup, got ${context}`);
+        }
+        if (props.dimensions.width !== EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH) {
+          throw new Error(
+            `Expected props width to be ${EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH}, got ${props.dimensions.width}`,
+          );
+        }
+        if (props.dimensions.height !== EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT) {
+          throw new Error(
+            `Expected props height to be ${EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT}, got ${props.dimensions.height}`,
+          );
+        }
+        if (parseInt(opts.width, 10) !== EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH) {
+          throw new Error(
+            `Expected width to be ${EXPERIMENTAL_POPUP_DIMENSIONS.WIDTH}, got ${opts.width}`,
+          );
+        }
+        if (
+          parseInt(opts.height, 10) !== EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT
+        ) {
+          throw new Error(
+            `Expected height to be ${EXPERIMENTAL_POPUP_DIMENSIONS.HEIGHT}, got ${opts.height}`,
+          );
+        }
+      },
+    );
+  });
+
+  it("should render a button with createOrder, click the button, fail to open a popup with an error, and render checkout", async () => {
+    const windowOpen = window.open;
+    window.open = () => {
+      throw new Error("Popup blocked!");
+    };
+    return await setupPopup(
+      {
+        fundingSource: FUNDING.PAYPAL,
+        mockWindow: false,
+      },
+      ({ context }) => {
+        window.open = windowOpen;
+        if (context !== "iframe") {
+          throw new Error(`Expected context to be iframe, got ${context}`);
+        }
+      },
+    );
+  });
+
+  it("should close the popup only after onApprove and all the inner promises are resolved", async () => {
+    return await wrapPromise(async ({ expect, avoid }) => {
+      const orderID = generateOrderID();
+      const payerID = "YYYYYYYYYY";
+      const timeout: ZalgoPromise<void> = new ZalgoPromise((resolve) => {
+        setTimeout(resolve);
+      });
+      let previouslyExecutedMethod = "";
+
+      window.xprops.createOrder = mockAsyncProp(
+        expect("createOrder", async () => {
+          previouslyExecutedMethod = "createOrder";
+          return ZalgoPromise.try(() => {
+            return orderID;
+          });
+        }),
+      );
+
+      window.xprops.onCancel = avoid("onCancel");
+
+      window.xprops.onApprove = mockAsyncProp(
+        expect("onApprove", async () => {
+          previouslyExecutedMethod = "onApprove";
+          return ZalgoPromise.all([timeout, timeout]).then(noop);
+        }),
+      );
+
+      mockFunction(
+        window.paypal,
+        "Checkout",
+        expect("Checkout", ({ original: CheckoutOriginal, args: [props] }) => {
+          mockFunction(
+            props,
+            "onApprove",
+            expect(
+              "onApprove",
+              ({ original: onApproveOriginal, args: [data, actions] }) => {
+                return onApproveOriginal({ ...data, payerID }, actions);
+              },
+            ),
+          );
+
+          const checkoutInstance = CheckoutOriginal(props);
+
+          mockFunction(
+            checkoutInstance,
+            "renderTo",
+            expect("renderTo", async ({ original: renderToOriginal, args }) => {
+              return props.createOrder().then((id) => {
+                if (id !== orderID) {
+                  throw new Error(
+                    `Expected orderID to be ${orderID}, got ${id}`,
+                  );
+                }
+                return renderToOriginal(...args);
+              });
+            }),
+          );
+
+          mockFunction(
+            checkoutInstance,
+            "close",
+            expect("close", () => {
+              if (previouslyExecutedMethod !== "onApprove") {
+                throw new Error(
+                  "Should have called onApprove and wait for all inner promises to get resolved before closing the popup",
+                );
+              }
+            }),
+          );
+
+          return checkoutInstance;
+        }),
+      );
+
+      createButtonHTML();
+
+      await mockSetupButton({
+        merchantID: ["XYZ12345"],
+        fundingEligibility: DEFAULT_FUNDING_ELIGIBILITY,
+      });
+
+      await clickButton(FUNDING.PAYPAL);
+    });
+  });
 });

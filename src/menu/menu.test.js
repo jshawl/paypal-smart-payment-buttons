@@ -59,7 +59,7 @@ describe("Menu", () => {
     button.click();
     expect(warn).toHaveBeenCalledWith(
       "menu_popup_open_error",
-      expect.anything()
+      expect.anything(),
     );
     expect(onSelect).toHaveBeenCalled();
   });
