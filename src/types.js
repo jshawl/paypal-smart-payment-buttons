@@ -37,7 +37,6 @@ export type Experiments = $Shape<{|
   useShippingChangeCallbackMutation?: boolean,
   payPalWalletVaultWithoutPurchase?: boolean,
   popupIncreaseDimensions?: boolean,
-  btSdkOrdersV2Migration?: boolean,
   disableSmartAPI?: boolean,
   deprecateVaultValidatePaymentMethod?: boolean,
   upgradeLSATWithIgnoreCache?: boolean,

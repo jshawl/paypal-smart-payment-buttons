@@ -691,11 +691,7 @@ export function getOnApproveOrder({
               supplementalData.checkoutSession &&
               supplementalData.checkoutSession.cart &&
               supplementalData.checkoutSession.cart.paymentId);
-          if (
-            experiments.btSdkOrdersV2Migration &&
-            !paymentID &&
-            !billingToken
-          ) {
+          if (!paymentID && !billingToken) {
             // The Braintree SDK prefixes the orderID with "EC-" to support
             // backwards compatibility. Before invoking onApprove, we need
             // to remove that prefix.

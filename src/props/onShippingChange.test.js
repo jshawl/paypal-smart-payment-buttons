@@ -57,9 +57,7 @@ describe("onShippingChange", () => {
         // $FlowFixMe
         {
           clientID,
-          experiments: {
-            btSdkOrdersV2Migration: true,
-          },
+          experiments: {},
           featureFlags,
           onShippingChange: merchantOnShippingChange,
           partnerAttributionID,

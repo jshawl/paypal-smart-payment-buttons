@@ -340,7 +340,7 @@ export function getOnShippingChange(
           })
           .flush();
 
-        if (experiments.btSdkOrdersV2Migration && !data.paymentID) {
+        if (!data.paymentID) {
           // The Braintree SDK prefixes the orderID with "EC-" to support
           // backwards compatibility. Before invoking onShippingChange,
           // we need to remove that prefix.
