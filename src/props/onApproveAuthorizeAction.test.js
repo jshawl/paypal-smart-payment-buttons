@@ -3,7 +3,6 @@ import { describe, test, expect, vi } from "vitest";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
 import { callGraphQL } from "../api/api";
-import { authorizeOrder } from "../api/order";
 import { HEADERS } from "../constants";
 
 import { getOnApproveOrder } from "./onApprove";
@@ -45,9 +44,7 @@ const commonOptions = {
   branded: false,
   clientAccessToken: "",
   createOrder: () => ZalgoPromise.try(() => orderID),
-  experiments: {
-    upgradeLSATWithIgnoreCache: false,
-  },
+  experiments: {},
   intent: "authorize",
   facilitatorAccessToken,
   featureFlags: { isLsatUpgradable: true },
@@ -66,15 +63,9 @@ const commonOptions = {
 };
 
 describe("getOnApproveOrder authorize action", () => {
-  test("invoke callGraphQL from onApprove authorize action if treatment is present", async () => {
-    const newOptions = {
-      ...commonOptions,
-      experiments: {
-        upgradeLSATWithIgnoreCache: true,
-      },
-    };
+  test("invoke callGraphQL from onApprove authorize action", async () => {
     // $FlowFixMe
-    const getOnApproveOrderResult = getOnApproveOrder(newOptions);
+    const getOnApproveOrderResult = getOnApproveOrder(commonOptions);
     await getOnApproveOrderResult({ buyerAccessToken }, { restart });
 
     expect(callGraphQL).toHaveBeenNthCalledWith(1, {
@@ -138,13 +129,5 @@ describe("getOnApproveOrder authorize action", () => {
         `,
       variables: { facilitatorAccessToken, buyerAccessToken, orderID },
     });
-  });
-
-  test("invoke authorizeOrder from onApprove authorize action if treatment is not present", async () => {
-    // $FlowFixMe
-    const getOnApproveOrderResult = getOnApproveOrder(commonOptions);
-    await getOnApproveOrderResult({}, { restart });
-
-    expect(authorizeOrder).toHaveBeenCalled();
   });
 });

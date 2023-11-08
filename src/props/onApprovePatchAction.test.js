@@ -35,9 +35,7 @@ const commonOptions = {
   branded: false,
   clientAccessToken: "",
   createOrder: () => ZalgoPromise.try(() => orderID),
-  experiments: {
-    upgradeLSATWithIgnoreCache: false,
-  },
+  experiments: {},
   intent: "capture",
   facilitatorAccessToken,
   featureFlags: { isLsatUpgradable: true },
@@ -56,15 +54,9 @@ const commonOptions = {
 };
 
 describe("getOnApproveOrder patch action", () => {
-  test("invoke callGraphQL from onApprove patch action if treatment is present", async () => {
-    const newOptions = {
-      ...commonOptions,
-      experiments: {
-        upgradeLSATWithIgnoreCache: true,
-      },
-    };
+  test("invoke callGraphQL from onApprove patch action", async () => {
     // $FlowFixMe
-    const getOnApproveOrderResult = getOnApproveOrder(newOptions);
+    const getOnApproveOrderResult = getOnApproveOrder(commonOptions);
     await getOnApproveOrderResult({ buyerAccessToken }, { restart });
 
     expect(callGraphQL).toHaveBeenNthCalledWith(1, {
@@ -136,28 +128,6 @@ describe("getOnApproveOrder patch action", () => {
     // check patchOrder v2 order api call
     expect(callRestAPI).toHaveBeenCalledWith({
       accessToken: "newToken",
-      method: "PATCH",
-      eventName: "v2_checkout_orders_patch",
-      url: `${ORDERS_API_URL}/${orderID}`,
-      data: {},
-      headers: {
-        [HEADERS.PARTNER_ATTRIBUTION_ID]: partnerAttributionID || "",
-        [HEADERS.PREFER]: PREFER.REPRESENTATION,
-      },
-      metricDimensions: {
-        lsatUpgrade: "with_ignore_cache_success",
-      },
-    });
-  });
-
-  test("invoke patchOrder from onApprove patch action if treatment is not present", async () => {
-    // $FlowFixMe
-    const getOnApproveOrderResult = getOnApproveOrder(commonOptions);
-    await getOnApproveOrderResult({}, { restart });
-
-    // check patchOrder v2 order api call
-    expect(callRestAPI).toHaveBeenCalledWith({
-      accessToken: facilitatorAccessToken,
       method: "PATCH",
       eventName: "v2_checkout_orders_patch",
       url: `${ORDERS_API_URL}/${orderID}`,

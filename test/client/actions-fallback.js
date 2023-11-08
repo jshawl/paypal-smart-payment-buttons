@@ -23,6 +23,7 @@ import {
   getCaptureOrderApiMock,
   getAuthorizeOrderApiMock,
   getPatchOrderApiMock,
+  MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN,
 } from "./mocks";
 
 describe("actions smart fallback cases", () => {
@@ -129,15 +130,17 @@ describe("actions smart fallback cases", () => {
     });
   });
 
-  it("should render a button, click the button, and render checkout, then pass onApprove callback to the parent with actions.order.get, fail to upgrade LSAT and fall back to smart api", async () => {
+  it("should render a button, click the button, and render checkout, then pass onApprove callback to the parent with actions.order.get, fail to create upgraded LSAT and fall back to smart api", async () => {
     return await wrapPromise(async ({ expect }) => {
       const accessToken = uniqueID();
       const orderID = generateOrderID();
       const payerID = "YYYYYYYYYY";
 
-      const upgradeLSATMock = getGraphQLApiMock({
+      const createUpgradeLSATMock = getGraphQLApiMock({
         extraHandler: ({ data }) => {
-          if (data.query.includes("mutation UpgradeFacilitatorAccessToken")) {
+          if (
+            data.query.includes("mutation CreateUpgradedLowScopeAccessToken")
+          ) {
             throw new Error(`Not today`);
           }
         },
@@ -184,7 +187,7 @@ describe("actions smart fallback cases", () => {
             );
           }
 
-          upgradeLSATMock.done();
+          createUpgradeLSATMock.done();
         }),
       );
 
@@ -345,15 +348,17 @@ describe("actions smart fallback cases", () => {
     });
   });
 
-  it("should render a button, click the button, and render checkout, then pass onApprove callback to the parent with actions.order.capture, fail to upgrade LSAT, and fall back to smart api", async () => {
+  it("should render a button, click the button, and render checkout, then pass onApprove callback to the parent with actions.order.capture, fail to create upgraded LSAT, and fall back to smart api", async () => {
     return await wrapPromise(async ({ expect }) => {
       const accessToken = uniqueID();
       const orderID = generateOrderID();
       const payerID = "YYYYYYYYYY";
 
-      const upgradeLSATMock = getGraphQLApiMock({
+      const createUpgradeLSATMock = getGraphQLApiMock({
         extraHandler: ({ data }) => {
-          if (data.query.includes("mutation UpgradeFacilitatorAccessToken")) {
+          if (
+            data.query.includes("mutation CreateUpgradedLowScopeAccessToken")
+          ) {
             throw new Error(`Not today`);
           }
         },
@@ -400,7 +405,7 @@ describe("actions smart fallback cases", () => {
             );
           }
 
-          upgradeLSATMock.done();
+          createUpgradeLSATMock.done();
         }),
       );
 
@@ -463,7 +468,7 @@ describe("actions smart fallback cases", () => {
 
       window.xprops.intent = INTENT.AUTHORIZE;
 
-      const upgradeLSATMock = getGraphQLApiMock({
+      const createUpgradeLSATMock = getGraphQLApiMock({
         extraHandler: expect("upgradeLSATGQLCall", ({ data }) => {
           if (data.query.includes("query GetCheckoutDetails")) {
             return {
@@ -490,7 +495,9 @@ describe("actions smart fallback cases", () => {
             };
           }
 
-          if (data.query.includes("mutation UpgradeFacilitatorAccessToken")) {
+          if (
+            data.query.includes("mutation CreateUpgradedLowScopeAccessToken")
+          ) {
             if (!data.variables.facilitatorAccessToken) {
               throw new Error(`We haven't received the facilitatorAccessToken`);
             }
@@ -505,7 +512,8 @@ describe("actions smart fallback cases", () => {
 
             return {
               data: {
-                upgradeLowScopeAccessToken: true,
+                createUpgradedLowScopeAccessToken:
+                  MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN,
               },
             };
           }
@@ -610,17 +618,17 @@ describe("actions smart fallback cases", () => {
 
       await clickButton(FUNDING.PAYPAL);
 
-      upgradeLSATMock.done();
+      createUpgradeLSATMock.done();
     });
   });
 
-  it("should render a button, click the button, and render checkout, then pass onApprove callback to the parent with actions.order.authorize, fail to upgrade LSAT and fall back to smart api", async () => {
+  it("should render a button, click the button, and render checkout, then pass onApprove callback to the parent with actions.order.authorize, fail to create upgraded LSAT and fall back to smart api", async () => {
     return await wrapPromise(async ({ expect }) => {
       const accessToken = uniqueID();
       const orderID = generateOrderID();
       const payerID = "YYYYYYYYYY";
 
-      const upgradeLSATMock = getGraphQLApiMock({
+      const createUpgradeLSATMock = getGraphQLApiMock({
         extraHandler: ({ data }) => {
           if (data.query.includes("query GetCheckoutDetails")) {
             return {
@@ -647,7 +655,9 @@ describe("actions smart fallback cases", () => {
             };
           }
 
-          if (data.query.includes("mutation UpgradeFacilitatorAccessToken")) {
+          if (
+            data.query.includes("mutation CreateUpgradedLowScopeAccessToken")
+          ) {
             throw new Error(`Not today`);
           }
         },
@@ -696,7 +706,7 @@ describe("actions smart fallback cases", () => {
             );
           }
 
-          upgradeLSATMock.done();
+          createUpgradeLSATMock.done();
         }),
       );
 
@@ -750,7 +760,7 @@ describe("actions smart fallback cases", () => {
 
       await clickButton(FUNDING.PAYPAL);
 
-      upgradeLSATMock.done();
+      createUpgradeLSATMock.done();
     });
   });
 
@@ -853,15 +863,17 @@ describe("actions smart fallback cases", () => {
     });
   });
 
-  it("should render a button, click the button, and render checkout, then pass onShippingChange callback to the parent with actions.order.patch, fail to upgrade LSAT, and fall back to smart api", async () => {
+  it("should render a button, click the button, and render checkout, then pass onShippingChange callback to the parent with actions.order.patch, fail to create upgraded LSAT, and fall back to smart api", async () => {
     return await wrapPromise(async ({ expect, avoid }) => {
       const orderID = generateOrderID();
       const payerID = "YYYYYYYYYY";
       const accessToken = uniqueID();
 
-      const upgradeLSATMock = getGraphQLApiMock({
+      const createUpgradeLSATMock = getGraphQLApiMock({
         extraHandler: ({ data }) => {
-          if (data.query.includes("mutation UpgradeFacilitatorAccessToken")) {
+          if (
+            data.query.includes("mutation CreateUpgradedLowScopeAccessToken")
+          ) {
             throw new Error(`Not today`);
           }
         },
@@ -896,7 +908,7 @@ describe("actions smart fallback cases", () => {
           await actions.order.patch();
           patchOrderSmartMock.done();
 
-          upgradeLSATMock.done();
+          createUpgradeLSATMock.done();
         }),
       );
 
@@ -1052,15 +1064,17 @@ describe("actions smart fallback cases", () => {
     });
   });
 
-  it("should render a button, click the button, and render checkout, then pass onApprove callback to the parent with actions.order.patch, fail to upgrade LSAT, and fall back to smart api", async () => {
+  it("should render a button, click the button, and render checkout, then pass onApprove callback to the parent with actions.order.patch, fail to create upgraded LSAT, and fall back to smart api", async () => {
     return await wrapPromise(async ({ expect }) => {
       const accessToken = uniqueID();
       const orderID = generateOrderID();
       const payerID = "YYYYYYYYYY";
 
-      const upgradeLSATMock = getGraphQLApiMock({
+      const createUpgradeLSATMock = getGraphQLApiMock({
         extraHandler: ({ data }) => {
-          if (data.query.includes("mutation UpgradeFacilitatorAccessToken")) {
+          if (
+            data.query.includes("mutation CreateUpgradedLowScopeAccessToken")
+          ) {
             throw new Error(`Not today`);
           }
         },
@@ -1095,7 +1109,7 @@ describe("actions smart fallback cases", () => {
           await actions.order.patch([]);
           patchOrderSmartMock.done();
 
-          upgradeLSATMock.done();
+          createUpgradeLSATMock.done();
         }),
       );
 

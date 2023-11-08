@@ -47,6 +47,7 @@ import { triggerKeyPress } from "./util";
 window.mockDomain = "mock://www.paypal.com";
 
 export const MOCK_BUYER_ACCESS_TOKEN = "abc123xxxyyyzzz456";
+export const MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN = "12345ABCDEF";
 
 beforeEach(() => {
   // eslint-disable-next-line unicorn/prefer-add-event-listener
@@ -1074,6 +1075,27 @@ export function getGraphQLApiMock(options: Object = {}): MockEndpoint {
         return {
           data: {
             upgradeLowScopeAccessToken: true,
+          },
+        };
+      }
+
+      if (data.query.includes("mutation CreateUpgradedLowScopeAccessToken")) {
+        if (!data.variables.facilitatorAccessToken) {
+          throw new Error(`We haven't received the facilitatorAccessToken`);
+        }
+
+        if (!data.variables.buyerAccessToken) {
+          throw new Error(`We haven't received the buyer's access token`);
+        }
+
+        if (!data.variables.orderID) {
+          throw new Error(`We haven't received the orderID`);
+        }
+
+        return {
+          data: {
+            createUpgradedLowScopeAccessToken:
+              MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN,
           },
         };
       }

@@ -20,6 +20,7 @@ import {
   getMockWindowOpen,
   MOCK_BUYER_ACCESS_TOKEN,
   DEFAULT_FUNDING_ELIGIBILITY,
+  MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN,
 } from "./mocks";
 
 describe("wallet cases", () => {
@@ -31,8 +32,6 @@ describe("wallet cases", () => {
       const userIDToken = uniqueID();
 
       window.xprops.userIDToken = userIDToken;
-
-      let isUpgradeLSATCalled = false;
 
       const gqlMock = getGraphQLApiMock({
         extraHandler: ({ headers, data }) => {
@@ -106,8 +105,9 @@ describe("wallet cases", () => {
             };
           }
 
-          if (data.query.includes("mutation UpgradeFacilitatorAccessToken")) {
-            isUpgradeLSATCalled = true;
+          if (
+            data.query.includes("mutation CreateUpgradedLowScopeAccessToken")
+          ) {
             if (!data.variables.facilitatorAccessToken) {
               throw new Error(`We haven't received the facilitatorAccessToken`);
             }
@@ -122,7 +122,8 @@ describe("wallet cases", () => {
 
             return {
               data: {
-                upgradeLowScopeAccessToken: true,
+                createUpgradedLowScopeAccessToken:
+                  MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN,
               },
             };
           }
@@ -152,10 +153,6 @@ describe("wallet cases", () => {
             throw new Error(
               `Expected payerID to be ${payerID}, got ${data.payerID}`,
             );
-          }
-
-          if (!isUpgradeLSATCalled) {
-            throw new Error(`Expected LSAT upgrade to be called`);
           }
         }),
       );
@@ -2526,14 +2523,6 @@ describe("wallet cases", () => {
               },
             };
           }
-
-          if (data.query.includes("mutation UpgradeFacilitatorAccessToken")) {
-            return {
-              data: {
-                upgradeLowScopeAccessToken: true,
-              },
-            };
-          }
         },
       }).expectCalls();
 
@@ -2568,7 +2557,7 @@ describe("wallet cases", () => {
       });
 
       await clickButton(FUNDING.PAYPAL);
-      if (getBuyerAccessToken() !== MOCK_BUYER_ACCESS_TOKEN) {
+      if (getBuyerAccessToken() !== accessToken) {
         throw new Error(`Expected buyerAccessToken to be stored`);
       }
       gqlMock.done();

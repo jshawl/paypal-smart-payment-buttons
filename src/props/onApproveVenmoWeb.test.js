@@ -45,9 +45,7 @@ const commonOptions = {
   branded: false,
   clientAccessToken: "",
   createOrder: () => ZalgoPromise.try(() => orderID),
-  experiments: {
-    upgradeLSATWithIgnoreCache: true,
-  },
+  experiments: {},
   intent: "capture",
   facilitatorAccessToken,
   featureFlags: { isLsatUpgradable: true },
@@ -66,7 +64,7 @@ const commonOptions = {
 };
 
 describe("getOnApproveOrder get action", () => {
-  test("Should create new acces token if treatment is present and payment source is venmo web", async () => {
+  test("Should create new acces token if payment source is venmo web", async () => {
     // $FlowFixMe
     const getOnApproveOrderResult = getOnApproveOrder(commonOptions);
     await getOnApproveOrderResult({ buyerAccessToken }, { restart });

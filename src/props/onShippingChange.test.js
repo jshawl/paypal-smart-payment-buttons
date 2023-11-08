@@ -4,7 +4,9 @@ import { uniqueID } from "@krakenjs/belter/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 import { describe, beforeEach, test, expect, vi } from "vitest";
 
-import { patchShipping, patchOrder } from "../api";
+import { patchShipping, patchOrder } from "../api/order";
+import { callGraphQL } from "../api/api";
+import { HEADERS } from "../constants";
 
 import {
   getOnShippingChange,
@@ -13,8 +15,19 @@ import {
   sanitizePatch,
 } from "./onShippingChange";
 
-vi.mock("../api");
+vi.mock("../api/order");
 vi.mock("./createOrder");
+vi.mock("../api/api", async () => {
+  const actual = await vi.importActual("../api/api");
+  return {
+    ...actual,
+    callGraphQL: vi.fn(() => {
+      return ZalgoPromise.resolve({
+        createUpgradedLowScopeAccessToken: "newToken",
+      });
+    }),
+  };
+});
 
 const logger = {
   error: vi.fn(() => logger),
@@ -96,6 +109,7 @@ describe("onShippingChange", () => {
         const fn = getOnShippingChange(
           // $FlowFixMe
           {
+            paymentSource: "paypal",
             onShippingChange,
             partnerAttributionID,
             featureFlags,
@@ -109,8 +123,34 @@ describe("onShippingChange", () => {
 
         if (fn) {
           await fn(data, invocationActions);
+          expect(callGraphQL)
+            .toHaveBeenNthCalledWith(1, {
+              name: "CreateUpgradedLowScopeAccessToken",
+              headers: {
+                [HEADERS.ACCESS_TOKEN]: buyerAccessToken,
+                [HEADERS.CLIENT_CONTEXT]: orderID,
+              },
+              query: `
+            mutation CreateUpgradedLowScopeAccessToken(
+                $orderID: String!
+                $buyerAccessToken: String!
+                $facilitatorAccessToken: String!
+            ) {
+                createUpgradedLowScopeAccessToken(
+                    token: $orderID
+                    buyerAccessToken: $buyerAccessToken
+                    merchantLSAT: $facilitatorAccessToken
+                )
+            }
+        `,
+              variables: { facilitatorAccessToken, buyerAccessToken, orderID },
+            })
+            .toReturn({
+              createUpgradedLowScopeAccessToken: "newToken",
+            });
+
           expect(patchOrder).toBeCalledWith(orderID, patchData, {
-            facilitatorAccessToken,
+            facilitatorAccessToken: "newToken",
             buyerAccessToken,
             partnerAttributionID,
             forceRestAPI: featureFlags.isLsatUpgradable,
@@ -118,7 +158,7 @@ describe("onShippingChange", () => {
           });
         }
 
-        expect.assertions(1);
+        expect.assertions(2);
       });
 
       test("when useShippingChangeCallbackMutation is active, but appName is not weasley", async () => {
@@ -150,8 +190,34 @@ describe("onShippingChange", () => {
 
         if (fn) {
           await fn(data, invocationActions);
+          expect(callGraphQL)
+            .toHaveBeenNthCalledWith(1, {
+              name: "CreateUpgradedLowScopeAccessToken",
+              headers: {
+                [HEADERS.ACCESS_TOKEN]: buyerAccessToken,
+                [HEADERS.CLIENT_CONTEXT]: orderID,
+              },
+              query: `
+            mutation CreateUpgradedLowScopeAccessToken(
+                $orderID: String!
+                $buyerAccessToken: String!
+                $facilitatorAccessToken: String!
+            ) {
+                createUpgradedLowScopeAccessToken(
+                    token: $orderID
+                    buyerAccessToken: $buyerAccessToken
+                    merchantLSAT: $facilitatorAccessToken
+                )
+            }
+        `,
+              variables: { facilitatorAccessToken, buyerAccessToken, orderID },
+            })
+            .toReturn({
+              createUpgradedLowScopeAccessToken: "newToken",
+            });
+
           expect(patchOrder).toBeCalledWith(orderID, patchData, {
-            facilitatorAccessToken,
+            facilitatorAccessToken: "newToken",
             buyerAccessToken,
             partnerAttributionID,
             forceRestAPI: featureFlags.isLsatUpgradable,
@@ -159,7 +225,7 @@ describe("onShippingChange", () => {
           });
         }
 
-        expect.assertions(1);
+        expect.assertions(2);
       });
 
       test("should return generic error if patchOrder fails", async () => {

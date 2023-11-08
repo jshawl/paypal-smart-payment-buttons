@@ -59,7 +59,6 @@ describe("onShippingChange", () => {
 
         const experiments = {
           useShippingChangeCallbackMutation: false,
-          upgradeLSATWithIgnoreCache: true,
         };
 
         const buyerAccessToken = uniqueID();
@@ -129,7 +128,6 @@ describe("onShippingChange", () => {
 
         const experiments = {
           useShippingChangeCallbackMutation: false,
-          upgradeLSATWithIgnoreCache: true,
         };
 
         const buyerAccessToken = undefined;

@@ -22,6 +22,7 @@ import {
   getReviseSubscriptionIdApiMock,
   getGraphQLApiMock,
   mockSetupButton,
+  MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN,
 } from "./mocks";
 
 describe("actions cases", () => {
@@ -45,7 +46,8 @@ describe("actions cases", () => {
           const getOrderMock = getRestfulGetOrderApiMock({
             handler: expect("getOrder", ({ headers }) => {
               if (
-                headers.authorization !== `Bearer ${facilitatorAccessToken}`
+                headers.authorization !==
+                `Bearer ${MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN}`
               ) {
                 throw new Error(
                   `Expected call to come with correct facilitator access token`,
@@ -146,7 +148,8 @@ describe("actions cases", () => {
           const captureOrderMock = getRestfulCaptureOrderApiMock({
             handler: expect("captureOrder", ({ headers }) => {
               if (
-                headers.authorization !== `Bearer ${facilitatorAccessToken}`
+                headers.authorization !==
+                `Bearer ${MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN}`
               ) {
                 throw new Error(
                   `Expected call to come with correct facilitator access token`,
@@ -298,7 +301,8 @@ describe("actions cases", () => {
           const authorizeOrderMock = getRestfulAuthorizeOrderApiMock({
             handler: expect("authorizeOrder", ({ headers }) => {
               if (
-                headers.authorization !== `Bearer ${facilitatorAccessToken}`
+                headers.authorization !==
+                `Bearer ${MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN}`
               ) {
                 throw new Error(
                   `Expected call to come with correct facilitator access token`,
@@ -402,7 +406,8 @@ describe("actions cases", () => {
           const patchOrderMock = getRestfulPatchOrderApiMock({
             handler: expect("patchOrder", ({ headers }) => {
               if (
-                headers.authorization !== `Bearer ${facilitatorAccessToken}`
+                headers.authorization !==
+                `Bearer ${MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN}`
               ) {
                 throw new Error(
                   `Expected call to come with correct facilitator access token`,
@@ -495,7 +500,8 @@ describe("actions cases", () => {
           const patchOrderMock = getRestfulPatchOrderApiMock({
             handler: expect("patchOrder", ({ headers }) => {
               if (
-                headers.authorization !== `Bearer ${facilitatorAccessToken}`
+                headers.authorization !==
+                `Bearer ${MOCK_CREATE_UPGRADED_LOW_SCOPE_ACCESS_TOKEN}`
               ) {
                 throw new Error(
                   `Expected call to come with correct facilitator access token`,

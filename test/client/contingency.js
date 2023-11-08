@@ -96,7 +96,9 @@ describe("contingency cases", () => {
         window.paypal,
         "Checkout",
         expect("Checkout", ({ original: CheckoutOriginal, args: [props] }) => {
-          props.onAuth({ accessToken });
+          if (checkoutRestarted) {
+            props.onAuth({ accessToken });
+          }
           mockFunction(
             props,
             "onApprove",

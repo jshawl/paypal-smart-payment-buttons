@@ -246,7 +246,7 @@ export function buildXShippingChangeActions({
       paymentSource,
       buyerAccessToken,
     );
-    if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired) {
+    if (!isUlsatNotRequired) {
       return upgradeFacilitatorAccessTokenWithIgnoreCache(
         facilitatorAccessToken,
         // $FlowFixMe

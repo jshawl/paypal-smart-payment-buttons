@@ -39,7 +39,6 @@ export type Experiments = $Shape<{|
   popupIncreaseDimensions?: boolean,
   disableSmartAPI?: boolean,
   deprecateVaultValidatePaymentMethod?: boolean,
-  upgradeLSATWithIgnoreCache?: boolean,
 |}>;
 
 export type ProxyWindow = _ProxyWindow;

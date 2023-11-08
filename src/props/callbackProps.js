@@ -204,13 +204,7 @@ export function getCallbackProps({
     { onShippingOptionsChange: inputOnShippingOptionsChange },
     { createOrder },
   );
-  const onAuth = getOnAuth({
-    facilitatorAccessToken,
-    createOrder,
-    createSubscription,
-    featureFlags,
-    experiments,
-  });
+  const onAuth = getOnAuth();
 
   return {
     createBillingAgreement,

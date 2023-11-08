@@ -191,7 +191,7 @@ function buildOrderActions({
       paymentSource,
       buyerAccessToken,
     );
-    if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired) {
+    if (!isUlsatNotRequired) {
       return upgradeFacilitatorAccessTokenWithIgnoreCache(
         facilitatorAccessToken,
         // $FlowFixMe
@@ -229,7 +229,7 @@ function buildOrderActions({
       paymentSource,
       buyerAccessToken,
     );
-    if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired) {
+    if (!isUlsatNotRequired) {
       return upgradeFacilitatorAccessTokenWithIgnoreCache(
         facilitatorAccessToken,
         // $FlowFixMe
@@ -278,7 +278,7 @@ function buildOrderActions({
       paymentSource,
       buyerAccessToken,
     );
-    if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired) {
+    if (!isUlsatNotRequired) {
       return upgradeFacilitatorAccessTokenWithIgnoreCache(
         facilitatorAccessToken,
         // $FlowFixMe
@@ -322,7 +322,7 @@ function buildOrderActions({
       paymentSource,
       buyerAccessToken,
     );
-    if (experiments?.upgradeLSATWithIgnoreCache && !isUlsatNotRequired) {
+    if (!isUlsatNotRequired) {
       return upgradeFacilitatorAccessTokenWithIgnoreCache(
         facilitatorAccessToken,
         // $FlowFixMe
