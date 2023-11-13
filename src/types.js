@@ -128,6 +128,7 @@ export type CheckoutProps = {|
     width: number,
     height: number,
   |},
+  sign_out_user?: boolean,
   smokeHash: string,
 |};
 

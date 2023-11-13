@@ -56,6 +56,9 @@ describe("happy cases", () => {
         window.paypal,
         "Checkout",
         expect("Checkout", ({ original: CheckoutOriginal, args: [props] }) => {
+          if (props.sign_out_user) {
+            throw new Error(`Did not expect sign_out_user`);
+          }
           mockFunction(
             props,
             "onApprove",

@@ -322,6 +322,7 @@ function initCheckout({
       clientAccessToken,
       venmoPayloadID,
       smokeHash,
+      sign_out_user: buyerIntent === BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT,
 
       createAuthCode: () => {
         return ZalgoPromise.try(() => {

@@ -1452,6 +1452,10 @@ describe("wallet cases", () => {
           throw new Error(`Expected correct window to be passed`);
         }
 
+        if (!props.sign_out_user) {
+          throw new Error(`Expected sign_out_user to be passed`);
+        }
+
         if (props.createAuthCode) {
           props.createAuthCode().then(
             expect("createAuthCodeThen", (authCode) => {
@@ -1592,6 +1596,10 @@ describe("wallet cases", () => {
           throw new Error(
             `Expected fundingSource to be ${FUNDING.CREDIT}, got ${props.fundingSource}`,
           );
+        }
+
+        if (!props.sign_out_user) {
+          throw new Error(`Expected sign_out_user to be passed`);
         }
 
         if (props.createAuthCode) {

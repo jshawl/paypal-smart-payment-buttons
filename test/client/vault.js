@@ -1168,6 +1168,10 @@ describe("vault cases", () => {
           throw new Error(`Expected correct window to be passed`);
         }
 
+        if (!props.sign_out_user) {
+          throw new Error(`Expected sign_out_user to be passed`);
+        }
+
         return Checkout(props);
       });
 
