@@ -10221,7 +10221,7 @@ window.spb = function(modules) {
             Object(lib.getLogger)().info("rest_api_create_order_token");
             var headers = ((_headers15 = {})[constants.HEADERS.AUTHORIZATION] = "Bearer " + accessToken, 
             _headers15[constants.HEADERS.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, _headers15[constants.HEADERS.CLIENT_METADATA_ID] = clientMetadataID, 
-            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.162", 
+            _headers15[constants.HEADERS.APP_NAME] = constants.SMART_PAYMENT_BUTTONS, _headers15[constants.HEADERS.APP_VERSION] = "5.0.163", 
             _headers15);
             var paymentSource = {
                 token: {
@@ -11349,13 +11349,7 @@ window.spb = function(modules) {
                     }, {
                         createOrder: createOrder
                     }),
-                    onAuth: Object(props_onAuth.getOnAuth)({
-                        facilitatorAccessToken: facilitatorAccessToken,
-                        createOrder: createOrder,
-                        createSubscription: createSubscription,
-                        featureFlags: featureFlags,
-                        experiments: experiments
-                    })
+                    onAuth: Object(props_onAuth.getOnAuth)()
                 };
             }({
                 paymentSource: paymentSource,
@@ -12305,6 +12299,7 @@ window.spb = function(modules) {
                         clientAccessToken: clientAccessToken,
                         venmoPayloadID: venmoPayloadID,
                         smokeHash: smokeHash,
+                        sign_out_user: buyerIntent === constants.BUYER_INTENT.PAY_WITH_DIFFERENT_ACCOUNT,
                         createAuthCode: function() {
                             return zalgo_promise_src.ZalgoPromise.try((function() {
                                 var fundingSkipLogin = src_config.FUNDING_SKIP_LOGIN[fundingSource];
@@ -14297,7 +14292,7 @@ window.spb = function(modules) {
         var VENMO_WEB_URL = ((_VENMO_WEB_URL = {})[sdk_constants_src.ENV.TEST] = "https://account.dev.venmo.com/go/web/paypal", 
         _VENMO_WEB_URL[sdk_constants_src.ENV.LOCAL] = "https://account.dev.venmo.com/go/web/paypal", 
         _VENMO_WEB_URL[sdk_constants_src.ENV.STAGE] = Object(cross_domain_utils_src.getDomain)().includes("cibns") ? "https://account.qa.venmo.com/go/web/paypal" : "https://account.dev.venmo.com/go/web/paypal", 
-        _VENMO_WEB_URL[sdk_constants_src.ENV.SANDBOX] = "https://account.qa.venmo.com/go/web/paypal", 
+        _VENMO_WEB_URL[sdk_constants_src.ENV.SANDBOX] = "https://account.venmo.com/go/web/paypal", 
         _VENMO_WEB_URL[sdk_constants_src.ENV.PRODUCTION] = "https://account.venmo.com/go/web/paypal", 
         _VENMO_WEB_URL);
         function isNativeOptedIn(_ref) {
@@ -16759,7 +16754,7 @@ window.spb = function(modules) {
                     var _ref2;
                     return (_ref2 = {})[sdk_constants_src.FPTI_KEY.CONTEXT_TYPE] = constants.FPTI_CONTEXT_TYPE.BUTTON_SESSION_ID, 
                     _ref2[sdk_constants_src.FPTI_KEY.CONTEXT_ID] = buttonSessionID, _ref2[sdk_constants_src.FPTI_KEY.BUTTON_SESSION_UID] = buttonSessionID, 
-                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.162", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
+                    _ref2[sdk_constants_src.FPTI_KEY.BUTTON_VERSION] = "5.0.163", _ref2[constants.FPTI_BUTTON_KEY.BUTTON_CORRELATION_ID] = buttonCorrelationID, 
                     _ref2[sdk_constants_src.FPTI_KEY.STICKINESS_ID] = Object(lib.isAndroidChrome)() ? stickinessID : null, 
                     _ref2[sdk_constants_src.FPTI_KEY.PARTNER_ATTRIBUTION_ID] = partnerAttributionID, 
                     _ref2[sdk_constants_src.FPTI_KEY.USER_ACTION] = commit ? sdk_constants_src.FPTI_USER_ACTION.COMMIT : sdk_constants_src.FPTI_USER_ACTION.CONTINUE, 
@@ -18897,8 +18892,7 @@ window.spb = function(modules) {
                     }).flush();
                     return Object(_api__WEBPACK_IMPORTED_MODULE_4__.getSupplementalOrderInfo)(orderID).then((function(supplementalData) {
                         billingToken = billingToken || supplementalData && supplementalData.checkoutSession && supplementalData.checkoutSession.cart && supplementalData.checkoutSession.cart.billingToken;
-                        paymentID = paymentID || supplementalData && supplementalData.checkoutSession && supplementalData.checkoutSession.cart && supplementalData.checkoutSession.cart.paymentId;
-                        !experiments.btSdkOrdersV2Migration || paymentID || billingToken || (paymentID = orderID.replace(/EC-/, ""));
+                        (paymentID = paymentID || supplementalData && supplementalData.checkoutSession && supplementalData.checkoutSession.cart && supplementalData.checkoutSession.cart.paymentId) || billingToken || (paymentID = orderID.replace(/EC-/, ""));
                         var data = {
                             orderID: orderID,
                             payerID: payerID,
@@ -18913,8 +18907,13 @@ window.spb = function(modules) {
                             var order = function(_ref) {
                                 var intent = _ref.intent, orderID = _ref.orderID, restart = _ref.restart, facilitatorAccessToken = _ref.facilitatorAccessToken, buyerAccessToken = _ref.buyerAccessToken, partnerAttributionID = _ref.partnerAttributionID, forceRestAPI = _ref.forceRestAPI, onError = _ref.onError, experiments = _ref.experiments, paymentSource = _ref.paymentSource;
                                 var get = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
-                                    var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
-                                    return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                                    return Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken) ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.getOrder)(orderID, {
+                                        facilitatorAccessToken: facilitatorAccessToken,
+                                        buyerAccessToken: buyerAccessToken,
+                                        partnerAttributionID: partnerAttributionID,
+                                        forceRestAPI: forceRestAPI,
+                                        experiments: experiments
+                                    }) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
                                         return Object(_api__WEBPACK_IMPORTED_MODULE_4__.getOrder)(orderID, {
                                             facilitatorAccessToken: upgradedFacilitatorAccessToken,
                                             buyerAccessToken: buyerAccessToken,
@@ -18922,18 +18921,19 @@ window.spb = function(modules) {
                                             forceRestAPI: forceRestAPI,
                                             experiments: experiments
                                         });
-                                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.getOrder)(orderID, {
+                                    }));
+                                }));
+                                var capture = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
+                                    if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE + " to use client-side capture");
+                                    return Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken) ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.captureOrder)(orderID, {
                                         facilitatorAccessToken: facilitatorAccessToken,
                                         buyerAccessToken: buyerAccessToken,
                                         partnerAttributionID: partnerAttributionID,
                                         forceRestAPI: forceRestAPI,
                                         experiments: experiments
-                                    });
-                                }));
-                                var capture = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
-                                    if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.CAPTURE + " to use client-side capture");
-                                    var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
-                                    return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                                    }).finally(get.reset).finally(capture.reset).catch((function(err) {
+                                        return handleProcessorError(err, restart, onError);
+                                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
                                         return Object(_api__WEBPACK_IMPORTED_MODULE_4__.captureOrder)(orderID, {
                                             facilitatorAccessToken: upgradedFacilitatorAccessToken,
                                             buyerAccessToken: buyerAccessToken,
@@ -18943,20 +18943,19 @@ window.spb = function(modules) {
                                         }).finally(get.reset).finally(capture.reset).catch((function(err) {
                                             return handleProcessorError(err, restart, onError);
                                         }));
-                                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.captureOrder)(orderID, {
+                                    }));
+                                }));
+                                var authorize = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
+                                    if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.AUTHORIZE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.AUTHORIZE + " to use client-side authorize");
+                                    return Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken) ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.authorizeOrder)(orderID, {
                                         facilitatorAccessToken: facilitatorAccessToken,
                                         buyerAccessToken: buyerAccessToken,
                                         partnerAttributionID: partnerAttributionID,
                                         forceRestAPI: forceRestAPI,
                                         experiments: experiments
-                                    }).finally(get.reset).finally(capture.reset).catch((function(err) {
+                                    }).finally(get.reset).finally(authorize.reset).catch((function(err) {
                                         return handleProcessorError(err, restart, onError);
-                                    }));
-                                }));
-                                var authorize = Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_2__.memoize)((function() {
-                                    if (intent !== _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.AUTHORIZE) throw new Error("Use " + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.SDK_QUERY_KEYS.INTENT + "=" + _paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.INTENT.AUTHORIZE + " to use client-side authorize");
-                                    var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
-                                    return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
                                         return Object(_api__WEBPACK_IMPORTED_MODULE_4__.authorizeOrder)(orderID, {
                                             facilitatorAccessToken: upgradedFacilitatorAccessToken,
                                             buyerAccessToken: buyerAccessToken,
@@ -18966,14 +18965,6 @@ window.spb = function(modules) {
                                         }).finally(get.reset).finally(authorize.reset).catch((function(err) {
                                             return handleProcessorError(err, restart, onError);
                                         }));
-                                    })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.authorizeOrder)(orderID, {
-                                        facilitatorAccessToken: facilitatorAccessToken,
-                                        buyerAccessToken: buyerAccessToken,
-                                        partnerAttributionID: partnerAttributionID,
-                                        forceRestAPI: forceRestAPI,
-                                        experiments: experiments
-                                    }).finally(get.reset).finally(authorize.reset).catch((function(err) {
-                                        return handleProcessorError(err, restart, onError);
                                     }));
                                 }));
                                 return {
@@ -18981,8 +18972,15 @@ window.spb = function(modules) {
                                     authorize: authorize,
                                     patch: function(data) {
                                         void 0 === data && (data = {});
-                                        var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
-                                        return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                                        return Object(_utils__WEBPACK_IMPORTED_MODULE_8__.checkUlsatNotRequired)(paymentSource, buyerAccessToken) ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
+                                            facilitatorAccessToken: facilitatorAccessToken,
+                                            buyerAccessToken: buyerAccessToken,
+                                            partnerAttributionID: partnerAttributionID,
+                                            forceRestAPI: forceRestAPI,
+                                            experiments: experiments
+                                        }).catch((function() {
+                                            throw new Error("Order could not be patched");
+                                        })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
                                             return Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
                                                 facilitatorAccessToken: upgradedFacilitatorAccessToken,
                                                 buyerAccessToken: buyerAccessToken,
@@ -18992,14 +18990,6 @@ window.spb = function(modules) {
                                             }).catch((function() {
                                                 throw new Error("Order could not be patched");
                                             }));
-                                        })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
-                                            facilitatorAccessToken: facilitatorAccessToken,
-                                            buyerAccessToken: buyerAccessToken,
-                                            partnerAttributionID: partnerAttributionID,
-                                            forceRestAPI: forceRestAPI,
-                                            experiments: experiments
-                                        }).catch((function() {
-                                            throw new Error("Order could not be patched");
                                         }));
                                     },
                                     get: get
@@ -19342,41 +19332,15 @@ window.spb = function(modules) {
             return getOnAuth;
         }));
         var _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./node_modules/@krakenjs/zalgo-promise/src/index.js");
-        var _krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./node_modules/@krakenjs/belter/src/index.js");
-        var _api__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./src/api/index.js");
-        var _lib__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("./src/lib/index.js");
-        function getOnAuth(_ref) {
-            var facilitatorAccessToken = _ref.facilitatorAccessToken, createOrder = _ref.createOrder, createSubscription = _ref.createSubscription, featureFlags = _ref.featureFlags, experiments = _ref.experiments;
-            return function(_ref2) {
-                var accessToken = _ref2.accessToken;
-                Object(_lib__WEBPACK_IMPORTED_MODULE_3__.getLogger)().info("spb_onauth_access_token_" + (accessToken ? "present" : "not_present"));
-                var isInIgnoreCacheExperiment = null == experiments ? void 0 : experiments.upgradeLSATWithIgnoreCache;
+        var _lib__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/lib/index.js");
+        function getOnAuth() {
+            return function(_ref) {
+                var accessToken = _ref.accessToken;
+                Object(_lib__WEBPACK_IMPORTED_MODULE_1__.getLogger)().info("spb_onauth_access_token_" + (accessToken ? "present" : "not_present"));
                 return _krakenjs_zalgo_promise_src__WEBPACK_IMPORTED_MODULE_0__.ZalgoPromise.try((function() {
                     if (accessToken) {
-                        if (createSubscription || isInIgnoreCacheExperiment) {
-                            Object(_lib__WEBPACK_IMPORTED_MODULE_3__.setBuyerAccessToken)(accessToken);
-                            Object(_lib__WEBPACK_IMPORTED_MODULE_3__.getLogger)().info("ignore_lsat_upgrade", {
-                                createSubscription: Boolean(createSubscription),
-                                upgradeLSATWithIgnoreCache: isInIgnoreCacheExperiment,
-                                isLsatUpgradable: featureFlags.isLsatUpgradable,
-                                accessToken: Boolean(accessToken)
-                            });
-                            return accessToken;
-                        }
-                        return featureFlags.isLsatUpgradable ? createOrder().then((function(orderID) {
-                            return Object(_api__WEBPACK_IMPORTED_MODULE_2__.upgradeFacilitatorAccessToken)(facilitatorAccessToken, {
-                                buyerAccessToken: accessToken,
-                                orderID: orderID
-                            });
-                        })).then((function() {
-                            Object(_lib__WEBPACK_IMPORTED_MODULE_3__.getLogger)().info("upgrade_lsat_success");
-                            return accessToken;
-                        })).catch((function(err) {
-                            Object(_lib__WEBPACK_IMPORTED_MODULE_3__.getLogger)().warn("upgrade_lsat_failure", {
-                                error: Object(_krakenjs_belter_src__WEBPACK_IMPORTED_MODULE_1__.stringifyError)(err)
-                            });
-                            return accessToken;
-                        })) : accessToken;
+                        Object(_lib__WEBPACK_IMPORTED_MODULE_1__.setBuyerAccessToken)(accessToken);
+                        return accessToken;
                     }
                 }));
             };
@@ -19864,15 +19828,21 @@ window.spb = function(modules) {
                             data: data,
                             shouldUsePatchShipping: shouldUsePatchShipping
                         });
-                        if (shouldUsePatchShipping) return Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchShipping)({
+                        return shouldUsePatchShipping ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchShipping)({
                             clientID: clientID,
                             data: data,
                             orderID: orderID
                         }).catch((function() {
                             throw new Error("Order could not be patched");
-                        }));
-                        var isUlsatNotRequired = Object(_utils__WEBPACK_IMPORTED_MODULE_7__.checkUlsatNotRequired)(paymentSource, buyerAccessToken);
-                        return null != experiments && experiments.upgradeLSATWithIgnoreCache && !isUlsatNotRequired ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
+                        })) : Object(_utils__WEBPACK_IMPORTED_MODULE_7__.checkUlsatNotRequired)(paymentSource, buyerAccessToken) ? Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
+                            facilitatorAccessToken: facilitatorAccessToken,
+                            buyerAccessToken: buyerAccessToken,
+                            partnerAttributionID: partnerAttributionID,
+                            forceRestAPI: forceRestAPI,
+                            experiments: experiments
+                        }).catch((function() {
+                            throw new Error("Order could not be patched");
+                        })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.upgradeFacilitatorAccessTokenWithIgnoreCache)(facilitatorAccessToken, buyerAccessToken, orderID).then((function(upgradedFacilitatorAccessToken) {
                             return Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
                                 facilitatorAccessToken: upgradedFacilitatorAccessToken,
                                 buyerAccessToken: buyerAccessToken,
@@ -19882,14 +19852,6 @@ window.spb = function(modules) {
                             }).catch((function() {
                                 throw new Error("Order could not be patched");
                             }));
-                        })) : Object(_api__WEBPACK_IMPORTED_MODULE_4__.patchOrder)(orderID, data, {
-                            facilitatorAccessToken: facilitatorAccessToken,
-                            buyerAccessToken: buyerAccessToken,
-                            partnerAttributionID: partnerAttributionID,
-                            forceRestAPI: forceRestAPI,
-                            experiments: experiments
-                        }).catch((function() {
-                            throw new Error("Order could not be patched");
                         }));
                     }
                 }
@@ -19910,7 +19872,7 @@ window.spb = function(modules) {
                     _getLogger$info$track[_paypal_sdk_constants_src__WEBPACK_IMPORTED_MODULE_3__.FPTI_KEY.CONTEXT_ID] = orderID, 
                     _getLogger$info$track[_constants__WEBPACK_IMPORTED_MODULE_5__.FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_INVOKED] = "1", 
                     _getLogger$info$track)).flush();
-                    if (experiments.btSdkOrdersV2Migration && !data.paymentID) {
+                    if (!data.paymentID) {
                         var _data$orderID;
                         data.paymentID = null == (_data$orderID = data.orderID) ? void 0 : _data$orderID.replace("EC-", "");
                         data.paymentId = data.paymentID;
