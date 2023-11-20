@@ -173,6 +173,7 @@ export function setupButton({
     createBillingAgreement,
     createSubscription,
     stickinessID,
+    getPageUrl,
   } = props;
 
   const config = getConfig({ serverCSPNonce, firebaseConfig });
@@ -471,6 +472,7 @@ export function setupButton({
     buyerCountry,
     onShippingChange,
     product,
+    getPageUrl,
   });
   const setupPaymentFlowsTask = setupPaymentFlows({
     props,

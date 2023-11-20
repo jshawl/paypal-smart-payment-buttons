@@ -458,6 +458,8 @@ function initCheckout({
         billingToken,
         subscriptionID,
         authCode,
+        // $FlowIssue
+        orderID,
       } = {}) => {
         if (approveOnClose) {
           doApproveOnClose = true;
@@ -474,23 +476,28 @@ function initCheckout({
 
         setBuyerAccessToken(buyerAccessToken);
 
-        return (
-          onApprove(
-            {
-              payerID,
-              paymentID,
-              billingToken,
-              subscriptionID,
-              buyerAccessToken,
-              authCode,
-            },
-            // eslint-disable-next-line no-use-before-define
-            { restart },
-          )
-            // eslint-disable-next-line no-use-before-define
-            .finally(() => close().then(noop))
-            .catch(noop)
-        );
+        return onApprove(
+          {
+            payerID,
+            paymentID,
+            billingToken,
+            subscriptionID,
+            buyerAccessToken,
+            authCode,
+          },
+          // eslint-disable-next-line no-use-before-define
+          { restart },
+        )
+          .finally(() => {
+            if (window.xprops.hostedButtonId) {
+              // $FlowIssue
+              win.location = `/ncp/payment/${window.xprops.hostedButtonId}/${orderID}`;
+            } else {
+              // eslint-disable-next-line no-use-before-define
+              return close().then(noop);
+            }
+          })
+          .catch(noop);
       },
 
       onComplete: () => {

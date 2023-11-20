@@ -35,6 +35,7 @@ import {
   FPTI_CUSTOM_KEY,
 } from "../constants";
 import type { GetQueriedEligibleFunding, OnShippingChange } from "../props";
+import { getButtonType } from "../props/utils";
 
 import type { ButtonStyle } from "./props";
 
@@ -79,6 +80,7 @@ type ButtonLoggerOptions = {|
   buyerCountry: $Values<typeof COUNTRY>,
   onShippingChange: ?OnShippingChange,
   product?: string,
+  getPageUrl: () => ZalgoPromise<string>,
 |};
 
 export function setupButtonLogger({
@@ -269,13 +271,17 @@ export function setupButtonLogger({
       [FPTI_BUTTON_KEY.BUTTON_SHAPE]: shape,
       [FPTI_BUTTON_KEY.BUTTON_LABEL]: label,
       [FPTI_BUTTON_KEY.BUTTON_WIDTH]: window.innerWidth,
-      [FPTI_BUTTON_KEY.BUTTON_TYPE]: FPTI_BUTTON_TYPE.IFRAME,
       [FPTI_BUTTON_KEY.BUTTON_TAGLINE_ENABLED]: tagline ? "1" : "0",
       [FPTI_CUSTOM_KEY.SHIPPING_CALLBACK_PASSED]: onShippingChange ? "1" : "0",
     };
 
-    logger.track(tracking);
+    getButtonType(getPageUrl).then((buttonType) => {
+      logger.track({
+        ...tracking,
+        [FPTI_BUTTON_KEY.BUTTON_TYPE]: buttonType,
+      });
 
-    logger.flush();
+      logger.flush();
+    });
   });
 }

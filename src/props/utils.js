@@ -4,6 +4,9 @@ import { redirect as redir } from "@krakenjs/belter/src";
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
 
 import { getLogger } from "../lib";
+import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
+import { getPayPalDomainRegex } from "@paypal/sdk-client/src";
+import { getDomainFromUrl } from "@krakenjs/cross-domain-utils/src";
 
 export const checkUlsatNotRequired = (
   paymentSource: $Values<typeof FUNDING> | null,
@@ -37,4 +40,24 @@ export const redirect = (url: string): ZalgoPromise<void> => {
   }
 
   return redir(url, window.top);
+}
+
+export const getButtonType = (
+  getPageUrl: () => ZalgoPromise<string>,
+): ZalgoPromise<string> => {
+  return getPageUrl().then((pageUrl) => {
+    const domain = getDomainFromUrl(pageUrl);
+    if (window.xprops.hostedButtonId) {
+      if (domain.match(getPayPalDomainRegex())) {
+        if (pageUrl.match(/qrcode/)) {
+          return "ncp_qr_code";
+        } else {
+          return "ncp_payment_link";
+        }
+      } else {
+        return "ncp_button_code";
+      }
+    }
+    return "iframe";
+  });
 };
