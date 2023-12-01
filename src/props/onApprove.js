@@ -2,7 +2,7 @@
 /* eslint max-nested-callbacks: off */
 
 import { ZalgoPromise } from "@krakenjs/zalgo-promise/src";
-import { memoize, redirect as redir, noop } from "@krakenjs/belter/src";
+import { memoize, noop } from "@krakenjs/belter/src";
 import {
   INTENT,
   SDK_QUERY_KEYS,
@@ -33,7 +33,7 @@ import { unresolvedPromise, getLogger, sendCountMetric } from "../lib";
 import { ENABLE_PAYMENT_API } from "../config";
 import type { FeatureFlags, Experiments } from "../types";
 
-import { checkUlsatNotRequired } from "./utils";
+import { checkUlsatNotRequired, redirect } from "./utils";
 import type { CreateOrder } from "./createOrder";
 import type { CreateVaultSetupToken } from "./createVaultSetupToken";
 import type { CreateBillingAgreement } from "./createBillingAgreement";
@@ -118,23 +118,6 @@ export type XOnApproveSubscriptionActionsType = {|
   restart: () => ZalgoPromise<void>,
   redirect: (string) => ZalgoPromise<void>,
 |};
-
-const redirect = (url) => {
-  if (!url) {
-    throw new Error(`Expected redirect url`);
-  }
-
-  if (url.indexOf("://") === -1) {
-    getLogger().warn("redir_url_non_scheme", { url }).flush();
-    throw new Error(
-      `Invalid redirect url: ${url} - must be fully qualified url`,
-    );
-  } else if (!url.match(/^https?:\/\//)) {
-    getLogger().warn("redir_url_non_http", { url }).flush();
-  }
-
-  return redir(url, window.top);
-};
 
 const handleProcessorError = <T>(
   err: mixed,

@@ -12,8 +12,7 @@ for (const [module, alias] of Object.entries(aliases)) {
   if (!alias) {
     continue;
   }
-
-  // $FlowFixMe
-  console.info(`Alias: ${module} -> ${alias}`); // eslint-disable-line no-console
-  moduleAlias.addAlias(module, alias);
+  // Alias is interpreted as mixed/any although it is always a string. This comes from Object.entries() not knowing the type the object's value.
+  console.info(`Alias: ${module} -> ${String(alias)}`); // eslint-disable-line no-console
+  moduleAlias.addAlias(module, String(alias));
 }
