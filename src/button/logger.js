@@ -195,7 +195,7 @@ export function setupButtonLogger({
     const dotSeparatedRenderVersion = serverRenderVersion.split("_").join(".");
 
     if (dotSeparatedRenderVersion !== sdkVersion) {
-      logger.warn("server_render_version_mismatch", {
+      logger.info("server_render_version_mismatch", {
         sdkVersion,
         serverRenderVersion,
       });
